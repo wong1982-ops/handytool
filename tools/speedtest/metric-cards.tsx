@@ -21,7 +21,7 @@ export function MetricCards({ download, upload, latency }: MetricCardsProps) {
           <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Download</h3>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-5xl font-bold tabular-nums text-slate-900 dark:text-white">{download.speed}</span>
+          <span className="text-5xl font-bold tabular-nums text-slate-900 dark:text-white">{download.speed.toFixed(1)}</span>
           <span className="text-lg text-slate-400">Mbps</span>
         </div>
         <div className="mt-4 h-1 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
@@ -49,7 +49,7 @@ export function MetricCards({ download, upload, latency }: MetricCardsProps) {
           <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Upload</h3>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-5xl font-bold tabular-nums text-slate-900 dark:text-white">{upload.speed}</span>
+          <span className="text-5xl font-bold tabular-nums text-slate-900 dark:text-white">{upload.speed.toFixed(1)}</span>
           <span className="text-lg text-slate-400">Mbps</span>
         </div>
         <div className="mt-4 h-1 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
@@ -83,12 +83,14 @@ export function MetricCards({ download, upload, latency }: MetricCardsProps) {
             <p className="text-lg font-bold text-amber-400">{latency.jitter} ms</p>
           </div>
         </div>
-        {/* Jitter dots indicator */}
         <div className="mt-4 flex gap-1 h-1 items-center">
-          <div className="h-full bg-amber-400 w-2 rounded-full opacity-30" />
-          <div className="h-full bg-amber-400 w-2 rounded-full opacity-50" />
-          <div className="h-full bg-amber-400 w-2 rounded-full" />
-          <div className="h-full bg-slate-200 dark:bg-white/10 w-2 rounded-full" />
+          {[0.3, 0.5, 1, 0].map((opacity, i) => (
+            <div
+              key={i}
+              className={`h-full w-2 rounded-full ${opacity > 0 ? 'bg-amber-400' : 'bg-slate-200 dark:bg-white/10'}`}
+              style={opacity > 0 ? { opacity } : undefined}
+            />
+          ))}
         </div>
       </div>
     </div>

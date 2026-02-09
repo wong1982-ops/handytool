@@ -1,15 +1,12 @@
 interface ServerInfoBarProps {
-  serverLocation: string
-  serverProvider: string
   ispName: string
   ispIp: string
-  onChangeServer?: () => void
 }
 
-export function ServerInfoBar({ serverLocation, serverProvider, ispName, ispIp, onChangeServer }: ServerInfoBarProps) {
+export function ServerInfoBar({ ispName, ispIp }: ServerInfoBarProps) {
   return (
     <div className="w-full flex flex-col md:flex-row gap-4">
-      {/* Current Server */}
+      {/* Test Server */}
       <div className="flex flex-1 items-center gap-4 bg-white dark:bg-[#16222a] p-4 rounded-xl shadow-sm border border-slate-200 dark:border-white/5">
         <div className="bg-[var(--ht-color-secondary-500)]/10 p-3 rounded-lg shrink-0">
           <svg className="w-6 h-6 text-[var(--ht-color-secondary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -17,17 +14,11 @@ export function ServerInfoBar({ serverLocation, serverProvider, ispName, ispIp, 
           </svg>
         </div>
         <div className="min-w-0">
-          <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">Current Server</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">Test Server</p>
           <p className="text-lg font-bold text-slate-900 dark:text-white truncate">
-            {serverLocation} — <span className="text-[var(--ht-color-secondary-500)]">{serverProvider}</span>
+            HandyTool Server
           </p>
         </div>
-        <button
-          onClick={onChangeServer}
-          className="ml-auto text-[var(--ht-color-secondary-500)] text-sm font-bold hover:underline cursor-pointer shrink-0"
-        >
-          Change
-        </button>
       </div>
 
       {/* ISP */}
@@ -40,7 +31,7 @@ export function ServerInfoBar({ serverLocation, serverProvider, ispName, ispIp, 
         <div className="min-w-0">
           <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">Internet Service Provider</p>
           <p className="text-lg font-bold text-slate-900 dark:text-white truncate">
-            {ispName} <span className="text-slate-400 font-medium text-sm ml-2">{ispIp}</span>
+            {ispName} {ispIp && <span className="text-slate-400 font-medium text-sm ml-2">{ispIp}</span>}
           </p>
         </div>
       </div>

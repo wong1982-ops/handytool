@@ -73,7 +73,13 @@ export function SpeedGauge({ speed, maxSpeed, unit = 'Mbps', status, isRunning, 
           {/* GO Button */}
           <button
             onClick={onStart}
-            className="group relative mt-4 flex size-24 lg:size-32 items-center justify-center rounded-full bg-[var(--ht-color-secondary-500)] text-[#0b0e14] shadow-[0_0_30px_rgba(37,209,244,0.5)] transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+            className="group relative mt-4 flex size-24 lg:size-32 items-center justify-center rounded-full bg-[var(--ht-color-secondary-500)] text-[#0b0e14] transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+            style={{
+              boxShadow: isRunning
+                ? '0 0 20px rgba(37,209,244,0.5), 0 0 60px rgba(37,209,244,0.25), inset 0 0 20px rgba(255,255,255,0.15)'
+                : '0 0 30px rgba(37,209,244,0.45), 0 0 80px rgba(37,209,244,0.2), inset 0 0 25px rgba(255,255,255,0.1)',
+              transition: 'box-shadow 0.6s ease, transform 0.2s ease',
+            }}
             aria-label={isRunning ? 'Stop speed test' : 'Start speed test'}
           >
             {isRunning && (
