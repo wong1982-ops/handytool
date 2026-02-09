@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>IDPhone - Passport Photo Editor &amp; Validator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#25d1f4",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#101f22",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .guide-overlay {
+            background-image: 
+                radial-gradient(circle at 50% 35%, transparent 120px, rgba(37, 209, 244, 0.1) 121px),
+                linear-gradient(to right, rgba(37, 209, 244, 0.2) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(37, 209, 244, 0.2) 1px, transparent 1px);
+            background-size: 100% 100%, 50% 100%, 100% 35%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col overflow-hidden">
+<!-- Header / TopNavBar -->
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark px-6 py-3 z-20">
+<div class="flex items-center gap-4">
+<div class="text-primary size-8">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M44 11.2727C44 14.0109 39.8386 16.3957 33.69 17.6364C39.8386 18.877 44 21.2618 44 24C44 26.7382 39.8386 29.123 33.69 30.3636C39.8386 31.6043 44 33.9891 44 36.7273C44 40.7439 35.0457 44 24 44C12.9543 44 4 40.7439 4 36.7273C4 33.9891 8.16144 31.6043 14.31 30.3636C8.16144 29.123 4 26.7382 4 24C4 21.2618 8.16144 18.877 14.31 17.6364C8.16144 16.3957 4 14.0109 4 11.2727C4 7.25611 12.9543 4 24 4C35.0457 4 44 7.25611 44 11.2727Z" fill="currentColor"></path>
+</svg>
+</div>
+<h1 class="text-xl font-bold tracking-tight">IDPhone <span class="text-xs font-normal opacity-50 px-2 border border-slate-500 rounded ml-2">v2.0</span></h1>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Project Explorer</a>
+<a class="text-sm font-medium hover:text-primary transition-colors border-b-2 border-primary pb-1" href="#">Editor</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Templates</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Compliance Log</a>
+</nav>
+<div class="flex items-center gap-3">
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-background-dark px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[20px]">file_download</span>
+<span>Export PDF</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden ml-2">
+<img class="w-full h-full object-cover" data-alt="User avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn4rahOUeouxHVRKk21c5vCd0RvpGD9U8jdW2c6dlGrId2sGsOHF9eegFL2jC-qvCE3GdzdMTYgf9lW_xfeZv8DIkktSUiDZw7cARbT3FxIEMxPrKSmHk14iXxZ0qktmXjd9JLrQXyrm4_7Ohj_w80ovgUBwSu6UI_7Inwxsb6IGWP5q466jjrhIyZgtyd_n8wKD7r8GOKIPNxP3hUEGiMM33xyKp5bGpcQLq5bdLIT5cGrFUIlXBCj7G2wf-NoPAOsOQB8Xicfl1j"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Sidebar Left: Navigation/History (Compact) -->
+<aside class="w-16 flex flex-col items-center py-4 gap-6 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark/50">
+<button class="text-primary bg-primary/10 p-2 rounded-lg"><span class="material-symbols-outlined">magic_button</span></button>
+<button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined">image_search</span></button>
+<button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined">history</span></button>
+<button class="text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined">folder</span></button>
+</aside>
+<!-- Central Workspace -->
+<section class="flex-1 relative flex flex-col bg-slate-50 dark:bg-slate-900/50 p-6 overflow-hidden">
+<!-- Toolbar -->
+<div class="flex justify-between items-center mb-6">
+<div class="flex gap-2">
+<button class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:shadow-md transition-all">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                        Take Photo
+                    </button>
+<button class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:shadow-md transition-all">
+<span class="material-symbols-outlined text-[18px]">upload</span>
+                        Upload
+                    </button>
+</div>
+<div class="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-lg">
+<button class="px-3 py-1 rounded bg-white dark:bg-slate-700 text-xs font-bold shadow-sm">Preview</button>
+<button class="px-3 py-1 text-xs font-bold opacity-50">Compare</button>
+</div>
+<div class="flex gap-4 items-center">
+<span class="text-xs text-slate-500 font-mono">2x2 in (600x600 px)</span>
+<button class="material-symbols-outlined text-slate-400">zoom_in</button>
+</div>
+</div>
+<!-- Image Canvas -->
+<div class="flex-1 flex items-center justify-center relative bg-slate-200 dark:bg-background-dark/80 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 overflow-hidden shadow-inner">
+<!-- Guidelines Overlay (Visible when image is present or active) -->
+<div class="absolute inset-0 z-10 guide-overlay">
+<!-- Head Height Guide -->
+<div class="absolute top-[20%] left-0 right-0 border-t border-primary/50 flex justify-center">
+<span class="text-[10px] text-primary bg-background-dark/80 px-1 -mt-2">TOP OF HEAD</span>
+</div>
+<!-- Eye Level Guide -->
+<div class="absolute top-[35%] left-0 right-0 border-t border-primary/30 border-dashed flex justify-center">
+<span class="text-[10px] text-primary/70 bg-background-dark/80 px-1 -mt-2">EYE LEVEL</span>
+</div>
+<!-- Chin Guide -->
+<div class="absolute bottom-[25%] left-0 right-0 border-t border-primary/50 flex justify-center">
+<span class="text-[10px] text-primary bg-background-dark/80 px-1 -mt-2">BOTTOM OF CHIN</span>
+</div>
+<!-- Center Line -->
+<div class="absolute inset-y-0 left-1/2 border-l border-primary/20"></div>
+</div>
+<!-- Empty State Content -->
+<div class="flex flex-col items-center gap-6 z-0 p-12 text-center max-w-md">
+<div class="w-24 h-24 rounded-full bg-slate-300 dark:bg-slate-800 flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-5xl opacity-20">person</span>
+</div>
+<div>
+<h3 class="text-xl font-bold mb-2">Ready to Start?</h3>
+<p class="text-slate-500 text-sm leading-relaxed">Align your face with the turquoise guides. Use a neutral background and ensure even lighting for best results.</p>
+</div>
+<div class="flex gap-4">
+<button class="px-8 py-3 bg-primary text-background-dark rounded-xl font-bold shadow-xl shadow-primary/20 hover:scale-[1.02] transition-transform">
+                            Open Webcam
+                        </button>
+<button class="px-8 py-3 bg-slate-800 text-white rounded-xl font-bold border border-slate-700 hover:bg-slate-700 transition-colors">
+                            Pick File
+                        </button>
+</div>
+</div>
+</div>
+<!-- Validation Status Bar (Bottom of Canvas) -->
+<div class="mt-6 bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 p-4 rounded-xl flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-500">pending</span>
+<span class="text-sm font-semibold">Validation Required</span>
+</div>
+<div class="h-4 w-px bg-slate-200 dark:bg-slate-800"></div>
+<div class="flex gap-3">
+<div class="flex items-center gap-1 text-xs opacity-50"><span class="material-symbols-outlined text-[14px]">check_circle</span> Lighting</div>
+<div class="flex items-center gap-1 text-xs opacity-50"><span class="material-symbols-outlined text-[14px]">check_circle</span> Background</div>
+<div class="flex items-center gap-1 text-xs opacity-50"><span class="material-symbols-outlined text-[14px]">check_circle</span> Dimensions</div>
+</div>
+</div>
+<button class="bg-primary/20 hover:bg-primary/30 text-primary px-6 py-2 rounded-lg text-sm font-bold transition-all border border-primary/30">
+                    Validate with Gov API
+                </button>
+</div>
+</section>
+<!-- Sidebar Right: Tools Panel -->
+<aside class="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col shadow-2xl">
+<div class="p-5 border-b border-slate-100 dark:border-slate-800">
+<h2 class="font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">tune</span>
+                    Editing Suite
+                </h2>
+</div>
+<div class="flex-1 overflow-y-auto p-5 flex flex-col gap-8">
+<!-- Format Selection -->
+<div class="flex flex-col gap-3">
+<label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Standard Format</label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary">
+<option>United States - Passport (2x2 in)</option>
+<option>European Union - Standard (35x45 mm)</option>
+<option>United Kingdom - Passport (35x45 mm)</option>
+<option>India - Passport (2x2 in)</option>
+<option>Custom Dimensions...</option>
+</select>
+</div>
+<!-- AI Tools -->
+<div class="flex flex-col gap-3">
+<label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">AI Enhancements</label>
+<div class="grid grid-cols-1 gap-2">
+<button class="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-colors group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">person_remove</span>
+<span class="text-sm font-medium">Remove Background</span>
+</div>
+<span class="text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity">RUN</span>
+</button>
+<button class="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-colors group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">center_focus_strong</span>
+<span class="text-sm font-medium">Auto-Center Face</span>
+</div>
+<span class="text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity">RUN</span>
+</button>
+</div>
+</div>
+<!-- Manual Adjustments -->
+<div class="flex flex-col gap-5">
+<label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Image Calibration</label>
+<div class="space-y-4">
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span>Brightness</span>
+<span class="text-primary">0%</span>
+</div>
+<input class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary" type="range"/>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span>Contrast</span>
+<span class="text-primary">0%</span>
+</div>
+<input class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary" type="range"/>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span>Sharpness</span>
+<span class="text-primary">+12%</span>
+</div>
+<input class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary" type="range"/>
+</div>
+</div>
+</div>
+<!-- Compliance Checklist Preview -->
+<div class="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800">
+<div class="bg-primary/5 border border-primary/20 rounded-xl p-4">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-[20px]">verified_user</span>
+<h4 class="text-xs font-bold text-primary uppercase">Quick Check</h4>
+</div>
+<ul class="space-y-2">
+<li class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-green-500 text-[16px]">check</span>
+                                Neutral expression detected
+                            </li>
+<li class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-slate-400 text-[16px]">close</span>
+                                Background too cluttered
+                            </li>
+<li class="flex items-center gap-2 text-xs opacity-50">
+<span class="material-symbols-outlined text-[16px]">circle</span>
+                                Eye level verification pending
+                            </li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Validation Action Footer -->
+<div class="p-5 bg-slate-50 dark:bg-slate-900/50">
+<button class="w-full bg-primary hover:bg-primary/90 text-background-dark py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">rocket_launch</span>
+                    GENERATE PHOTO SET
+                </button>
+<p class="text-[10px] text-center mt-3 text-slate-500 leading-tight">By clicking generate, you agree to our terms of service regarding official document preparation.</p>
+</div>
+</aside>
+</main>
+<!-- Footer Bar -->
+<footer class="h-10 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex items-center justify-between px-6 text-[10px] uppercase tracking-widest text-slate-400">
+<div class="flex gap-4">
+<span>© 2024 IDPhone Inc.</span>
+<span class="text-primary/50">Gov-API Connected</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Service Operational</span>
+<span class="flex items-center gap-1">Session ID: <span class="text-slate-200 font-mono">IDP-9283-XK</span></span>
+</div>
+</footer>
+</body></html>

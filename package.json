@@ -1,0 +1,18 @@
+{
+  "name": "handytool-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build:ui": "pnpm --filter @wong1982-ops/handytool-ui build",
+    "dev:ui": "pnpm --filter @wong1982-ops/handytool-ui dev",
+    "dev:admin": "pnpm --filter handytool-admin dev",
+    "dev:api": "pnpm --filter handytool-api dev",
+    "dev:client": "pnpm --filter handytool-client dev",
+    "build:admin": "pnpm --filter handytool-admin build",
+    "build:api": "pnpm --filter handytool-api build",
+    "build:client": "pnpm --filter handytool-client build",
+    "build": "pnpm run build:ui && pnpm run build:api && pnpm run build:admin && pnpm run build:client",
+    "lint": "pnpm -r run lint",
+    "audit": "pnpm audit"
+  }
+}

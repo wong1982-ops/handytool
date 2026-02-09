@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Find My IP Dashboard - Variant 2</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass {
+            background: rgba(16, 25, 34, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bg-gradient-mesh {
+            background-color: #f6f7f8;
+            background-image: radial-gradient(at 0% 0%, rgba(19, 127, 236, 0.1) 0px, transparent 50%),
+                              radial-gradient(at 100% 0%, rgba(19, 127, 236, 0.05) 0px, transparent 50%),
+                              radial-gradient(at 100% 100%, rgba(19, 127, 236, 0.1) 0px, transparent 50%),
+                              radial-gradient(at 0% 100%, rgba(19, 127, 236, 0.05) 0px, transparent 50%);
+        }
+        .dark .bg-gradient-mesh {
+            background-color: #101922;
+            background-image: radial-gradient(at 0% 0%, rgba(19, 127, 236, 0.15) 0px, transparent 50%),
+                              radial-gradient(at 100% 100%, rgba(19, 127, 236, 0.15) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="font-display bg-gradient-mesh min-h-screen text-slate-900 dark:text-slate-100 transition-colors duration-300">
+<!-- Top Navigation -->
+<header class="w-full border-b border-slate-200/50 dark:border-slate-800/50 glass sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">hub</span>
+<span class="text-xl font-bold tracking-tight">IPCheck</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Developer API</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Resources</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors">
+<span class="material-symbols-outlined text-xl">dark_mode</span>
+</button>
+<button class="bg-primary text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                    Sign In
+                </button>
+</div>
+</div>
+</header>
+<main class="max-w-5xl mx-auto px-6 py-12">
+<!-- Search Section -->
+<div class="mb-12 flex justify-center">
+<div class="w-full max-w-2xl relative">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400">search</span>
+</div>
+<input class="w-full pl-12 pr-32 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm" placeholder="Lookup any IP address or domain..." type="text"/>
+<button class="absolute right-2 top-2 bottom-2 px-6 bg-primary text-white rounded-lg font-bold text-sm hover:bg-primary/90 transition-all">
+                    Lookup
+                </button>
+</div>
+</div>
+<!-- Central Hero Card -->
+<div class="relative group">
+<div class="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-blue-400/20 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+<div class="relative glass rounded-2xl p-8 md:p-12 text-center shadow-xl">
+<p class="text-primary text-sm font-bold uppercase tracking-widest mb-4">Your Public IPv4 Address</p>
+<h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-slate-900 dark:text-white">
+                    104.28.192.254
+                </h1>
+<div class="flex flex-wrap items-center justify-center gap-4 mb-8">
+<div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-sm text-primary">location_on</span>
+<span class="text-sm font-medium">San Francisco, CA, US</span>
+</div>
+<div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-sm text-green-500">verified_user</span>
+<span class="text-sm font-medium">Safe Connection</span>
+</div>
+</div>
+<div class="flex justify-center gap-3">
+<button class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined text-xl">content_copy</span>
+                        Copy Address
+                    </button>
+<button class="flex items-center gap-2 px-6 py-3 glass rounded-xl font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+<span class="material-symbols-outlined text-xl">refresh</span>
+                        Refresh
+                    </button>
+</div>
+</div>
+</div>
+<!-- Secondary Information Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+<!-- Card 1: Proxy / VPN -->
+<div class="glass p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-start">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary">shield_person</span>
+</div>
+<h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">Proxy / VPN</h3>
+<p class="text-lg font-semibold">None Detected</p>
+<span class="mt-2 text-xs font-medium text-green-600 dark:text-green-400 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Clean Status
+                </span>
+</div>
+<!-- Card 2: ISP -->
+<div class="glass p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-start">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary">router</span>
+</div>
+<h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">Service Provider</h3>
+<p class="text-lg font-semibold truncate w-full">Google Cloud LLC</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">AS15169</p>
+</div>
+<!-- Card 3: DNS Info -->
+<div class="glass p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-start">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary">dns</span>
+</div>
+<h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">DNS Server</h3>
+<p class="text-lg font-semibold">8.8.8.8</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Google Public DNS</p>
+</div>
+<!-- Card 4: System -->
+<div class="glass p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-start">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary">devices</span>
+</div>
+<h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">User Agent</h3>
+<p class="text-lg font-semibold">Chrome / macOS</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate w-full">v122.0.0.0</p>
+</div>
+</div>
+<!-- Detail Map Preview Section -->
+<div class="mt-8 glass rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl">
+<div class="grid md:grid-cols-3">
+<div class="p-8 md:col-span-1 border-r border-slate-200 dark:border-slate-800">
+<h2 class="text-xl font-bold mb-6">Detailed Location</h2>
+<ul class="space-y-4">
+<li class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2">
+<span class="text-sm text-slate-500 dark:text-slate-400">City</span>
+<span class="font-medium">San Francisco</span>
+</li>
+<li class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2">
+<span class="text-sm text-slate-500 dark:text-slate-400">State</span>
+<span class="font-medium">California</span>
+</li>
+<li class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2">
+<span class="text-sm text-slate-500 dark:text-slate-400">Country</span>
+<span class="font-medium flex items-center gap-2">
+<img alt="US Flag" class="h-3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPYcDbo2ArP4_t-W8oOU3vbL_43qyQps9lGur2wT4M2R-bQpb0kaXw1Dzdpkj8rg_Ri0ZsEhn30rNZdVFxJ_Tu38sYs73a-L94d14M1wdJca4cen-s-Lzfq3OiZn4wy7iIJSlUiA_F1g1mtyxHTz9USy0n1fVmx3twSW9rMwUhg2OnhnvIq7lOAHqzuxrwB12yXZX3_WK--c-2AsWbvXhQoYfu8L-tAmIcOKL4_wfl_KthYpMOdfgsJTDkqvg4soBf-FyBbNi17tvW"/> United States
+                            </span>
+</li>
+<li class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2">
+<span class="text-sm text-slate-500 dark:text-slate-400">Postal Code</span>
+<span class="font-medium">94105</span>
+</li>
+<li class="flex justify-between items-center">
+<span class="text-sm text-slate-500 dark:text-slate-400">Coordinates</span>
+<span class="font-medium">37.7749, -122.4194</span>
+</li>
+</ul>
+</div>
+<div class="md:col-span-2 min-h-[300px] relative">
+<img class="w-full h-full object-cover" data-alt="Modern map view centered on San Francisco" data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtqN35yabDfuCzYFdooTZyRRY79vllBJoKIwkTS-OgJ-TynaAmjapHFCL9O00Yuxy3QAUHTghP891Txr63RXon5j3rEcOxvzAY1JB2kgcfCBaGkj8xqRuOp7T6G00q7iJ05gUSdHeTvdRJFUTAlMQJ2JZEcFA16Qwti4JuzQ74UPNCKdaXYGXQo2ZJVnOMHoRWVZM_pMQJpMYpXxym50Cye7i1rpSgYqDDca_8180F-ALHO4L6UfpSV7tZVonVeCa5IdCO9n4aY8oV"/>
+<div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+<div class="relative">
+<div class="absolute -inset-4 bg-primary/30 rounded-full animate-ping"></div>
+<div class="relative w-4 h-4 bg-primary border-2 border-white rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-auto py-12 px-6 border-t border-slate-200/50 dark:border-slate-800/50">
+<div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2 opacity-50">
+<span class="material-symbols-outlined">hub</span>
+<span class="text-sm font-semibold">© 2024 IPCheck Global</span>
+</div>
+<div class="flex gap-8">
+<a class="text-sm text-slate-500 hover:text-primary" href="#">Terms of Service</a>
+<a class="text-sm text-slate-500 hover:text-primary" href="#">Privacy Policy</a>
+<a class="text-sm text-slate-500 hover:text-primary" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</body></html>

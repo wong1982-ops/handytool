@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>IDPhone - Compliance Alignment Wizard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#25d1f4",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#101f22",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .passport-grid {
+            background-image: 
+                linear-gradient(to right, rgba(37, 209, 244, 0.2) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(37, 209, 244, 0.2) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .alignment-oval {
+            border: 2px dashed #25d1f4;
+            border-radius: 50% 50% 45% 45%;
+            width: 60%;
+            height: 75%;
+            position: absolute;
+            top: 10%;
+            left: 20%;
+            pointer-events: none;
+        }
+        .eye-line {
+            border-top: 1px solid #25d1f4;
+            width: 100%;
+            position: absolute;
+            top: 40%;
+            left: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between border-b border-solid border-slate-200 dark:border-[#224249] px-6 py-4 bg-background-light dark:bg-background-dark">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<svg fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M44 11.2727C44 14.0109 39.8386 16.3957 33.69 17.6364C39.8386 18.877 44 21.2618 44 24C44 26.7382 39.8386 29.123 33.69 30.3636C39.8386 31.6043 44 33.9891 44 36.7273C44 40.7439 35.0457 44 24 44C12.9543 44 4 40.7439 4 36.7273C4 33.9891 8.16144 31.6043 14.31 30.3636C8.16144 29.123 4 26.7382 4 24C4 21.2618 8.16144 18.877 14.31 17.6364C8.16144 16.3957 4 14.0109 4 11.2727C4 7.25611 12.9543 4 24 4C35.0457 4 44 7.25611 44 11.2727Z"></path>
+</svg>
+</div>
+<h2 class="text-xl font-bold tracking-tight">IDPhone</h2>
+</div>
+<div class="flex items-center gap-8">
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity" href="#">Dashboard</a>
+<a class="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity" href="#">Archive</a>
+<a class="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity" href="#">Settings</a>
+</nav>
+<div class="bg-primary/20 rounded-full p-1 border border-primary/30">
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="User profile avatar circle" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC9B6_tJbTuTI8u6MJE5YVt5A9zyLSQekwuMtXcNzZP_e4aqRssOvNTljfPZASatOKIJnyEhco5IfunvntMUx1nDry-8FxUounZCIv0jU7KcFkdnRE5ojVaWI0I10V3QO_dy8U5Vbc2u16ufI3CTY7Z5ERn4oqUZPtnSS06GakZvtrn7qWPXQmoPgNKc-Noc2d0NnJh8sNWC_8-TJdHmFKJWsDRG8Q41mq0B-dPBtrAspjkZR7PeghWN_JG4_n-JRbNYx_nA6szqtJJ");'></div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col max-w-7xl mx-auto w-full p-6 gap-6">
+<!-- Breadcrumbs & Title -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 text-sm font-medium">
+<span class="text-primary">Step 1: Capture</span>
+<span class="opacity-30 material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-slate-900 dark:text-white">Step 2: Edit &amp; Align</span>
+<span class="opacity-30 material-symbols-outlined text-xs">chevron_right</span>
+<span class="opacity-40">Step 3: Export</span>
+</div>
+<h1 class="text-3xl font-bold">Alignment Wizard</h1>
+</div>
+<!-- Split Workspace -->
+<div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Photo & Controls -->
+<div class="lg:col-span-8 flex flex-col gap-4">
+<div class="relative aspect-[4/5] bg-black rounded-xl overflow-hidden shadow-2xl flex items-center justify-center border border-white/5">
+<!-- The Captured Image -->
+<img alt="Captured portrait for passport" class="w-full h-full object-cover opacity-90" data-alt="Professional studio portrait of a man looking forward" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4zyLRpUD_vI1RMuXVKQtGwuZeENRvy4dbJlCEUiR1cOZ2kPxPhVH5OU7BYXFhpQcmANKUGvBYO0y1B_nwS6bq3FIUm6M5ZBueVRf6TXB3WilWvN61NBGAgTDbYOokNIoyJRh4rQ7xUU2Ps6A5fvPrlxS3II7kdK1tWWU02SuWyuI4Dx5TwohOVX-akrYrPzcyGWS3aPEYrw8cjF3FyW8qMaeht5gOzwJc66h-ZJ6wVLgS3SNW47EueFHmSBz5NeUJyTt7BTA0cVSM"/>
+<!-- Passport Grid Overlay -->
+<div class="absolute inset-0 passport-grid opacity-40"></div>
+<div class="alignment-oval opacity-60"></div>
+<div class="eye-line opacity-50"></div>
+<!-- Overlay Tooltip -->
+<div class="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">grid_on</span>
+<span class="text-[11px] font-bold uppercase tracking-wider text-white">US Passport Standard (2x2")</span>
+</div>
+</div>
+<!-- Fine-Tuning Controls -->
+<div class="bg-white dark:bg-slate-800/50 p-6 rounded-xl border border-slate-200 dark:border-white/5 flex flex-col gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Head Rotation -->
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<label class="text-sm font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">rotate_right</span>
+                                    Head Rotation
+                                </label>
+<span class="text-xs font-mono bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded">1.2°</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[10px] opacity-50">-10°</span>
+<div class="relative flex-1 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full">
+<div class="absolute left-0 h-full w-[60%] bg-primary rounded-full"></div>
+<div class="absolute left-[60%] top-1/2 -translate-y-1/2 size-4 bg-white border-2 border-primary rounded-full shadow-lg cursor-pointer"></div>
+</div>
+<span class="text-[10px] opacity-50">+10°</span>
+</div>
+</div>
+<!-- Scaling -->
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<label class="text-sm font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">zoom_in</span>
+                                    Scale / Zoom
+                                </label>
+<span class="text-xs font-mono bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded">100%</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[10px] opacity-50">80%</span>
+<div class="relative flex-1 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full">
+<div class="absolute left-0 h-full w-[50%] bg-primary rounded-full"></div>
+<div class="absolute left-[50%] top-1/2 -translate-y-1/2 size-4 bg-white border-2 border-primary rounded-full shadow-lg cursor-pointer"></div>
+</div>
+<span class="text-[10px] opacity-50">120%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Compliance Checklist -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<div class="bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-white/5 flex flex-col overflow-hidden">
+<div class="p-4 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 flex items-center justify-between">
+<h3 class="font-bold text-sm uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">verified_user</span>
+                            Compliance Checklist
+                        </h3>
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">LIVE AI</span>
+</div>
+<div class="p-4 flex flex-col gap-3">
+<!-- Checklist Items -->
+<div class="flex items-start gap-3 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+<span class="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-green-700 dark:text-green-400">Head Centered</p>
+<p class="text-xs opacity-70">Alignment within ±2px margin of center.</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+<span class="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-green-700 dark:text-green-400">Eyes Level</p>
+<p class="text-xs opacity-70">Horizontal axis tilt detected at 0.05°.</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+<span class="material-symbols-outlined text-amber-500 text-xl">warning</span>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-amber-700 dark:text-amber-400">Background Contrast</p>
+<p class="text-xs opacity-70">Top left corner slightly too dark.</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+<span class="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-green-700 dark:text-green-400">No Eyewear Detected</p>
+<p class="text-xs opacity-70">Clear facial features confirmed.</p>
+</div>
+</div>
+</div>
+<!-- AI Tip Box -->
+<div class="m-4 p-4 rounded-lg bg-primary/10 border border-primary/20">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-sm">lightbulb</span>
+<p class="text-xs font-bold uppercase text-primary">AI Quick Tip</p>
+</div>
+<p class="text-xs leading-relaxed">
+                            "To fix the background contrast issue, use the 'Auto-Brighten' tool in the next step or adjust your scaling to crop closer to the face."
+                        </p>
+</div>
+</div>
+<!-- Summary Panel -->
+<div class="mt-auto bg-primary rounded-xl p-6 text-white shadow-xl shadow-primary/20">
+<h4 class="font-bold mb-1">Official Validation</h4>
+<p class="text-sm opacity-90 mb-6">Ready for government submission. All critical requirements met.</p>
+<button class="w-full bg-white text-primary font-bold py-4 rounded-lg flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors">
+                        Process &amp; Save
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Actions -->
+<footer class="mt-auto px-6 py-4 border-t border-slate-200 dark:border-[#224249] flex justify-between items-center bg-white dark:bg-[#101f22]">
+<button class="flex items-center gap-2 px-6 py-2 rounded-lg border border-slate-300 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors font-medium">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+            Back to Capture
+        </button>
+<div class="flex items-center gap-4">
+<span class="text-xs opacity-50 hidden sm:block">Autosaved 2m ago</span>
+<button class="px-6 py-2 rounded-lg text-primary hover:bg-primary/10 transition-colors font-semibold">
+                Save Draft
+            </button>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Swagger API Editor &amp; Previewer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#25d1f4",
+                "background-light": "#f5f8f8",
+                "background-dark": "#101f22",
+                "nord-bg": "#1a1b26",
+                "nord-gutter": "#15161e",
+                "nord-text": "#c0caf5",
+                "nord-comment": "#565f89",
+                "nord-keyword": "#bb9af7",
+                "nord-string": "#9ece6a",
+              },
+              fontFamily: {
+                "display": ["Inter", "sans-serif"],
+                "mono": ["JetBrains Mono", "monospace"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        .code-editor-line::before {
+            content: attr(data-line);
+            display: inline-block;
+            width: 2.5rem;
+            text-align: right;
+            padding-right: 1rem;
+            color: #4b5563;
+            user-select: none;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #224249;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #25d1f455;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="h-14 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex items-center justify-between px-4 shrink-0">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+<span class="material-symbols-outlined text-lg font-bold">api</span>
+</div>
+<h1 class="font-bold text-lg tracking-tight">Swagger Editor</h1>
+</div>
+<nav class="hidden md:flex items-center gap-1">
+<button class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                    File <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                    Edit <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg text-sm font-medium transition-colors">Generate Client</button>
+<button class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg text-sm font-medium transition-colors">Generate Server</button>
+</nav>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="bg-slate-100 dark:bg-white/5 border-none focus:ring-1 focus:ring-primary rounded-lg pl-10 py-1.5 text-sm w-64 placeholder:text-slate-500" placeholder="Search methods..." type="text"/>
+</div>
+<div class="h-6 w-px bg-slate-200 dark:border-slate-800 mx-1"></div>
+<button class="flex items-center gap-2 bg-primary text-background-dark px-4 py-1.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+<span>Test API</span>
+</button>
+<button class="flex items-center gap-2 bg-slate-200 dark:bg-white/5 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-slate-300 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>Export</span>
+</button>
+<div class="size-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800">
+<img class="w-full h-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNMkiEQbKKnhfbtx27CtTE3Q6J0Ap1vUTcjVzwgD5P7aNgGNoPm8FdKzYW2SJo_FBJICJ8ajmGek8_a8x4v0OyK6esK6kA6_iEFFwzhDykD7BDxpKWh7DQR27rt9Nw4SKcnHQSREZuwVr9Tt0uzdasLOcBXHshxjB03uFtWo6RWgzjXGRWqc8gplT-eFbajLFSYtX96YkZaa3_8WFLgJo6Lyd2W3GUQlxlB9G6HdLOKS2W2qUcksaSN23WuUcMWE-aXO-XHZk5BwIr"/>
+</div>
+</div>
+</header>
+<!-- Main Workspace -->
+<main class="flex flex-1 overflow-hidden">
+<!-- Left Pane: Navigation Tree -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-background-dark/50 flex flex-col shrink-0">
+<div class="p-4 flex items-center justify-between">
+<span class="text-xs font-bold uppercase tracking-widest text-slate-500">Navigation</span>
+<button class="text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-sm">unfold_more</span></button>
+</div>
+<div class="flex-1 overflow-y-auto px-2 space-y-4">
+<!-- Group -->
+<div>
+<div class="flex items-center gap-2 px-2 py-1 text-slate-400 text-xs font-semibold uppercase tracking-tighter">
+<span class="material-symbols-outlined text-sm">folder_open</span>
+                        Endpoints
+                    </div>
+<div class="mt-1 space-y-0.5">
+<div class="flex items-center justify-between px-2 py-1.5 rounded-lg bg-primary/10 text-primary group cursor-pointer">
+<div class="flex items-center gap-2 truncate">
+<span class="text-[10px] font-bold px-1 rounded bg-green-500/20 text-green-400 w-8 text-center">GET</span>
+<span class="text-sm truncate">/pets</span>
+</div>
+</div>
+<div class="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 text-slate-600 dark:text-slate-300 group cursor-pointer transition-colors">
+<div class="flex items-center gap-2 truncate">
+<span class="text-[10px] font-bold px-1 rounded bg-blue-500/20 text-blue-400 w-8 text-center">POST</span>
+<span class="text-sm truncate">/pets</span>
+</div>
+</div>
+<div class="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 text-slate-600 dark:text-slate-300 group cursor-pointer transition-colors">
+<div class="flex items-center gap-2 truncate">
+<span class="text-[10px] font-bold px-1 rounded bg-green-500/20 text-green-400 w-8 text-center">GET</span>
+<span class="text-sm truncate">/pets/{id}</span>
+</div>
+</div>
+<div class="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 text-slate-600 dark:text-slate-300 group cursor-pointer transition-colors">
+<div class="flex items-center gap-2 truncate">
+<span class="text-[10px] font-bold px-1 rounded bg-orange-500/20 text-orange-400 w-8 text-center">PUT</span>
+<span class="text-sm truncate">/pets/{id}</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Group -->
+<div>
+<div class="flex items-center gap-2 px-2 py-1 text-slate-400 text-xs font-semibold uppercase tracking-tighter">
+<span class="material-symbols-outlined text-sm">database</span>
+                        Schemas
+                    </div>
+<div class="mt-1 space-y-0.5">
+<div class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 text-slate-600 dark:text-slate-300 cursor-pointer">
+<span class="material-symbols-outlined text-slate-500 text-sm">code</span>
+<span class="text-sm">PetModel</span>
+</div>
+<div class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 text-slate-600 dark:text-slate-300 cursor-pointer">
+<span class="material-symbols-outlined text-slate-500 text-sm">code</span>
+<span class="text-sm">ErrorResponse</span>
+</div>
+</div>
+</div>
+<!-- Group -->
+<div>
+<div class="flex items-center gap-2 px-2 py-1 text-slate-400 text-xs font-semibold uppercase tracking-tighter">
+<span class="material-symbols-outlined text-sm">lock</span>
+                        Security
+                    </div>
+<div class="mt-1 space-y-0.5">
+<div class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 text-slate-600 dark:text-slate-300 cursor-pointer">
+<span class="material-symbols-outlined text-slate-500 text-sm">key</span>
+<span class="text-sm">BearerAuth</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Sidebar Action -->
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<button class="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 text-slate-500 text-xs font-medium hover:bg-slate-200 dark:hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                    New Endpoint
+                </button>
+</div>
+</aside>
+<!-- Center Pane: Code Editor -->
+<section class="flex-1 flex flex-col bg-nord-bg border-r border-slate-200 dark:border-slate-800">
+<div class="h-10 bg-nord-gutter flex items-center px-4 justify-between border-b border-white/5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">description</span>
+<span class="text-xs font-mono text-nord-text">openapi.yaml</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-nord-comment font-mono">YAML 1.2</span>
+<span class="material-symbols-outlined text-nord-comment text-sm">settings</span>
+</div>
+</div>
+<div class="flex-1 flex font-mono text-sm leading-relaxed overflow-hidden">
+<!-- Gutter -->
+<div class="w-10 bg-nord-gutter flex flex-col items-end py-4 text-slate-600 select-none pr-3">
+<span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+</div>
+<!-- Content Area -->
+<div class="flex-1 p-4 overflow-y-auto relative">
+<div class="space-y-0.5">
+<div><span class="text-nord-primary text-primary">openapi</span>: <span class="text-nord-string">"3.0.1"</span></div>
+<div><span class="text-nord-primary text-primary">info</span>:</div>
+<div class="pl-4"><span class="text-nord-primary text-primary">title</span>: <span class="text-nord-string">"Petstore API"</span></div>
+<div class="pl-4"><span class="text-nord-primary text-primary">description</span>: <span class="text-nord-comment">|-</span></div>
+<div class="pl-8 text-nord-comment">This is a sample server Petstore server.</div>
+<div class="pl-4"><span class="text-nord-primary text-primary">version</span>: <span class="text-nord-string">"1.0.0"</span></div>
+<div><span class="text-nord-primary text-primary">servers</span>:</div>
+<div class="pl-4">- <span class="text-nord-primary text-primary">url</span>: <span class="text-nord-string">"http://petstore.swagger.io/v1"</span></div>
+<div><span class="text-nord-primary text-primary">paths</span>:</div>
+<div class="pl-4"><span class="text-nord-primary text-primary">/pets</span>:</div>
+<div class="pl-8"><span class="text-nord-primary text-primary">get</span>:</div>
+<div class="pl-12"><span class="text-nord-primary text-primary">summary</span>: <span class="text-nord-string">"List all pets"</span></div>
+<div class="pl-12"><span class="text-nord-primary text-primary">operationId</span>: <span class="text-nord-string">"listPets"</span></div>
+<div class="pl-12"><span class="text-nord-primary text-primary">tags</span>:</div>
+<div class="pl-16">- <span class="text-nord-string">"pets"</span></div>
+<!-- Error Marker Simulation -->
+<div class="relative pl-12">
+<div class="absolute -left-20 right-0 h-[1.5rem] bg-red-500/10 pointer-events-none"></div>
+<span class="text-nord-primary text-primary">parameters</span>:
+                            <span class="absolute -left-1 text-red-500 bottom-0 underline decoration-wavy"> </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Status Bar -->
+<div class="h-8 bg-nord-gutter border-t border-white/5 flex items-center px-4 justify-between text-[11px] font-mono text-nord-comment">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-green-500">check_circle</span>
+<span>Valid OpenAPI</span>
+</div>
+<span>Ln 16, Col 12</span>
+<span>Spaces: 2</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="hover:text-nord-text cursor-pointer">UTF-8</span>
+<span class="hover:text-nord-text cursor-pointer">YAML</span>
+</div>
+</div>
+</section>
+<!-- Right Pane: Live Preview -->
+<section class="w-1/3 min-w-[400px] flex flex-col bg-white dark:bg-background-dark">
+<div class="h-10 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 bg-slate-50 dark:bg-white/5">
+<span class="text-xs font-bold uppercase tracking-widest text-slate-500">Live Preview</span>
+<div class="flex gap-2">
+<button class="size-6 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-white/10 rounded"><span class="material-symbols-outlined text-sm">open_in_new</span></button>
+<button class="size-6 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-white/10 rounded"><span class="material-symbols-outlined text-sm">refresh</span></button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-8">
+<!-- Documentation Header -->
+<div>
+<div class="flex items-center gap-3 mb-2">
+<h2 class="text-3xl font-bold">Petstore API</h2>
+<span class="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-xs font-mono">1.0.0</span>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<span class="px-2 py-1 bg-green-500/10 text-green-500 rounded text-xs font-bold uppercase tracking-tight">OAS3</span>
+<a class="text-primary text-sm hover:underline" href="#">/swagger.json</a>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                        This is a sample server Petstore server. You can find out more about Swagger at http://swagger.io or on irc.freenode.net, #swagger.
+                    </p>
+</div>
+<!-- Endpoints Section -->
+<div class="space-y-4">
+<h3 class="text-lg font-bold border-b border-slate-200 dark:border-slate-800 pb-2">Pets</h3>
+<!-- GET /pets Card -->
+<div class="border border-green-500/30 rounded-lg overflow-hidden bg-green-500/5">
+<div class="flex items-center gap-3 p-3 bg-green-500/10 cursor-pointer">
+<span class="bg-green-500 text-white font-bold text-xs px-2 py-1 rounded min-w-[50px] text-center">GET</span>
+<span class="font-mono text-sm font-semibold truncate">/pets</span>
+<span class="text-xs text-slate-500 ml-auto">List all pets</span>
+<span class="material-symbols-outlined text-slate-400">expand_more</span>
+</div>
+<div class="p-4 border-t border-green-500/20 space-y-4">
+<div>
+<h4 class="text-xs font-bold uppercase text-slate-500 mb-2">Parameters</h4>
+<div class="bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-800">
+<table class="w-full text-xs">
+<thead class="bg-slate-50 dark:bg-white/5 text-slate-400 border-b border-slate-200 dark:border-slate-800">
+<tr>
+<th class="text-left px-3 py-2 font-semibold">Name</th>
+<th class="text-left px-3 py-2 font-semibold">Description</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr>
+<td class="px-3 py-2 font-mono"><span class="text-primary">limit</span> <span class="text-[10px] text-slate-400">(query)</span></td>
+<td class="px-3 py-2 text-slate-400">How many items to return at one time</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between mb-2">
+<h4 class="text-xs font-bold uppercase text-slate-500">Responses</h4>
+<span class="text-[10px] text-slate-400">Content-Type: application/json</span>
+</div>
+<div class="p-3 bg-nord-bg rounded-lg font-mono text-[11px] border border-slate-800 overflow-x-auto">
+<pre class="text-nord-text">[
+  {
+    <span class="text-nord-primary text-primary">"id"</span>: 1,
+    <span class="text-nord-primary text-primary">"name"</span>: <span class="text-nord-string">"Fluffy"</span>,
+    <span class="text-nord-primary text-primary">"tag"</span>: <span class="text-nord-string">"dog"</span>
+  }
+]
+</pre>
+</div>
+</div>
+</div>
+</div>
+<!-- POST /pets Card -->
+<div class="border border-blue-500/30 rounded-lg overflow-hidden bg-blue-500/5 opacity-80 hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-3 p-3 bg-blue-500/10 cursor-pointer">
+<span class="bg-blue-500 text-white font-bold text-xs px-2 py-1 rounded min-w-[50px] text-center">POST</span>
+<span class="font-mono text-sm font-semibold truncate">/pets</span>
+<span class="text-xs text-slate-500 ml-auto">Create a pet</span>
+<span class="material-symbols-outlined text-slate-400">expand_less</span>
+</div>
+</div>
+<!-- GET /pets/{id} Card -->
+<div class="border border-green-500/30 rounded-lg overflow-hidden bg-green-500/5 opacity-80">
+<div class="flex items-center gap-3 p-3 bg-green-500/10 cursor-pointer">
+<span class="bg-green-500 text-white font-bold text-xs px-2 py-1 rounded min-w-[50px] text-center">GET</span>
+<span class="font-mono text-sm font-semibold truncate">/pets/{id}</span>
+<span class="text-xs text-slate-500 ml-auto">Info for a specific pet</span>
+<span class="material-symbols-outlined text-slate-400">expand_less</span>
+</div>
+</div>
+</div>
+<!-- Schemas Section -->
+<div class="space-y-4">
+<h3 class="text-lg font-bold border-b border-slate-200 dark:border-slate-800 pb-2">Schemas</h3>
+<div class="p-3 bg-slate-50 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between mb-2">
+<span class="text-sm font-bold font-mono">PetModel</span>
+<span class="material-symbols-outlined text-slate-400 text-sm">code</span>
+</div>
+<div class="text-xs space-y-1">
+<div class="flex justify-between border-b border-slate-100 dark:border-slate-800 py-1">
+<span class="text-slate-500">id</span>
+<span class="text-blue-400 font-mono">integer (int64)</span>
+</div>
+<div class="flex justify-between border-b border-slate-100 dark:border-slate-800 py-1">
+<span class="text-slate-500">name</span>
+<span class="text-blue-400 font-mono">string</span>
+</div>
+<div class="flex justify-between py-1">
+<span class="text-slate-500">tag</span>
+<span class="text-blue-400 font-mono">string</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Action Tooltip (Floating Mini Map for Navigation) -->
+<div class="absolute bottom-12 right-6 flex flex-col gap-2">
+<button class="size-12 rounded-full bg-primary text-background-dark shadow-xl shadow-primary/20 flex items-center justify-center hover:scale-110 transition-transform">
+<span class="material-symbols-outlined font-bold">bolt</span>
+</button>
+<button class="size-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 shadow-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+</button>
+</div>
+</body></html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>IPFinder - Find My IP Dashboard</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#137fec",
+                "background-light": "#f6f7f8",
+                "background-dark": "#101922",
+                "navy": {
+                    "800": "#1e293b",
+                    "900": "#0f172a"
+                }
+              },
+              fontFamily: {
+                "display": ["Inter", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display transition-colors duration-200">
+<!-- Top Navigation Bar -->
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-navy-900 px-6 lg:px-40 py-3 sticky top-0 z-50 shadow-sm">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-navy-900 dark:text-white">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<h2 class="text-navy-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">IPFinder</h2>
+</div>
+<div class="hidden md:flex items-center gap-9">
+<a class="text-navy-900 dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">API</a>
+<a class="text-navy-900 dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="text-navy-900 dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-4 md:gap-8 items-center">
+<label class="hidden sm:flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full overflow-hidden">
+<div class="text-slate-500 bg-slate-100 dark:bg-slate-800 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-slate-100 dark:bg-slate-800 dark:text-white focus:ring-0 placeholder:text-slate-400 pl-2 text-sm font-normal" placeholder="Lookup any IP..."/>
+</div>
+</label>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all">
+<span>Sign In</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-slate-200 dark:border-slate-700" data-alt="User profile avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCr4WN8sX4-VrF8uoYqztlpyhsCrU8Sv3Q3GR3RR40M3FvMsP3_irrzyeSAFzZ6cl7y7KUADjdfCygMjppJe1rmizJOnKFq2KPTRBHRg9iyiyllnmg8oO-PZVDufQD4aXuAPUwQ-IKYtpSLRcpjHgCHGoLMhu_d0T23YmJG-DRuoeAcFsMv3A7qcTTV-PdDoiB0NKSvnV9XroJZZYOjDLvk8aJHKLukw_fCgwi1YbCBtsgO8DYp9SPYkV-ftCv9x9oOxid5MOiCNqA1");'></div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col items-center py-10 px-4">
+<div class="w-full max-w-[1024px] flex flex-col gap-8">
+<!-- Hero Section: IP Display -->
+<section class="flex flex-col items-center text-center gap-4 bg-white dark:bg-navy-900 p-8 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+<h1 class="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-widest">Your Public IP Address</h1>
+<div class="flex flex-wrap items-center justify-center gap-4">
+<p class="text-navy-900 dark:text-white text-5xl md:text-7xl font-black tracking-tight">192.168.1.1</p>
+<button class="group flex items-center justify-center p-3 rounded-lg bg-primary/10 hover:bg-primary transition-all text-primary hover:text-white" title="Copy to Clipboard">
+<span class="material-symbols-outlined">content_copy</span>
+</button>
+</div>
+<div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+<span class="text-sm">Connection Secure &amp; Private</span>
+</div>
+</section>
+<!-- Technical Details & Map Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Details Panel (Left) -->
+<div class="lg:col-span-7 flex flex-col gap-6">
+<div class="bg-white dark:bg-navy-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-navy-900 dark:text-white text-lg font-bold">Technical Information</h3>
+<span class="text-primary material-symbols-outlined">info</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- ISP -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700">
+<div class="size-10 flex items-center justify-center bg-white dark:bg-slate-700 rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-primary">router</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase">ISP Provider</p>
+<p class="text-navy-900 dark:text-white font-bold">Global Link Technology</p>
+</div>
+</div>
+<!-- Country -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700">
+<div class="size-10 flex items-center justify-center bg-white dark:bg-slate-700 rounded-lg shadow-sm overflow-hidden">
+<span class="material-symbols-outlined text-primary">flag</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase">Country</p>
+<div class="flex items-center gap-2">
+<p class="text-navy-900 dark:text-white font-bold">United States</p>
+<span class="text-xs text-slate-400">US</span>
+</div>
+</div>
+</div>
+<!-- Location -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700">
+<div class="size-10 flex items-center justify-center bg-white dark:bg-slate-700 rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-primary">distance</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase">City &amp; Region</p>
+<p class="text-navy-900 dark:text-white font-bold">San Francisco, CA</p>
+</div>
+</div>
+<!-- Lat/Long -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700">
+<div class="size-10 flex items-center justify-center bg-white dark:bg-slate-700 rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-primary">explore</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase">Coordinates</p>
+<p class="text-navy-900 dark:text-white font-bold">37.7749, -122.4194</p>
+</div>
+</div>
+</div>
+<!-- Additional Flags -->
+<div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-slate-400 uppercase font-bold">Proxy</span>
+<span class="text-sm font-semibold text-red-500">No</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-slate-400 uppercase font-bold">VPN</span>
+<span class="text-sm font-semibold text-emerald-500">Yes</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-slate-400 uppercase font-bold">Tor</span>
+<span class="text-sm font-semibold text-slate-900 dark:text-white">No</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-slate-400 uppercase font-bold">Timezone</span>
+<span class="text-sm font-semibold text-slate-900 dark:text-white">PDT</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Map Panel (Right) -->
+<div class="lg:col-span-5">
+<div class="bg-white dark:bg-navy-900 h-full rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col">
+<div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<h3 class="text-navy-900 dark:text-white text-lg font-bold">Live Location</h3>
+<button class="text-primary text-sm font-semibold flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                                        Fullscreen
+                                    </button>
+</div>
+<div class="flex-1 min-h-[300px] relative bg-slate-200 dark:bg-slate-800">
+<!-- Map Placeholder -->
+<div class="absolute inset-0 bg-center bg-cover" data-alt="Map of San Francisco with a blue pin marker" data-location="San Francisco" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBobNcLZ522y7mT45bHLQt5oSbXyFhgeO7yOEv2wgr1Je3YjH3ECKJA1VGYQUcDva7GYZ52pBPzwbsX0QFLIARwVdFsDl8M3hQoxQCWX7E8V0aNfr5G3zEDEeOIAAMzdzT-VGxGN2A3O8OUl4wr32vJb4LJa-B1Y7k5IHIpgD3yqlCAdaJ1ohx6zRndV2LfK5GZJ6FQ5GVyvTUjCjy7NqhxjSFEbpJXQf--2LmUncKDAUSrleSWQO3i71VlrJf4rqs5maI-2tdPD22t');"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="relative">
+<span class="material-symbols-outlined text-primary text-5xl drop-shadow-lg">location_on</span>
+<div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1 bg-black/20 rounded-full blur-sm"></div>
+</div>
+</div>
+<div class="absolute bottom-4 right-4 flex flex-col gap-2">
+<button class="size-8 bg-white dark:bg-slate-700 rounded shadow-md flex items-center justify-center text-navy-900 dark:text-white hover:bg-slate-50">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+<button class="size-8 bg-white dark:bg-slate-700 rounded shadow-md flex items-center justify-center text-navy-900 dark:text-white hover:bg-slate-50">
+<span class="material-symbols-outlined text-[20px]">remove</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Info -->
+<footer class="flex flex-col md:flex-row justify-between items-center gap-4 py-8 border-t border-slate-200 dark:border-slate-800">
+<div class="text-slate-500 dark:text-slate-400 text-xs">
+                            Data provided by Global GeoIP Engine. Geolocation estimates can vary.
+                        </div>
+<div class="flex gap-6 text-xs font-medium text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">API Status</a>
+</div>
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-[10px] text-slate-400 uppercase font-bold">System Online</span>
+</div>
+</footer>
+</div>
+</main>
+</div>
+</div>
+</body></html>
