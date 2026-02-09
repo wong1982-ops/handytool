@@ -27,57 +27,95 @@ interface IpData {
   }
 }
 
-// Mock data — replace with API calls later
-const mockData: IpData = {
-  ip: '104.28.192.254',
-  location: 'San Francisco, CA, US',
-  isSecure: true,
-  info: {
-    proxy: { detected: false, status: 'Clean Status' },
-    isp: { name: 'Google Cloud LLC', asn: 'AS15169' },
-    dns: { server: '8.8.8.8', provider: 'Google Public DNS' },
-    userAgent: { browser: 'Chrome / macOS', version: 'v122.0.0.0' },
-  },
-  locationDetail: {
-    city: 'San Francisco',
-    state: 'California',
-    country: 'United States',
-    countryCode: 'US',
-    postalCode: '94105',
-    lat: 37.7749,
-    lng: -122.4194,
-  },
-}
-
 type PageState = 'idle' | 'loading' | 'success' | 'error'
 
+function detectBrowser(): { browser: string; version: string } {
+  if (typeof navigator === 'undefined') return { browser: 'Unknown', version: '' }
+  const ua = navigator.userAgent
+  if (ua.includes('Chrome') && !ua.includes('Edg')) {
+    const m = ua.match(/Chrome\/([\d.]+)/)
+    return { browser: 'Chrome', version: m ? `v${m[1]}` : '' }
+  }
+  if (ua.includes('Firefox')) {
+    const m = ua.match(/Firefox\/([\d.]+)/)
+    return { browser: 'Firefox', version: m ? `v${m[1]}` : '' }
+  }
+  if (ua.includes('Safari') && !ua.includes('Chrome')) {
+    const m = ua.match(/Version\/([\d.]+)/)
+    return { browser: 'Safari', version: m ? `v${m[1]}` : '' }
+  }
+  if (ua.includes('Edg')) {
+    const m = ua.match(/Edg\/([\d.]+)/)
+    return { browser: 'Edge', version: m ? `v${m[1]}` : '' }
+  }
+  return { browser: 'Unknown', version: '' }
+}
+
+function isIpAddress(query: string): boolean {
+  return /^(\d{1,3}\.){3}\d{1,3}$/.test(query) || query.includes(':')
+}
+
 export default function IpCheckPage() {
-  const [state, setState] = useState<PageState>('success')
-  const [data] = useState<IpData>(mockData)
+  const [state, setState] = useState<PageState>('idle')
+  const [data, setData] = useState<IpData | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [lastQuery, setLastQuery] = useState<string>('')
+
+  const fetchIp = useCallback(async (query: string) => {
+    setState('loading')
+    setError(null)
+    setLastQuery(query)
+    try {
+      const param = isIpAddress(query) ? `ip=${encodeURIComponent(query)}` : `domain=${encodeURIComponent(query)}`
+      const res = await fetch(`/api/v1/ipcheck?${param}`)
+      const json = await res.json()
+
+      if (!res.ok || json.error) {
+        throw new Error(json.error || `Lookup failed (${res.status})`)
+      }
+
+      const d = json.data
+      const browser = detectBrowser()
+
+      setData({
+        ip: d.ip,
+        location: `${d.location.city}, ${d.location.state}, ${d.location.countryCode}`,
+        isSecure: typeof window !== 'undefined' && window.location.protocol === 'https:',
+        info: {
+          proxy: { detected: d.network.proxy, status: d.network.proxy ? 'Proxy Detected' : 'Clean Status' },
+          isp: { name: d.network.isp, asn: d.network.asn },
+          dns: { server: '-', provider: d.network.org || d.network.isp },
+          userAgent: { browser: browser.browser, version: browser.version },
+        },
+        locationDetail: {
+          city: d.location.city,
+          state: d.location.state,
+          country: d.location.country,
+          countryCode: d.location.countryCode,
+          postalCode: d.location.postalCode,
+          lat: d.location.lat,
+          lng: d.location.lng,
+        },
+      })
+      setState('success')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to look up IP')
+      setState('error')
+    }
+  }, [])
 
   const handleSearch = useCallback((query: string) => {
-    setState('loading')
-    setError(null)
-    // TODO: Call IP lookup API with query
-    // Simulating instant response with mock data
-    void query
-    setState('success')
-  }, [])
+    if (!query.trim()) return
+    fetchIp(query.trim())
+  }, [fetchIp])
 
   const handleRefresh = useCallback(() => {
-    setState('loading')
-    setError(null)
-    // TODO: Re-fetch current IP
-    setState('success')
-  }, [])
+    if (lastQuery) fetchIp(lastQuery)
+  }, [lastQuery, fetchIp])
 
   const handleRetry = useCallback(() => {
-    setError(null)
-    setState('loading')
-    // TODO: Retry last operation
-    setState('success')
-  }, [])
+    if (lastQuery) fetchIp(lastQuery)
+  }, [lastQuery, fetchIp])
 
   return (
     <main className="max-w-5xl mx-auto px-6 py-12 flex-1">
@@ -111,7 +149,17 @@ export default function IpCheckPage() {
 
       {state === 'loading' && <LoadingSkeleton />}
 
-      {(state === 'success' || state === 'idle') && data && (
+      {state === 'idle' && (
+        <div className="text-center py-16">
+          <svg className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <p className="text-slate-500 dark:text-slate-400 text-lg font-medium">Enter an IP address or domain to get started</p>
+          <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">e.g. 8.8.8.8 or google.com</p>
+        </div>
+      )}
+
+      {state === 'success' && data && (
         <div>
           <IpHeroCard
             ip={data.ip}
@@ -130,7 +178,6 @@ export default function IpCheckPage() {
 function LoadingSkeleton() {
   return (
     <div aria-busy="true" aria-label="Loading IP information">
-      {/* Hero card skeleton */}
       <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-2xl shadow-xl p-8 md:p-12 text-center">
         <div className="h-4 w-48 bg-slate-200 dark:bg-slate-700 rounded mx-auto mb-4 animate-pulse" />
         <div className="h-16 md:h-20 w-80 bg-slate-200 dark:bg-slate-700 rounded mx-auto mb-6 animate-pulse" />
@@ -138,13 +185,7 @@ function LoadingSkeleton() {
           <div className="h-8 w-40 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse" />
           <div className="h-8 w-32 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse" />
         </div>
-        <div className="flex justify-center gap-3">
-          <div className="h-12 w-36 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" />
-          <div className="h-12 w-28 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" />
-        </div>
       </div>
-
-      {/* Info grid skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
         {Array.from({ length: 4 }).map((_, i) => (
           <div
@@ -153,26 +194,9 @@ function LoadingSkeleton() {
           >
             <div className="w-10 h-10 bg-slate-200 dark:bg-slate-700 rounded-lg mb-4 animate-pulse" />
             <div className="h-3 w-20 bg-slate-200 dark:bg-slate-700 rounded mb-2 animate-pulse" />
-            <div className="h-5 w-32 bg-slate-200 dark:bg-slate-700 rounded mb-1 animate-pulse" />
-            <div className="h-3 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+            <div className="h-5 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
           </div>
         ))}
-      </div>
-
-      {/* Location detail skeleton */}
-      <div className="mt-8 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-2xl shadow-xl overflow-hidden">
-        <div className="grid md:grid-cols-3">
-          <div className="p-8 md:col-span-1 border-r border-slate-200 dark:border-slate-800">
-            <div className="h-6 w-40 bg-slate-200 dark:bg-slate-700 rounded mb-6 animate-pulse" />
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex justify-between items-center pb-2 mb-4">
-                <div className="h-3 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-              </div>
-            ))}
-          </div>
-          <div className="md:col-span-2 min-h-[300px] bg-slate-100 dark:bg-slate-800 animate-pulse" />
-        </div>
       </div>
     </div>
   )

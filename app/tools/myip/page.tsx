@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { MyIpHero } from '@/tools/myip/myip-hero'
 import { TechInfoPanel } from '@/tools/myip/tech-info-panel'
 import { LiveLocationPanel } from '@/tools/myip/live-location-panel'
@@ -20,35 +20,49 @@ interface MyIpData {
   isSecure: boolean
 }
 
-// Mock data — replace with API calls later
-const mockData: MyIpData = {
-  ip: '192.168.1.1',
-  isp: 'Global Link Technology',
-  country: 'United States',
-  countryCode: 'US',
-  city: 'San Francisco',
-  region: 'CA',
-  coordinates: { lat: 37.7749, lng: -122.4194 },
-  proxy: false,
-  vpn: true,
-  tor: false,
-  timezone: 'PDT',
-  isSecure: true,
-}
-
 type PageState = 'loading' | 'success' | 'error'
 
 export default function MyIpPage() {
-  const [state, setState] = useState<PageState>('success')
-  const [data] = useState<MyIpData>(mockData)
+  const [state, setState] = useState<PageState>('loading')
+  const [data, setData] = useState<MyIpData | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const handleRetry = useCallback(() => {
-    setError(null)
+  const fetchMyIp = useCallback(async () => {
     setState('loading')
-    // TODO: Re-fetch IP data
-    setState('success')
+    setError(null)
+    try {
+      const res = await fetch('/api/v1/myip')
+      const json = await res.json()
+
+      if (!res.ok || json.error) {
+        throw new Error(json.error || `Request failed (${res.status})`)
+      }
+
+      const d = json.data
+      setData({
+        ip: d.ip,
+        isp: d.isp,
+        country: d.country,
+        countryCode: d.countryCode,
+        city: d.city,
+        region: d.region,
+        coordinates: d.coordinates,
+        proxy: d.proxy ?? false,
+        vpn: false,
+        tor: false,
+        timezone: d.timezone,
+        isSecure: typeof window !== 'undefined' && window.location.protocol === 'https:',
+      })
+      setState('success')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch IP information')
+      setState('error')
+    }
   }, [])
+
+  useEffect(() => {
+    fetchMyIp()
+  }, [fetchMyIp])
 
   return (
     <main className="flex-1 flex flex-col items-center py-10 px-4">
@@ -75,7 +89,7 @@ export default function MyIpPage() {
               <p className="text-sm font-medium text-red-700 dark:text-red-300">{error}</p>
             </div>
             <button
-              onClick={handleRetry}
+              onClick={fetchMyIp}
               className="shrink-0 text-sm font-bold text-red-600 dark:text-red-400 hover:underline cursor-pointer"
             >
               Retry
@@ -120,7 +134,6 @@ function LoadingSkeleton() {
 
       {/* Grid skeleton */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8">
-        {/* Tech info skeleton */}
         <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
           <div className="h-6 w-48 bg-slate-200 dark:bg-slate-700 rounded mb-6 animate-pulse" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -137,17 +150,7 @@ function LoadingSkeleton() {
               </div>
             ))}
           </div>
-          <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 md:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex flex-col gap-1">
-                <div className="h-2 w-10 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                <div className="h-4 w-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-              </div>
-            ))}
-          </div>
         </div>
-
-        {/* Map skeleton */}
         <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
             <div className="h-6 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
