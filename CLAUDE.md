@@ -38,6 +38,59 @@ handytool-ui      →  (no app dependencies, only react/react-dom peers)
 - If a component is needed by BOTH client and admin → extract to **handytool-ui**
 - If a component is only used in one app → keep it in that app's repo
 
+### handytool-ui — Shared Component Library (IMPORTANT)
+
+**handytool-ui** is the single source of truth for reusable UI components shared across apps. It can be consumed in two ways:
+
+| Method | When | How |
+|---|---|---|
+| **pnpm workspace** (local dev) | During development in the monorepo | `"@wong1982-ops/handytool-ui": "workspace:*"` in `package.json` |
+| **npm install** (published) | External projects or CI without monorepo | `pnpm add @wong1982-ops/handytool-ui` after publishing to npm |
+
+**What goes in handytool-ui:**
+- Design tokens (SCSS variables, CSS custom properties)
+- Reusable React components used by **both** client and admin (buttons, cards, badges, inputs, modals, etc.)
+- Component exports via `src/index.ts` (barrel file)
+- No app-specific logic, no API calls, no routing, no page components
+
+**Package structure:**
+```
+handytool-ui/
+├── package.json              # name: "@wong1982-ops/handytool-ui"
+├── src/
+│   ├── index.ts              # Barrel export — all public components
+│   ├── components/
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── badge.tsx
+│   │   └── ...
+│   └── styles/
+│       ├── tokens.scss       # Design tokens (colors, spacing, typography)
+│       └── globals.scss      # Global styles
+└── tsconfig.json
+```
+
+**Import pattern (from client or admin):**
+```tsx
+// ✅ Import from package name (works with workspace:* AND npm)
+import { Button, Card, Badge } from '@wong1982-ops/handytool-ui'
+
+// ❌ Never import from relative paths across packages
+import { Button } from '../../handytool-ui/src/components/button'
+```
+
+**Publishing to npm:**
+```bash
+cd handytool-ui
+pnpm build
+npm publish --access public
+```
+
+**Component extraction rule:**
+- Component used in **1 app only** → keep in that app's `components/ui/`
+- Component used in **2+ apps** → extract to `handytool-ui`, export from `src/index.ts`
+- When extracting: move the component, update imports in all consumers, verify build passes
+
 ## Tool Development Pattern (FOLLOW FOR ALL NEW TOOLS)
 See [.claude/tool-pattern.md](.claude/tool-pattern.md) for full details.
 
@@ -72,11 +125,29 @@ See [.claude/tool-pattern.md](.claude/tool-pattern.md) for full details.
 See [.claude/ui-ux-guideline.md](.claude/ui-ux-guideline.md) — MUST follow for all UI work.
 Key rules: WCAG 2.1 AA, 4.5:1 contrast for text, 44px touch targets, mobile-first, semantic HTML, Core Web Vitals 90+.
 
-## Skills (global ~/.claude/skills/)
-- **seo-expert** — SEO audit, meta tags, structured data, Core Web Vitals
-- **ui-ux-react-dev** — Accessibility, responsive design, performance, component architecture
-- **api-dev** — REST/tRPC APIs, validation, error handling, auth, rate limiting
-- **architect** — System design, monorepo structure, rendering strategy, state management
+## Development Lifecycle (MANDATORY)
+All features MUST follow the 3-phase lifecycle defined in [.claude/dev-lifecycle.md](.claude/dev-lifecycle.md):
+- **Phase 1 — Discovery**: PO + BA + UX + UI + Architect + QA Lead collaborate on PRD
+- **Phase 2 — Build**: Dev + QA work in parallel (implementation + E2E tests)
+- **Phase 3 — Review**: PO + UX + UI + QA + Architect review, score 7 dimensions, APPROVED or NEEDS ITERATION
+- **Iteration**: Back to Phase 1 with refined PRD, max 3 cycles per feature
+
+## Team Roles & Skills (global ~/.claude/skills/)
+
+### Discovery (Phase 1)
+- **product-owner** — Product vision, PRD authoring, backlog priority, competitive benchmarking, approval gate
+- **business-analyst** — Requirements elicitation, user stories, acceptance criteria, edge cases, process mapping
+- **ux-designer** — User research, personas, user flows, wireframes, 5-state design, usability heuristics
+- **ui-designer** — Visual design, color/typography specs, component styling, dark mode, design consistency
+
+### Build (Phase 2)
+- **ui-ux-react-dev** — Front-end dev: React/Next.js, responsive layouts, accessibility, component architecture
+- **api-dev** — Back-end dev: REST APIs, Zod validation, auth, rate limiting, caching
+- **architect** — System design, NFRs (security, encryption, performance, caching, scalability)
+- **seo-expert** — Meta tags, structured data, Core Web Vitals, semantic HTML
+
+### Review & Quality (Phase 3)
+- **qa-engineer** — Test planning, E2E automation (Playwright), manual testing, bug reports, QA sign-off
 
 ## Session Continuity (MANDATORY)
 Before starting any implementation, write a summary to [.claude/session-log.md](.claude/session-log.md).
