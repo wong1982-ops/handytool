@@ -1,19 +1,25 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 
 interface SearchBarProps {
   placeholder?: string
   buttonLabel?: string
+  defaultValue?: string
   onSearch: (query: string) => void
 }
 
 export function SearchBar({
   placeholder = 'Search...',
   buttonLabel = 'Search',
+  defaultValue,
   onSearch,
 }: SearchBarProps) {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(defaultValue ?? '')
+
+  useEffect(() => {
+    if (defaultValue && !query) setQuery(defaultValue)
+  }, [defaultValue]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()

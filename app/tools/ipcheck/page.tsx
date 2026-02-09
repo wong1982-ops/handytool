@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { SearchBar } from '@/components/ui/search-bar'
 import { IpHeroCard } from '@/tools/ipcheck/ip-hero-card'
 import { IpInfoGrid } from '@/tools/ipcheck/ip-info-grid'
@@ -56,10 +56,11 @@ function isIpAddress(query: string): boolean {
 }
 
 export default function IpCheckPage() {
-  const [state, setState] = useState<PageState>('idle')
+  const [state, setState] = useState<PageState>('loading')
   const [data, setData] = useState<IpData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [lastQuery, setLastQuery] = useState<string>('')
+  const [userIp, setUserIp] = useState<string>('')
 
   const fetchIp = useCallback(async (query: string) => {
     setState('loading')
@@ -104,6 +105,23 @@ export default function IpCheckPage() {
     }
   }, [])
 
+  // Auto-fetch user's current IP on mount
+  useEffect(() => {
+    fetch('/api/v1/myip')
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.data?.ip) {
+          setUserIp(json.data.ip)
+          fetchIp(json.data.ip)
+        } else {
+          setState('idle')
+        }
+      })
+      .catch(() => {
+        setState('idle')
+      })
+  }, [fetchIp])
+
   const handleSearch = useCallback((query: string) => {
     if (!query.trim()) return
     fetchIp(query.trim())
@@ -119,10 +137,19 @@ export default function IpCheckPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-6 py-12 flex-1">
+      <nav aria-label="Breadcrumb" className="mb-8">
+        <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
+          <li><a href="/tools" className="hover:text-[var(--ht-color-primary-500)] transition-colors">Home</a></li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="text-slate-900 dark:text-white font-medium">IP Check</li>
+        </ol>
+      </nav>
+
       <div className="mb-12 flex justify-center">
         <SearchBar
           placeholder="Lookup any IP address or domain..."
           buttonLabel="Lookup"
+          defaultValue={userIp}
           onSearch={handleSearch}
         />
       </div>
