@@ -13,6 +13,7 @@
 - **Styling**: Tailwind CSS v4 + SCSS (always `.scss`, never `.css`) + system font stack (no external fonts)
 - **UI**: shadcn/ui + Tailwind, CSS custom properties for theming (`--ht-*`)
 - **Framework**: Next.js 16 App Router, React 19, TypeScript strict
+- **E2E Testing**: Playwright — every tool MUST have E2E tests (see `.claude/ui-ux-guideline.md`)
 
 ## Repo Responsibilities (MUST follow — put code in the correct repo)
 
