@@ -85,11 +85,26 @@ export default function JsonConverterPage() {
     }
   }, [input])
 
-  // Line counts
+  // Detect input language for editor highlighting
+  const inputLanguage = useMemo<'json' | 'yaml'>(() => {
+    const trimmed = input.trim()
+    if (!trimmed) return 'json'
+    try {
+      JSON.parse(trimmed)
+      return 'json'
+    } catch {
+      return 'yaml'
+    }
+  }, [input])
+
+  // Output language for read-only editor highlighting
+  const outputLanguage = useMemo<'json' | 'yaml'>(() => {
+    return outputFormat === 'YAML' ? 'yaml' : 'json'
+  }, [outputFormat])
+
+  // Line counts for status bar
   const inputLineCount = input ? input.split('\n').length : 1
   const outputLineCount = output ? output.split('\n').length : 1
-  const currentContent = activeTab === 'input' ? input : output
-  const currentLineCount = activeTab === 'input' ? inputLineCount : outputLineCount
 
   // Actions
   const handleBeautify = useCallback(() => {
@@ -102,6 +117,25 @@ export default function JsonConverterPage() {
       setActiveTab('output')
     } catch {
       setOutput('Error: Invalid JSON input')
+    }
+  }, [input])
+
+  const handleFormat = useCallback(() => {
+    try {
+      const parsed = JSON.parse(input)
+      const formatted = JSON.stringify(parsed, null, 2)
+      setInput(formatted)
+      setActiveAction('format')
+    } catch {
+      // Try YAML format
+      try {
+        const parsed = yaml.load(input)
+        if (typeof parsed === 'object' && parsed !== null) {
+          const formatted = yaml.dump(parsed, { indent: 2, lineWidth: -1 })
+          setInput(formatted)
+          setActiveAction('format')
+        }
+      } catch { /* ignore */ }
     }
   }, [input])
 
@@ -173,6 +207,12 @@ export default function JsonConverterPage() {
   // Keyboard shortcuts
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
+      // Shift+Alt+F — format in place
+      if (e.shiftKey && e.altKey && e.key === 'F') {
+        e.preventDefault()
+        handleFormat()
+        return
+      }
       if (e.ctrlKey || e.metaKey) {
         if (e.key === 'z' && e.shiftKey) {
           e.preventDefault()
@@ -191,7 +231,7 @@ export default function JsonConverterPage() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleToYaml, handleToJson, handleUndo, handleRedo])
+  }, [handleToYaml, handleToJson, handleUndo, handleRedo, handleFormat])
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -262,6 +302,7 @@ export default function JsonConverterPage() {
           onToJson={handleToJson}
           onCopy={handleCopy}
           onDownload={handleDownload}
+          onFormat={handleFormat}
           activeAction={activeAction}
         />
 
@@ -274,6 +315,7 @@ export default function JsonConverterPage() {
                 actions={[
                   { label: 'Beautify Code', onClick: () => { handleBeautify(); setShowMobileSidebar(false) } },
                   { label: 'Minify Output', onClick: () => { handleMinify(); setShowMobileSidebar(false) } },
+                  { label: 'Format (Shift+Alt+F)', onClick: () => { handleFormat(); setShowMobileSidebar(false) } },
                 ]}
                 title="Core Actions"
               />
@@ -296,9 +338,9 @@ export default function JsonConverterPage() {
         )}
 
         {/* Editor Area */}
-        <section className="flex-1 bg-slate-50 dark:bg-slate-950 p-4 md:p-8 flex flex-col gap-4 overflow-hidden">
-          {/* Tabs + Validation */}
-          <div className="flex items-center justify-between">
+        <section className="flex-1 bg-slate-50 dark:bg-slate-950 p-4 md:p-6 flex flex-col gap-4 overflow-hidden">
+          {/* Mobile: Tabs + Validation */}
+          <div className="flex items-center justify-between md:hidden">
             <div className="flex p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-xl w-fit">
               <button
                 onClick={() => setActiveTab('input')}
@@ -333,14 +375,69 @@ export default function JsonConverterPage() {
             )}
           </div>
 
-          {/* Editor */}
-          <div className="flex-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col relative">
+          {/* Desktop: Side-by-side editors */}
+          <div className="hidden md:flex flex-1 gap-4 overflow-hidden">
+            {/* Input Panel */}
+            <div className="flex-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Input</span>
+                {validation.valid !== null && (
+                  <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold border ${
+                    validation.valid
+                      ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800/50'
+                      : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${validation.valid ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
+                    {validation.label}
+                  </div>
+                )}
+              </div>
+              <CodeEditor
+                value={input}
+                onChange={handleInputChange}
+                placeholder='{ "paste": "your JSON or YAML here" }'
+                language={inputLanguage}
+              />
+              <StatusBar
+                format={validation.label.includes('YAML') ? 'YAML' : 'JSON'}
+                lineCount={inputLineCount}
+                charCount={input.length}
+                isValid={validation.valid}
+                validationLabel={validation.label}
+              />
+            </div>
+
+            {/* Output Panel */}
+            <div className="flex-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  {output ? `Result (${outputFormat})` : 'Result'}
+                </span>
+              </div>
+              <CodeEditor
+                value={output}
+                onChange={() => {}}
+                readOnly
+                placeholder="Run an action to see results..."
+                language={outputLanguage}
+              />
+              <StatusBar
+                format={outputFormat}
+                lineCount={outputLineCount}
+                charCount={output.length}
+                isValid={null}
+              />
+            </div>
+          </div>
+
+          {/* Mobile: Tab-switched single editor */}
+          <div className="flex-1 md:hidden bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col relative">
             {activeTab === 'input' ? (
               <CodeEditor
                 value={input}
                 onChange={handleInputChange}
                 placeholder='{ "paste": "your JSON or YAML here" }'
-                lineCount={inputLineCount}
+                language={inputLanguage}
               />
             ) : (
               <CodeEditor
@@ -348,15 +445,14 @@ export default function JsonConverterPage() {
                 onChange={() => {}}
                 readOnly
                 placeholder="Run an action to see results..."
-                lineCount={outputLineCount}
+                language={outputLanguage}
               />
             )}
 
-            {/* Status Bar */}
             <StatusBar
               format={activeTab === 'input' ? (validation.label.includes('YAML') ? 'YAML' : 'JSON') : outputFormat}
-              lineCount={currentLineCount}
-              charCount={currentContent.length}
+              lineCount={activeTab === 'input' ? inputLineCount : outputLineCount}
+              charCount={activeTab === 'input' ? input.length : output.length}
               isValid={activeTab === 'input' ? validation.valid : null}
               validationLabel={activeTab === 'input' ? validation.label : undefined}
             />

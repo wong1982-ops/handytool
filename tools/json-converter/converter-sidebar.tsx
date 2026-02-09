@@ -5,6 +5,7 @@ interface ConverterSidebarProps {
   onToJson: () => void
   onCopy: () => void
   onDownload: () => void
+  onFormat: () => void
   activeAction?: string
 }
 
@@ -15,6 +16,7 @@ export function ConverterSidebar({
   onToJson,
   onCopy,
   onDownload,
+  onFormat,
   activeAction,
 }: ConverterSidebarProps) {
   return (
@@ -41,6 +43,17 @@ export function ConverterSidebar({
             }
             label="Minify Output"
             onClick={onMinify}
+          />
+          <SidebarButton
+            icon={
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h10M4 14h16M4 18h10" />
+              </svg>
+            }
+            label="Format"
+            kbd="Shift+Alt+F"
+            onClick={onFormat}
+            active={activeAction === 'format'}
           />
         </div>
       </div>

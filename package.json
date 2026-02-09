@@ -12,9 +12,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.10.2",
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/lang-yaml": "^6.1.2",
+    "@codemirror/language": "^6.12.1",
+    "@codemirror/lint": "^6.9.3",
+    "@codemirror/state": "^6.5.4",
+    "@codemirror/view": "^6.39.13",
+    "@lezer/highlight": "^1.2.3",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.95.3",
     "@wong1982-ops/handytool-ui": "workspace:*",
+    "codemirror": "^6.0.2",
     "js-yaml": "^4.1.1",
     "leaflet": "^1.9.4",
     "next": "16.1.6",
