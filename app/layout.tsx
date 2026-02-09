@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,8 +16,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "HandyTool",
-  description: "HandyTool Web Client",
+  description: "HandyTool - Free online developer tools",
 };
+
+const navItems = [
+  { label: "Tools", href: "/tools/ipcheck" },
+];
 
 export default function RootLayout({
   children,
@@ -25,9 +31,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
+        <Header brandName="HandyTool" navItems={navItems} />
         {children}
+        <Footer brandName="HandyTool" />
       </body>
     </html>
   );

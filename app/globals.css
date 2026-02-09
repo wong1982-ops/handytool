@@ -1,8 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ht-color-primary-50:  #edf2fe;
+  --ht-color-primary-100: #d9e3fd;
+  --ht-color-primary-200: #b3c7fb;
+  --ht-color-primary-300: #8daaf9;
+  --ht-color-primary-400: #3D9DF2;
+  --ht-color-primary-500: #3D79F2;
+  --ht-color-primary-600: #3D6AF2;
+  --ht-color-primary-700: #2f54d9;
+  --ht-color-primary-800: #2341b3;
+  --ht-color-primary-900: #1a2f8c;
+  --ht-color-primary-950: #0e1a59;
+
+  --ht-color-secondary-50:  #ecfbfb;
+  --ht-color-secondary-100: #cff5f5;
+  --ht-color-secondary-200: #a0ecec;
+  --ht-color-secondary-300: #68e0e0;
+  --ht-color-secondary-400: #32D9D9;
+  --ht-color-secondary-500: #32A9D9;
+  --ht-color-secondary-600: #288db3;
+  --ht-color-secondary-700: #206d8c;
+  --ht-color-secondary-800: #1a5570;
+  --ht-color-secondary-900: #143d54;
+  --ht-color-secondary-950: #0a2233;
+
+  --ht-font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --ht-font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --background: #f6f7f8;
+  --foreground: #0f172a;
+}
+
+.dark {
+  --background: #101922;
+  --foreground: #f1f5f9;
 }
 
 @theme inline {
@@ -12,15 +44,19 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(at 0% 0%, rgba(61, 121, 242, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(61, 121, 242, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(61, 121, 242, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(61, 121, 242, 0.05) 0px, transparent 50%);
+  color: var(--foreground);
+  font-family: var(--ht-font-family-sans);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.dark body {
+  background-image:
+    radial-gradient(at 0% 0%, rgba(61, 121, 242, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(61, 121, 242, 0.15) 0px, transparent 50%);
 }
