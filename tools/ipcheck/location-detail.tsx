@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { GlassCard } from '@/components/ui/glass-card'
 import { DetailList, type DetailItem } from '@/components/ui/detail-list'
 
-const LocationMap = dynamic(() => import('./location-map').then((m) => m.LocationMap), {
+const LocationMap = dynamic(() => import('@/components/ui/location-map').then((m) => m.LocationMap), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full min-h-[300px] bg-slate-100 dark:bg-slate-800 animate-pulse flex items-center justify-center">
@@ -50,7 +50,7 @@ export function LocationDetail({ data }: LocationDetailProps) {
         <div className="p-8 md:col-span-1 border-r border-slate-200 dark:border-slate-800">
           <DetailList title="Detailed Location" items={items} />
         </div>
-        <div className="md:col-span-2 min-h-[300px] relative">
+        <div className="md:col-span-2 min-h-[300px] relative" role="img" aria-label="Map showing IP location">
           <LocationMap lat={data.lat} lng={data.lng} />
         </div>
       </div>

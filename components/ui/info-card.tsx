@@ -28,7 +28,7 @@ const dotColors = {
 
 export function InfoCard({ icon, label, value, subValue, status }: InfoCardProps) {
   return (
-    <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-5 rounded-xl shadow-sm flex flex-col items-start">
+    <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/30 dark:border-white/10 p-5 rounded-xl shadow-sm flex flex-col items-start">
       <IconBox className="mb-4">{icon}</IconBox>
       <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">{label}</h3>
       <p className="text-lg font-semibold truncate w-full text-slate-900 dark:text-white">{value}</p>

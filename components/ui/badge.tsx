@@ -16,7 +16,7 @@ const variantStyles = {
 export function Badge({ icon, children, variant = 'default' }: BadgeProps) {
   return (
     <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
-      {icon && <span className={variantStyles[variant]}>{icon}</span>}
+      {icon && <span className={variantStyles[variant]} aria-hidden="true">{icon}</span>}
       <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{children}</span>
     </div>
   )

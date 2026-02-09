@@ -2,6 +2,9 @@
   "name": "handytool-client",
   "version": "0.1.0",
   "private": true,
+  "sideEffects": [
+    "*.scss"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,6 +15,7 @@
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.95.3",
     "@wong1982-ops/handytool-ui": "workspace:*",
+    "js-yaml": "^4.1.1",
     "leaflet": "^1.9.4",
     "next": "16.1.6",
     "react": "19.2.3",
@@ -20,12 +24,14 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/js-yaml": "^4.0.9",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "sass": "^1.97.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
