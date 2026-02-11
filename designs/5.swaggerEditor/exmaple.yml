@@ -1,0 +1,4263 @@
+openapi: '3.0.2'
+info:
+  title: Entitlement Service API
+  version: 1.0.0
+servers:
+  - url: https://entitlement-service.test.datarock.com.au
+    description: API for entitlement service in test env
+  - url: https://entitlement-service.demo.datarock.com.au
+    description: API for entitlement service in demo env
+  - url: https://entitlement-service.prod.datarock.com.au
+    description: API for entitlement service in prod env
+
+paths:
+  /project/{projectUuid}/entitlements:
+    get:
+      tags:
+        - Entitlements
+      summary: Get a list of entitlements for a project
+      parameters:
+        - $ref: '#/components/parameters/projectUuid'
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EntitlementObject'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  v2/project/{projectUuid}/subscriptions:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get all subscriptions for a project
+      description: |
+        Returns all subscriptions associated with a project, along with their status based on the effective date.
+        Each subscription's status is determined by comparing the effective date with the subscription's date range:
+        - active: effective date is within the subscription period (dateFrom <= effectiveDate <= dateTo)
+        - expired: effective date is after the subscription period (effectiveDate > dateTo)
+        - scheduled: effective date is before the subscription period (effectiveDate < dateFrom)
+      parameters:
+        - $ref: '#/components/parameters/projectUuid'
+        - $ref: '#/components/parameters/authorizationHeader'
+        - in: query
+          name: effectiveDate
+          description: The date to evaluate subscription status against. Defaults to today's date if not provided.
+          schema:
+            type: string
+            format: date
+          required: false
+          example: "2024-12-12"
+      responses:
+        '200':
+          description: Subscriptions found (empty array if no subscriptions exist)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectSubscriptionObject'
+              examples:
+                single_active:
+                  summary: Single active subscription
+                  value:
+                    - subscriptionUuid: "d41ae335-7f54-4fdd-b6aa-29b433d21505"
+                      status: "active"
+                multiple_mixed:
+                  summary: Multiple subscriptions with different statuses
+                  value:
+                    - subscriptionUuid: "d41ae335-7f54-4fdd-b6aa-29b433d21505"
+                      status: "active"
+                    - subscriptionUuid: "a1b2c3d4-5678-9012-3456-789012345678"
+                      status: "expired"
+                    - subscriptionUuid: "f9e8d7c6-5432-1098-7654-321098765432"
+                      status: "scheduled"
+                empty:
+                  summary: No subscriptions found
+                  value: []
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/entitlements:
+    get:
+      tags:
+        - Entitlements
+      summary: List all entitlements
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2EntitlementsExportObject'
+              example:
+                entitlements:
+                  - id: 36
+                    projectId: 9c19f759-bf67-4a13-a6fd-68bd69eaa413
+                    productId: 5aec28e7-ae38-4f67-b3ce-4640e407031b
+                    dateFrom: 2024-01-01T00:00:00.000Z
+                    dateTo: 2024-12-31T23:59:59.999Z
+                    subscriptionId: 123e4567-e89b-12d3-a456-426614174000
+                    isUnlimited: false
+                  - id: 37
+                    projectId: 83adc40e-152a-4566-82b3-295b586123a9
+                    productId: 6b771755-885a-44fe-91ff-a4b3938a787b
+                    dateFrom: 2025-01-01T00:00:00.000Z
+                    dateTo: 2025-12-31T23:59:59.999Z
+                    subscriptionId: 123e4567-e89b-12d3-a456-426614174000
+                    isUnlimited: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/project/{projectUuid}/entitlements:
+    get:
+      tags:
+        - Entitlements
+      summary: Get a list of summarised entitlements for a project
+      parameters:
+        - $ref: '#/components/parameters/projectUuid'
+        - $ref: '#/components/parameters/authorizationHeader'
+        - in: query
+          name: effectiveDate
+          description: The date from which the entitlements are valid. Defaults to today's date.
+          schema:
+            $ref: '#/components/parameters/effectiveDate'
+          required: false
+        - in: query
+          name: contractualAmountsOnly
+          description: Whether to only return the contractual amount of the entitlement. Defaults to false.
+          schema:
+            $ref: '#/components/parameters/contractualAmountsOnly'
+          required: false
+        - in: query
+          name: includeAmountInMetres
+          description: Whether to include the sum of ledger entries in amountInMetres. When true, calculates amounts and filters out unlimited entitlements. When false, includes all entitlements with amountInMetres as undefined. Defaults to true.
+          schema:
+            $ref: '#/components/parameters/includeAmountInMetres'
+          required: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2EntitlementsObject'
+              example:
+                products:
+                  - id: 9c19f759-bf67-4a13-a6fd-68bd69eaa413
+                    name: Pre-processing
+                    amountUsedInMetres: 25000
+                    isUnlimited: true
+                    subscriptionId: 123e4567-e89b-12d3-a456-426614174000
+                    dateFrom: 2024-01-01T00:00:00.000Z
+                    dateTo: 2024-12-31T23:59:59.999Z
+                    usageAvailable: true
+                  - id: 5aec28e7-ae38-4f67-b3ce-4640e407031b
+                    name: RQD
+                    amountInMetres: 30000
+                    amountUsedInMetres: 10000
+                    isUnlimited: false
+                    subscriptionId: 123e4567-e89b-12d3-a456-426614174000
+                    dateFrom: 2024-01-01T00:00:00.000Z
+                    dateTo: 2024-12-31T23:59:59.999Z
+                    usageAvailable: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Entitlements
+      summary: Indicate that a project is entitled to use a product
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/projectUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/V2EntitlementDateRangeObject'
+      responses:
+        '201':
+          description: Entitlement created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: An entitlement for this product already exists for this project within the specified date range
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/entitlements:
+    get:
+      tags:
+        - Entitlement Management
+      summary: Retrieve all entitlements for a subscription
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+        - in: query
+          name: contractualAmountsOnly
+          description: Whether to only return the contractual amount of the entitlement. Defaults to false.
+          schema:
+            $ref: '#/components/parameters/contractualAmountsOnly'
+          required: false
+        - in: query
+          name: includeAmountInMetres
+          description: Whether to include the sum of ledger entries in amountInMetres. When true, calculates amounts and filters out unlimited entitlements. When false, includes all entitlements with amountInMetres as undefined. Defaults to true.
+          schema:
+            $ref: '#/components/parameters/includeAmountInMetres'
+          required: false
+      responses:
+        '200':
+          description: Subscription product entitlements retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionProductEntitlementsResponse'
+              example:
+                entitlements:
+                  - subscriptionId: d41ae335-7f54-4fdd-b6aa-29b433d21505
+                    productId: 5aec28e7-ae38-4f67-b3ce-4640e407031b
+                    isUnlimited: false
+                    productSlug: rqd
+                    amountInMetres: 4000
+                  - subscriptionId: d41ae335-7f54-4fdd-b6aa-29b433d21505
+                    productId: 6b771755-885a-44fe-91ff-a4b3938a787b
+                    isUnlimited: true
+                    productSlug: fracture
+        '400':
+          description: Your request was invalid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Entitlement Management
+      summary: Create SubscriptionEntitlements for given subscription
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionProductEntitlementsCreationInput'
+            example:
+              products:
+                - productId: '5aec28e7-ae38-4f67-b3ce-4640e407031b'
+                  isUnlimited: false
+                - productId: '6b771755-885a-44fe-91ff-a4b3938a787b'
+                  isUnlimited: true
+      responses:
+        '200':
+          description: Subscription product entitlements created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionProductEntitlementsCreationOutput'
+              example:
+                - id: 19229f3b-4c1e-4d2a-8b5c-9f0e1a2b3c4d
+                  subscriptionId: d41ae335-7f54-4fdd-b6aa-29b433d21505
+                  productId: 5aec28e7-ae38-4f67-b3ce-4640e407031b
+                  isUnlimited: false
+                - id: 374f0d8a-3926-4a30-a89f-05f0dab76794
+                  subscriptionId: d41ae335-7f54-4fdd-b6aa-29b433d21505
+                  productId: 6b771755-885a-44fe-91ff-a4b3938a787b
+                  isUnlimited: true
+        '400':
+          description: Your request was invalid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/entitlements/remaining:
+    get:
+      tags:
+        - Entitlement Management
+      summary: Retrieve remaining entitlements for a subscription
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemainingEntitlement'
+              example:
+                products:
+                  rqd: 6000
+                  fractures: 6000
+                  jsa: 6000
+                projects:
+                  '9c19f759-bf67-4a13-a6fd-68bd69eaa413':
+                    rqd: 1000
+                    fractures: 1000
+                    jsa: 2000
+                  '9c19f759-bf67-4a13-a6fd-68bd69eaa414':
+                    rqd: 1000
+                    fractures: 1000
+                    jsa: 500
+        '400':
+          description: Your request was invalid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/allocations:
+    get:
+      tags:
+        - Entitlement Management
+      summary: Retrieve allocation summary for a subscription
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productsAllocated:
+                    type: number
+                    description: Sum of product entitlements at the subscription product level (not usage or allocation to projects), in metres
+                  projectsAllocated:
+                    type: number
+                    description: Sum of project entitlements at the subscription project level (not usage or allocation to products), in metres
+                required:
+                  - productsAllocated
+                  - projectsAllocated
+              example:
+                productsAllocated: 50000
+                projectsAllocated: 25000
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/entitlements/product/{productUuid}:
+    post:
+      tags:
+        - Entitlement Management
+      summary: Create an immutable ledger entry for a subscription and product
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+        - $ref: '#/components/parameters/productUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionLedgerEntryCreationInput'
+            example:
+              type: SUB_SETUP
+              amountInMetres: 30000
+              notes: Subscription setup entitlement for Essentials plan
+              referenceId: PLT-3293
+              referenceSystem: JIRA
+      responses:
+        '200':
+          description: Ledger entry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionLedgerEntryCreationOutput'
+              example:
+                id: '19229f3b-4c1e-4d2a-8b5c-9f0e1a2b3c4d'
+                subscriptionId: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+                productId: '5aec28e7-ae38-4f67-b3ce-4640e407031b'
+                type: SUB_SETUP
+                amountInMetres: 30000
+                notes: Subscription setup entitlement for Essentials plan
+                referenceId: PLT-3293
+                referenceSystem: JIRA
+        '400':
+          description: Your request was invalid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/entitlements/product/{productUuid}/ledger-entries:
+    get:
+      tags:
+        - Entitlement Management
+      summary: Get all ledger entries for a subscription and product
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+        - $ref: '#/components/parameters/productUuid'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubscriptionLedgerEntryCreationOutput'
+              example:
+                - id: '19229f3b-4c1e-4d2a-8b5c-9f0e1a2b3c4d'
+                  subscriptionProductEntitlementId: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+                  type: SUB_SETUP
+                  amountInMetres: 30000
+                  notes: Subscription setup entitlement for Essentials plan
+                  referenceId: PLT-3293
+                  referenceSystem: JIRA
+                  createdBy: test@datarock.com.au
+                - id: '29339f4c-5d2f-5e3b-9c6d-0f1e2a3b4c5e'
+                  subscriptionProductEntitlementId: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+                  type: TOP_UP
+                  amountInMetres: 15000
+                  notes: Additional entitlement top-up
+                  referenceId: PLT-3294
+                  referenceSystem: JIRA
+                  createdBy: admin@datarock.com.au
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/project/{projectUuid}/entitlements/product/{productUuid}:
+    get:
+      tags:
+        - Entitlement Management
+      summary: Retrieve all ledger entries for a project, product and date
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/projectUuid'
+        - $ref: '#/components/parameters/productUuid'
+        - $ref: '#/components/parameters/effectiveDate'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dateFrom:
+                    type: string
+                    format: ISO 8601 timestamp
+                    description: >
+                      The date & time from which the entitlement becomes valid
+                  dateTo:
+                    type: string
+                    format: ISO 8601 timestamp
+                    description: >
+                      The date & time after which the entitlement is no longer valid
+                  entries:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProjectProductEntitlementLedgerEntry'
+                example:
+                  dateFrom: 2024-01-01T00:00:00.000Z
+                  dateTo: 2024-12-31T23:59:59.999Z
+                  entries:
+                    - type: SUB_SETUP
+                      amountInMetres: 30000
+                      notes: Subscription setup entitlement for Essentials plan
+                      createdBy: user@email.com
+                      createdAt: 2024-11-22T00:00:00Z
+                    - type: TOP_UP
+                      amountInMetres: 10001
+                      createdBy: user@email.com
+                      createdAt: 2024-12-25T00:00:00Z
+                    - type: ADJUSTMENT
+                      notes: Corrected typo in top-up amount
+                      amountInMetres: -1
+                      createdBy: user@email.com
+                      createdAt: 2024-12-26T00:00:00Z
+                    - type: ADD_PRODUCT
+                      notes: Added new product
+                      amountInMetres: 10000
+                      createdBy: user@email.com
+                      createdAt: 2024-12-27T00:00:00Z
+                    - type: UPGRADE
+                      notes: Upgraded to premium plan
+                      amountInMetres: 20000
+                      createdBy: user@email.com
+                      createdAt: 2024-12-28T00:00:00Z
+                    - type: RENEWAL
+                      notes: Renewed subscription
+                      amountInMetres: 30000
+                      createdBy: user@email.com
+                      createdAt: 2024-12-29T00:00:00Z
+
+        '400':
+          description: Your request was invalid, eg. you requested ledger entries on an unlimited entitlement, the requested product or project UUIDs are not well formed, etc
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Entitlement Management
+      summary: Create an immutable ledger entry for a project, product & date range
+      parameters:
+        - in: header
+          name: authorizationHeader
+          description: The JWT as issued by the Datarock Platform UI, prepended with the Bearer identifier
+          schema:
+            $ref: '#/components/parameters/authorizationHeader'
+          required: true
+        - $ref: '#/components/parameters/projectUuid'
+        - $ref: '#/components/parameters/productUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectProductEntitlementModification'
+            example:
+              type: SUB_SETUP
+              amountInMetres: 30000
+              notes: Subscription setup entitlement for Essentials plan
+              effectiveDate: 2024-11-22
+      responses:
+        '201':
+          description: Ledger entry created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: The modification requested would result in an entitlement with a negative balance, or the entitlement is unlimited
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/ledgerEntries:
+    get:
+      tags:
+        - Entitlements
+      summary: List all ledger entries
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2LedgerEntriesExportObject'
+              example:
+                entries:
+                  - id: 1
+                    type: SUB_SETUP
+                    amountInMetres: 30000
+                    notes: Subscription setup entitlement for Essentials plan
+                    referenceId: PLT-3293
+                    referenceSystem: JIRA
+                    createdBy: user@email.com
+                    createdAt: 2024-11-22T00:00:00Z
+                    projectProductEntitlementId: 1
+                  - id: 2
+                    type: TOP_UP
+                    amountInMetres: 10001
+                    notes: Top-up entitlement for Essentials plan
+                    referenceId: PLT-3294
+                    referenceSystem: JIRA
+                    createdBy: user@email.com
+                    createdAt: 2024-12-25T00:00:00Z
+                    projectProductEntitlementId: 1
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscriptionProductEntitlements:
+    get:
+      tags:
+        - Entitlements
+      summary: List all subscription product entitlements
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2SubscriptionProductEntitlementsExportObject'
+              example:
+                subscriptionProductEntitlements:
+                  - id: '123e4567-e89b-12d3-a456-426614174000'
+                    subscriptionId: '456e4567-e89b-12d3-a456-426614174000'
+                    productId: '789e4567-e89b-12d3-a456-426614174000'
+                    isUnlimited: false
+                  - id: '123e4567-e89b-12d3-a456-426614174001'
+                    subscriptionId: '456e4567-e89b-12d3-a456-426614174001'
+                    productId: '789e4567-e89b-12d3-a456-426614174001'
+                    isUnlimited: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscriptionLedgerEntries:
+    get:
+      tags:
+        - Entitlements
+      summary: List all subscription ledger entries
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2SubscriptionLedgerEntriesExportObject'
+              example:
+                subscriptionLedgerEntries:
+                  - id: '1'
+                    type: 'SUB_SETUP'
+                    amountInMetres: 30000
+                    notes: 'Subscription setup entitlement'
+                    referenceId: 'PLT-3293'
+                    referenceSystem: 'JIRA'
+                    subscriptionProductEntitlementId: '123e4567-e89b-12d3-a456-426614174000'
+                    createdBy: 'admin@datarock.com.au'
+                  - id: '2'
+                    type: 'TOP_UP'
+                    amountInMetres: 10000
+                    notes: 'Top-up entitlement'
+                    referenceId: 'PLT-3294'
+                    referenceSystem: 'JIRA'
+                    subscriptionProductEntitlementId: '123e4567-e89b-12d3-a456-426614174001'
+                    createdBy: 'admin@datarock.com.au'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/user/{userEmail}/projects:
+    get:
+      tags:
+        - Entitlements
+      summary: Get entitlement status for projects the user is a member of
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/userEmail'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2UserProjectsObject'
+              example:
+                projects:
+                  - uuid: 9c19f759-bf67-4a13-a6fd-68bd69eaa413
+                    status: active
+                  - uuid: 9c19f759-bf67-4a13-a6fd-68bd69eaa413
+                    status: expired
+                  - uuid: 9c19f759-bf67-4a13-a6fd-68bd69eaa413
+                    status: uncapped
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/company/{companyUuid}/subscriptions:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get subscription status for a company
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/companyUuid'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2CompanySubscriptionsObject'
+              example:
+                companySubscriptions:
+                  - id: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+                    externalId: 'Hope Bay3465763'
+                    tier: 'essentials'
+                    tierLabel: 'Essentials'
+                    type: 'single-site'
+                    projectsForSubscription:
+                      - projectUuid: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                        numUsers: 2
+                        numUsersAllowed: 4
+                    numProjectsAllowed: 10
+                    dateFrom: '2023-12-31T16:00:00.000Z'
+                    dateTo: '2024-04-30T16:00:00.000Z'
+                    lastModified: '2023-12-31T16:00:00.000Z'
+                  - id: 'f37b0d8a-3926-4a30-a89f-05f0dab76794'
+                    externalId: 'Hope Bay3465764'
+                    tier: 'standard'
+                    tierLabel: 'Standard'
+                    type: 'multi-site'
+                    projectsForSubscription:
+                      - projectUuid: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                        numUsers: 2
+                        numUsersAllowed: 4
+                      - projectUuid: '9c19f759-bf67-4a13-a6fd-68bd69eaa414'
+                        numUsers: 3
+                        numUsersAllowed: 4
+                    numProjectsAllowed: 10
+                    dateFrom: '2024-12-31T16:00:00.000Z'
+                    dateTo: '2025-12-31T16:00:00.000Z'
+                    lastModified: '2023-12-31T16:00:00.000Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Subscriptions
+      summary: Indicate that a company has a subscription
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/companyUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/V2SubscriptionObject'
+      responses:
+        '201':
+          description: Subscription created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/cancel:
+    put:
+      summary: Cancel a subscription
+      description: |
+        Cancels an active subscription by setting the `dateTo` field.
+      tags:
+        - Subscriptions
+      parameters:
+        - $ref: '#/components/parameters/subscriptionUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/V2SubscriptionCancellationObject'
+            example:
+              dateTo: "2025-06-30"
+      responses:
+        '200':
+          description: Subscription cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2SubscriptionCancellationResponse'
+              example:
+                dateTo: '2025-06-30'
+                originalDateTo: '2025-12-31'
+                id: d41ae335-7f54-4fdd-b6aa-29b433d21505
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/subscriptionProjects:
+    post:
+      tags:
+        - SubscriptionProjects
+      summary: Upsert subscription projects
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionProjectRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionProjectResponse'
+              example:
+                - id: 'dcc588a5-1e4a-4760-8e12-ac0411df82b7'
+                  projectId: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                  subscriptionId: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+                  numUsersAllowed: 4
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v2/subscriptionTemplates:
+    get:
+      tags:
+        - Subscriptions
+      summary: List all subscription templates
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2SubscriptionTemplateObject'
+              example:
+                entitlements:
+                  - id: 'dcc588a5-1e4a-4760-8e12-ac0411df82b7'
+                    tier: 'essentials'
+                    tierLabel: 'Essentials'
+                    type: 'single-site'
+                    createdAt: '2023-12-31T16:00:00.000Z'
+                    updatedAt: '2024-04-30T16:00:00.000Z'
+                    version: 0
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get subscription details
+      description: Retrieves detailed information about a specific subscription
+      parameters:
+        - $ref: '#/components/parameters/subscriptionUuid'
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Subscription found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSubscriptionOutput'
+              example:
+                id: "d41ae335-7f54-4fdd-b6aa-29b433d21505"
+                externalId: "Hope Bay3465763"
+                dateFrom: "2024-01-01T00:00:00.000Z"
+                dateTo: "2024-12-31T23:59:59.999Z"
+                numProjectsAllowed: 10
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/entitlements/allocation:
+    post:
+      tags:
+        - Entitlement Management
+      summary: Allocate entitlements between projects within a subscription
+      description: |
+        Allocates product entitlements between projects within the same subscription.
+        Accepts the final desired amounts per project/product to prevent stale data issues.
+        Validates that negative changes don't exceed current usage limits.
+        Creates compensating ledger entries in a single database transaction.
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntitlementAllocationRequest'
+            example:
+              projectEntitlements:
+                - projectUuid: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                  productEntitlements:
+                    - productSlug: 'rqd'
+                      amountInMetres: 15000
+                    - productSlug: 'jsa'
+                      amountInMetres: 8000
+                - projectUuid: '83adc40e-152a-4566-82b3-295b586123a9'
+                  productEntitlements:
+                    - productSlug: 'rqd'
+                      amountInMetres: 15000
+                    - productSlug: 'fracture'
+                      amountInMetres: 12000
+      responses:
+        '200':
+          description: Entitlements allocated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocatedLedgerEntries'
+              example:
+                - projectId: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                  amountInMetres: -500
+                  createdBy: 'testuser@datarock.com.au'
+                  productSlug: 'rqd'
+                  type: 'UPDATE_ALLOCATION'
+                - projectId: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                  amountInMetres: 500
+                  createdBy: 'testuser@datarock.com.au'
+                  productSlug: 'jsa'
+                  type: 'UPDATE_ALLOCATION'
+                - projectId: '83adc40e-152a-4566-82b3-295b586123a9'
+                  amountInMetres: 1500
+                  createdBy: 'testuser@datarock.com.au'
+                  productSlug: 'rqd'
+                  type: 'UPDATE_ALLOCATION'
+                - projectId: '83adc40e-152a-4566-82b3-295b586123a9'
+                  amountInMetres: 3000
+                  createdBy: 'testuser@datarock.com.au'
+                  productSlug: 'fracture'
+                  type: 'UPDATE_ALLOCATION'
+        '400':
+          description: Invalid request or validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Invalid project UUID format'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Allocation would violate business rules
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  responses:
+    BadRequest:
+      description: |
+        SchemaValidationError - Validation error
+    NotFound:
+      description: Not Found
+    Forbidden:
+      description: >
+        Forbidden - You don't have permission to access this resource. This typically indicates insufficient permissions. To resolve this, verify that your account has the necessary rights.
+    Unauthorized:
+      description: Unauthorized - authentication failed
+    InternalServerError:
+      description: An unexpected error occurred. Please try again later or contact support if the problem persists.
+  parameters:
+    subscriptionUuid:
+      in: path
+      name: subscriptionUuid
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: UUID of the subscription
+    projectUuid:
+      in: path
+      name: projectUuid
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: The UUID of the project
+    productUuid:
+      in: path
+      name: productUuid
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: The UUID of the product
+    authorizationHeader:
+      description: Authentication header that accepts either a JWT token prepended with 'Bearer' or an API key prepended with 'Digest' (e.g., 'Bearer <jwt>' or 'Digest <api-key>')
+      in: header
+      name: Authorization
+      required: true
+      schema:
+        type: string
+    effectiveDate:
+      description: The date from which the entitlements are valid
+      name: effectiveDate
+      in: query
+      required: true
+      schema:
+        type: string
+        format: ISO 8601 date only
+    contractualAmountsOnly:
+      description: Whether to only return the contractual amount of the entitlement. Defaults to false.
+      name: contractualAmountsOnly
+      in: query
+      required: false
+      schema:
+        type: string
+    includeAmountInMetres:
+      description: Whether to include the sum of ledger entries in amountInMetres. When true, calculates amounts and filters out unlimited entitlements. When false, includes all entitlements with amountInMetres as undefined. Defaults to true.
+      name: includeAmountInMetres
+      in: query
+      required: false
+      schema:
+        type: string
+    userEmail:
+      description: The e-mail address of the user
+      name: userEmail
+      in: path
+      schema:
+        type: string
+      required: true
+    companyUuid:
+      description: The UUID of the company
+      name: companyUuid
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    EntitlementStatus:
+      type: string
+      enum:
+        - active
+        - expired
+        - uncapped
+    EntitlementObject:
+      type: object
+      required:
+        - slug
+      properties:
+        slug:
+          type: string
+          description: The unique identifier of the entitlement
+          example: 'depth_registration'
+        features:
+          type: array
+          description: List of optional turned on features of an entitlement
+          items:
+            $ref: '#/components/schemas/FeatureObject'
+    FeatureObject:
+      type: object
+      required:
+        - slug
+      properties:
+        slug:
+          type: string
+          description: The unique identifier of the feature under an entitlement
+          example: 'full_row_export'
+    V2EntitlementsObject:
+      type: object
+      required:
+        - status
+        - products
+      properties:
+        status:
+          $ref: '#/components/schemas/EntitlementStatus'
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2EntitlementObject'
+    V2EntitlementsExportObject:
+      type: object
+      required:
+        - entitlements
+      properties:
+        entitlements:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2EntitlementExportObject'
+    V2EntitlementExportObject:
+      type: object
+      required:
+        - id
+        - projectId
+        - productId
+        - subscriptionId
+        - dateFrom
+        - dateTo
+        - isUnlimited
+      properties:
+        id:
+          type: number
+          description: >
+            The ID of the entitlement
+        projectId:
+          type: string
+          format: uuid
+          description: >
+            The UUID of the project
+        productId:
+          type: string
+          format: uuid
+          description: >
+            The UUID of the product
+        isUnlimited:
+          type: boolean
+          description: >
+            Determines whether the entitlement is capped or unlimited (from subscription level)
+        dateFrom:
+          type: string
+          format: ISO 8601 timestamp
+          description: >
+            The date & time from which the entitlement becomes valid
+        dateTo:
+          type: string
+          format: ISO 8601 timestamp
+          description: >
+            The date & time after which the entitlement is no longer valid
+        subscriptionId:
+          type: string
+          format: uuid
+          description: >
+            The UUID of the subscription that this entitlement belongs to
+    V2LedgerEntriesExportObject:
+      type: object
+      required:
+        - entries
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2LedgerEntryExportObject'
+    V2LedgerEntryExportObject:
+      type: object
+      required:
+        - id
+        - type
+        - amountInMetres
+        - notes
+        - referenceId
+        - referenceSystem
+        - createdBy
+        - createdAt
+        - projectProductEntitlementId
+      properties:
+        id:
+          type: number
+          description: >
+            The ID of the ledger entry
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement to add. Can be negative
+        notes:
+          type: string
+          description: Any comments about the change
+        referenceId:
+          type: string
+          description: The unique identifier of the reference
+        referenceSystem:
+          type: string
+          description: The system that the reference belongs to
+        createdBy:
+          type: string
+          description: The user who created the ledger entry
+        createdAt:
+          type: string
+          format: ISO 8601 timestamp
+          description: The date & time the ledger entry was created
+        projectProductEntitlementId:
+          type: number
+          description: The ID of the project product entitlement
+    V2EntitlementObject:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - isUnlimited
+        - usageAvailable
+        - amountUsedInMetres
+        - subscriptionId
+        - dateFrom
+        - dateTo
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: >
+            The UUID of the product
+        name:
+          type: string
+          description: >
+            The name of the product
+        slug:
+          type: string
+          description: >
+            The unique identifier of the product
+        amountInMetres:
+          type: number
+          format: integer
+          description: >
+            The amount of processing that the project is entitled to for this product, applicable only if isUnlimited is false
+        amountUsedInMetres:
+          type: number
+          format: float
+          description: >
+            The amount of processing that the project has used for this product
+        subscriptionId:
+          type: string
+          format: uuid
+          description: >
+            The id of the subscription
+        isUnlimited:
+          type: boolean
+          description: >
+            Determines whether the entitlement is capped or unlimited
+        usageAvailable:
+          type: boolean
+          description: >
+            Determines whether the product has usage information available
+        dateFrom:
+          type: string
+          format: ISO 8601 timestamp
+          description: >
+            The date & time from which the entitlement becomes valid
+        dateTo:
+          type: string
+          format: ISO 8601 timestamp
+          description: >
+            The date & time after which the entitlement is no longer valid
+    V2EntitlementDateRangeObject:
+      type: object
+      required:
+        - id
+        - subscriptionId
+        - dateFrom
+        - dateTo
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: >
+            The UUID of the product
+        subscriptionId:
+          type: string
+          format: uuid
+          description: >
+            The id of the subscription
+        dateFrom:
+          type: string
+          description: >
+            The entitlements valid starting from this date. Represented in ISO 8601 date-only format (e.g. 2024-11-22)
+        dateTo:
+          type: string
+          description: >
+            The entitlements valid up to this date. Represented in ISO 8601 date-only format (e.g. 2024-11-22)
+    V2SubscriptionObject:
+      type: object
+      required:
+        - externalId
+        - tier
+        - tierLabel
+        - type
+        - dateFrom
+        - dateTo
+      properties:
+        externalId:
+          type: string
+          description: >
+            The Subscription ID that is used in contracts and other correspondence
+        tier:
+          type: string
+          description: >
+            The tier of the subscription (e.g. 'essentials', 'standard', 'premium', 'enterprise-plus', 'enterprise-elite')
+        tierLabel:
+          type: string
+          description: >
+            User-friendly tier name of the subscription (e.g. 'Essentials', 'Standard', 'Premium', 'Enterprise Plus', 'Enterprise Elite')
+        type:
+          type: string
+          description: >
+            The type of the subscription (e.g. 'single-site', 'multi-site')
+        dateFrom:
+          type: string
+          description: >
+            The date the subscription starts. Represented in ISO 8601 date-only format (e.g. 2024-11-22)
+        dateTo:
+          type: string
+          description: >
+            The date the subscription ends. Represented in ISO 8601 date-only format (e.g. 2024-11-22)
+        numProjectsAllowed:
+          type: number
+          description: >
+            The number of projects that are allowed under this subscription (e.g. 10)
+    ProjectProductEntitlementModification:
+      type: object
+      required:
+        - type
+        - amountInMetres
+        - effectiveDate
+        - referenceId
+        - referenceSystem
+      properties:
+        effectiveDate:
+          type: string
+          format: ISO 8601 date only
+          description: The date from which the entitlements are valid
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of change
+        notes:
+          type: string
+          description: Any comments about the change
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement to add. Can be negative
+        referenceId:
+          type: string
+          description: The unique identifier of the reference
+        referenceSystem:
+          type: string
+          description: The system that the reference belongs to
+          example: 'jira, vogsy, etc'
+    ProjectProductEntitlementLedgerEntry:
+      type: object
+      required:
+        - type
+        - amountInMetres
+        - createdBy
+        - createdAt
+      properties:
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of change
+        notes:
+          type: string
+          description: Any comments about the change
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement to add. Can be negative
+        createdBy:
+          type: string
+          description: The user who created the ledger entry
+        createdAt:
+          type: string
+          format: ISO 8601 full date
+    V2UserProjectsObject:
+      type: object
+      properties:
+        projects:
+          type: array
+          items:
+            type: object
+            properties:
+              uuid:
+                type: string
+                format: uuid
+              id:
+                type: integer
+                description: The project ID
+              status:
+                $ref: '#/components/schemas/EntitlementStatus'
+    V2SubscriptionTemplates:
+      type: object
+      required:
+        - subscriptionTemplates
+      properties:
+        subscriptionTemplates:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2SubscriptionTemplateObject'
+    V2SubscriptionTemplateObject:
+      type: object
+      required:
+        - id
+        - tier
+        - tierLabel
+        - type
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 'dcc588a5-1e4a-4760-8e12-ac0411df82b7'
+        tier:
+          type: string
+          description: The tier of the subscription (e.g. 'essentials', 'standard', 'premium', 'enterprise-plus', 'enterprise-elite')
+          example: 'essentials'
+        tierLabel:
+          type: string
+          description: >
+            User-friendly tier name of the subscription (e.g. 'Essentials', 'Standard', 'Premium', 'Enterprise Plus', 'Enterprise Elite')
+          example: 'Essentials'
+        type:
+          type: string
+          description: The type of the subscription (e.g. 'single-site', 'multi-site')
+          example: 'single-site'
+        createdAt:
+          type: string
+          format: ISO 8601 timestamp
+          description: The date & time the subscription template was created
+        updatedAt:
+          type: string
+          format: ISO 8601 timestamp
+          description: The date & time the subscription template was last updated
+        version:
+          type: number
+          description: The version of the subscription template
+          example: 0
+    V2SubscriptionCancellationObject:
+      type: object
+      required:
+        - dateTo
+      properties:
+        dateTo:
+          type: string
+          format: date
+          description: The end date of the subscription (inclusive)
+          example: '2025-06-30'
+    V2SubscriptionCancellationResponse:
+      type: object
+      required:
+        - originalDateTo
+        - dateTo
+        - id
+      properties:
+        originalDateTo:
+          type: string
+          description: The original end date of the subscription before cancellation
+          example: '2025-12-31'
+        dateTo:
+          type: string
+          description: The new end date of the subscription after cancellation
+          example: '2025-06-30'
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the cancelled subscription
+          example: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+    V2CompanySubscriptionsObject:
+      type: object
+      required:
+        - companySubscriptions
+      properties:
+        companySubscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2CompanySubscriptionObject'
+    V2CompanySubscriptionObject:
+      type: object
+      required:
+        - id
+        - externalId
+        - tier
+        - tierLabel
+        - type
+        - projectsForSubscription
+        - numProjectsAllowed
+        - dateFrom
+        - dateTo
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+        externalId:
+          type: string
+          description: The external ID of the company
+          example: 'Hope Bay3465763'
+        tier:
+          type: string
+          description: The tier of the subscription (e.g. 'essentials', 'standard', 'premium', 'enterprise-plus', 'enterprise-elite')
+          example: 'essentials'
+        tierLabel:
+          type: string
+          description: >
+            User-friendly tier name of the subscription (e.g. 'Essentials', 'Standard', 'Premium', 'Enterprise plus', 'Enterprise elite')
+          example: 'Essentials'
+        type:
+          type: string
+          description: The type of the subscription (e.g. 'single-site', 'multi-site')
+          example: 'single-site'
+        projectsForSubscription:
+          type: array
+          items:
+            type: object
+            properties:
+              projectUuid:
+                type: string
+                format: uuid
+                description: The UUID of the project
+                example: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+              numUsers:
+                type: number
+                description: The number of users for the project under the subscription
+                example: 2
+              numUsersAllowed:
+                type: number
+                description: The number of users allowed for the project under the subscription
+                example: 5
+        numProjectsAllowed:
+          type: number
+          description: The number of projects allowed under the subscription
+          example: 10
+        dateFrom:
+          type: string
+          format: ISO 8601 date only
+          description: The date from which the subscription is valid
+          example: '2023-12-31T16:00:00.000Z'
+        dateTo:
+          type: string
+          format: ISO 8601 date only
+          description: The date to which the subscription is valid
+          example: '2024-04-30T16:00:00.000Z'
+        lastModified:
+          type: string
+          format: ISO 8601 date only
+          description: The last modified date of the subscription
+          example: '2023-12-31T16:00:00.000Z'
+    SubscriptionProjectRequest:
+      type: object
+      required:
+        - subscriptionProjects
+      properties:
+        subscriptionProjects:
+          type: array
+          description: A list of subscription projects to be created or updated
+          items:
+            $ref: '#/components/schemas/SubscriptionProjectInput'
+    SubscriptionProjectInput:
+      type: object
+      required:
+        - projectUuid
+      properties:
+        projectUuid:
+          type: string
+          format: uuid
+          description: The UUID of the project
+        numUsersAllowed:
+          type: number
+          description: The number of users allowed for the project
+          example: 5
+    SubscriptionProjectResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubscriptionProjectOutput'
+    SubscriptionProjectOutput:
+      type: object
+      required:
+        - id
+        - projectId
+        - subscriptionId
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the subscription project entry
+          example: 'dcc588a5-1e4a-4760-8e12-ac0411df82b7'
+        projectId:
+          type: string
+          format: uuid
+          description: The UUID of the project
+          example: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+        subscriptionId:
+          type: string
+          format: uuid
+          description: The UUID of the subscription
+          example: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+        numUsersAllowed:
+          type: number
+          description: The number of users allowed for the project under the subscription
+          example: 5
+    SubscriptionProduct:
+      type: object
+      required:
+        - productId
+      properties:
+        productId:
+          type: string
+          format: uuid
+          description: The UUID of the product
+        isUnlimited:
+          type: boolean
+          description: Whether the product entitlement is unlimited
+          example: false
+    SubscriptionProductEntitlementsCreationInput:
+      type: object
+      required:
+        - products
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionProduct'
+          description: A list of products to be added to the subscription
+    SubscriptionProductEntitlement:
+      type: object
+      required:
+        - productId
+        - subscriptionId
+      properties:
+        productId:
+          type: string
+          format: uuid
+          description: The UUID of the product
+        isUnlimited:
+          type: boolean
+          description: Whether the product entitlement is unlimited
+          example: false
+        subscriptionId:
+          type: string
+          format: uuid
+          description: The UUID of the subscription which includes the product
+    SubscriptionProductEntitlementsCreationOutput:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubscriptionProductEntitlement'
+    SubscriptionProductEntitlementsResponse:
+      type: object
+      required:
+        - entitlements
+      properties:
+        entitlements:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductEntitlementItem'
+          description: Array of product entitlements for the subscription
+    ProductEntitlementItem:
+      type: object
+      required:
+        - subscriptionId
+        - productId
+        - isUnlimited
+        - productSlug
+      properties:
+        subscriptionId:
+          type: string
+          format: uuid
+          description: The UUID of the subscription
+        productId:
+          type: string
+          format: uuid
+          description: The UUID of the product
+        isUnlimited:
+          type: boolean
+          description: Whether the product entitlement is unlimited
+        productSlug:
+          type: string
+          description: The slug identifier of the product
+        amountInMetres:
+          type: number
+          format: float
+          description: The amount in metres. Undefined when includeAmountInMetres is false or for unlimited entitlements.
+          nullable: true
+    SubscriptionLedgerEntryCreationInput:
+      type: object
+      required:
+        - type
+        - amountInMetres
+        - referenceId
+        - referenceSystem
+      properties:
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of change for the ledger entry
+          example: SUB_SETUP
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement to add. Can be negative
+          example: 10000
+        notes:
+          type: string
+          description: Any comments about the change
+          example: 'Initial setup of subscription product entitlement'
+        referenceId:
+          type: string
+          description: The unique identifier of the reference
+          example: 'PLT-3293'
+        referenceSystem:
+          type: string
+          description: The system that the reference belongs to (e.g., 'jira', 'vogsy', etc.)
+          example: 'jira'
+    SubscriptionLedgerEntryCreationOutput:
+      type: object
+      required:
+        - id
+        - subscriptionProductEntitlementId
+        - type
+        - amountInMetres
+        - createdBy
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the ledger entry
+          example: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+        subscriptionProductEntitlementId:
+          type: string
+          format: uuid
+          description: The UUID of the subscription product entitlement to which the ledger entry belongs
+          example: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of change for the ledger entry
+          example: SUB_SETUP
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement to add. Can be negative
+          example: 10000
+        notes:
+          type: string
+          description: Any comments about the change
+          example: 'Initial setup of subscription product entitlement'
+        createdBy:
+          type: string
+          description: The user who created the ledger entry
+          example: 'test@datarock.com.au'
+        referenceId:
+          type: string
+          description: The unique identifier of the reference
+          example: 'PLT-3293'
+        referenceSystem:
+          type: string
+          description: The system that the reference belongs to (e.g., 'jira', 'vogsy', etc.)
+          example: 'jira'
+    RemainingEntitlement:
+      type: object
+      required:
+        - products
+        - projects
+      properties:
+        products:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+            example: 4000
+          example:
+            rqd: 4000
+            fractures: 4000
+            jsa: 4000
+        projects:
+          type: object
+          additionalProperties:
+            type: object
+            description: The remaining entitlements for each project or subscription products
+            additionalProperties:
+              description: The remaining entitlement in metres for the product
+              type: number
+              format: float
+    EntitlementAllocationRequest:
+      type: object
+      required:
+        - projectEntitlements
+      properties:
+        projectEntitlements:
+          type: array
+          description: List of project entitlements to be set
+          items:
+            $ref: '#/components/schemas/ProjectEntitlementAllocation'
+    ProjectEntitlementAllocation:
+      type: object
+      required:
+        - projectUuid
+        - productEntitlements
+      properties:
+        projectUuid:
+          type: string
+          format: uuid
+          description: The UUID of the project
+          example: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+        productEntitlements:
+          type: array
+          description: List of product entitlements for this project
+          items:
+            $ref: '#/components/schemas/ProductEntitlementAllocation'
+    ProductEntitlementAllocation:
+      type: object
+      required:
+        - productSlug
+        - amountInMetres
+      properties:
+        productSlug:
+          type: string
+          description: The unique identifier of the product
+          example: 'rqd'
+        amountInMetres:
+          type: number
+          format: integer
+          description: The final amount in metres for this product (must be positive)
+          example: 15000
+    AllocatedLedgerEntry:
+      type: object
+      properties:
+        projectId:
+          type: string
+          format: uuid
+          description: The UUID of the project
+          example: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement allocated (positive or negative)
+          example: 30000
+        createdBy:
+          type: string
+          description: The user who created the ledger entry
+          format: email
+          example: 'test@datarock.com.au'
+        productSlug:
+          type: string
+          description: The unique identifier of the product
+          example: 'rqd'
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of change
+    AllocatedLedgerEntries:
+      type: array
+      description: List of ledger entries created as part of the allocation
+      items:
+        $ref: '#/components/schemas/AllocatedLedgerEntry'
+    V2SubscriptionProductEntitlementsExportObject:
+      type: object
+      required:
+        - subscriptionProductEntitlements
+      properties:
+        subscriptionProductEntitlements:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2SubscriptionProductEntitlementExportObject'
+    V2SubscriptionProductEntitlementExportObject:
+      type: object
+      required:
+        - id
+        - subscriptionId
+        - productId
+        - isUnlimited
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the subscription product entitlement
+        subscriptionId:
+          type: string
+          format: uuid
+          description: The UUID of the subscription this entitlement belongs to
+        productId:
+          type: string
+          format: uuid
+          description: The UUID of the product this entitlement is for
+        isUnlimited:
+          type: boolean
+          description: Whether this entitlement has unlimited usage
+    V2SubscriptionLedgerEntriesExportObject:
+      type: object
+      required:
+        - subscriptionLedgerEntries
+      properties:
+        subscriptionLedgerEntries:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2SubscriptionLedgerEntryExportObject'
+    V2SubscriptionLedgerEntryExportObject:
+      type: object
+      required:
+        - id
+        - type
+        - amountInMetres
+        - subscriptionProductEntitlementId
+        - createdBy
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the ledger entry
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of ledger entry
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount in metres for this ledger entry
+        notes:
+          type: string
+          description: Optional notes for this ledger entry
+        referenceId:
+          type: string
+          description: Optional reference ID for this ledger entry
+        referenceSystem:
+          type: string
+          description: Optional reference system for this ledger entry
+        subscriptionProductEntitlementId:
+          type: string
+          description: The ID of the subscription product entitlement this ledger entry belongs to
+        createdBy:
+          type: string
+          description: The email of the user who created this ledger entry
+    GetSubscriptionOutput:
+      type: object
+      required:
+        - id
+        - externalId
+        - dateFrom
+        - dateTo
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the subscription
+          example: "d41ae335-7f54-4fdd-b6aa-29b433d21505"
+        externalId:
+          type: string
+          description: The external identifier used in contracts and correspondence
+          example: "Hope Bay3465763"
+        dateFrom:
+          type: string
+          format: date
+          description: The date and time when the subscription becomes valid
+          example: "2024-01-01T00:00:00.000Z"
+        dateTo:
+          type: string
+          format: date
+          description: The date and time when the subscription expires
+          example: "2024-12-31T23:59:59.999Z"
+        numProjectsAllowed:
+          type: number
+          description: The number of projects allowed under this subscription
+          example: 10
+          nullable: true
+    ProjectSubscriptionObject:
+      type: object
+      required:
+        - subscriptionUuid
+        - status
+      properties:
+        subscriptionUuid:
+          type: string
+          format: uuid
+          description: The UUID of the subscription associated with the project
+          example: "d41ae335-7f54-4fdd-b6aa-29b433d21505"
+        status:
+          type: string
+          enum:
+            - active
+            - expired
+            - scheduled
+          description: |
+            The status of the subscription relative to the effective date:
+            - active: The effective date falls within the subscription's dateFrom and dateTo
+            - expired: The effective date is after the subscription's dateTo
+            - scheduled: The effective date is before the subscription's dateFrom
+          example: "active"openapi: '3.0.2'
+info:
+  title: Entitlement Service API
+  version: 1.0.0
+servers:
+  - url: https://entitlement-service.test.datarock.com.au
+    description: API for entitlement service in test env
+  - url: https://entitlement-service.demo.datarock.com.au
+    description: API for entitlement service in demo env
+  - url: https://entitlement-service.prod.datarock.com.au
+    description: API for entitlement service in prod env
+
+paths:
+  /project/{projectUuid}/entitlements:
+    get:
+      tags:
+        - Entitlements
+      summary: Get a list of entitlements for a project
+      parameters:
+        - $ref: '#/components/parameters/projectUuid'
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EntitlementObject'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  v2/project/{projectUuid}/subscriptions:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get all subscriptions for a project
+      description: |
+        Returns all subscriptions associated with a project, along with their status based on the effective date.
+        Each subscription's status is determined by comparing the effective date with the subscription's date range:
+        - active: effective date is within the subscription period (dateFrom <= effectiveDate <= dateTo)
+        - expired: effective date is after the subscription period (effectiveDate > dateTo)
+        - scheduled: effective date is before the subscription period (effectiveDate < dateFrom)
+      parameters:
+        - $ref: '#/components/parameters/projectUuid'
+        - $ref: '#/components/parameters/authorizationHeader'
+        - in: query
+          name: effectiveDate
+          description: The date to evaluate subscription status against. Defaults to today's date if not provided.
+          schema:
+            type: string
+            format: date
+          required: false
+          example: "2024-12-12"
+      responses:
+        '200':
+          description: Subscriptions found (empty array if no subscriptions exist)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectSubscriptionObject'
+              examples:
+                single_active:
+                  summary: Single active subscription
+                  value:
+                    - subscriptionUuid: "d41ae335-7f54-4fdd-b6aa-29b433d21505"
+                      status: "active"
+                multiple_mixed:
+                  summary: Multiple subscriptions with different statuses
+                  value:
+                    - subscriptionUuid: "d41ae335-7f54-4fdd-b6aa-29b433d21505"
+                      status: "active"
+                    - subscriptionUuid: "a1b2c3d4-5678-9012-3456-789012345678"
+                      status: "expired"
+                    - subscriptionUuid: "f9e8d7c6-5432-1098-7654-321098765432"
+                      status: "scheduled"
+                empty:
+                  summary: No subscriptions found
+                  value: []
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/entitlements:
+    get:
+      tags:
+        - Entitlements
+      summary: List all entitlements
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2EntitlementsExportObject'
+              example:
+                entitlements:
+                  - id: 36
+                    projectId: 9c19f759-bf67-4a13-a6fd-68bd69eaa413
+                    productId: 5aec28e7-ae38-4f67-b3ce-4640e407031b
+                    dateFrom: 2024-01-01T00:00:00.000Z
+                    dateTo: 2024-12-31T23:59:59.999Z
+                    subscriptionId: 123e4567-e89b-12d3-a456-426614174000
+                    isUnlimited: false
+                  - id: 37
+                    projectId: 83adc40e-152a-4566-82b3-295b586123a9
+                    productId: 6b771755-885a-44fe-91ff-a4b3938a787b
+                    dateFrom: 2025-01-01T00:00:00.000Z
+                    dateTo: 2025-12-31T23:59:59.999Z
+                    subscriptionId: 123e4567-e89b-12d3-a456-426614174000
+                    isUnlimited: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/project/{projectUuid}/entitlements:
+    get:
+      tags:
+        - Entitlements
+      summary: Get a list of summarised entitlements for a project
+      parameters:
+        - $ref: '#/components/parameters/projectUuid'
+        - $ref: '#/components/parameters/authorizationHeader'
+        - in: query
+          name: effectiveDate
+          description: The date from which the entitlements are valid. Defaults to today's date.
+          schema:
+            $ref: '#/components/parameters/effectiveDate'
+          required: false
+        - in: query
+          name: contractualAmountsOnly
+          description: Whether to only return the contractual amount of the entitlement. Defaults to false.
+          schema:
+            $ref: '#/components/parameters/contractualAmountsOnly'
+          required: false
+        - in: query
+          name: includeAmountInMetres
+          description: Whether to include the sum of ledger entries in amountInMetres. When true, calculates amounts and filters out unlimited entitlements. When false, includes all entitlements with amountInMetres as undefined. Defaults to true.
+          schema:
+            $ref: '#/components/parameters/includeAmountInMetres'
+          required: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2EntitlementsObject'
+              example:
+                products:
+                  - id: 9c19f759-bf67-4a13-a6fd-68bd69eaa413
+                    name: Pre-processing
+                    amountUsedInMetres: 25000
+                    isUnlimited: true
+                    subscriptionId: 123e4567-e89b-12d3-a456-426614174000
+                    dateFrom: 2024-01-01T00:00:00.000Z
+                    dateTo: 2024-12-31T23:59:59.999Z
+                    usageAvailable: true
+                  - id: 5aec28e7-ae38-4f67-b3ce-4640e407031b
+                    name: RQD
+                    amountInMetres: 30000
+                    amountUsedInMetres: 10000
+                    isUnlimited: false
+                    subscriptionId: 123e4567-e89b-12d3-a456-426614174000
+                    dateFrom: 2024-01-01T00:00:00.000Z
+                    dateTo: 2024-12-31T23:59:59.999Z
+                    usageAvailable: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Entitlements
+      summary: Indicate that a project is entitled to use a product
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/projectUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/V2EntitlementDateRangeObject'
+      responses:
+        '201':
+          description: Entitlement created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: An entitlement for this product already exists for this project within the specified date range
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/entitlements:
+    get:
+      tags:
+        - Entitlement Management
+      summary: Retrieve all entitlements for a subscription
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+        - in: query
+          name: contractualAmountsOnly
+          description: Whether to only return the contractual amount of the entitlement. Defaults to false.
+          schema:
+            $ref: '#/components/parameters/contractualAmountsOnly'
+          required: false
+        - in: query
+          name: includeAmountInMetres
+          description: Whether to include the sum of ledger entries in amountInMetres. When true, calculates amounts and filters out unlimited entitlements. When false, includes all entitlements with amountInMetres as undefined. Defaults to true.
+          schema:
+            $ref: '#/components/parameters/includeAmountInMetres'
+          required: false
+      responses:
+        '200':
+          description: Subscription product entitlements retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionProductEntitlementsResponse'
+              example:
+                entitlements:
+                  - subscriptionId: d41ae335-7f54-4fdd-b6aa-29b433d21505
+                    productId: 5aec28e7-ae38-4f67-b3ce-4640e407031b
+                    isUnlimited: false
+                    productSlug: rqd
+                    amountInMetres: 4000
+                  - subscriptionId: d41ae335-7f54-4fdd-b6aa-29b433d21505
+                    productId: 6b771755-885a-44fe-91ff-a4b3938a787b
+                    isUnlimited: true
+                    productSlug: fracture
+        '400':
+          description: Your request was invalid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Entitlement Management
+      summary: Create SubscriptionEntitlements for given subscription
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionProductEntitlementsCreationInput'
+            example:
+              products:
+                - productId: '5aec28e7-ae38-4f67-b3ce-4640e407031b'
+                  isUnlimited: false
+                - productId: '6b771755-885a-44fe-91ff-a4b3938a787b'
+                  isUnlimited: true
+      responses:
+        '200':
+          description: Subscription product entitlements created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionProductEntitlementsCreationOutput'
+              example:
+                - id: 19229f3b-4c1e-4d2a-8b5c-9f0e1a2b3c4d
+                  subscriptionId: d41ae335-7f54-4fdd-b6aa-29b433d21505
+                  productId: 5aec28e7-ae38-4f67-b3ce-4640e407031b
+                  isUnlimited: false
+                - id: 374f0d8a-3926-4a30-a89f-05f0dab76794
+                  subscriptionId: d41ae335-7f54-4fdd-b6aa-29b433d21505
+                  productId: 6b771755-885a-44fe-91ff-a4b3938a787b
+                  isUnlimited: true
+        '400':
+          description: Your request was invalid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/entitlements/remaining:
+    get:
+      tags:
+        - Entitlement Management
+      summary: Retrieve remaining entitlements for a subscription
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemainingEntitlement'
+              example:
+                products:
+                  rqd: 6000
+                  fractures: 6000
+                  jsa: 6000
+                projects:
+                  '9c19f759-bf67-4a13-a6fd-68bd69eaa413':
+                    rqd: 1000
+                    fractures: 1000
+                    jsa: 2000
+                  '9c19f759-bf67-4a13-a6fd-68bd69eaa414':
+                    rqd: 1000
+                    fractures: 1000
+                    jsa: 500
+        '400':
+          description: Your request was invalid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/allocations:
+    get:
+      tags:
+        - Entitlement Management
+      summary: Retrieve allocation summary for a subscription
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productsAllocated:
+                    type: number
+                    description: Sum of product entitlements at the subscription product level (not usage or allocation to projects), in metres
+                  projectsAllocated:
+                    type: number
+                    description: Sum of project entitlements at the subscription project level (not usage or allocation to products), in metres
+                required:
+                  - productsAllocated
+                  - projectsAllocated
+              example:
+                productsAllocated: 50000
+                projectsAllocated: 25000
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/entitlements/product/{productUuid}:
+    post:
+      tags:
+        - Entitlement Management
+      summary: Create an immutable ledger entry for a subscription and product
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+        - $ref: '#/components/parameters/productUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionLedgerEntryCreationInput'
+            example:
+              type: SUB_SETUP
+              amountInMetres: 30000
+              notes: Subscription setup entitlement for Essentials plan
+              referenceId: PLT-3293
+              referenceSystem: JIRA
+      responses:
+        '200':
+          description: Ledger entry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionLedgerEntryCreationOutput'
+              example:
+                id: '19229f3b-4c1e-4d2a-8b5c-9f0e1a2b3c4d'
+                subscriptionId: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+                productId: '5aec28e7-ae38-4f67-b3ce-4640e407031b'
+                type: SUB_SETUP
+                amountInMetres: 30000
+                notes: Subscription setup entitlement for Essentials plan
+                referenceId: PLT-3293
+                referenceSystem: JIRA
+        '400':
+          description: Your request was invalid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/entitlements/product/{productUuid}/ledger-entries:
+    get:
+      tags:
+        - Entitlement Management
+      summary: Get all ledger entries for a subscription and product
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+        - $ref: '#/components/parameters/productUuid'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubscriptionLedgerEntryCreationOutput'
+              example:
+                - id: '19229f3b-4c1e-4d2a-8b5c-9f0e1a2b3c4d'
+                  subscriptionProductEntitlementId: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+                  type: SUB_SETUP
+                  amountInMetres: 30000
+                  notes: Subscription setup entitlement for Essentials plan
+                  referenceId: PLT-3293
+                  referenceSystem: JIRA
+                  createdBy: test@datarock.com.au
+                - id: '29339f4c-5d2f-5e3b-9c6d-0f1e2a3b4c5e'
+                  subscriptionProductEntitlementId: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+                  type: TOP_UP
+                  amountInMetres: 15000
+                  notes: Additional entitlement top-up
+                  referenceId: PLT-3294
+                  referenceSystem: JIRA
+                  createdBy: admin@datarock.com.au
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/project/{projectUuid}/entitlements/product/{productUuid}:
+    get:
+      tags:
+        - Entitlement Management
+      summary: Retrieve all ledger entries for a project, product and date
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/projectUuid'
+        - $ref: '#/components/parameters/productUuid'
+        - $ref: '#/components/parameters/effectiveDate'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dateFrom:
+                    type: string
+                    format: ISO 8601 timestamp
+                    description: >
+                      The date & time from which the entitlement becomes valid
+                  dateTo:
+                    type: string
+                    format: ISO 8601 timestamp
+                    description: >
+                      The date & time after which the entitlement is no longer valid
+                  entries:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProjectProductEntitlementLedgerEntry'
+                example:
+                  dateFrom: 2024-01-01T00:00:00.000Z
+                  dateTo: 2024-12-31T23:59:59.999Z
+                  entries:
+                    - type: SUB_SETUP
+                      amountInMetres: 30000
+                      notes: Subscription setup entitlement for Essentials plan
+                      createdBy: user@email.com
+                      createdAt: 2024-11-22T00:00:00Z
+                    - type: TOP_UP
+                      amountInMetres: 10001
+                      createdBy: user@email.com
+                      createdAt: 2024-12-25T00:00:00Z
+                    - type: ADJUSTMENT
+                      notes: Corrected typo in top-up amount
+                      amountInMetres: -1
+                      createdBy: user@email.com
+                      createdAt: 2024-12-26T00:00:00Z
+                    - type: ADD_PRODUCT
+                      notes: Added new product
+                      amountInMetres: 10000
+                      createdBy: user@email.com
+                      createdAt: 2024-12-27T00:00:00Z
+                    - type: UPGRADE
+                      notes: Upgraded to premium plan
+                      amountInMetres: 20000
+                      createdBy: user@email.com
+                      createdAt: 2024-12-28T00:00:00Z
+                    - type: RENEWAL
+                      notes: Renewed subscription
+                      amountInMetres: 30000
+                      createdBy: user@email.com
+                      createdAt: 2024-12-29T00:00:00Z
+
+        '400':
+          description: Your request was invalid, eg. you requested ledger entries on an unlimited entitlement, the requested product or project UUIDs are not well formed, etc
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Entitlement Management
+      summary: Create an immutable ledger entry for a project, product & date range
+      parameters:
+        - in: header
+          name: authorizationHeader
+          description: The JWT as issued by the Datarock Platform UI, prepended with the Bearer identifier
+          schema:
+            $ref: '#/components/parameters/authorizationHeader'
+          required: true
+        - $ref: '#/components/parameters/projectUuid'
+        - $ref: '#/components/parameters/productUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectProductEntitlementModification'
+            example:
+              type: SUB_SETUP
+              amountInMetres: 30000
+              notes: Subscription setup entitlement for Essentials plan
+              effectiveDate: 2024-11-22
+      responses:
+        '201':
+          description: Ledger entry created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: The modification requested would result in an entitlement with a negative balance, or the entitlement is unlimited
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/ledgerEntries:
+    get:
+      tags:
+        - Entitlements
+      summary: List all ledger entries
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2LedgerEntriesExportObject'
+              example:
+                entries:
+                  - id: 1
+                    type: SUB_SETUP
+                    amountInMetres: 30000
+                    notes: Subscription setup entitlement for Essentials plan
+                    referenceId: PLT-3293
+                    referenceSystem: JIRA
+                    createdBy: user@email.com
+                    createdAt: 2024-11-22T00:00:00Z
+                    projectProductEntitlementId: 1
+                  - id: 2
+                    type: TOP_UP
+                    amountInMetres: 10001
+                    notes: Top-up entitlement for Essentials plan
+                    referenceId: PLT-3294
+                    referenceSystem: JIRA
+                    createdBy: user@email.com
+                    createdAt: 2024-12-25T00:00:00Z
+                    projectProductEntitlementId: 1
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscriptionProductEntitlements:
+    get:
+      tags:
+        - Entitlements
+      summary: List all subscription product entitlements
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2SubscriptionProductEntitlementsExportObject'
+              example:
+                subscriptionProductEntitlements:
+                  - id: '123e4567-e89b-12d3-a456-426614174000'
+                    subscriptionId: '456e4567-e89b-12d3-a456-426614174000'
+                    productId: '789e4567-e89b-12d3-a456-426614174000'
+                    isUnlimited: false
+                  - id: '123e4567-e89b-12d3-a456-426614174001'
+                    subscriptionId: '456e4567-e89b-12d3-a456-426614174001'
+                    productId: '789e4567-e89b-12d3-a456-426614174001'
+                    isUnlimited: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscriptionLedgerEntries:
+    get:
+      tags:
+        - Entitlements
+      summary: List all subscription ledger entries
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2SubscriptionLedgerEntriesExportObject'
+              example:
+                subscriptionLedgerEntries:
+                  - id: '1'
+                    type: 'SUB_SETUP'
+                    amountInMetres: 30000
+                    notes: 'Subscription setup entitlement'
+                    referenceId: 'PLT-3293'
+                    referenceSystem: 'JIRA'
+                    subscriptionProductEntitlementId: '123e4567-e89b-12d3-a456-426614174000'
+                    createdBy: 'admin@datarock.com.au'
+                  - id: '2'
+                    type: 'TOP_UP'
+                    amountInMetres: 10000
+                    notes: 'Top-up entitlement'
+                    referenceId: 'PLT-3294'
+                    referenceSystem: 'JIRA'
+                    subscriptionProductEntitlementId: '123e4567-e89b-12d3-a456-426614174001'
+                    createdBy: 'admin@datarock.com.au'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/user/{userEmail}/projects:
+    get:
+      tags:
+        - Entitlements
+      summary: Get entitlement status for projects the user is a member of
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/userEmail'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2UserProjectsObject'
+              example:
+                projects:
+                  - uuid: 9c19f759-bf67-4a13-a6fd-68bd69eaa413
+                    status: active
+                  - uuid: 9c19f759-bf67-4a13-a6fd-68bd69eaa413
+                    status: expired
+                  - uuid: 9c19f759-bf67-4a13-a6fd-68bd69eaa413
+                    status: uncapped
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/company/{companyUuid}/subscriptions:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get subscription status for a company
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/companyUuid'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2CompanySubscriptionsObject'
+              example:
+                companySubscriptions:
+                  - id: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+                    externalId: 'Hope Bay3465763'
+                    tier: 'essentials'
+                    tierLabel: 'Essentials'
+                    type: 'single-site'
+                    projectsForSubscription:
+                      - projectUuid: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                        numUsers: 2
+                        numUsersAllowed: 4
+                    numProjectsAllowed: 10
+                    dateFrom: '2023-12-31T16:00:00.000Z'
+                    dateTo: '2024-04-30T16:00:00.000Z'
+                    lastModified: '2023-12-31T16:00:00.000Z'
+                  - id: 'f37b0d8a-3926-4a30-a89f-05f0dab76794'
+                    externalId: 'Hope Bay3465764'
+                    tier: 'standard'
+                    tierLabel: 'Standard'
+                    type: 'multi-site'
+                    projectsForSubscription:
+                      - projectUuid: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                        numUsers: 2
+                        numUsersAllowed: 4
+                      - projectUuid: '9c19f759-bf67-4a13-a6fd-68bd69eaa414'
+                        numUsers: 3
+                        numUsersAllowed: 4
+                    numProjectsAllowed: 10
+                    dateFrom: '2024-12-31T16:00:00.000Z'
+                    dateTo: '2025-12-31T16:00:00.000Z'
+                    lastModified: '2023-12-31T16:00:00.000Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Subscriptions
+      summary: Indicate that a company has a subscription
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/companyUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/V2SubscriptionObject'
+      responses:
+        '201':
+          description: Subscription created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/cancel:
+    put:
+      summary: Cancel a subscription
+      description: |
+        Cancels an active subscription by setting the `dateTo` field.
+      tags:
+        - Subscriptions
+      parameters:
+        - $ref: '#/components/parameters/subscriptionUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/V2SubscriptionCancellationObject'
+            example:
+              dateTo: "2025-06-30"
+      responses:
+        '200':
+          description: Subscription cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2SubscriptionCancellationResponse'
+              example:
+                dateTo: '2025-06-30'
+                originalDateTo: '2025-12-31'
+                id: d41ae335-7f54-4fdd-b6aa-29b433d21505
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/subscriptionProjects:
+    post:
+      tags:
+        - SubscriptionProjects
+      summary: Upsert subscription projects
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionProjectRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionProjectResponse'
+              example:
+                - id: 'dcc588a5-1e4a-4760-8e12-ac0411df82b7'
+                  projectId: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                  subscriptionId: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+                  numUsersAllowed: 4
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v2/subscriptionTemplates:
+    get:
+      tags:
+        - Subscriptions
+      summary: List all subscription templates
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2SubscriptionTemplateObject'
+              example:
+                entitlements:
+                  - id: 'dcc588a5-1e4a-4760-8e12-ac0411df82b7'
+                    tier: 'essentials'
+                    tierLabel: 'Essentials'
+                    type: 'single-site'
+                    createdAt: '2023-12-31T16:00:00.000Z'
+                    updatedAt: '2024-04-30T16:00:00.000Z'
+                    version: 0
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get subscription details
+      description: Retrieves detailed information about a specific subscription
+      parameters:
+        - $ref: '#/components/parameters/subscriptionUuid'
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: Subscription found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSubscriptionOutput'
+              example:
+                id: "d41ae335-7f54-4fdd-b6aa-29b433d21505"
+                externalId: "Hope Bay3465763"
+                dateFrom: "2024-01-01T00:00:00.000Z"
+                dateTo: "2024-12-31T23:59:59.999Z"
+                numProjectsAllowed: 10
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscription/{subscriptionUuid}/entitlements/allocation:
+    post:
+      tags:
+        - Entitlement Management
+      summary: Allocate entitlements between projects within a subscription
+      description: |
+        Allocates product entitlements between projects within the same subscription.
+        Accepts the final desired amounts per project/product to prevent stale data issues.
+        Validates that negative changes don't exceed current usage limits.
+        Creates compensating ledger entries in a single database transaction.
+      parameters:
+        - $ref: '#/components/parameters/authorizationHeader'
+        - $ref: '#/components/parameters/subscriptionUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntitlementAllocationRequest'
+            example:
+              projectEntitlements:
+                - projectUuid: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                  productEntitlements:
+                    - productSlug: 'rqd'
+                      amountInMetres: 15000
+                    - productSlug: 'jsa'
+                      amountInMetres: 8000
+                - projectUuid: '83adc40e-152a-4566-82b3-295b586123a9'
+                  productEntitlements:
+                    - productSlug: 'rqd'
+                      amountInMetres: 15000
+                    - productSlug: 'fracture'
+                      amountInMetres: 12000
+      responses:
+        '200':
+          description: Entitlements allocated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocatedLedgerEntries'
+              example:
+                - projectId: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                  amountInMetres: -500
+                  createdBy: 'testuser@datarock.com.au'
+                  productSlug: 'rqd'
+                  type: 'UPDATE_ALLOCATION'
+                - projectId: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+                  amountInMetres: 500
+                  createdBy: 'testuser@datarock.com.au'
+                  productSlug: 'jsa'
+                  type: 'UPDATE_ALLOCATION'
+                - projectId: '83adc40e-152a-4566-82b3-295b586123a9'
+                  amountInMetres: 1500
+                  createdBy: 'testuser@datarock.com.au'
+                  productSlug: 'rqd'
+                  type: 'UPDATE_ALLOCATION'
+                - projectId: '83adc40e-152a-4566-82b3-295b586123a9'
+                  amountInMetres: 3000
+                  createdBy: 'testuser@datarock.com.au'
+                  productSlug: 'fracture'
+                  type: 'UPDATE_ALLOCATION'
+        '400':
+          description: Invalid request or validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Invalid project UUID format'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Allocation would violate business rules
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  responses:
+    BadRequest:
+      description: |
+        SchemaValidationError - Validation error
+    NotFound:
+      description: Not Found
+    Forbidden:
+      description: >
+        Forbidden - You don't have permission to access this resource. This typically indicates insufficient permissions. To resolve this, verify that your account has the necessary rights.
+    Unauthorized:
+      description: Unauthorized - authentication failed
+    InternalServerError:
+      description: An unexpected error occurred. Please try again later or contact support if the problem persists.
+  parameters:
+    subscriptionUuid:
+      in: path
+      name: subscriptionUuid
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: UUID of the subscription
+    projectUuid:
+      in: path
+      name: projectUuid
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: The UUID of the project
+    productUuid:
+      in: path
+      name: productUuid
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: The UUID of the product
+    authorizationHeader:
+      description: Authentication header that accepts either a JWT token prepended with 'Bearer' or an API key prepended with 'Digest' (e.g., 'Bearer <jwt>' or 'Digest <api-key>')
+      in: header
+      name: Authorization
+      required: true
+      schema:
+        type: string
+    effectiveDate:
+      description: The date from which the entitlements are valid
+      name: effectiveDate
+      in: query
+      required: true
+      schema:
+        type: string
+        format: ISO 8601 date only
+    contractualAmountsOnly:
+      description: Whether to only return the contractual amount of the entitlement. Defaults to false.
+      name: contractualAmountsOnly
+      in: query
+      required: false
+      schema:
+        type: string
+    includeAmountInMetres:
+      description: Whether to include the sum of ledger entries in amountInMetres. When true, calculates amounts and filters out unlimited entitlements. When false, includes all entitlements with amountInMetres as undefined. Defaults to true.
+      name: includeAmountInMetres
+      in: query
+      required: false
+      schema:
+        type: string
+    userEmail:
+      description: The e-mail address of the user
+      name: userEmail
+      in: path
+      schema:
+        type: string
+      required: true
+    companyUuid:
+      description: The UUID of the company
+      name: companyUuid
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    EntitlementStatus:
+      type: string
+      enum:
+        - active
+        - expired
+        - uncapped
+    EntitlementObject:
+      type: object
+      required:
+        - slug
+      properties:
+        slug:
+          type: string
+          description: The unique identifier of the entitlement
+          example: 'depth_registration'
+        features:
+          type: array
+          description: List of optional turned on features of an entitlement
+          items:
+            $ref: '#/components/schemas/FeatureObject'
+    FeatureObject:
+      type: object
+      required:
+        - slug
+      properties:
+        slug:
+          type: string
+          description: The unique identifier of the feature under an entitlement
+          example: 'full_row_export'
+    V2EntitlementsObject:
+      type: object
+      required:
+        - status
+        - products
+      properties:
+        status:
+          $ref: '#/components/schemas/EntitlementStatus'
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2EntitlementObject'
+    V2EntitlementsExportObject:
+      type: object
+      required:
+        - entitlements
+      properties:
+        entitlements:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2EntitlementExportObject'
+    V2EntitlementExportObject:
+      type: object
+      required:
+        - id
+        - projectId
+        - productId
+        - subscriptionId
+        - dateFrom
+        - dateTo
+        - isUnlimited
+      properties:
+        id:
+          type: number
+          description: >
+            The ID of the entitlement
+        projectId:
+          type: string
+          format: uuid
+          description: >
+            The UUID of the project
+        productId:
+          type: string
+          format: uuid
+          description: >
+            The UUID of the product
+        isUnlimited:
+          type: boolean
+          description: >
+            Determines whether the entitlement is capped or unlimited (from subscription level)
+        dateFrom:
+          type: string
+          format: ISO 8601 timestamp
+          description: >
+            The date & time from which the entitlement becomes valid
+        dateTo:
+          type: string
+          format: ISO 8601 timestamp
+          description: >
+            The date & time after which the entitlement is no longer valid
+        subscriptionId:
+          type: string
+          format: uuid
+          description: >
+            The UUID of the subscription that this entitlement belongs to
+    V2LedgerEntriesExportObject:
+      type: object
+      required:
+        - entries
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2LedgerEntryExportObject'
+    V2LedgerEntryExportObject:
+      type: object
+      required:
+        - id
+        - type
+        - amountInMetres
+        - notes
+        - referenceId
+        - referenceSystem
+        - createdBy
+        - createdAt
+        - projectProductEntitlementId
+      properties:
+        id:
+          type: number
+          description: >
+            The ID of the ledger entry
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement to add. Can be negative
+        notes:
+          type: string
+          description: Any comments about the change
+        referenceId:
+          type: string
+          description: The unique identifier of the reference
+        referenceSystem:
+          type: string
+          description: The system that the reference belongs to
+        createdBy:
+          type: string
+          description: The user who created the ledger entry
+        createdAt:
+          type: string
+          format: ISO 8601 timestamp
+          description: The date & time the ledger entry was created
+        projectProductEntitlementId:
+          type: number
+          description: The ID of the project product entitlement
+    V2EntitlementObject:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - isUnlimited
+        - usageAvailable
+        - amountUsedInMetres
+        - subscriptionId
+        - dateFrom
+        - dateTo
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: >
+            The UUID of the product
+        name:
+          type: string
+          description: >
+            The name of the product
+        slug:
+          type: string
+          description: >
+            The unique identifier of the product
+        amountInMetres:
+          type: number
+          format: integer
+          description: >
+            The amount of processing that the project is entitled to for this product, applicable only if isUnlimited is false
+        amountUsedInMetres:
+          type: number
+          format: float
+          description: >
+            The amount of processing that the project has used for this product
+        subscriptionId:
+          type: string
+          format: uuid
+          description: >
+            The id of the subscription
+        isUnlimited:
+          type: boolean
+          description: >
+            Determines whether the entitlement is capped or unlimited
+        usageAvailable:
+          type: boolean
+          description: >
+            Determines whether the product has usage information available
+        dateFrom:
+          type: string
+          format: ISO 8601 timestamp
+          description: >
+            The date & time from which the entitlement becomes valid
+        dateTo:
+          type: string
+          format: ISO 8601 timestamp
+          description: >
+            The date & time after which the entitlement is no longer valid
+    V2EntitlementDateRangeObject:
+      type: object
+      required:
+        - id
+        - subscriptionId
+        - dateFrom
+        - dateTo
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: >
+            The UUID of the product
+        subscriptionId:
+          type: string
+          format: uuid
+          description: >
+            The id of the subscription
+        dateFrom:
+          type: string
+          description: >
+            The entitlements valid starting from this date. Represented in ISO 8601 date-only format (e.g. 2024-11-22)
+        dateTo:
+          type: string
+          description: >
+            The entitlements valid up to this date. Represented in ISO 8601 date-only format (e.g. 2024-11-22)
+    V2SubscriptionObject:
+      type: object
+      required:
+        - externalId
+        - tier
+        - tierLabel
+        - type
+        - dateFrom
+        - dateTo
+      properties:
+        externalId:
+          type: string
+          description: >
+            The Subscription ID that is used in contracts and other correspondence
+        tier:
+          type: string
+          description: >
+            The tier of the subscription (e.g. 'essentials', 'standard', 'premium', 'enterprise-plus', 'enterprise-elite')
+        tierLabel:
+          type: string
+          description: >
+            User-friendly tier name of the subscription (e.g. 'Essentials', 'Standard', 'Premium', 'Enterprise Plus', 'Enterprise Elite')
+        type:
+          type: string
+          description: >
+            The type of the subscription (e.g. 'single-site', 'multi-site')
+        dateFrom:
+          type: string
+          description: >
+            The date the subscription starts. Represented in ISO 8601 date-only format (e.g. 2024-11-22)
+        dateTo:
+          type: string
+          description: >
+            The date the subscription ends. Represented in ISO 8601 date-only format (e.g. 2024-11-22)
+        numProjectsAllowed:
+          type: number
+          description: >
+            The number of projects that are allowed under this subscription (e.g. 10)
+    ProjectProductEntitlementModification:
+      type: object
+      required:
+        - type
+        - amountInMetres
+        - effectiveDate
+        - referenceId
+        - referenceSystem
+      properties:
+        effectiveDate:
+          type: string
+          format: ISO 8601 date only
+          description: The date from which the entitlements are valid
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of change
+        notes:
+          type: string
+          description: Any comments about the change
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement to add. Can be negative
+        referenceId:
+          type: string
+          description: The unique identifier of the reference
+        referenceSystem:
+          type: string
+          description: The system that the reference belongs to
+          example: 'jira, vogsy, etc'
+    ProjectProductEntitlementLedgerEntry:
+      type: object
+      required:
+        - type
+        - amountInMetres
+        - createdBy
+        - createdAt
+      properties:
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of change
+        notes:
+          type: string
+          description: Any comments about the change
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement to add. Can be negative
+        createdBy:
+          type: string
+          description: The user who created the ledger entry
+        createdAt:
+          type: string
+          format: ISO 8601 full date
+    V2UserProjectsObject:
+      type: object
+      properties:
+        projects:
+          type: array
+          items:
+            type: object
+            properties:
+              uuid:
+                type: string
+                format: uuid
+              id:
+                type: integer
+                description: The project ID
+              status:
+                $ref: '#/components/schemas/EntitlementStatus'
+    V2SubscriptionTemplates:
+      type: object
+      required:
+        - subscriptionTemplates
+      properties:
+        subscriptionTemplates:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2SubscriptionTemplateObject'
+    V2SubscriptionTemplateObject:
+      type: object
+      required:
+        - id
+        - tier
+        - tierLabel
+        - type
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 'dcc588a5-1e4a-4760-8e12-ac0411df82b7'
+        tier:
+          type: string
+          description: The tier of the subscription (e.g. 'essentials', 'standard', 'premium', 'enterprise-plus', 'enterprise-elite')
+          example: 'essentials'
+        tierLabel:
+          type: string
+          description: >
+            User-friendly tier name of the subscription (e.g. 'Essentials', 'Standard', 'Premium', 'Enterprise Plus', 'Enterprise Elite')
+          example: 'Essentials'
+        type:
+          type: string
+          description: The type of the subscription (e.g. 'single-site', 'multi-site')
+          example: 'single-site'
+        createdAt:
+          type: string
+          format: ISO 8601 timestamp
+          description: The date & time the subscription template was created
+        updatedAt:
+          type: string
+          format: ISO 8601 timestamp
+          description: The date & time the subscription template was last updated
+        version:
+          type: number
+          description: The version of the subscription template
+          example: 0
+    V2SubscriptionCancellationObject:
+      type: object
+      required:
+        - dateTo
+      properties:
+        dateTo:
+          type: string
+          format: date
+          description: The end date of the subscription (inclusive)
+          example: '2025-06-30'
+    V2SubscriptionCancellationResponse:
+      type: object
+      required:
+        - originalDateTo
+        - dateTo
+        - id
+      properties:
+        originalDateTo:
+          type: string
+          description: The original end date of the subscription before cancellation
+          example: '2025-12-31'
+        dateTo:
+          type: string
+          description: The new end date of the subscription after cancellation
+          example: '2025-06-30'
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the cancelled subscription
+          example: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+    V2CompanySubscriptionsObject:
+      type: object
+      required:
+        - companySubscriptions
+      properties:
+        companySubscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2CompanySubscriptionObject'
+    V2CompanySubscriptionObject:
+      type: object
+      required:
+        - id
+        - externalId
+        - tier
+        - tierLabel
+        - type
+        - projectsForSubscription
+        - numProjectsAllowed
+        - dateFrom
+        - dateTo
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+        externalId:
+          type: string
+          description: The external ID of the company
+          example: 'Hope Bay3465763'
+        tier:
+          type: string
+          description: The tier of the subscription (e.g. 'essentials', 'standard', 'premium', 'enterprise-plus', 'enterprise-elite')
+          example: 'essentials'
+        tierLabel:
+          type: string
+          description: >
+            User-friendly tier name of the subscription (e.g. 'Essentials', 'Standard', 'Premium', 'Enterprise plus', 'Enterprise elite')
+          example: 'Essentials'
+        type:
+          type: string
+          description: The type of the subscription (e.g. 'single-site', 'multi-site')
+          example: 'single-site'
+        projectsForSubscription:
+          type: array
+          items:
+            type: object
+            properties:
+              projectUuid:
+                type: string
+                format: uuid
+                description: The UUID of the project
+                example: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+              numUsers:
+                type: number
+                description: The number of users for the project under the subscription
+                example: 2
+              numUsersAllowed:
+                type: number
+                description: The number of users allowed for the project under the subscription
+                example: 5
+        numProjectsAllowed:
+          type: number
+          description: The number of projects allowed under the subscription
+          example: 10
+        dateFrom:
+          type: string
+          format: ISO 8601 date only
+          description: The date from which the subscription is valid
+          example: '2023-12-31T16:00:00.000Z'
+        dateTo:
+          type: string
+          format: ISO 8601 date only
+          description: The date to which the subscription is valid
+          example: '2024-04-30T16:00:00.000Z'
+        lastModified:
+          type: string
+          format: ISO 8601 date only
+          description: The last modified date of the subscription
+          example: '2023-12-31T16:00:00.000Z'
+    SubscriptionProjectRequest:
+      type: object
+      required:
+        - subscriptionProjects
+      properties:
+        subscriptionProjects:
+          type: array
+          description: A list of subscription projects to be created or updated
+          items:
+            $ref: '#/components/schemas/SubscriptionProjectInput'
+    SubscriptionProjectInput:
+      type: object
+      required:
+        - projectUuid
+      properties:
+        projectUuid:
+          type: string
+          format: uuid
+          description: The UUID of the project
+        numUsersAllowed:
+          type: number
+          description: The number of users allowed for the project
+          example: 5
+    SubscriptionProjectResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubscriptionProjectOutput'
+    SubscriptionProjectOutput:
+      type: object
+      required:
+        - id
+        - projectId
+        - subscriptionId
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the subscription project entry
+          example: 'dcc588a5-1e4a-4760-8e12-ac0411df82b7'
+        projectId:
+          type: string
+          format: uuid
+          description: The UUID of the project
+          example: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+        subscriptionId:
+          type: string
+          format: uuid
+          description: The UUID of the subscription
+          example: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+        numUsersAllowed:
+          type: number
+          description: The number of users allowed for the project under the subscription
+          example: 5
+    SubscriptionProduct:
+      type: object
+      required:
+        - productId
+      properties:
+        productId:
+          type: string
+          format: uuid
+          description: The UUID of the product
+        isUnlimited:
+          type: boolean
+          description: Whether the product entitlement is unlimited
+          example: false
+    SubscriptionProductEntitlementsCreationInput:
+      type: object
+      required:
+        - products
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionProduct'
+          description: A list of products to be added to the subscription
+    SubscriptionProductEntitlement:
+      type: object
+      required:
+        - productId
+        - subscriptionId
+      properties:
+        productId:
+          type: string
+          format: uuid
+          description: The UUID of the product
+        isUnlimited:
+          type: boolean
+          description: Whether the product entitlement is unlimited
+          example: false
+        subscriptionId:
+          type: string
+          format: uuid
+          description: The UUID of the subscription which includes the product
+    SubscriptionProductEntitlementsCreationOutput:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubscriptionProductEntitlement'
+    SubscriptionProductEntitlementsResponse:
+      type: object
+      required:
+        - entitlements
+      properties:
+        entitlements:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductEntitlementItem'
+          description: Array of product entitlements for the subscription
+    ProductEntitlementItem:
+      type: object
+      required:
+        - subscriptionId
+        - productId
+        - isUnlimited
+        - productSlug
+      properties:
+        subscriptionId:
+          type: string
+          format: uuid
+          description: The UUID of the subscription
+        productId:
+          type: string
+          format: uuid
+          description: The UUID of the product
+        isUnlimited:
+          type: boolean
+          description: Whether the product entitlement is unlimited
+        productSlug:
+          type: string
+          description: The slug identifier of the product
+        amountInMetres:
+          type: number
+          format: float
+          description: The amount in metres. Undefined when includeAmountInMetres is false or for unlimited entitlements.
+          nullable: true
+    SubscriptionLedgerEntryCreationInput:
+      type: object
+      required:
+        - type
+        - amountInMetres
+        - referenceId
+        - referenceSystem
+      properties:
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of change for the ledger entry
+          example: SUB_SETUP
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement to add. Can be negative
+          example: 10000
+        notes:
+          type: string
+          description: Any comments about the change
+          example: 'Initial setup of subscription product entitlement'
+        referenceId:
+          type: string
+          description: The unique identifier of the reference
+          example: 'PLT-3293'
+        referenceSystem:
+          type: string
+          description: The system that the reference belongs to (e.g., 'jira', 'vogsy', etc.)
+          example: 'jira'
+    SubscriptionLedgerEntryCreationOutput:
+      type: object
+      required:
+        - id
+        - subscriptionProductEntitlementId
+        - type
+        - amountInMetres
+        - createdBy
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the ledger entry
+          example: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+        subscriptionProductEntitlementId:
+          type: string
+          format: uuid
+          description: The UUID of the subscription product entitlement to which the ledger entry belongs
+          example: 'd41ae335-7f54-4fdd-b6aa-29b433d21505'
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of change for the ledger entry
+          example: SUB_SETUP
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement to add. Can be negative
+          example: 10000
+        notes:
+          type: string
+          description: Any comments about the change
+          example: 'Initial setup of subscription product entitlement'
+        createdBy:
+          type: string
+          description: The user who created the ledger entry
+          example: 'test@datarock.com.au'
+        referenceId:
+          type: string
+          description: The unique identifier of the reference
+          example: 'PLT-3293'
+        referenceSystem:
+          type: string
+          description: The system that the reference belongs to (e.g., 'jira', 'vogsy', etc.)
+          example: 'jira'
+    RemainingEntitlement:
+      type: object
+      required:
+        - products
+        - projects
+      properties:
+        products:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+            example: 4000
+          example:
+            rqd: 4000
+            fractures: 4000
+            jsa: 4000
+        projects:
+          type: object
+          additionalProperties:
+            type: object
+            description: The remaining entitlements for each project or subscription products
+            additionalProperties:
+              description: The remaining entitlement in metres for the product
+              type: number
+              format: float
+    EntitlementAllocationRequest:
+      type: object
+      required:
+        - projectEntitlements
+      properties:
+        projectEntitlements:
+          type: array
+          description: List of project entitlements to be set
+          items:
+            $ref: '#/components/schemas/ProjectEntitlementAllocation'
+    ProjectEntitlementAllocation:
+      type: object
+      required:
+        - projectUuid
+        - productEntitlements
+      properties:
+        projectUuid:
+          type: string
+          format: uuid
+          description: The UUID of the project
+          example: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+        productEntitlements:
+          type: array
+          description: List of product entitlements for this project
+          items:
+            $ref: '#/components/schemas/ProductEntitlementAllocation'
+    ProductEntitlementAllocation:
+      type: object
+      required:
+        - productSlug
+        - amountInMetres
+      properties:
+        productSlug:
+          type: string
+          description: The unique identifier of the product
+          example: 'rqd'
+        amountInMetres:
+          type: number
+          format: integer
+          description: The final amount in metres for this product (must be positive)
+          example: 15000
+    AllocatedLedgerEntry:
+      type: object
+      properties:
+        projectId:
+          type: string
+          format: uuid
+          description: The UUID of the project
+          example: '9c19f759-bf67-4a13-a6fd-68bd69eaa413'
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount of entitlement allocated (positive or negative)
+          example: 30000
+        createdBy:
+          type: string
+          description: The user who created the ledger entry
+          format: email
+          example: 'test@datarock.com.au'
+        productSlug:
+          type: string
+          description: The unique identifier of the product
+          example: 'rqd'
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of change
+    AllocatedLedgerEntries:
+      type: array
+      description: List of ledger entries created as part of the allocation
+      items:
+        $ref: '#/components/schemas/AllocatedLedgerEntry'
+    V2SubscriptionProductEntitlementsExportObject:
+      type: object
+      required:
+        - subscriptionProductEntitlements
+      properties:
+        subscriptionProductEntitlements:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2SubscriptionProductEntitlementExportObject'
+    V2SubscriptionProductEntitlementExportObject:
+      type: object
+      required:
+        - id
+        - subscriptionId
+        - productId
+        - isUnlimited
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the subscription product entitlement
+        subscriptionId:
+          type: string
+          format: uuid
+          description: The UUID of the subscription this entitlement belongs to
+        productId:
+          type: string
+          format: uuid
+          description: The UUID of the product this entitlement is for
+        isUnlimited:
+          type: boolean
+          description: Whether this entitlement has unlimited usage
+    V2SubscriptionLedgerEntriesExportObject:
+      type: object
+      required:
+        - subscriptionLedgerEntries
+      properties:
+        subscriptionLedgerEntries:
+          type: array
+          items:
+            $ref: '#/components/schemas/V2SubscriptionLedgerEntryExportObject'
+    V2SubscriptionLedgerEntryExportObject:
+      type: object
+      required:
+        - id
+        - type
+        - amountInMetres
+        - subscriptionProductEntitlementId
+        - createdBy
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the ledger entry
+        type:
+          type: string
+          enum:
+            - SUB_SETUP
+            - TOP_UP
+            - ADJUSTMENT
+            - ADD_PRODUCT
+            - UPGRADE
+            - RENEWAL
+            - UPDATE_ALLOCATION
+            - ONBOARDING_ONLY
+          description: The type of ledger entry
+        amountInMetres:
+          type: number
+          format: integer
+          description: The amount in metres for this ledger entry
+        notes:
+          type: string
+          description: Optional notes for this ledger entry
+        referenceId:
+          type: string
+          description: Optional reference ID for this ledger entry
+        referenceSystem:
+          type: string
+          description: Optional reference system for this ledger entry
+        subscriptionProductEntitlementId:
+          type: string
+          description: The ID of the subscription product entitlement this ledger entry belongs to
+        createdBy:
+          type: string
+          description: The email of the user who created this ledger entry
+    GetSubscriptionOutput:
+      type: object
+      required:
+        - id
+        - externalId
+        - dateFrom
+        - dateTo
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the subscription
+          example: "d41ae335-7f54-4fdd-b6aa-29b433d21505"
+        externalId:
+          type: string
+          description: The external identifier used in contracts and correspondence
+          example: "Hope Bay3465763"
+        dateFrom:
+          type: string
+          format: date
+          description: The date and time when the subscription becomes valid
+          example: "2024-01-01T00:00:00.000Z"
+        dateTo:
+          type: string
+          format: date
+          description: The date and time when the subscription expires
+          example: "2024-12-31T23:59:59.999Z"
+        numProjectsAllowed:
+          type: number
+          description: The number of projects allowed under this subscription
+          example: 10
+          nullable: true
+    ProjectSubscriptionObject:
+      type: object
+      required:
+        - subscriptionUuid
+        - status
+      properties:
+        subscriptionUuid:
+          type: string
+          format: uuid
+          description: The UUID of the subscription associated with the project
+          example: "d41ae335-7f54-4fdd-b6aa-29b433d21505"
+        status:
+          type: string
+          enum:
+            - active
+            - expired
+            - scheduled
+          description: |
+            The status of the subscription relative to the effective date:
+            - active: The effective date falls within the subscription's dateFrom and dateTo
+            - expired: The effective date is after the subscription's dateTo
+            - scheduled: The effective date is before the subscription's dateFrom
+          example: "active"
