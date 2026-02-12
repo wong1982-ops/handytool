@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ECard Pro - Business Recommendations</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .pattern-overlay {
+            background-blend-mode: overlay;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-300">
+<!-- Header -->
+<header class="border-b border-slate-200 dark:border-primary/10 bg-white/50 dark:bg-background-dark/50 backdrop-blur-md sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-icons-outlined text-white text-xl">style</span>
+</div>
+<span class="text-xl font-bold tracking-tight">ECard<span class="text-primary text-2xl">.</span>Pro</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Templates</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">My Designs</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Corporate Solutions</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="text-sm font-medium px-4 py-2 hover:bg-slate-100 dark:hover:bg-primary/10 rounded-lg transition-all">Sign In</button>
+<button class="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-lg shadow-primary/20 transition-all">Get Started</button>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 py-16 lg:py-24">
+<!-- Hero & Intent -->
+<div class="text-center space-y-8 mb-24">
+<h1 class="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 dark:text-white">
+                What's the occasion?
+            </h1>
+<p class="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-lg">
+                Select your intent to generate smart recommendations tailored for your business relationships.
+            </p>
+<div class="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto mt-12">
+<button class="px-6 py-2.5 rounded-full border border-primary bg-primary/10 text-primary font-medium text-sm transition-all hover:bg-primary hover:text-white">
+                    New Product Launch
+                </button>
+<button class="px-6 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-primary/50 text-slate-600 dark:text-slate-400 font-medium text-sm transition-all">
+                    Client Anniversary
+                </button>
+<button class="px-6 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-primary/50 text-slate-600 dark:text-slate-400 font-medium text-sm transition-all">
+                    Employee Welcome
+                </button>
+<button class="px-6 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-primary/50 text-slate-600 dark:text-slate-400 font-medium text-sm transition-all">
+                    Quarterly Milestone
+                </button>
+<button class="px-6 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-primary/50 text-slate-600 dark:text-slate-400 font-medium text-sm transition-all">
+                    Holiday Greetings
+                </button>
+<button class="px-6 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-primary/50 text-slate-600 dark:text-slate-400 font-medium text-sm transition-all">
+                    Thank You Note
+                </button>
+</div>
+</div>
+<!-- Grid Section -->
+<div class="space-y-12">
+<div class="flex items-end justify-between">
+<div>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">Recommended for You</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Based on "New Product Launch" intent</p>
+</div>
+<button class="flex items-center gap-2 text-primary font-medium hover:underline text-sm">
+                    View All Templates <span class="material-icons-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<div class="group bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-500">
+<div class="aspect-[4/3] relative overflow-hidden bg-slate-100 dark:bg-slate-800">
+<img alt="Executive Marble Pattern" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Sophisticated white marble texture with gold veins" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8UrFnHD6bcQVk0d-cs_rtWT6S6l11TNG98YRor9jbE5nQOQWdC1qNl8djLBE7pB2uoD-o_zElB50h_2rSQRKR1MQXtrNuMsfJWxj---wkCumJldvkLlQfR8B-BEFAdTwMz8hTm8Su1V7Yen0Pqjudi07JMd2lzjN9gGc6uXjfJuUNp1-29sV_i75PpyUVETdjhO0ST9LH_MFGvC8ljJwlit9wyBXsLGKowgfHZh9qc6SsUoPaYarjg3YtGy_dXNp-ncHuTjTzw-KD"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<button class="w-full bg-primary text-white py-3 rounded-lg font-medium shadow-xl">Personalize</button>
+</div>
+<div class="absolute top-4 left-4">
+<span class="bg-white/90 dark:bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold">Classic Marble</span>
+</div>
+</div>
+<div class="p-6 flex justify-between items-start">
+<div>
+<h3 class="font-bold text-lg">The Executive</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Minimalist &amp; Elegant</p>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons-outlined">bookmark_border</span>
+</button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-500">
+<div class="aspect-[4/3] relative overflow-hidden bg-slate-100 dark:bg-slate-800">
+<img alt="Dark Pinstripe Pattern" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Dark charcoal pinstripe professional suit pattern" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1hPYyzf4GCPB10eTdGOtB7qtOU_olQFYcpVmwG6d-uswI0GTgGsFXF4UXe7hYnIt9UPqErmvUKhUkfvqHoUa8r2Sr9LA3shpJdntQJXeM8xfcE6UqP_6QYFNa3xv9wZcy4t73hm_ov1TPiUdGAxplKgFC3xvmbIbp1LlSNwKg_4Aeh1O-yIchLqmsNHwC2MIqUlPYIZU3ZLvziNExhzVecQ6YOfFFRRvXhk-cIaKZtRZtmbUBfl9ObuqHloN0_dQpqEU-NmwS7fPu"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<button class="w-full bg-primary text-white py-3 rounded-lg font-medium shadow-xl">Personalize</button>
+</div>
+<div class="absolute top-4 left-4">
+<span class="bg-white/90 dark:bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold">Corporate</span>
+</div>
+</div>
+<div class="p-6 flex justify-between items-start">
+<div>
+<h3 class="font-bold text-lg">Midnight Pinstripe</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Professional Trust</p>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons-outlined">bookmark_border</span>
+</button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-500">
+<div class="aspect-[4/3] relative overflow-hidden bg-slate-100 dark:bg-slate-800">
+<img alt="Geometric Grid Pattern" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Subtle light blue and white geometric grid" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5WFp7TZvPQqvedOxksl3I6GLIA8hk5sCrcFscuIfInCYdGNnOScGJ8Jp0AjpQUN6qHSvl7_rvohSNPprxnty01eluzBEZJAYCwmVm7yVnBCI-BSQbNRqsMRu5Tprpl39V7dUWFu7q0yCo1j_Wii8XllO8qZpVJdhyKyJEq8YGOlCfzy5ZZCdHF5fa4myqBAh6DkfUgpU2qJmHNC0WJdTGTmbofkZ2AqhJqtCrqe-P0PNoGPjxYVbau0zV15lyd9so7zrxesBvWyBq"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<button class="w-full bg-primary text-white py-3 rounded-lg font-medium shadow-xl">Personalize</button>
+</div>
+<div class="absolute top-4 left-4">
+<span class="bg-white/90 dark:bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold">Modernist</span>
+</div>
+</div>
+<div class="p-6 flex justify-between items-start">
+<div>
+<h3 class="font-bold text-lg">Tech Blueprint</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Clean &amp; Geometric</p>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons-outlined">bookmark_border</span>
+</button>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-500">
+<div class="aspect-[4/3] relative overflow-hidden bg-slate-100 dark:bg-slate-800">
+<img alt="Subtle Gradient Pattern" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Soft ethereal gradient from primary blue to deep slate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4ZohLU5pbx5_a_XKrEmDDAF7sEtQO4SEALp4uCYGwToff7wfU4w2QzNG7lN2HGKYDGuYduPA0de52bYIpZMnDryFAO0tqA0dOAPPTf6lkYDGVYgl3L55kay5N08cDLayM49VLDHMIFAvFhiWh7HBhUfbV-7_JRQ_UKYeo0QyuF8mK6tuGNVbzxPapXrfOBzKnNKuPOak_qQZmkod80Y73yJnLLr9do240O6VdHd9xA-lHMVzbSiUVX6u9kqTzatHMBUNrBpA-ZR7g"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<button class="w-full bg-primary text-white py-3 rounded-lg font-medium shadow-xl">Personalize</button>
+</div>
+<div class="absolute top-4 left-4">
+<span class="bg-white/90 dark:bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold">Ethereal</span>
+</div>
+</div>
+<div class="p-6 flex justify-between items-start">
+<div>
+<h3 class="font-bold text-lg">Aura Signature</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Creative &amp; Fluid</p>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons-outlined">bookmark_border</span>
+</button>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="group bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-500">
+<div class="aspect-[4/3] relative overflow-hidden bg-slate-100 dark:bg-slate-800">
+<img alt="Matte Texture" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Deep matte black textured paper background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBK0l_DJLNE7nEbuWV7p5fubHdGGHokwi5m2lci414TEthHcQtMchJF0KQ_WcXIyNVF4DyeJ2wM62fN3LW_Z40ccJHn9BSlJdyZnrUgxFhDmZJw42piUi4gUn-V-MQilHTKE76dat0Eprg_9K9cNx-VGc1sHqOGHZp87Wc8D8NyZSO2whrvM1DjICcO_Szzi1i74zUa-HX2IS5__etUKCsX0JoQz2ldUPq-0aWeJ9rI-S_CEgFY94FKJCRKzd92cvw8GlZFLhCdh6xB"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<button class="w-full bg-primary text-white py-3 rounded-lg font-medium shadow-xl">Personalize</button>
+</div>
+<div class="absolute top-4 left-4">
+<span class="bg-white/90 dark:bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold">Noir</span>
+</div>
+</div>
+<div class="p-6 flex justify-between items-start">
+<div>
+<h3 class="font-bold text-lg">Black Tie Matte</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Luxury Premium</p>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons-outlined">bookmark_border</span>
+</button>
+</div>
+</div>
+<!-- Create Custom -->
+<div class="group border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary transition-all duration-300 flex flex-col items-center justify-center p-8 bg-slate-50/50 dark:bg-slate-900/20">
+<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+<span class="material-icons-outlined text-primary text-3xl">add</span>
+</div>
+<h3 class="font-bold text-lg">Start from Scratch</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 text-center mt-2 max-w-[200px]">Define your own patterns, colors, and layouts.</p>
+</div>
+</div>
+</div>
+<!-- Editor Modal Preview (Visible for demonstration) -->
+<div class="mt-32 pt-16 border-t border-slate-200 dark:border-primary/10">
+<div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+<div class="grid lg:grid-cols-5 h-[600px]">
+<!-- Editor Sidebar -->
+<div class="lg:col-span-2 border-r border-slate-200 dark:border-slate-800 p-8 space-y-8">
+<div>
+<h4 class="text-xs uppercase tracking-[0.2em] font-bold text-primary mb-4">Editor</h4>
+<h3 class="text-2xl font-bold">Personalize Design</h3>
+</div>
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="text-sm font-medium text-slate-500 dark:text-slate-400">Typography</label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border-0 rounded-lg focus:ring-2 focus:ring-primary py-3 px-4 text-sm">
+<option>Space Grotesk (Default)</option>
+<option>Inter Display</option>
+<option>Cormorant Garamond</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-slate-500 dark:text-slate-400">Message</label>
+<textarea class="w-full bg-slate-50 dark:bg-slate-800 border-0 rounded-lg focus:ring-2 focus:ring-primary py-3 px-4 text-sm" placeholder="We are excited to announce..." rows="3"></textarea>
+</div>
+<div class="space-y-4">
+<label class="text-sm font-medium text-slate-500 dark:text-slate-400 block">Brand Identity</label>
+<div class="flex gap-4">
+<button class="flex-1 border border-slate-200 dark:border-slate-700 rounded-lg p-4 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<span class="material-icons-outlined text-slate-400">cloud_upload</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Logo</span>
+</button>
+<button class="flex-1 border border-slate-200 dark:border-slate-700 rounded-lg p-4 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<span class="material-icons-outlined text-slate-400">palette</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Colors</span>
+</button>
+</div>
+</div>
+</div>
+<div class="pt-4">
+<button class="w-full bg-primary text-white py-4 rounded-lg font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/30">
+<span class="material-icons-outlined">send</span>
+                                Generate Preview
+                            </button>
+</div>
+</div>
+<!-- Live Preview -->
+<div class="lg:col-span-3 bg-slate-100 dark:bg-slate-950 p-12 flex items-center justify-center relative">
+<div class="w-full aspect-[16/10] bg-white dark:bg-slate-900 rounded shadow-2xl border border-white/10 relative overflow-hidden group">
+<!-- Simulated E-Card Canvas -->
+<div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&amp;fit=crop&amp;q=80&amp;w=800')] bg-cover opacity-20 dark:opacity-10 pointer-events-none" data-alt="Light marble texture background for card canvas"></div>
+<div class="relative h-full flex flex-col items-center justify-center p-12 text-center">
+<div class="w-12 h-12 border border-slate-300 dark:border-slate-700 rounded mb-8 flex items-center justify-center text-[8px] text-slate-400 uppercase tracking-widest italic">
+                                    Your Logo
+                                </div>
+<h2 class="text-3xl font-light tracking-tight mb-4 text-slate-800 dark:text-slate-100">Expanding Tomorrow</h2>
+<div class="h-px w-20 bg-primary/40 mb-6"></div>
+<p class="text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed text-sm">
+                                    We're thrilled to share our latest innovation with our most valued partners. Thank you for being part of our journey.
+                                </p>
+</div>
+<div class="absolute bottom-4 right-4 flex gap-2">
+<div class="w-2 h-2 rounded-full bg-slate-300"></div>
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-slate-300"></div>
+</div>
+</div>
+<!-- Floating Preview Tag -->
+<div class="absolute top-6 right-6 flex items-center gap-2 bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Live Preview
+                        </div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 py-12">
+<div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 bg-primary rounded flex items-center justify-center">
+<span class="material-icons-outlined text-white text-[14px]">style</span>
+</div>
+<span class="font-bold tracking-tight text-sm">ECard Pro</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm">
+                © 2024 ECard Pro. Part of the Enterprise Suite.
+            </p>
+<div class="flex gap-6">
+<a class="text-slate-400 hover:text-primary transition-colors" href="#"><span class="material-icons-outlined text-xl">share</span></a>
+<a class="text-slate-400 hover:text-primary transition-colors" href="#"><span class="material-icons-outlined text-xl">help_outline</span></a>
+<a class="text-slate-400 hover:text-primary transition-colors" href="#"><span class="material-icons-outlined text-xl">settings</span></a>
+</div>
+</div>
+</footer>
+</body></html>

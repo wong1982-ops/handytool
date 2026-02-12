@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DiffMaster - Side-by-Side Editor &amp; Comparison</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "monokai-bg": "#272822",
+                        "diff-del": "rgba(249, 38, 114, 0.2)",
+                        "diff-add": "rgba(166, 226, 46, 0.2)",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace; }
+        .gutter-connection {
+            background: linear-gradient(90deg, rgba(249, 38, 114, 0.1) 0%, rgba(166, 226, 46, 0.1) 100%);
+        }
+        .diff-line-del { border-left: 4px solid #f92672; background-color: rgba(249, 38, 114, 0.15); }
+        .diff-line-add { border-left: 4px solid #a6e22e; background-color: rgba(166, 226, 46, 0.15); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #101922; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="h-14 border-b border-primary/20 bg-background-light dark:bg-background-dark flex items-center justify-between px-6 z-50">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons-round text-white text-lg">difference</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-800 dark:text-white">DiffMaster</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
+<span class="text-xs font-medium uppercase tracking-wider text-primary">Sync Scroll</span>
+<button class="relative inline-flex h-5 w-9 items-center rounded-full bg-primary">
+<span class="inline-block h-3.5 w-3.5 translate-x-5 transform rounded-full bg-white transition"></span>
+</button>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<button class="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-800 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+<span class="material-icons-round text-sm">settings</span>
+<span class="text-sm font-medium">Comparison Settings</span>
+<span class="material-icons-round text-sm">expand_more</span>
+</button>
+</div>
+<button class="px-5 py-2 bg-primary text-white font-semibold rounded-lg hover:brightness-110 transition-all flex items-center gap-2 shadow-lg shadow-primary/20">
+<span class="material-icons-round text-sm">play_arrow</span>
+                    Compare Now
+                </button>
+</div>
+</div>
+</header>
+<!-- Main Workspace -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Left Editor Pane -->
+<section class="flex-1 flex flex-col border-r border-slate-200 dark:border-slate-800">
+<div class="h-12 flex items-center justify-between px-4 bg-slate-100 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-2">
+<span class="material-icons-round text-red-500 text-sm">description</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm font-medium p-0 w-32" type="text" value="auth_service.py"/>
+<span class="text-[10px] bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500">ORIGINAL</span>
+</div>
+<button class="flex items-center gap-1.5 text-xs font-medium px-3 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+<span class="material-icons-round text-sm">download</span>
+                    Download
+                </button>
+</div>
+<div class="flex-1 overflow-auto bg-monokai-bg code-font text-sm leading-relaxed p-0 selection:bg-primary/30">
+<div class="flex">
+<!-- Line Numbers -->
+<div class="w-12 bg-black/20 text-slate-500 text-right pr-3 select-none py-4 border-r border-white/5">
+<div class="h-6">1</div><div class="h-6">2</div><div class="h-6">3</div><div class="h-6">4</div><div class="h-6">5</div><div class="h-6">6</div><div class="h-6">7</div><div class="h-6">8</div><div class="h-6">9</div><div class="h-6">10</div><div class="h-6">11</div><div class="h-6">12</div><div class="h-6">13</div><div class="h-6">14</div>
+</div>
+<!-- Code Content -->
+<div class="flex-1 py-4">
+<div class="h-6 px-4 text-slate-300">import <span class="text-pink-500">jwt</span></div>
+<div class="h-6 px-4 text-slate-300">from <span class="text-pink-500">datetime</span> import <span class="text-pink-500">datetime</span></div>
+<div class="h-6 px-4"></div>
+<div class="h-6 px-4 text-slate-300"><span class="text-blue-400">class</span> <span class="text-green-400">AuthManager</span>:</div>
+<div class="h-6 px-4 text-slate-300">    <span class="text-blue-400">def</span> <span class="text-green-400">__init__</span>(self, secret):</div>
+<div class="h-6 px-4 text-slate-300">        self.secret = secret</div>
+<div class="h-6 px-4"></div>
+<div class="h-6 px-4 text-slate-300">    <span class="text-blue-400">def</span> <span class="text-green-400">validate_token</span>(self, token):</div>
+<!-- Deleted Line -->
+<div class="h-6 px-4 diff-line-del text-slate-200">        payload = jwt.decode(token, self.secret)</div>
+<div class="h-6 px-4 diff-line-del text-slate-200">        return payload['user_id']</div>
+<div class="h-6 px-4"></div>
+<div class="h-6 px-4 text-slate-300">    <span class="text-blue-400">def</span> <span class="text-green-400">get_status</span>(self):</div>
+<div class="h-6 px-4 text-slate-300">        <span class="text-blue-400">return</span> <span class="text-yellow-400">"Active"</span></div>
+<div class="h-6 px-4 text-slate-300">    </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Central Gutter / Bridge -->
+<aside class="w-12 bg-slate-100 dark:bg-slate-900 border-x border-slate-200 dark:border-slate-800 flex flex-col items-center py-4 gap-1 relative">
+<div class="h-6"></div><div class="h-6"></div><div class="h-6"></div><div class="h-6"></div><div class="h-6"></div><div class="h-6"></div><div class="h-6"></div><div class="h-6"></div>
+<!-- Connection Map visualization -->
+<div class="absolute inset-x-0 top-[224px] h-[48px] gutter-connection flex items-center justify-center">
+<div class="flex flex-col gap-1">
+<button class="bg-primary hover:scale-110 text-white rounded-full w-4 h-4 flex items-center justify-center transition-transform cursor-pointer">
+<span class="material-icons-round text-[10px]">chevron_right</span>
+</button>
+<button class="bg-primary/20 hover:scale-110 text-primary border border-primary/40 rounded-full w-4 h-4 flex items-center justify-center transition-transform cursor-pointer">
+<span class="material-icons-round text-[10px]">chevron_left</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Right Editor Pane -->
+<section class="flex-1 flex flex-col">
+<div class="h-12 flex items-center justify-between px-4 bg-slate-100 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-2">
+<span class="material-icons-round text-green-500 text-sm">description</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm font-medium p-0 w-32" type="text" value="auth_service.py"/>
+<span class="text-[10px] bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500">MODIFIED</span>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">Clear</button>
+<button class="flex items-center gap-1.5 text-xs font-medium px-3 py-1 bg-primary text-white rounded-lg hover:brightness-110 transition-colors">
+<span class="material-icons-round text-sm">download</span>
+                        Download
+                    </button>
+</div>
+</div>
+<div class="flex-1 overflow-auto bg-monokai-bg code-font text-sm leading-relaxed p-0 selection:bg-primary/30">
+<div class="flex">
+<!-- Line Numbers -->
+<div class="w-12 bg-black/20 text-slate-500 text-right pr-3 select-none py-4 border-r border-white/5">
+<div class="h-6">1</div><div class="h-6">2</div><div class="h-6">3</div><div class="h-6">4</div><div class="h-6">5</div><div class="h-6">6</div><div class="h-6">7</div><div class="h-6">8</div><div class="h-6">9</div><div class="h-6">10</div><div class="h-6">11</div><div class="h-6">12</div><div class="h-6">13</div><div class="h-6">14</div><div class="h-6">15</div>
+</div>
+<!-- Code Content -->
+<div class="flex-1 py-4">
+<div class="h-6 px-4 text-slate-300">import <span class="text-pink-500">jwt</span></div>
+<div class="h-6 px-4 text-slate-300">from <span class="text-pink-500">datetime</span> import <span class="text-pink-500">datetime</span></div>
+<div class="h-6 px-4"></div>
+<div class="h-6 px-4 text-slate-300"><span class="text-blue-400">class</span> <span class="text-green-400">AuthManager</span>:</div>
+<div class="h-6 px-4 text-slate-300">    <span class="text-blue-400">def</span> <span class="text-green-400">__init__</span>(self, secret):</div>
+<div class="h-6 px-4 text-slate-300">        self.secret = secret</div>
+<div class="h-6 px-4"></div>
+<div class="h-6 px-4 text-slate-300">    <span class="text-blue-400">def</span> <span class="text-green-400">validate_token</span>(self, token):</div>
+<!-- Added Lines -->
+<div class="h-6 px-4 diff-line-add text-slate-200">        <span class="text-blue-400">try:</span></div>
+<div class="h-6 px-4 diff-line-add text-slate-200">            payload = jwt.decode(token, self.secret, algorithms=[<span class="text-yellow-400">"HS256"</span>])</div>
+<div class="h-6 px-4 diff-line-add text-slate-200">            return payload[<span class="text-yellow-400">'user_id'</span>]</div>
+<div class="h-6 px-4 diff-line-add text-slate-200">        <span class="text-blue-400">except</span> <span class="text-green-400">jwt.ExpiredSignatureError</span>:</div>
+<div class="h-6 px-4 diff-line-add text-slate-200">            return <span class="text-pink-500">None</span></div>
+<div class="h-6 px-4"></div>
+<div class="h-6 px-4 text-slate-300">    <span class="text-blue-400">def</span> <span class="text-green-400">get_status</span>(self):</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Status Bar -->
+<footer class="h-10 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between px-6 text-xs text-slate-500 dark:text-slate-400">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+<span>2 Deletions</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+<span>5 Additions</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-icons-round text-sm">unfold_more</span>
+<span>1 Changed Block</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="font-medium">UTF-8</span>
+<span class="opacity-30">|</span>
+<span class="font-medium">Python</span>
+<span class="opacity-30">|</span>
+<span class="font-medium">Spaces: 4</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-icons-round text-sm">place</span>
+<span>Ln 12, Col 42</span>
+</div>
+</div>
+</footer>
+<!-- Image for Context Reference -->
+<div class="hidden">
+<img alt="Reference" data-alt="Dark coding environment with neon syntax highlighting elements" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCzO2-4KtZCxpMJ6hiFLQloTWZs2Xz2YhEGPLY-sPDw-dq4akAWGuQde7fo1fJc0RaX-W0SXLJ_LVEpz5MiwRLZTzdz-y94S9lAba8Lpl4oqGeiZg8ADglnn44BVPPVzE38s6YSsg-d4rTOlRPU2S0-5qPBH4VkPQwceG9Jp9h8h45gz5rkRt9IaeWDeLou8Vxg_e2yhvzkEcfpZLTOrH70526-7fSmxRzfZ3zkpKiJmBJ2kobLAqb7b8Fv29kjDy7YMoDDdYmCGog"/>
+</div>
+</body></html>
