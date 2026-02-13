@@ -345,38 +345,56 @@ On mobile (`< md`), stack vertically: input on top, output below.
 
 ### Editor-Style Tool Layout (MANDATORY)
 
-For tools with a full-screen editor canvas (SVG Converter, Image Editor, PDF Converter), follow this fixed layout pattern:
+For tools with a full-screen editor canvas (SVG Converter, Image Editor, PDF Converter), the entire page MUST NOT exceed 100dvh. The site header + site footer + workspace fill exactly the viewport. The workspace area scrolls internally — the page itself never scrolls.
+
+#### Viewport Lock (MANDATORY)
+
+Add this `<style>` tag in the tool's `layout.tsx` to lock the body to viewport height:
+
+```tsx
+<style dangerouslySetInnerHTML={{ __html: 'body{height:100dvh;overflow:hidden}' }} />
+```
+
+The tool page's root div MUST use `flex-1 min-h-0 overflow-hidden` so it shrinks within the flex layout:
+
+```tsx
+<div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+```
+
+- `flex-1` — fills remaining space between site header and footer
+- `min-h-0` — allows the flex item to shrink below content size (critical!)
+- `overflow-hidden` — clips internal overflow, workspace scrolls independently
+
+#### Full Layout Structure
 
 ```
-┌─ Toolbar (sticky top-0 z-30) ─────────────────────────────────┐
-│  Controls, inputs, presets, action buttons                     │
-├────────────────────────────────────────────────────────────────┤
-│  ┌─ Canvas wrapper (flex-1, relative, overflow-hidden) ─────┐  │
-│  │  ┌─ Scrollable area (absolute inset-0, overflow-auto) ─┐ │  │
-│  │  │                                                      │ │  │
-│  │  │         Main content (zoomable, pannable)            │ │  │
-│  │  │                                                      │ │  │
-│  │  └──────────────────────────────────────────────────────┘ │  │
-│  │                                                           │  │
-│  │  [Floating overlays — absolute, z-20, pointer-events-auto]│  │
-│  │  (zoom bar, preview thumbnail, info badges)               │  │
-│  └───────────────────────────────────────────────────────────┘  │
-├────────────────────────────────────────────────────────────────┤
-│  Footer hint bar (h-5, shrink-0, compact)                      │
-└────────────────────────────────────────────────────────────────┘
+body (h-[100dvh] overflow-hidden flex flex-col)
+├─ Site Header (shrink-0)
+├─ Page (flex-1 min-h-0 flex flex-col overflow-hidden)
+│  ├─ Tool Header / Breadcrumb (h-12 shrink-0)
+│  ├─ Toolbar (shrink-0, sticky top-0 z-30)
+│  ├─ Workspace (flex-1 relative overflow-hidden)
+│  │  ├─ Scrollable area (absolute inset-0 overflow-auto)
+│  │  │  └─ Zoomable content
+│  │  ├─ Zoom controls (absolute bottom-4 z-20)
+│  │  └─ Preview panel (absolute bottom-4 right-4 z-20)
+│  └─ Status bar / hint bar (h-5 shrink-0, compact)
+└─ Site Footer (shrink-0)
 ```
 
 #### Rules
 
 | Element | Requirement |
 |---|---|
+| **Body** | `height: 100dvh; overflow: hidden` — via style tag in tool layout |
+| **Page root** | `flex-1 min-h-0 flex flex-col overflow-hidden` — shrinks within flex layout |
 | **Toolbar** | `sticky top-0 z-30 bg-[#1a2333] border-b border-slate-700 shrink-0` — always visible above scroll |
-| **Canvas wrapper** | `flex-1 relative overflow-hidden` — establishes positioning context for floating overlays |
+| **Workspace** | `flex-1 relative overflow-hidden` — establishes positioning context for floating overlays |
 | **Scrollable area** | `absolute inset-0 overflow-auto` — scrolls independently when content is zoomed |
-| **Floating overlays** | `absolute z-20 pointer-events-auto` on the canvas wrapper (NOT inside the scrollable area) — stay pinned to viewport |
-| **Footer** | `h-5 shrink-0` — compact, always visible, never scrolls away |
+| **Floating overlays** | `absolute z-20 pointer-events-auto` on the workspace (NOT inside the scrollable area) — stay pinned |
+| **Status bar** | `h-5 shrink-0` — compact, always visible, never scrolls away |
 
-**Key principle:** Floating UI (zoom controls, preview thumbnails, info badges) must be siblings of the scrollable area inside the canvas wrapper — never children of the scrollable area, or they scroll away when zoomed.
+**Key principle:** Floating UI (zoom controls, preview thumbnails, info badges) must be siblings of the scrollable area inside the workspace wrapper — never children of the scrollable area, or they scroll away when zoomed.
 
 ### When Multi-Page Is Acceptable
 
