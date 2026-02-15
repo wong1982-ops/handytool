@@ -2,6 +2,10 @@
   "name": "handytool-workspace",
   "version": "0.0.0",
   "private": true,
+  "packageManager": "pnpm@10.26.1",
+  "pnpm": {
+    "onlyBuiltDependencies": ["canvas"]
+  },
   "scripts": {
     "build:ui": "pnpm --filter @wong1982-ops/handytool-ui build",
     "dev:ui": "pnpm --filter @wong1982-ops/handytool-ui dev",
