@@ -1,0 +1,124 @@
+// ============================================================
+// Breakpoints — Mobile First
+// ============================================================
+
+@use 'sass:map';
+@use 'sass:list';
+@use 'tokens' as *;
+
+$breakpoints: (
+  xs:  0,       // mobile (default — no media query needed)
+  sm:  640px,   // large phone / small tablet
+  md:  768px,   // tablet portrait
+  lg:  1024px,  // tablet landscape / small desktop
+  xl:  1280px,  // desktop
+  2xl: 1536px,  // wide desktop
+);
+
+// ----------------------------------------------------------
+// Mixins
+// ----------------------------------------------------------
+
+/// Mobile-first: min-width (styles apply at this breakpoint and UP)
+/// Usage: @include bp(md) { ... }
+@mixin bp($name) {
+  $value: map.get($breakpoints, $name);
+
+  @if $value == null {
+    @error "Unknown breakpoint `#{$name}`. Available: #{map.keys($breakpoints)}";
+  }
+
+  @if $value == 0 {
+    @content;
+  } @else {
+    @media (min-width: $value) {
+      @content;
+    }
+  }
+}
+
+/// Desktop-first: max-width (styles apply BELOW this breakpoint)
+/// Usage: @include bp-down(md) { ... }
+@mixin bp-down($name) {
+  $value: map.get($breakpoints, $name);
+
+  @if $value == null {
+    @error "Unknown breakpoint `#{$name}`. Available: #{map.keys($breakpoints)}";
+  }
+
+  @if $value == 0 {
+    @content;
+  } @else {
+    @media (max-width: ($value - 0.02px)) {
+      @content;
+    }
+  }
+}
+
+/// Range: styles apply only BETWEEN two breakpoints
+/// Usage: @include bp-between(sm, lg) { ... }
+@mixin bp-between($lower, $upper) {
+  $min: map.get($breakpoints, $lower);
+  $max: map.get($breakpoints, $upper);
+
+  @if $min == null {
+    @error "Unknown breakpoint `#{$lower}`.";
+  }
+  @if $max == null {
+    @error "Unknown breakpoint `#{$upper}`.";
+  }
+
+  @media (min-width: $min) and (max-width: ($max - 0.02px)) {
+    @content;
+  }
+}
+
+/// Only: styles apply ONLY at this single breakpoint range
+/// Usage: @include bp-only(md) { ... }
+@mixin bp-only($name) {
+  $keys: map.keys($breakpoints);
+  $index: list.index($keys, $name);
+
+  @if $index == null {
+    @error "Unknown breakpoint `#{$name}`.";
+  }
+
+  $min: map.get($breakpoints, $name);
+
+  @if $index < list.length($keys) {
+    $next-key: list.nth($keys, $index + 1);
+    $max: map.get($breakpoints, $next-key);
+    @media (min-width: $min) and (max-width: ($max - 0.02px)) {
+      @content;
+    }
+  } @else {
+    @media (min-width: $min) {
+      @content;
+    }
+  }
+}
+
+// ----------------------------------------------------------
+// Container
+// ----------------------------------------------------------
+
+$container-padding: $spacing-4 !default;
+
+$container-max-widths: (
+  sm:  640px,
+  md:  768px,
+  lg:  1024px,
+  xl:  1280px,
+);
+
+@mixin container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: $container-padding;
+
+  @each $bp, $max-width in $container-max-widths {
+    @include bp($bp) {
+      max-width: $max-width;
+    }
+  }
+}

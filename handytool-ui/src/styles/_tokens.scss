@@ -1,0 +1,161 @@
+// ============================================================
+// Design Tokens
+// ============================================================
+// All brand/theme colors are exposed as CSS custom properties
+// on :root so they can be overridden for rebranding.
+// SCSS variables below are defaults used to seed the custom properties.
+// ============================================================
+
+// ----------------------------------------------------------
+// Colors (defaults — override via CSS custom properties)
+// ----------------------------------------------------------
+
+// Brand — Primary (blue, from design: #3D6AF2 → #3D9DF2)
+$color-primary-50:  #edf2fe !default;
+$color-primary-100: #d9e3fd !default;
+$color-primary-200: #b3c7fb !default;
+$color-primary-300: #8daaf9 !default;
+$color-primary-400: #3D9DF2 !default; // design
+$color-primary-500: #3D79F2 !default; // design
+$color-primary-600: #3D6AF2 !default; // design
+$color-primary-700: #2f54d9 !default;
+$color-primary-800: #2341b3 !default;
+$color-primary-900: #1a2f8c !default;
+$color-primary-950: #0e1a59 !default;
+
+// Brand — Secondary (teal/cyan, from design: #32A9D9 → #32D9D9)
+$color-secondary-50:  #ecfbfb !default;
+$color-secondary-100: #cff5f5 !default;
+$color-secondary-200: #a0ecec !default;
+$color-secondary-300: #68e0e0 !default;
+$color-secondary-400: #32D9D9 !default; // design
+$color-secondary-500: #32A9D9 !default; // design
+$color-secondary-600: #288db3 !default;
+$color-secondary-700: #206d8c !default;
+$color-secondary-800: #1a5570 !default;
+$color-secondary-900: #143d54 !default;
+$color-secondary-950: #0a2233 !default;
+
+// Brand — Accent (derived from midpoint of palette)
+$color-accent-50:  #edf6fe !default;
+$color-accent-100: #d6ecfd !default;
+$color-accent-200: #add9fb !default;
+$color-accent-300: #7ac3f7 !default;
+$color-accent-400: #3D9DF2 !default;
+$color-accent-500: #2d88d9 !default;
+$color-accent-600: #2370b3 !default;
+$color-accent-700: #1b578c !default;
+$color-accent-800: #154370 !default;
+$color-accent-900: #103154 !default;
+$color-accent-950: #091c33 !default;
+
+// Neutral
+$color-neutral-0:   #ffffff !default;
+$color-neutral-50:  #f9fafb !default;
+$color-neutral-100: #f3f4f6 !default;
+$color-neutral-200: #e5e7eb !default;
+$color-neutral-300: #d1d5db !default;
+$color-neutral-400: #9ca3af !default;
+$color-neutral-500: #6b7280 !default;
+$color-neutral-600: #4b5563 !default;
+$color-neutral-700: #374151 !default;
+$color-neutral-800: #1f2937 !default;
+$color-neutral-900: #111827 !default;
+$color-neutral-950: #030712 !default;
+
+// Semantic
+$color-success-500: #22c55e !default;
+$color-success-600: #16a34a !default;
+$color-warning-500: #eab308 !default;
+$color-warning-600: #ca8a04 !default;
+$color-error-500:   #ef4444 !default;
+$color-error-600:   #dc2626 !default;
+$color-info-500:    #3b82f6 !default;
+$color-info-600:    #2563eb !default;
+
+// ----------------------------------------------------------
+// Spacing (4px base unit)
+// ----------------------------------------------------------
+$spacing-0:   0;
+$spacing-0-5: 0.125rem; // 2px
+$spacing-1:   0.25rem;  // 4px
+$spacing-1-5: 0.375rem; // 6px
+$spacing-2:   0.5rem;   // 8px
+$spacing-2-5: 0.625rem; // 10px
+$spacing-3:   0.75rem;  // 12px
+$spacing-3-5: 0.875rem; // 14px
+$spacing-4:   1rem;     // 16px
+$spacing-5:   1.25rem;  // 20px
+$spacing-6:   1.5rem;   // 24px
+$spacing-7:   1.75rem;  // 28px
+$spacing-8:   2rem;     // 32px
+$spacing-9:   2.25rem;  // 36px
+$spacing-10:  2.5rem;   // 40px
+$spacing-12:  3rem;     // 48px
+$spacing-14:  3.5rem;   // 56px
+$spacing-16:  4rem;     // 64px
+$spacing-20:  5rem;     // 80px
+$spacing-24:  6rem;     // 96px
+$spacing-32:  8rem;     // 128px
+
+// ----------------------------------------------------------
+// Typography
+// ----------------------------------------------------------
+$font-family-sans:  'Inter', system-ui, -apple-system, sans-serif !default;
+$font-family-mono:  'JetBrains Mono', ui-monospace, monospace !default;
+
+// Body text (static sizes)
+$font-size-xs:   0.75rem;   // 12px
+$font-size-sm:   0.875rem;  // 14px
+$font-size-base: 1rem;      // 16px
+$font-size-lg:   1.125rem;  // 18px
+$font-size-xl:   1.25rem;   // 20px
+
+// Fluid heading sizes using clamp()
+// clamp(min, preferred, max) — scales between 320px and 1280px viewports
+$heading-1: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);     // 32px → 56px
+$heading-2: clamp(1.75rem, 1.35rem + 2vw, 3rem);      // 28px → 48px
+$heading-3: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);   // 24px → 36px
+$heading-4: clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem);  // 20px → 28px
+$heading-5: clamp(1.125rem, 1rem + 0.5vw, 1.5rem);    // 18px → 24px
+$heading-6: clamp(1rem, 0.95rem + 0.25vw, 1.25rem);   // 16px → 20px
+
+$line-height-tight:   1.25;
+$line-height-normal:  1.5;
+$line-height-relaxed: 1.75;
+
+$font-weight-normal:   400;
+$font-weight-medium:   500;
+$font-weight-semibold: 600;
+$font-weight-bold:     700;
+
+// ----------------------------------------------------------
+// Border radius
+// ----------------------------------------------------------
+$radius-none: 0;
+$radius-sm:   0.25rem;  // 4px
+$radius-md:   0.375rem; // 6px
+$radius-lg:   0.5rem;   // 8px
+$radius-xl:   0.75rem;  // 12px
+$radius-2xl:  1rem;     // 16px
+$radius-full: 9999px;
+
+// ----------------------------------------------------------
+// Shadows
+// ----------------------------------------------------------
+$shadow-sm:  0 1px 2px 0 rgb(0 0 0 / 0.05);
+$shadow-md:  0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+$shadow-lg:  0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+$shadow-xl:  0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+// ----------------------------------------------------------
+// Z-index scale
+// ----------------------------------------------------------
+$z-dropdown:  1000;
+$z-sticky:    1020;
+$z-fixed:     1030;
+$z-overlay:   1040;
+$z-modal:     1050;
+$z-popover:   1060;
+$z-tooltip:   1070;
+$z-toast:     1080;

@@ -1,0 +1,74 @@
+// ============================================================
+// Utility Mixins
+// ============================================================
+
+// ----------------------------------------------------------
+// Layout
+// ----------------------------------------------------------
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin stack($gap: $spacing-4) {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}
+
+@mixin cluster($gap: $spacing-4) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $gap;
+}
+
+// ----------------------------------------------------------
+// Typography
+// ----------------------------------------------------------
+
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// ----------------------------------------------------------
+// Accessibility
+// ----------------------------------------------------------
+
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin focus-ring($color: $color-primary-500, $offset: 2px) {
+  outline: 2px solid $color;
+  outline-offset: $offset;
+}

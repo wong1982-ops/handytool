@@ -3,11 +3,5 @@ node_modules/
 .idea/
 .claude/
 
-# Sub-projects have their own repos
-handytool-admin/
-handytool-api/
-handytool-client/
-handytool-ui/
-
 # Lock file (regenerated from sub-project locks)
 pnpm-lock.yaml
