@@ -1,22 +1,20 @@
 import type { NextConfig } from "next";
 
-const apiUrl = process.env.API_URL || "http://localhost:3001";
-
 const nextConfig: NextConfig = {
+  serverExternalPackages: [
+    "pdfjs-dist",
+    "exceljs",
+    "docx",
+    "jspdf",
+    "jszip",
+    "@neplex/vectorizer",
+  ],
   experimental: {
     optimizePackageImports: [
       "@wong1982-ops/handytool-ui",
       "react-leaflet",
       "leaflet",
     ],
-  },
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: `${apiUrl}/api/:path*`,
-      },
-    ];
   },
 };
 
