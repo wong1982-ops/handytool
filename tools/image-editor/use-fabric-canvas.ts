@@ -6,6 +6,20 @@ import type { Adjustments } from './adjustments-panel'
 import type { FilterPresetConfig } from './filter-presets'
 
 // ---------------------------------------------------------------------------
+// Layer type
+// ---------------------------------------------------------------------------
+
+export interface Layer {
+  id: string
+  name: string
+  type: 'image' | 'text' | 'drawing' | 'shape'
+  visible: boolean
+  locked: boolean
+  opacity: number       // 0-100
+  blendMode: string     // globalCompositeOperation value
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -40,6 +54,22 @@ export interface FabricCanvasAPI {
   /** Enable/disable spacebar-pan mode (call from keydown/keyup) */
   setSpacebarPanning: (active: boolean) => void
   isPanning: boolean
+  // Layer operations
+  layers: Layer[]
+  activeLayerId: string | null
+  setActiveLayer: (id: string | null) => void
+  addImageLayer: (file: File) => void
+  deleteLayer: (id: string) => void
+  toggleLayerVisibility: (id: string) => void
+  toggleLayerLock: (id: string) => void
+  renameLayer: (id: string, name: string) => void
+  setLayerOpacity: (id: string, opacity: number) => void
+  setLayerBlendMode: (id: string, mode: string) => void
+  reorderLayer: (id: string, newIndex: number) => void
+  moveLayerForward: (id: string) => void
+  moveLayerBackward: (id: string) => void
+  moveLayerToFront: (id: string) => void
+  moveLayerToBack: (id: string) => void
 }
 
 // ---------------------------------------------------------------------------
@@ -66,6 +96,10 @@ export function useFabricCanvas(): FabricCanvasAPI {
   const [canUndo, setCanUndo] = useState(false)
   const [canRedo, setCanRedo] = useState(false)
   const [initialZoom, setInitialZoom] = useState(100)
+
+  // Layer state
+  const [layers, setLayers] = useState<Layer[]>([])
+  const [activeLayerId, setActiveLayerId] = useState<string | null>(null)
 
   // Undo / redo stacks
   const historyRef = useRef<string[]>([])
@@ -113,7 +147,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
   const pushHistory = useCallback(() => {
     const canvas = fabricRef.current
     if (!canvas || isRestoringRef.current) return
-    const json = JSON.stringify(canvas.toJSON(['__isBgImage', '__isCropRect']))
+    const json = JSON.stringify(canvas.toJSON(['__isBgImage', '__isCropRect', '__layerId', '__layerName']))
     const stack = historyRef.current
     stack.push(json)
     if (stack.length > MAX_HISTORY) stack.shift()
@@ -190,6 +224,8 @@ export function useFabricCanvas(): FabricCanvasAPI {
           top: 0,
         }) as any
         fabricImg.__isBgImage = true
+        fabricImg.__layerId = 'bg'
+        fabricImg.__layerName = 'Background'
 
         // Clear previous content
         canvas.clear()
@@ -248,8 +284,32 @@ export function useFabricCanvas(): FabricCanvasAPI {
       setIsReady(true)
 
       // Listen for object modifications to push history
-      canvas.on('object:modified', () => pushHistory())
-      canvas.on('path:created', () => pushHistory())
+      canvas.on('object:modified', () => { pushHistory(); syncLayersFromCanvas() })
+      canvas.on('path:created', () => { pushHistory(); syncLayersFromCanvas() })
+
+      // Layer sync: assign __layerId to new objects, sync panel on changes
+      canvas.on('object:added', (e: any) => {
+        const obj = e.target
+        if (obj && !obj.__layerId) {
+          obj.__layerId = crypto.randomUUID().slice(0, 8)
+        }
+        if (obj && !obj.__layerName) {
+          obj.__layerName = autoName(obj)
+        }
+        syncLayersFromCanvas()
+      })
+      canvas.on('object:removed', () => syncLayersFromCanvas())
+
+      // Sync canvas selection → activeLayerId
+      canvas.on('selection:created', (e: any) => {
+        const obj = e.selected?.[0]
+        if (obj?.__layerId) setActiveLayerId(obj.__layerId)
+      })
+      canvas.on('selection:updated', (e: any) => {
+        const obj = e.selected?.[0]
+        if (obj?.__layerId) setActiveLayerId(obj.__layerId)
+      })
+      canvas.on('selection:cleared', () => setActiveLayerId(null))
 
       // --- Mouse wheel zoom (zoom at cursor position) ---
       canvas.on('mouse:wheel', (opt: any) => {
@@ -725,6 +785,218 @@ export function useFabricCanvas(): FabricCanvasAPI {
   }, [])
 
   // ------------------------------------------------------------------
+  // Layer sync helpers
+  // ------------------------------------------------------------------
+
+  function autoName(obj: any): string {
+    if (obj.__isBgImage) return 'Background'
+    if (obj.type === 'i-text' || obj.type === 'textbox') return `Text "${(obj.text || '').slice(0, 15)}"`
+    if (obj.type === 'path') return `Drawing ${obj.__layerId?.slice(-4) || ''}`
+    if (obj.type === 'image') return obj.__layerName || 'Image Layer'
+    return `Layer ${obj.__layerId?.slice(-4) || ''}`
+  }
+
+  function detectType(obj: any): Layer['type'] {
+    if (obj.type === 'image') return 'image'
+    if (obj.type === 'i-text' || obj.type === 'textbox') return 'text'
+    if (obj.type === 'path' || obj.type === 'group') return 'drawing'
+    return 'shape'
+  }
+
+  const syncLayersFromCanvas = useCallback(() => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+
+    const objects = canvas.getObjects() as any[]
+    const layerList: Layer[] = objects
+      .filter((obj: any) => !obj.__isCropRect)
+      .reverse()  // top object = first in list
+      .map((obj: any) => ({
+        id: obj.__layerId || '',
+        name: obj.__layerName || autoName(obj),
+        type: detectType(obj),
+        visible: obj.visible !== false,
+        locked: !obj.selectable,
+        opacity: Math.round((obj.opacity ?? 1) * 100),
+        blendMode: obj.globalCompositeOperation || 'source-over',
+      }))
+
+    setLayers(layerList)
+  }, [])
+
+  // ------------------------------------------------------------------
+  // Layer operations
+  // ------------------------------------------------------------------
+
+  const setActiveLayer = useCallback((id: string | null) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+    if (!id) {
+      canvas.discardActiveObject()
+    } else {
+      const obj = (canvas.getObjects() as any[]).find((o: any) => o.__layerId === id)
+      if (obj && obj.selectable) {
+        canvas.setActiveObject(obj)
+      }
+    }
+    canvas.renderAll()
+    setActiveLayerId(id)
+  }, [])
+
+  const addImageLayer = useCallback((file: File) => {
+    const canvas = fabricRef.current
+    const fabric = fabricModuleRef.current
+    if (!canvas || !fabric) return
+
+    const reader = new FileReader()
+    reader.onload = async () => {
+      const img = await fabric.FabricImage.fromURL(reader.result as string)
+      const canvasW = canvas.getWidth()
+      const canvasH = canvas.getHeight()
+      const sc = Math.min(canvasW / (img.width || 1), canvasH / (img.height || 1), 0.5)
+      img.set({ scaleX: sc, scaleY: sc, left: canvasW / 4, top: canvasH / 4 })
+      ;(img as any).__layerId = crypto.randomUUID().slice(0, 8)
+      ;(img as any).__layerName = file.name.replace(/\.[^.]+$/, '')
+      canvas.add(img)
+      canvas.setActiveObject(img)
+      canvas.renderAll()
+      pushHistory()
+    }
+    reader.readAsDataURL(file)
+  }, [pushHistory])
+
+  const deleteLayer = useCallback((id: string) => {
+    const canvas = fabricRef.current
+    if (!canvas || id === 'bg') return
+
+    const obj = (canvas.getObjects() as any[]).find((o: any) => o.__layerId === id)
+    if (obj) {
+      canvas.remove(obj)
+      canvas.discardActiveObject()
+      canvas.renderAll()
+      syncLayersFromCanvas()
+      pushHistory()
+    }
+  }, [syncLayersFromCanvas, pushHistory])
+
+  const toggleLayerVisibility = useCallback((id: string) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+    const obj = (canvas.getObjects() as any[]).find((o: any) => o.__layerId === id)
+    if (obj) {
+      obj.visible = !obj.visible
+      canvas.renderAll()
+      syncLayersFromCanvas()
+    }
+  }, [syncLayersFromCanvas])
+
+  const toggleLayerLock = useCallback((id: string) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+    const obj = (canvas.getObjects() as any[]).find((o: any) => o.__layerId === id)
+    if (obj) {
+      const wasSelectable = obj.selectable
+      obj.selectable = !wasSelectable
+      obj.evented = !wasSelectable
+      canvas.renderAll()
+      syncLayersFromCanvas()
+    }
+  }, [syncLayersFromCanvas])
+
+  const renameLayer = useCallback((id: string, name: string) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+    const obj = (canvas.getObjects() as any[]).find((o: any) => o.__layerId === id)
+    if (obj) {
+      obj.__layerName = name
+      syncLayersFromCanvas()
+    }
+  }, [syncLayersFromCanvas])
+
+  const setLayerOpacity = useCallback((id: string, opacity: number) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+    const obj = (canvas.getObjects() as any[]).find((o: any) => o.__layerId === id)
+    if (obj) {
+      obj.opacity = opacity / 100
+      canvas.renderAll()
+      syncLayersFromCanvas()
+    }
+  }, [syncLayersFromCanvas])
+
+  const setLayerBlendMode = useCallback((id: string, mode: string) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+    const obj = (canvas.getObjects() as any[]).find((o: any) => o.__layerId === id)
+    if (obj) {
+      obj.globalCompositeOperation = mode
+      canvas.renderAll()
+      syncLayersFromCanvas()
+    }
+  }, [syncLayersFromCanvas])
+
+  const reorderLayer = useCallback((id: string, newIndex: number) => {
+    const canvas = fabricRef.current
+    if (!canvas || id === 'bg') return
+
+    const objects = (canvas.getObjects() as any[]).filter((o: any) => !o.__isCropRect)
+    const obj = objects.find((o: any) => o.__layerId === id)
+    if (obj) {
+      // newIndex is in panel order (reversed), convert to canvas index
+      const canvasIndex = objects.length - 1 - newIndex
+      canvas.moveTo(obj, Math.max(0, canvasIndex))
+      canvas.renderAll()
+      syncLayersFromCanvas()
+      pushHistory()
+    }
+  }, [syncLayersFromCanvas, pushHistory])
+
+  const moveLayerForward = useCallback((id: string) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+    const obj = (canvas.getObjects() as any[]).find((o: any) => o.__layerId === id)
+    if (obj) {
+      canvas.bringObjectForward(obj)
+      canvas.renderAll()
+      syncLayersFromCanvas()
+    }
+  }, [syncLayersFromCanvas])
+
+  const moveLayerBackward = useCallback((id: string) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+    const obj = (canvas.getObjects() as any[]).find((o: any) => o.__layerId === id)
+    if (obj) {
+      canvas.sendObjectBackwards(obj)
+      canvas.renderAll()
+      syncLayersFromCanvas()
+    }
+  }, [syncLayersFromCanvas])
+
+  const moveLayerToFront = useCallback((id: string) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+    const obj = (canvas.getObjects() as any[]).find((o: any) => o.__layerId === id)
+    if (obj) {
+      canvas.bringObjectToFront(obj)
+      canvas.renderAll()
+      syncLayersFromCanvas()
+    }
+  }, [syncLayersFromCanvas])
+
+  const moveLayerToBack = useCallback((id: string) => {
+    const canvas = fabricRef.current
+    if (!canvas || id === 'bg') return
+    const obj = (canvas.getObjects() as any[]).find((o: any) => o.__layerId === id)
+    if (obj) {
+      // Move to index 1 (above background at 0)
+      canvas.moveTo(obj, 1)
+      canvas.renderAll()
+      syncLayersFromCanvas()
+    }
+  }, [syncLayersFromCanvas])
+
+  // ------------------------------------------------------------------
   // Zoom
   // ------------------------------------------------------------------
 
@@ -1028,5 +1300,21 @@ export function useFabricCanvas(): FabricCanvasAPI {
     reset,
     setSpacebarPanning,
     isPanning,
+    // Layer operations
+    layers,
+    activeLayerId,
+    setActiveLayer,
+    addImageLayer,
+    deleteLayer,
+    toggleLayerVisibility,
+    toggleLayerLock,
+    renameLayer,
+    setLayerOpacity,
+    setLayerBlendMode,
+    reorderLayer,
+    moveLayerForward,
+    moveLayerBackward,
+    moveLayerToFront,
+    moveLayerToBack,
   }
 }

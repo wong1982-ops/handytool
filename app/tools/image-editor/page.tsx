@@ -5,13 +5,7 @@ import { EditorToolbar, type ToolType } from '@/tools/image-editor/editor-toolba
 import { AdjustmentsPanel, type Adjustments } from '@/tools/image-editor/adjustments-panel'
 import { FILTER_PRESETS } from '@/tools/image-editor/filter-presets'
 import { useFabricCanvas } from '@/tools/image-editor/use-fabric-canvas'
-
-interface Layer {
-  id: string
-  name: string
-  visible: boolean
-  locked: boolean
-}
+import { LayersPanel } from '@/tools/image-editor/layers-panel'
 
 const DEFAULT_ADJUSTMENTS: Adjustments = {
   brightness: 0,
@@ -29,12 +23,11 @@ export default function ImageEditorPage() {
   const [zoom, setZoom] = useState(100)
   const [fgColor, setFgColor] = useState('#ffffff')
   const [bgColor, setBgColor] = useState('#000000')
-  const [layers, setLayers] = useState<Layer[]>([])
-  const [activeLayerId, setActiveLayerId] = useState<string | null>(null)
   const [dragging, setDragging] = useState(false)
   const [showMobileAdjustments, setShowMobileAdjustments] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const layerFileInputRef = useRef<HTMLInputElement>(null)
 
   const fabric = useFabricCanvas()
 
@@ -126,8 +119,6 @@ export default function ImageEditorPage() {
 
   const loadImage = useCallback((file: File) => {
     fabric.loadImage(file)
-    setLayers([{ id: 'bg', name: `Background (${file.name})`, visible: true, locked: false }])
-    setActiveLayerId('bg')
     setAdjustments(DEFAULT_ADJUSTMENTS)
     setActiveFilter('natural')
     setFilterIntensity(100)
@@ -171,14 +162,9 @@ export default function ImageEditorPage() {
     setFilterThumbnails({})
     setZoom(100)
     fabric.reset()
-    setLayers([])
-    setActiveLayerId(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.reset])
 
-  const toggleLayerVisibility = useCallback((id: string) => {
-    setLayers((prev) => prev.map((l) => (l.id === id ? { ...l, visible: !l.visible } : l)))
-  }, [])
 
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-[#101622]">
@@ -447,12 +433,23 @@ export default function ImageEditorPage() {
             <canvas ref={fabric.canvasRef} />
           </div>
 
-          {/* Hidden file input */}
+          {/* Hidden file inputs */}
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
             onChange={handleFileSelect}
+            className="hidden"
+          />
+          <input
+            ref={layerFileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) fabric.addImageLayer(file)
+              e.target.value = ''
+            }}
             className="hidden"
           />
         </section>
@@ -477,52 +474,19 @@ export default function ImageEditorPage() {
 
           {/* Layers */}
           <div className="border-t border-slate-700">
-            <div className="p-3 flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">Layers</h3>
-              <span className="text-[10px] text-slate-500">{layers.length} layer{layers.length !== 1 ? 's' : ''}</span>
-            </div>
-            <div className="max-h-40 overflow-y-auto px-1 pb-2 space-y-0.5">
-              {layers.length === 0 ? (
-                <p className="text-[11px] text-slate-600 px-3 py-2">No layers yet</p>
-              ) : (
-                layers.map((layer) => (
-                  <div
-                    key={layer.id}
-                    onClick={() => setActiveLayerId(layer.id)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded cursor-pointer transition-colors ${
-                      activeLayerId === layer.id
-                        ? 'bg-[var(--ht-color-primary-500)]/20 border border-[var(--ht-color-primary-500)]/30'
-                        : 'hover:bg-slate-800'
-                    }`}
-                  >
-                    <button
-                      onClick={(e) => { e.stopPropagation(); toggleLayerVisibility(layer.id) }}
-                      className="text-slate-400 hover:text-white cursor-pointer"
-                      aria-label={layer.visible ? `Hide ${layer.name}` : `Show ${layer.name}`}
-                    >
-                      {layer.visible ? (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      ) : (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                        </svg>
-                      )}
-                    </button>
-                    <span className={`text-xs font-medium truncate ${activeLayerId === layer.id ? 'text-white' : 'text-slate-400'}`}>
-                      {layer.name}
-                    </span>
-                    {layer.locked && (
-                      <svg className="w-3 h-3 text-slate-500 ml-auto shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
+            <LayersPanel
+              layers={fabric.layers}
+              activeLayerId={fabric.activeLayerId}
+              onSelectLayer={fabric.setActiveLayer}
+              onToggleVisibility={fabric.toggleLayerVisibility}
+              onToggleLock={fabric.toggleLayerLock}
+              onRename={fabric.renameLayer}
+              onDelete={fabric.deleteLayer}
+              onOpacityChange={fabric.setLayerOpacity}
+              onBlendModeChange={fabric.setLayerBlendMode}
+              onReorder={fabric.reorderLayer}
+              onAddImage={() => layerFileInputRef.current?.click()}
+            />
           </div>
         </div>
 
