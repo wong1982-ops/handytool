@@ -36,7 +36,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // --- Supabase session refresh for all other routes ---
-  return await updateSession(request)
+  if (
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    return await updateSession(request)
+  }
+
+  return NextResponse.next()
 }
 
 export const config = {
