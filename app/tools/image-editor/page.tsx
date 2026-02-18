@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect, useRef, type DragEvent, type ChangeEvent } from 'react'
 import { EditorToolbar, type ToolType } from '@/tools/image-editor/editor-toolbar'
-import { AdjustmentsPanel, FILTERS, type Adjustments, type FilterPreset } from '@/tools/image-editor/adjustments-panel'
+import { AdjustmentsPanel, type Adjustments } from '@/tools/image-editor/adjustments-panel'
+import { FILTER_PRESETS } from '@/tools/image-editor/filter-presets'
 import { useFabricCanvas } from '@/tools/image-editor/use-fabric-canvas'
 
 interface Layer {
@@ -22,7 +23,9 @@ const DEFAULT_ADJUSTMENTS: Adjustments = {
 export default function ImageEditorPage() {
   const [activeTool, setActiveTool] = useState<ToolType>('move')
   const [adjustments, setAdjustments] = useState<Adjustments>(DEFAULT_ADJUSTMENTS)
-  const [activeFilter, setActiveFilter] = useState<FilterPreset>('none')
+  const [activeFilter, setActiveFilter] = useState('natural')
+  const [filterIntensity, setFilterIntensity] = useState(100)
+  const [filterThumbnails, setFilterThumbnails] = useState<Record<string, string>>({})
   const [zoom, setZoom] = useState(100)
   const [fgColor, setFgColor] = useState('#ffffff')
   const [bgColor, setBgColor] = useState('#000000')
@@ -41,7 +44,10 @@ export default function ImageEditorPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fabric.applyAdjustments(adjustments) }, [adjustments, fabric.applyAdjustments])
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { fabric.applyFilterPreset(activeFilter) }, [activeFilter, fabric.applyFilterPreset])
+  useEffect(() => {
+    const preset = FILTER_PRESETS.find(p => p.id === activeFilter)
+    if (preset) fabric.applyFilterPreset(preset, filterIntensity)
+  }, [activeFilter, filterIntensity, fabric.applyFilterPreset])
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fabric.setZoom(zoom) }, [zoom, fabric.setZoom])
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -53,6 +59,13 @@ export default function ImageEditorPage() {
       const meta = e.ctrlKey || e.metaKey
       const tag = (e.target as HTMLElement)?.tagName
       const isInput = tag === 'INPUT' || tag === 'TEXTAREA'
+
+      // Spacebar → pan mode (any tool)
+      if (e.code === 'Space' && !isInput && !e.repeat) {
+        e.preventDefault()
+        fabric.setSpacebarPanning(true)
+        return
+      }
 
       if (meta && e.shiftKey && e.key.toLowerCase() === 'z') {
         e.preventDefault()
@@ -77,10 +90,19 @@ export default function ImageEditorPage() {
         return
       }
     }
+    const keyupHandler = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        fabric.setSpacebarPanning(false)
+      }
+    }
     window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
+    window.addEventListener('keyup', keyupHandler)
+    return () => {
+      window.removeEventListener('keydown', handler)
+      window.removeEventListener('keyup', keyupHandler)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fabric.undo, fabric.redo, fabric.deleteSelected, fabric.selectAll])
+  }, [fabric.undo, fabric.redo, fabric.deleteSelected, fabric.selectAll, fabric.setSpacebarPanning])
 
   // Sync zoom slider with hook's fit-to-viewport calculation
   useEffect(() => {
@@ -88,12 +110,20 @@ export default function ImageEditorPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.initialZoom])
 
+  // Sync zoom from wheel zoom (hook → page state)
+  useEffect(() => {
+    if (fabric.zoomPercent !== zoom) setZoom(fabric.zoomPercent)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.zoomPercent])
+
   const loadImage = useCallback((file: File) => {
     fabric.loadImage(file)
     setLayers([{ id: 'bg', name: `Background (${file.name})`, visible: true, locked: false }])
     setActiveLayerId('bg')
     setAdjustments(DEFAULT_ADJUSTMENTS)
-    setActiveFilter('none')
+    setActiveFilter('natural')
+    setFilterIntensity(100)
+    setFilterThumbnails({})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.loadImage])
 
@@ -110,8 +140,8 @@ export default function ImageEditorPage() {
   }, [loadImage])
 
   const handleSwapColors = useCallback(() => {
-    setFgColor((prev) => {
-      setBgColor(prev)
+    setFgColor((prevFg) => {
+      setBgColor(prevFg)
       return bgColor
     })
   }, [bgColor])
@@ -128,7 +158,9 @@ export default function ImageEditorPage() {
 
   const handleReset = useCallback(() => {
     setAdjustments(DEFAULT_ADJUSTMENTS)
-    setActiveFilter('none')
+    setActiveFilter('natural')
+    setFilterIntensity(100)
+    setFilterThumbnails({})
     setZoom(100)
     fabric.reset()
     setLayers([])
@@ -259,19 +291,19 @@ export default function ImageEditorPage() {
             {/* Filters menu */}
             <div className="group relative">
               <button className="hover:text-white transition-colors cursor-pointer px-3 py-1 rounded hover:bg-slate-800">Filters</button>
-              <div className="hidden group-hover:block group-focus-within:block absolute top-full left-0 mt-0.5 w-48 bg-[#1a2333] border border-slate-700 rounded-lg shadow-xl z-50 py-1">
-                {FILTERS.map((f) => (
+              <div className="hidden group-hover:block group-focus-within:block absolute top-full left-0 mt-0.5 w-48 bg-[#1a2333] border border-slate-700 rounded-lg shadow-xl z-50 py-1 max-h-64 overflow-y-auto">
+                {FILTER_PRESETS.map((p) => (
                   <button
-                    key={f.id}
-                    onClick={() => setActiveFilter(f.id)}
-                    className={`w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer flex items-center justify-between ${
-                      activeFilter === f.id
+                    key={p.id}
+                    onClick={() => setActiveFilter(p.id)}
+                    className={`w-full text-left px-4 py-1.5 text-sm transition-colors cursor-pointer flex items-center justify-between ${
+                      activeFilter === p.id
                         ? 'text-[var(--ht-color-primary-500)] bg-[var(--ht-color-primary-500)]/10'
                         : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                     }`}
                   >
-                    <span>{f.label}</span>
-                    {activeFilter === f.id && (
+                    <span>{p.name}</span>
+                    {activeFilter === p.id && (
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
@@ -373,7 +405,14 @@ export default function ImageEditorPage() {
         >
           {/* Upload prompt — absolutely positioned so it doesn't affect scroll layout */}
           {!fabric.imageSize && (
-            <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div
+              className="absolute inset-0 flex items-center justify-center z-10 cursor-pointer"
+              onClick={() => fileInputRef.current?.click()}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click() } }}
+              aria-label="Upload an image"
+            >
               <div
                 className={`flex flex-col items-center gap-4 p-10 rounded-2xl border-2 border-dashed transition-all ${
                   dragging
@@ -385,12 +424,11 @@ export default function ImageEditorPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <p className="text-slate-400 text-sm font-medium">Drop an image here or click to upload</p>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="bg-[var(--ht-color-primary-500)] hover:bg-[var(--ht-color-primary-600,#2d5ad2)] text-white font-bold py-2 px-6 rounded-lg text-sm transition-all cursor-pointer"
+                <span
+                  className="bg-[var(--ht-color-primary-500)] hover:bg-[var(--ht-color-primary-600,#2d5ad2)] text-white font-bold py-2 px-6 rounded-lg text-sm transition-all"
                 >
                   Choose Image
-                </button>
+                </span>
                 <p className="text-slate-600 text-xs">Supports JPG, PNG, WebP, GIF</p>
               </div>
             </div>
@@ -420,6 +458,9 @@ export default function ImageEditorPage() {
               onAdjustmentsChange={setAdjustments}
               activeFilter={activeFilter}
               onFilterChange={setActiveFilter}
+              filterIntensity={filterIntensity}
+              onFilterIntensityChange={setFilterIntensity}
+              filterThumbnails={filterThumbnails}
               zoom={zoom}
               onZoomChange={setZoom}
               imageSize={fabric.imageSize}
@@ -495,6 +536,9 @@ export default function ImageEditorPage() {
                 onAdjustmentsChange={setAdjustments}
                 activeFilter={activeFilter}
                 onFilterChange={setActiveFilter}
+                filterIntensity={filterIntensity}
+                onFilterIntensityChange={setFilterIntensity}
+                filterThumbnails={filterThumbnails}
                 zoom={zoom}
                 onZoomChange={setZoom}
                 imageSize={fabric.imageSize}
@@ -521,8 +565,8 @@ export default function ImageEditorPage() {
           <span className="capitalize">Tool: {activeTool}</span>
         </div>
         <div className="flex items-center gap-3">
-          {activeFilter !== 'none' && (
-            <span className="text-[var(--ht-color-primary-500)]">Filter: {FILTERS.find((f) => f.id === activeFilter)?.label}</span>
+          {activeFilter !== 'natural' && (
+            <span className="text-[var(--ht-color-primary-500)]">Filter: {FILTER_PRESETS.find((p) => p.id === activeFilter)?.name}</span>
           )}
           <span className="hidden sm:inline">Client-side editing</span>
         </div>

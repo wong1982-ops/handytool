@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ToolType } from './editor-toolbar'
-import type { Adjustments, FilterPreset } from './adjustments-panel'
+import type { Adjustments } from './adjustments-panel'
+import type { FilterPresetConfig } from './filter-presets'
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -18,8 +19,10 @@ export interface FabricCanvasAPI {
   setBrushColor: (color: string) => void
   setBrushWidth: (width: number) => void
   applyAdjustments: (adj: Adjustments) => void
-  applyFilterPreset: (preset: FilterPreset) => void
+  applyFilterPreset: (preset: FilterPresetConfig, intensity: number) => void
   setZoom: (zoomPercent: number) => void
+  /** Current zoom percent (kept in sync with wheel zoom) */
+  zoomPercent: number
   undo: () => void
   redo: () => void
   canUndo: boolean
@@ -33,6 +36,9 @@ export interface FabricCanvasAPI {
   exportPNG: () => void
   exportJPEG: (quality?: number) => void
   reset: () => void
+  /** Enable/disable spacebar-pan mode (call from keydown/keyup) */
+  setSpacebarPanning: (active: boolean) => void
+  isPanning: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -85,6 +91,19 @@ export function useFabricCanvas(): FabricCanvasAPI {
 
   // Initial zoom calculated by fit-to-viewport
   const initialZoomRef = useRef(1)
+
+  // Universal pan/zoom state
+  const [isPanning, setIsPanning] = useState(false)
+  const [zoomPercent, setZoomPercent] = useState(100)
+  const spacebarDownRef = useRef(false)
+  const spacebarPanRef = useRef<{ active: boolean; lastX: number; lastY: number }>({
+    active: false, lastX: 0, lastY: 0,
+  })
+  // Track the tool that was active before spacebar pan started
+  const prePanToolStateRef = useRef<{
+    cursor: string
+    isDrawingMode: boolean
+  } | null>(null)
 
   // ------------------------------------------------------------------
   // History helpers
@@ -154,7 +173,9 @@ export function useFabricCanvas(): FabricCanvasAPI {
         imageSizeRef.current = { width: imgW, height: imgH }
         setImageSize({ width: imgW, height: imgH })
         initialZoomRef.current = fitZoom
-        setInitialZoom(Math.round(fitZoom * 100))
+        const fitPercent = Math.round(fitZoom * 100)
+        setInitialZoom(fitPercent)
+        setZoomPercent(fitPercent)
 
         // Create the Fabric image at canvas origin
         const fabricImg = new fabric.FabricImage(imgEl, {
@@ -228,6 +249,78 @@ export function useFabricCanvas(): FabricCanvasAPI {
       // Listen for object modifications to push history
       canvas.on('object:modified', () => pushHistory())
       canvas.on('path:created', () => pushHistory())
+
+      // --- Mouse wheel zoom (zoom at cursor position) ---
+      canvas.on('mouse:wheel', (opt: any) => {
+        const e = opt.e as WheelEvent
+        e.preventDefault()
+        e.stopPropagation()
+
+        const delta = e.deltaY
+        const vpt = [...canvas.viewportTransform!]
+        let currentZoom = vpt[0]
+        const zoomStep = delta > 0 ? 0.9 : 1.1
+        let newZoom = currentZoom * zoomStep
+
+        // Clamp between 25% and 300%
+        newZoom = Math.min(Math.max(newZoom, 0.25), 3)
+
+        // Zoom toward cursor position
+        const pointer = canvas.getViewportPoint(opt.e)
+        vpt[0] = newZoom
+        vpt[3] = newZoom
+        vpt[4] = pointer.x - (pointer.x - vpt[4]) * (newZoom / currentZoom)
+        vpt[5] = pointer.y - (pointer.y - vpt[5]) * (newZoom / currentZoom)
+
+        canvas.setViewportTransform(vpt as any)
+        canvas.requestRenderAll()
+        setZoomPercent(Math.round(newZoom * 100))
+      })
+
+      // --- Middle-click pan (button 1 = middle mouse) ---
+      let middlePanning = false
+      let midLastX = 0
+      let midLastY = 0
+
+      canvas.on('mouse:down', (opt: any) => {
+        if (opt.e.button === 1) {
+          middlePanning = true
+          midLastX = opt.e.clientX
+          midLastY = opt.e.clientY
+          canvas.defaultCursor = 'grabbing'
+          opt.e.preventDefault()
+        }
+      })
+      canvas.on('mouse:move', (opt: any) => {
+        // Middle-click pan
+        if (middlePanning) {
+          const vpt = canvas.viewportTransform!
+          vpt[4] += opt.e.clientX - midLastX
+          vpt[5] += opt.e.clientY - midLastY
+          midLastX = opt.e.clientX
+          midLastY = opt.e.clientY
+          canvas.requestRenderAll()
+          return
+        }
+        // Spacebar pan
+        if (spacebarPanRef.current.active) {
+          const vpt = canvas.viewportTransform!
+          vpt[4] += opt.e.clientX - spacebarPanRef.current.lastX
+          vpt[5] += opt.e.clientY - spacebarPanRef.current.lastY
+          spacebarPanRef.current.lastX = opt.e.clientX
+          spacebarPanRef.current.lastY = opt.e.clientY
+          canvas.requestRenderAll()
+        }
+      })
+      canvas.on('mouse:up', () => {
+        if (middlePanning) {
+          middlePanning = false
+          canvas.defaultCursor = activeToolRef.current === 'move' ? 'grab' : 'default'
+        }
+        if (spacebarPanRef.current.active) {
+          spacebarPanRef.current.active = false
+        }
+      })
 
       // Process any file queued before Fabric was ready
       if (pendingFileRef.current) {
@@ -307,7 +400,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
 
     switch (tool) {
       case 'move': {
-        canvas.defaultCursor = 'grab'
+        canvas.defaultCursor = 'default'
         canvas.selection = true
         allObjects.forEach((obj: any) => {
           if (!obj.__isBgImage && !obj.__isCropRect) {
@@ -315,21 +408,25 @@ export function useFabricCanvas(): FabricCanvasAPI {
             obj.evented = true
           }
         })
+        break
+      }
 
-        // Panning: drag on empty space to pan the viewport
-        let isPanning = false
+      case 'hand': {
+        canvas.defaultCursor = 'grab'
+        canvas.selection = false
+
+        let isPanningHand = false
         let lastX = 0
         let lastY = 0
 
         const panDown = (opt: any) => {
-          if (opt.target) return // don't pan when clicking on an object
-          isPanning = true
+          isPanningHand = true
           lastX = opt.e.clientX
           lastY = opt.e.clientY
           canvas.defaultCursor = 'grabbing'
         }
         const panMove = (opt: any) => {
-          if (!isPanning) return
+          if (!isPanningHand) return
           const vpt = canvas.viewportTransform!
           vpt[4] += opt.e.clientX - lastX
           vpt[5] += opt.e.clientY - lastY
@@ -338,7 +435,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
           canvas.requestRenderAll()
         }
         const panUp = () => {
-          isPanning = false
+          isPanningHand = false
           canvas.defaultCursor = 'grab'
         }
 
@@ -509,48 +606,41 @@ export function useFabricCanvas(): FabricCanvasAPI {
   // Filter presets (applied on top of adjustments)
   // ------------------------------------------------------------------
 
-  const applyFilterPreset = useCallback((preset: FilterPreset) => {
+  const applyFilterPreset = useCallback((preset: FilterPresetConfig, intensity: number) => {
     const bgImg = bgImageRef.current
     const fabric = fabricModuleRef.current
     const canvas = fabricRef.current
     if (!bgImg || !fabric || !canvas) return
 
-    const filters = fabric.filters ?? fabric
+    const filtersNS = fabric.filters ?? fabric
 
     // Keep only non-preset (adjustment) filters
     const currentFilters: any[] = bgImg.filters ?? []
     const adjustmentFilters = currentFilters.filter((f: any) => !f.__isPreset)
 
     const presetFilters: any[] = []
+    const scale = intensity / 100
 
-    const tagPreset = (f: any) => {
-      f.__isPreset = true
-      return f
-    }
+    if (scale > 0 && preset.filters.length > 0) {
+      for (const f of preset.filters) {
+        const FilterClass = (filtersNS as any)[f.type]
+        if (!FilterClass) continue
 
-    switch (preset) {
-      case 'grayscale':
-        presetFilters.push(tagPreset(new filters.Grayscale()))
-        break
-      case 'sepia':
-        presetFilters.push(tagPreset(new filters.Sepia()))
-        break
-      case 'invert':
-        presetFilters.push(tagPreset(new filters.Invert()))
-        break
-      case 'blur':
-        presetFilters.push(tagPreset(new filters.Blur({ blur: 0.5 })))
-        break
-      case 'warm':
-        // Warm effect: slight brightness + saturation boost + hue shift
-        presetFilters.push(tagPreset(new filters.Brightness({ brightness: 0.06 })))
-        presetFilters.push(tagPreset(new filters.Saturation({ saturation: 0.2 })))
-        presetFilters.push(tagPreset(new filters.HueRotation({ rotation: -0.05 })))
-        break
-      case 'none':
-      default:
-        // No preset filters
-        break
+        const tag = (inst: any) => { inst.__isPreset = true; return inst }
+
+        // Boolean filters (Grayscale, Sepia) — apply at full strength
+        if (Object.keys(f.params).length === 0) {
+          presetFilters.push(tag(new FilterClass()))
+          continue
+        }
+
+        // Numeric filters — scale params by intensity
+        const scaledParams: Record<string, number> = {}
+        for (const [k, v] of Object.entries(f.params)) {
+          scaledParams[k] = v * scale
+        }
+        presetFilters.push(tag(new FilterClass(scaledParams)))
+      }
     }
 
     bgImg.filters = [...adjustmentFilters, ...presetFilters]
@@ -562,22 +652,27 @@ export function useFabricCanvas(): FabricCanvasAPI {
   // Zoom
   // ------------------------------------------------------------------
 
-  const setZoom = useCallback((zoomPercent: number) => {
+  const setZoom = useCallback((percent: number) => {
     const canvas = fabricRef.current
-    const imgSize = imageSizeRef.current
     if (!canvas) return
-    const zoomFactor = zoomPercent / 100
-    // Center the image at the new zoom level
+    const newZoom = percent / 100
+    const vpt = canvas.viewportTransform!
+    const oldZoom = vpt[0]
+
+    // Zoom toward viewport center (preserves pan position relative to center)
     const viewW = canvas.width ?? 0
     const viewH = canvas.height ?? 0
-    if (imgSize) {
-      const offsetX = (viewW - imgSize.width * zoomFactor) / 2
-      const offsetY = (viewH - imgSize.height * zoomFactor) / 2
-      canvas.setViewportTransform([zoomFactor, 0, 0, zoomFactor, offsetX, offsetY])
-    } else {
-      canvas.setZoom(zoomFactor)
-    }
+    const cx = viewW / 2
+    const cy = viewH / 2
+
+    vpt[0] = newZoom
+    vpt[3] = newZoom
+    vpt[4] = cx - (cx - vpt[4]) * (newZoom / oldZoom)
+    vpt[5] = cy - (cy - vpt[5]) * (newZoom / oldZoom)
+
+    canvas.setViewportTransform(vpt as any)
     canvas.requestRenderAll()
+    setZoomPercent(percent)
   }, [])
 
   // ------------------------------------------------------------------
@@ -772,6 +867,59 @@ export function useFabricCanvas(): FabricCanvasAPI {
   }, [pushHistory])
 
   // ------------------------------------------------------------------
+  // Spacebar pan (any tool)
+  // ------------------------------------------------------------------
+
+  const setSpacebarPanning = useCallback((active: boolean) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+
+    if (active && !spacebarDownRef.current) {
+      spacebarDownRef.current = true
+      setIsPanning(true)
+      // Save current tool state
+      prePanToolStateRef.current = {
+        cursor: canvas.defaultCursor,
+        isDrawingMode: canvas.isDrawingMode,
+      }
+      canvas.isDrawingMode = false
+      canvas.defaultCursor = 'grab'
+      canvas.discardActiveObject()
+      canvas.requestRenderAll()
+    } else if (!active && spacebarDownRef.current) {
+      spacebarDownRef.current = false
+      spacebarPanRef.current.active = false
+      setIsPanning(false)
+      // Restore previous tool state
+      if (prePanToolStateRef.current) {
+        canvas.defaultCursor = prePanToolStateRef.current.cursor
+        canvas.isDrawingMode = prePanToolStateRef.current.isDrawingMode
+        prePanToolStateRef.current = null
+      }
+      canvas.requestRenderAll()
+    }
+  }, [])
+
+  // Spacebar mouse:down — start dragging
+  useEffect(() => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+
+    const handleSpacePanDown = (opt: any) => {
+      if (spacebarDownRef.current && !spacebarPanRef.current.active) {
+        spacebarPanRef.current = {
+          active: true,
+          lastX: opt.e.clientX,
+          lastY: opt.e.clientY,
+        }
+        canvas.defaultCursor = 'grabbing'
+      }
+    }
+    canvas.on('mouse:down', handleSpacePanDown)
+    return () => { canvas.off('mouse:down', handleSpacePanDown) }
+  }, [isReady])
+
+  // ------------------------------------------------------------------
   // Return public API
   // ------------------------------------------------------------------
 
@@ -787,6 +935,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     applyAdjustments,
     applyFilterPreset,
     setZoom,
+    zoomPercent,
     undo,
     redo,
     canUndo,
@@ -800,5 +949,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     exportPNG,
     exportJPEG,
     reset,
+    setSpacebarPanning,
+    isPanning,
   }
 }
