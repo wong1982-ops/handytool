@@ -104,6 +104,14 @@ export default function ImageEditorPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.undo, fabric.redo, fabric.deleteSelected, fabric.selectAll, fabric.setSpacebarPanning])
 
+  // Generate filter thumbnails when image is loaded
+  useEffect(() => {
+    if (fabric.imageSize && fabric.isReady) {
+      fabric.generateFilterThumbnails().then(setFilterThumbnails)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.imageSize, fabric.isReady])
+
   // Sync zoom slider with hook's fit-to-viewport calculation
   useEffect(() => {
     if (fabric.initialZoom !== zoom) setZoom(fabric.initialZoom)

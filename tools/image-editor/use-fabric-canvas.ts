@@ -20,6 +20,7 @@ export interface FabricCanvasAPI {
   setBrushWidth: (width: number) => void
   applyAdjustments: (adj: Adjustments) => void
   applyFilterPreset: (preset: FilterPresetConfig, intensity: number) => void
+  generateFilterThumbnails: () => Promise<Record<string, string>>
   setZoom: (zoomPercent: number) => void
   /** Current zoom percent (kept in sync with wheel zoom) */
   zoomPercent: number
@@ -649,6 +650,81 @@ export function useFabricCanvas(): FabricCanvasAPI {
   }, [])
 
   // ------------------------------------------------------------------
+  // Filter thumbnail generation (64x64 off-screen previews)
+  // ------------------------------------------------------------------
+
+  const generateFilterThumbnails = useCallback(async (): Promise<Record<string, string>> => {
+    const bgImg = bgImageRef.current
+    const fabric = fabricModuleRef.current
+    if (!bgImg || !fabric) return {}
+
+    const { FILTER_PRESETS } = await import('./filter-presets')
+    const filtersNS = fabric.filters ?? fabric
+    const thumbnails: Record<string, string> = {}
+
+    const srcElement = bgImg.getElement() as HTMLImageElement
+    if (!srcElement || !srcElement.naturalWidth) return {}
+
+    const thumbSize = 64
+    const offscreen = document.createElement('canvas')
+    offscreen.width = thumbSize
+    offscreen.height = thumbSize
+    const ctx = offscreen.getContext('2d')!
+
+    // Calculate scale to fit image in thumbnail
+    const scale = Math.min(thumbSize / srcElement.naturalWidth, thumbSize / srcElement.naturalHeight)
+    const w = srcElement.naturalWidth * scale
+    const h = srcElement.naturalHeight * scale
+    const x = (thumbSize - w) / 2
+    const y = (thumbSize - h) / 2
+
+    // Natural thumbnail (no filters)
+    ctx.clearRect(0, 0, thumbSize, thumbSize)
+    ctx.drawImage(srcElement, x, y, w, h)
+    thumbnails['natural'] = offscreen.toDataURL('image/jpeg', 0.6)
+
+    for (const preset of FILTER_PRESETS) {
+      if (preset.id === 'natural') continue
+
+      // Yield to main thread to avoid blocking
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      try {
+        const tempImg = new fabric.FabricImage(srcElement, {
+          scaleX: scale,
+          scaleY: scale,
+        })
+
+        const presetFilters: any[] = []
+        for (const f of preset.filters) {
+          const FilterClass = (filtersNS as any)[f.type]
+          if (!FilterClass) continue
+          if (Object.keys(f.params).length === 0) {
+            presetFilters.push(new FilterClass())
+          } else {
+            presetFilters.push(new FilterClass(f.params))
+          }
+        }
+        tempImg.filters = presetFilters
+        tempImg.applyFilters()
+
+        const el = tempImg.toCanvasElement()
+        ctx.clearRect(0, 0, thumbSize, thumbSize)
+        const dw = Math.min(thumbSize, el.width)
+        const dh = Math.min(thumbSize, el.height)
+        const dx = (thumbSize - dw) / 2
+        const dy = (thumbSize - dh) / 2
+        ctx.drawImage(el, dx, dy, dw, dh)
+        thumbnails[preset.id] = offscreen.toDataURL('image/jpeg', 0.6)
+      } catch {
+        // Skip failed thumbnails silently
+      }
+    }
+
+    return thumbnails
+  }, [])
+
+  // ------------------------------------------------------------------
   // Zoom
   // ------------------------------------------------------------------
 
@@ -934,6 +1010,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     setBrushWidth,
     applyAdjustments,
     applyFilterPreset,
+    generateFilterThumbnails,
     setZoom,
     zoomPercent,
     undo,
