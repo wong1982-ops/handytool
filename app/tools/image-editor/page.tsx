@@ -25,6 +25,7 @@ export default function ImageEditorPage() {
   const [bgColor, setBgColor] = useState('#000000')
   const [dragging, setDragging] = useState(false)
   const [showMobileAdjustments, setShowMobileAdjustments] = useState(false)
+  const [mobileTab, setMobileTab] = useState<'adjustments' | 'layers'>('adjustments')
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const layerFileInputRef = useRef<HTMLInputElement>(null)
@@ -80,6 +81,28 @@ export default function ImageEditorPage() {
         if (isInput) return
         e.preventDefault()
         fabric.selectAll()
+        return
+      }
+
+      // Layer reorder shortcuts
+      if (meta && e.key === ']' && !e.shiftKey) {
+        e.preventDefault()
+        if (fabric.activeLayerId) fabric.moveLayerForward(fabric.activeLayerId)
+        return
+      }
+      if (meta && e.key === '[' && !e.shiftKey) {
+        e.preventDefault()
+        if (fabric.activeLayerId) fabric.moveLayerBackward(fabric.activeLayerId)
+        return
+      }
+      if (meta && e.shiftKey && e.key === ']') {
+        e.preventDefault()
+        if (fabric.activeLayerId) fabric.moveLayerToFront(fabric.activeLayerId)
+        return
+      }
+      if (meta && e.shiftKey && e.key === '[') {
+        e.preventDefault()
+        if (fabric.activeLayerId) fabric.moveLayerToBack(fabric.activeLayerId)
         return
       }
     }
@@ -494,27 +517,67 @@ export default function ImageEditorPage() {
         {showMobileAdjustments && (
           <>
             <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={() => setShowMobileAdjustments(false)} />
-            <div className="fixed right-0 top-0 bottom-0 w-72 bg-[#1a2333] z-40 lg:hidden shadow-2xl overflow-y-auto">
-              <div className="p-3 border-b border-slate-700 flex items-center justify-between">
-                <span className="font-bold text-sm text-white">Adjustments</span>
-                <button onClick={() => setShowMobileAdjustments(false)} className="p-1 hover:bg-slate-800 rounded cursor-pointer" aria-label="Close">
-                  <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <div className="fixed right-0 top-0 bottom-0 w-72 bg-[#1a2333] z-40 lg:hidden shadow-2xl flex flex-col">
+              {/* Tab bar */}
+              <div className="flex border-b border-slate-700 shrink-0">
+                <button
+                  onClick={() => setMobileTab('adjustments')}
+                  className={`flex-1 py-2.5 text-xs font-medium transition-colors cursor-pointer ${
+                    mobileTab === 'adjustments' ? 'text-white border-b-2 border-[var(--ht-color-primary-500)]' : 'text-slate-400'
+                  }`}
+                >
+                  Adjustments
+                </button>
+                <button
+                  onClick={() => setMobileTab('layers')}
+                  className={`flex-1 py-2.5 text-xs font-medium transition-colors cursor-pointer ${
+                    mobileTab === 'layers' ? 'text-white border-b-2 border-[var(--ht-color-primary-500)]' : 'text-slate-400'
+                  }`}
+                >
+                  Layers
+                </button>
+                <button
+                  onClick={() => setShowMobileAdjustments(false)}
+                  className="px-3 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                  aria-label="Close panel"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
-              <AdjustmentsPanel
-                adjustments={adjustments}
-                onAdjustmentsChange={setAdjustments}
-                activeFilter={activeFilter}
-                onFilterChange={setActiveFilter}
-                filterIntensity={filterIntensity}
-                onFilterIntensityChange={setFilterIntensity}
-                filterThumbnails={filterThumbnails}
-                zoom={zoom}
-                onZoomChange={setZoom}
-                imageSize={fabric.imageSize}
-              />
+
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto">
+                {mobileTab === 'adjustments' ? (
+                  <AdjustmentsPanel
+                    adjustments={adjustments}
+                    onAdjustmentsChange={setAdjustments}
+                    activeFilter={activeFilter}
+                    onFilterChange={setActiveFilter}
+                    filterIntensity={filterIntensity}
+                    onFilterIntensityChange={setFilterIntensity}
+                    filterThumbnails={filterThumbnails}
+                    zoom={zoom}
+                    onZoomChange={setZoom}
+                    imageSize={fabric.imageSize}
+                  />
+                ) : (
+                  <LayersPanel
+                    layers={fabric.layers}
+                    activeLayerId={fabric.activeLayerId}
+                    onSelectLayer={fabric.setActiveLayer}
+                    onToggleVisibility={fabric.toggleLayerVisibility}
+                    onToggleLock={fabric.toggleLayerLock}
+                    onRename={fabric.renameLayer}
+                    onDelete={fabric.deleteLayer}
+                    onOpacityChange={fabric.setLayerOpacity}
+                    onBlendModeChange={fabric.setLayerBlendMode}
+                    onReorder={fabric.reorderLayer}
+                    onAddImage={() => layerFileInputRef.current?.click()}
+                  />
+                )}
+              </div>
             </div>
           </>
         )}
