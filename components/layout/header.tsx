@@ -5,6 +5,9 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { tools, type Tool } from '@/lib/tools'
+import { useAuth } from '@/lib/hooks/use-auth'
+import { SignInModal } from '@/components/auth/sign-in-modal'
+import { UserMenu } from '@/components/auth/user-menu'
 
 interface HeaderProps {
   brandName?: string
@@ -22,6 +25,9 @@ export function Header({
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
   const [scrolled, setScrolled] = useState(false)
+  const [signInOpen, setSignInOpen] = useState(false)
+
+  const { user, loading } = useAuth()
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const desktopSearchRef = useRef<HTMLDivElement>(null)
@@ -297,12 +303,20 @@ export function Header({
             <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-200 ${dark ? 'translate-x-7' : 'translate-x-0'}`} />
           </button>
 
-          <Link
-            href="/signin"
-            className="hidden md:inline-flex bg-[var(--ht-color-primary-500)] text-white px-5 py-2 rounded-lg text-sm font-bold hover:opacity-90 transition-all shadow-lg shadow-[var(--ht-color-primary-500)]/20"
-          >
-            Sign In
-          </Link>
+          {loading ? (
+            <div className="hidden md:block w-20 h-9 rounded-lg bg-slate-200/50 dark:bg-slate-800/50 animate-pulse" />
+          ) : user ? (
+            <div className="hidden md:block">
+              <UserMenu user={user} />
+            </div>
+          ) : (
+            <button
+              onClick={() => setSignInOpen(true)}
+              className="hidden md:inline-flex bg-[var(--ht-color-primary-500)] text-white px-5 py-2 rounded-lg text-sm font-bold hover:opacity-90 transition-all shadow-lg shadow-[var(--ht-color-primary-500)]/20 cursor-pointer"
+            >
+              Sign In
+            </button>
+          )}
 
           <button
             onClick={toggleMobileMenu}
@@ -430,16 +444,26 @@ export function Header({
                 </Link>
               ))}
             </div>
-            <Link
-              href="/signin"
-              onClick={() => setMobileMenuOpen(false)}
-              className="inline-flex justify-center bg-[var(--ht-color-primary-500)] text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-all mt-1"
-            >
-              Sign In
-            </Link>
+            {!loading && !user && (
+              <button
+                onClick={() => { setSignInOpen(true); setMobileMenuOpen(false) }}
+                className="inline-flex justify-center bg-[var(--ht-color-primary-500)] text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-all mt-1 cursor-pointer"
+              >
+                Sign In
+              </button>
+            )}
+            {!loading && user && (
+              <div className="flex items-center gap-3 mt-1 p-2 rounded-lg bg-slate-100/50 dark:bg-slate-800/50">
+                <UserMenu user={user} />
+                <span className="text-sm text-slate-600 dark:text-slate-300 truncate">
+                  {user.user_metadata?.full_name || user.email}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}
+      <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} />
     </header>
   )
 }
