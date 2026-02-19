@@ -10,7 +10,7 @@ export async function requireAdmin() {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user || !ADMIN_EMAILS.includes(user.email ?? '')) {
-    redirect('/')
+    redirect('/login')
   }
 
   return user
