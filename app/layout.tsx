@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { ProfilePrompt } from "@/components/auth/profile-prompt";
 import "./globals.scss";
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function RootLayout({
         <Header brandName="HandyTool" />
         {children}
         <Footer brandName="HandyTool" />
+        <ProfilePrompt />
       </body>
     </html>
   );

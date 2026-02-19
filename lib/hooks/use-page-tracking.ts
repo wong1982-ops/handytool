@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { trackToolVisit } from '@/lib/hooks/use-profile-prompt'
 
 function getSessionId(): string {
   const key = 'ht-session-id'
@@ -34,6 +35,8 @@ export function usePageTracking() {
   useEffect(() => {
     const toolSlug = getToolSlug(pathname)
     if (!toolSlug) return
+
+    trackToolVisit(toolSlug)
 
     const supabase = createClient()
     const sessionId = getSessionId()

@@ -44,6 +44,18 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--ht-font-family-sans);
   --font-mono: var(--ht-font-family-mono);
+  --animate-slide-up: slide-up 0.35s ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 body {
