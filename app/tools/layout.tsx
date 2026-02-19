@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ToolsLayoutClient } from "./tools-layout-client";
 
 export const metadata: Metadata = {
   title: "Free Online Tools",
@@ -40,7 +41,7 @@ export default function ToolsLayout({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {children}
+      <ToolsLayoutClient>{children}</ToolsLayoutClient>
     </>
   );
 }
