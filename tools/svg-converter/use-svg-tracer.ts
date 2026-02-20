@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { ImageMeta, VectorizationSettings, VectorResult, ConversionState } from './types'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || ''
 
 interface UseSvgTracerReturn {
   conversionState: ConversionState

@@ -44,7 +44,7 @@ export function ModeOptions({
               onClick={() => onScaleChange(s)}
               className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                 scale === s
-                  ? 'bg-[var(--ht-color-secondary-500)] text-slate-900'
+                  ? 'bg-[var(--tk-color-secondary-500)] text-slate-900'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
@@ -69,7 +69,7 @@ export function ModeOptions({
           value={pageRanges}
           onChange={(e) => onPageRangesChange(e.target.value)}
           placeholder="e.g. 1-3, 5, 8-10"
-          className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[var(--ht-color-secondary-500)] focus:border-transparent transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+          className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[var(--tk-color-secondary-500)] focus:border-transparent transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
         />
         <p className="text-xs text-slate-400">Separate ranges with commas. Use dashes for page spans.</p>
       </div>
@@ -87,7 +87,7 @@ export function ModeOptions({
               onClick={() => onQualityChange(q)}
               className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors capitalize cursor-pointer ${
                 quality === q
-                  ? 'bg-[var(--ht-color-secondary-500)] text-slate-900'
+                  ? 'bg-[var(--tk-color-secondary-500)] text-slate-900'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
@@ -111,7 +111,7 @@ export function ModeOptions({
               onClick={() => onPreserveLayoutChange(val)}
               className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                 preserveLayout === val
-                  ? 'bg-[var(--ht-color-secondary-500)] text-slate-900'
+                  ? 'bg-[var(--tk-color-secondary-500)] text-slate-900'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
@@ -135,7 +135,7 @@ export function ModeOptions({
               onClick={() => onExtractionModeChange(m)}
               className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors capitalize cursor-pointer ${
                 extractionMode === m
-                  ? 'bg-[var(--ht-color-secondary-500)] text-slate-900'
+                  ? 'bg-[var(--tk-color-secondary-500)] text-slate-900'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >

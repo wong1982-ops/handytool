@@ -1,17 +1,17 @@
-# HandyTool Workspace — Project Context
+# Toolk1t Workspace — Project Context
 
 ## GitHub & Deployment
 - **GitHub org**: `wong1982-ops` (account: loicwong1982@gmail.com)
 - **SSH key**: `~/.ssh/handytool` — alias `github-handytool` in SSH config
 - **Remote URL format**: `git@github-handytool:wong1982-ops/<repo>.git`
-- **Repos**: handytool-client, handytool-admin, handytool-api, handytool-ui — all under `wong1982-ops`
+- **Repos**: toolk1t-client, toolk1t-admin, toolk1t-api, toolk1t-ui — all under `wong1982-ops`
 - **Note**: local `gh` CLI is logged in as `coolloic`, cannot create repos in `wong1982-ops` org — create repos manually on GitHub if needed
 
 ## Project Stack
 - **Package manager**: pnpm (NOT npm) — always use `pnpm` for scripts, installs, etc.
 - **Monorepo**: pnpm workspaces (`pnpm-workspace.yaml`)
 - **Styling**: Tailwind CSS v4 + SCSS (always `.scss`, never `.css`) + system font stack (no external fonts)
-- **UI**: shadcn/ui + Tailwind, CSS custom properties for theming (`--ht-*`)
+- **UI**: shadcn/ui + Tailwind, CSS custom properties for theming (`--tk-*`)
 - **Framework**: Next.js 16 App Router, React 19, TypeScript strict
 - **E2E Testing**: Playwright — every tool MUST have E2E tests (see `.claude/ui-ux-guideline.md`)
 
@@ -19,35 +19,35 @@
 
 | Repo | Role | What goes here | What does NOT go here |
 |---|---|---|---|
-| **handytool-client** | Public web client | Tool pages (`app/tools/`), tool-specific components (`tools/`), page layouts, client-side UI, `components/ui/` and `components/layout/` for client-only reusable parts | API routes, database queries, admin features |
-| **handytool-admin** | Admin dashboard | Admin pages, admin-specific components, admin auth, internal management UI | Public tools, REST API endpoints, shared UI components |
-| **handytool-api** | REST API service | API route handlers (`app/api/`), Supabase database access, Zod validation, auth middleware, business logic, response helpers | UI components, page templates, CSS/styling |
-| **handytool-ui** | Shared UI library | Design tokens (SCSS), CSS custom properties, React components shared across client AND admin, exported via `src/index.ts` | App-specific logic, API calls, routing, page components |
+| **toolk1t-client** | Public web client | Tool pages (`app/tools/`), tool-specific components (`tools/`), page layouts, client-side UI, `components/ui/` and `components/layout/` for client-only reusable parts | API routes, database queries, admin features |
+| **toolk1t-admin** | Admin dashboard | Admin pages, admin-specific components, admin auth, internal management UI | Public tools, REST API endpoints, shared UI components |
+| **toolk1t-api** | REST API service | API route handlers (`app/api/`), Supabase database access, Zod validation, auth middleware, business logic, response helpers | UI components, page templates, CSS/styling |
+| **toolk1t-ui** | Shared UI library | Design tokens (SCSS), CSS custom properties, React components shared across client AND admin, exported via `src/index.ts` | App-specific logic, API calls, routing, page components |
 
 ### Dependency Rules
 ```
-handytool-client  →  handytool-ui (workspace:*)
-handytool-admin   →  handytool-ui (workspace:*)
-handytool-api     →  (standalone, no UI dependency)
-handytool-ui      →  (no app dependencies, only react/react-dom peers)
+toolk1t-client  →  toolk1t-ui (workspace:*)
+toolk1t-admin   →  toolk1t-ui (workspace:*)
+toolk1t-api     →  (standalone, no UI dependency)
+toolk1t-ui      →  (no app dependencies, only react/react-dom peers)
 ```
 
-- **handytool-ui** must NEVER import from client, admin, or api
-- **handytool-client** and **handytool-admin** must NEVER import from each other
-- **handytool-api** is independently deployable (port 3001), no UI dependency
-- If a component is needed by BOTH client and admin → extract to **handytool-ui**
+- **toolk1t-ui** must NEVER import from client, admin, or api
+- **toolk1t-client** and **toolk1t-admin** must NEVER import from each other
+- **toolk1t-api** is independently deployable (port 3001), no UI dependency
+- If a component is needed by BOTH client and admin → extract to **toolk1t-ui**
 - If a component is only used in one app → keep it in that app's repo
 
-### handytool-ui — Shared Component Library (IMPORTANT)
+### toolk1t-ui — Shared Component Library (IMPORTANT)
 
-**handytool-ui** is the single source of truth for reusable UI components shared across apps. It can be consumed in two ways:
+**toolk1t-ui** is the single source of truth for reusable UI components shared across apps. It can be consumed in two ways:
 
 | Method | When | How |
 |---|---|---|
-| **pnpm workspace** (local dev) | During development in the monorepo | `"@wong1982-ops/handytool-ui": "workspace:*"` in `package.json` |
-| **npm install** (published) | External projects or CI without monorepo | `pnpm add @wong1982-ops/handytool-ui` after publishing to npm |
+| **pnpm workspace** (local dev) | During development in the monorepo | `"@wong1982-ops/toolk1t-ui": "workspace:*"` in `package.json` |
+| **npm install** (published) | External projects or CI without monorepo | `pnpm add @wong1982-ops/toolk1t-ui` after publishing to npm |
 
-**What goes in handytool-ui:**
+**What goes in toolk1t-ui:**
 - Design tokens (SCSS variables, CSS custom properties)
 - Reusable React components used by **both** client and admin (buttons, cards, badges, inputs, modals, etc.)
 - Component exports via `src/index.ts` (barrel file)
@@ -55,8 +55,8 @@ handytool-ui      →  (no app dependencies, only react/react-dom peers)
 
 **Package structure:**
 ```
-handytool-ui/
-├── package.json              # name: "@wong1982-ops/handytool-ui"
+toolk1t-ui/
+├── package.json              # name: "@wong1982-ops/toolk1t-ui"
 ├── src/
 │   ├── index.ts              # Barrel export — all public components
 │   ├── components/
@@ -73,22 +73,22 @@ handytool-ui/
 **Import pattern (from client or admin):**
 ```tsx
 // ✅ Import from package name (works with workspace:* AND npm)
-import { Button, Card, Badge } from '@wong1982-ops/handytool-ui'
+import { Button, Card, Badge } from '@wong1982-ops/toolk1t-ui'
 
 // ❌ Never import from relative paths across packages
-import { Button } from '../../handytool-ui/src/components/button'
+import { Button } from '../../toolk1t-ui/src/components/button'
 ```
 
 **Publishing to npm:**
 ```bash
-cd handytool-ui
+cd toolk1t-ui
 pnpm build
 npm publish --access public
 ```
 
 **Component extraction rule:**
 - Component used in **1 app only** → keep in that app's `components/ui/`
-- Component used in **2+ apps** → extract to `handytool-ui`, export from `src/index.ts`
+- Component used in **2+ apps** → extract to `toolk1t-ui`, export from `src/index.ts`
 - When extracting: move the component, update imports in all consumers, verify build passes
 
 ## Tool Development Pattern (FOLLOW FOR ALL NEW TOOLS)
@@ -102,7 +102,7 @@ See [.claude/tool-pattern.md](.claude/tool-pattern.md) for full details.
 - Use `@/` path alias for imports
 - Mobile-first responsive design
 - Mock data first, API integration later
-- Use CSS custom properties `var(--ht-color-primary-500)` for brand colors
+- Use CSS custom properties `var(--tk-color-primary-500)` for brand colors
 
 ## Brand Colors (from design)
 - Primary (blue): #3D6AF2 → #3D79F2 → #3D9DF2

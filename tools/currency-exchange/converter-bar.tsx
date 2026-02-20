@@ -56,7 +56,7 @@ export function ConverterBar({
               value={amount}
               onChange={(e) => onAmountChange(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') onConvert() }}
-              className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[var(--ht-color-primary-500)] focus:border-[var(--ht-color-primary-500)] outline-none text-lg font-bold"
+              className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[var(--tk-color-primary-500)] focus:border-[var(--tk-color-primary-500)] outline-none text-lg font-bold"
             />
           </div>
         </div>
@@ -79,7 +79,7 @@ export function ConverterBar({
           <button
             onClick={onSwap}
             aria-label="Swap currencies"
-            className="bg-[var(--ht-color-primary-500)]/10 hover:bg-[var(--ht-color-primary-500)]/20 text-[var(--ht-color-primary-500)] p-3 rounded-full transition-all hover:rotate-180 duration-300 cursor-pointer"
+            className="bg-[var(--tk-color-primary-500)]/10 hover:bg-[var(--tk-color-primary-500)]/20 text-[var(--tk-color-primary-500)] p-3 rounded-full transition-all hover:rotate-180 duration-300 cursor-pointer"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -105,7 +105,7 @@ export function ConverterBar({
           <button
             onClick={onConvert}
             disabled={loading}
-            className="w-full bg-[var(--ht-color-primary-500)] hover:bg-[var(--ht-color-primary-600)] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-lg shadow-lg shadow-[var(--ht-color-primary-500)]/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600)] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-lg shadow-lg shadow-[var(--tk-color-primary-500)]/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading ? (
               <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">

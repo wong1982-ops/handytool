@@ -1,6 +1,6 @@
-# UI/UX Implementation Guideline — HandyTool
+# UI/UX Implementation Guideline — Toolk1t
 
-This guideline MUST be followed for all UI implementation across handytool-client and handytool-admin.
+This guideline MUST be followed for all UI implementation across toolk1t-client and toolk1t-admin.
 
 ## Core Principles
 
@@ -104,7 +104,7 @@ When a non-critical section fails (e.g., map won't load), show a graceful placeh
 <div className="flex flex-col items-center justify-center p-8 text-center bg-slate-50 dark:bg-slate-800/50 rounded-xl">
   <WarningIcon className="w-10 h-10 text-slate-300 dark:text-slate-600 mb-3" />
   <p className="text-sm text-slate-500 dark:text-slate-400">Map could not be loaded</p>
-  <button onClick={onRetry} className="text-xs text-[var(--ht-color-primary-500)] mt-2 hover:underline">
+  <button onClick={onRetry} className="text-xs text-[var(--tk-color-primary-500)] mt-2 hover:underline">
     Try again
   </button>
 </div>
@@ -440,12 +440,12 @@ Even in these cases, show a progress indicator and allow navigating back without
 
 ## Brand Colors (CSS Custom Properties)
 
-Always reference via `var(--ht-color-*)`, never hardcode hex values in components:
+Always reference via `var(--tk-color-*)`, never hardcode hex values in components:
 
 ```tsx
 // ✅ Correct
-className="text-[var(--ht-color-primary-500)]"
-className="bg-[var(--ht-color-primary-500)]/10"
+className="text-[var(--tk-color-primary-500)]"
+className="bg-[var(--tk-color-primary-500)]/10"
 
 // ❌ Wrong
 className="text-[#3D79F2]"
@@ -454,10 +454,10 @@ className="text-[#3D79F2]"
 ## Styling
 
 - **Always use `.scss` files** — never plain `.css`
-- System font stack (no external font loading) — defined via `--ht-font-family-sans`
+- System font stack (no external font loading) — defined via `--tk-font-family-sans`
 - Tailwind utility classes for component styling
 - SCSS for global styles, variables, and complex selectors
-- Brand colors via CSS custom properties: `var(--ht-color-primary-500)`
+- Brand colors via CSS custom properties: `var(--tk-color-primary-500)`
 
 ## Breadcrumbs (MANDATORY)
 
@@ -476,9 +476,9 @@ Every page MUST include a breadcrumb navigation at the top of the content area.
 ```tsx
 <nav aria-label="Breadcrumb" className="mb-6">
   <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-    <li><a href="/" className="hover:text-[var(--ht-color-primary-500)] transition-colors">Home</a></li>
+    <li><a href="/" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
     <li aria-hidden="true">/</li>
-    <li><a href="/tools" className="hover:text-[var(--ht-color-primary-500)] transition-colors">Tools</a></li>
+    <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Tools</a></li>
     <li aria-hidden="true">/</li>
     <li aria-current="page" className="text-slate-900 dark:text-white font-medium">IP Check</li>
   </ol>
@@ -492,12 +492,12 @@ Every page MUST include a breadcrumb navigation at the top of the content area.
 
 ## End-to-End Testing with Playwright (MANDATORY)
 
-Every tool page MUST have Playwright E2E tests covering its core user flows. Tests live in the `handytool-client` project.
+Every tool page MUST have Playwright E2E tests covering its core user flows. Tests live in the `toolk1t-client` project.
 
 ### Setup
 
-- **Config**: `handytool-client/playwright.config.ts`
-- **Test dir**: `handytool-client/e2e/`
+- **Config**: `toolk1t-client/playwright.config.ts`
+- **Test dir**: `toolk1t-client/e2e/`
 - **Test naming**: `e2e/<toolname>.spec.ts` (one spec file per tool)
 - **Run**: `pnpm test:e2e` (all tests) or `pnpm test:e2e -- e2e/ipcheck.spec.ts` (single file)
 - **Dependencies**: `@playwright/test` as devDependency, browsers installed via `npx playwright install`
@@ -505,7 +505,7 @@ Every tool page MUST have Playwright E2E tests covering its core user flows. Tes
 ### Test Structure
 
 ```
-handytool-client/
+toolk1t-client/
   e2e/
     ipcheck.spec.ts
     myip.spec.ts
@@ -647,7 +647,7 @@ export default defineConfig({
 
 ## New Tool Development Checklist (MANDATORY)
 
-When adding a new tool to handytool-client, EVERY item below must be addressed before the tool is considered complete.
+When adding a new tool to toolk1t-client, EVERY item below must be addressed before the tool is considered complete.
 
 ### SEO & Discoverability
 
@@ -676,7 +676,7 @@ When adding a new tool to handytool-client, EVERY item below must be addressed b
 
 - [ ] All backgrounds, text, borders use Tailwind dark: variants or CSS custom properties
 - [ ] Contrast ratios meet WCAG 2.1 AA in both light and dark modes
-- [ ] No hardcoded colors — use `dark:bg-slate-*`, `dark:text-slate-*`, or `var(--ht-color-*)`
+- [ ] No hardcoded colors — use `dark:bg-slate-*`, `dark:text-slate-*`, or `var(--tk-color-*)`
 - [ ] Tested in both light mode and dark mode
 
 ### UX Behaviour Consistency
@@ -701,7 +701,7 @@ When adding a new tool to handytool-client, EVERY item below must be addressed b
 
 ### Design Token & Style Consistency
 
-- [ ] Brand colors via CSS custom properties: `var(--ht-color-primary-500)`, never hardcoded hex
+- [ ] Brand colors via CSS custom properties: `var(--tk-color-primary-500)`, never hardcoded hex
 - [ ] Font sizes follow existing scale (`text-xs`, `text-sm`, `text-[10px]` for labels)
 - [ ] Spacing follows compact desktop rules (see Compact Desktop Design section)
 - [ ] Border radius consistent: `rounded-xl` for panels, `rounded-lg` for buttons/inputs
@@ -714,7 +714,7 @@ When adding a new tool to handytool-client, EVERY item below must be addressed b
 - [ ] Check `tools/` for patterns already solved in other tools (CodeEditor, toolbar groups, etc.)
 - [ ] If a new reusable component emerges, extract to `components/ui/` if useful across tools
 - [ ] Layout components (header, footer, breadcrumb) reused from `components/layout/`
-- [ ] Shared UI across client + admin extracted to `handytool-ui` package
+- [ ] Shared UI across client + admin extracted to `toolk1t-ui` package
 
 ### Functional Requirements
 
@@ -883,7 +883,7 @@ function handleSubmit() {
     className={`w-full px-3 py-2 rounded-lg border transition-colors ${
       error
         ? 'border-red-500 dark:border-red-400 focus:ring-red-500'
-        : 'border-slate-200 dark:border-slate-800 focus:ring-[var(--ht-color-primary-500)]'
+        : 'border-slate-200 dark:border-slate-800 focus:ring-[var(--tk-color-primary-500)]'
     }`}
   />
   {error && (
@@ -980,7 +980,7 @@ All scrollable elements across the entire app use thin themed scrollbars. Styles
 
 - **Firefox**: `scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent` (dark: `#334155 transparent`)
 - **WebKit** (Chrome, Safari, Edge): 6px wide/tall, transparent track, rounded thumb
-- **Hover**: thumb color changes to `var(--ht-color-primary-500)` (dark: `var(--ht-color-primary-400)`)
+- **Hover**: thumb color changes to `var(--tk-color-primary-500)` (dark: `var(--tk-color-primary-400)`)
 
 ### Rules
 

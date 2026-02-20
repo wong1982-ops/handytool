@@ -312,8 +312,8 @@ export function InteractiveCanvas({
           aria-label="Upload photo"
           className={`relative w-full max-w-[500px] bg-white dark:bg-slate-900 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-6 cursor-pointer transition-all ${
             dragOverState
-              ? 'border-[var(--ht-color-secondary-500)] bg-[var(--ht-color-secondary-500)]/5 scale-[1.01]'
-              : 'border-slate-300 dark:border-slate-700 hover:border-[var(--ht-color-secondary-500)] hover:bg-[var(--ht-color-secondary-500)]/5'
+              ? 'border-[var(--tk-color-secondary-500)] bg-[var(--tk-color-secondary-500)]/5 scale-[1.01]'
+              : 'border-slate-300 dark:border-slate-700 hover:border-[var(--tk-color-secondary-500)] hover:bg-[var(--tk-color-secondary-500)]/5'
           }`}
           style={{ aspectRatio: `${aspectRatio}` }}
         >
@@ -321,8 +321,8 @@ export function InteractiveCanvas({
           <FaceGuides visible />
 
           <div className="relative z-20 flex flex-col items-center gap-4">
-            <div className="w-20 h-20 rounded-full bg-[var(--ht-color-secondary-500)]/10 flex items-center justify-center">
-              <svg className="w-10 h-10 text-[var(--ht-color-secondary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <div className="w-20 h-20 rounded-full bg-[var(--tk-color-secondary-500)]/10 flex items-center justify-center">
+              <svg className="w-10 h-10 text-[var(--tk-color-secondary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
@@ -334,7 +334,7 @@ export function InteractiveCanvas({
               </p>
             </div>
             <div className="flex gap-3">
-              <span className="bg-[var(--ht-color-secondary-500)] text-slate-900 px-6 py-2.5 rounded-lg text-sm font-bold shadow-lg">
+              <span className="bg-[var(--tk-color-secondary-500)] text-slate-900 px-6 py-2.5 rounded-lg text-sm font-bold shadow-lg">
                 Pick File
               </span>
             </div>

@@ -239,7 +239,7 @@ export function CropResizeEditor({ imageMeta, onConfirm, onSkip }: CropResizeEdi
 
           <button
             onClick={() => setLockAspect(!lockAspect)}
-            className={`p-1 rounded transition-colors cursor-pointer ${lockAspect ? 'text-[var(--ht-color-secondary-500)]' : 'text-slate-500'}`}
+            className={`p-1 rounded transition-colors cursor-pointer ${lockAspect ? 'text-[var(--tk-color-secondary-500)]' : 'text-slate-500'}`}
             title={lockAspect ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
             aria-label={lockAspect ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
           >
@@ -288,7 +288,7 @@ export function CropResizeEditor({ imageMeta, onConfirm, onSkip }: CropResizeEdi
           </button>
           <button
             onClick={handleConfirm}
-            className="px-4 py-1.5 text-xs font-bold text-white bg-[var(--ht-color-secondary-500)] hover:bg-[var(--ht-color-secondary-500)]/80 rounded-lg transition-colors cursor-pointer min-h-[36px]"
+            className="px-4 py-1.5 text-xs font-bold text-white bg-[var(--tk-color-secondary-500)] hover:bg-[var(--tk-color-secondary-500)]/80 rounded-lg transition-colors cursor-pointer min-h-[36px]"
           >
             Continue to Vectorize
           </button>

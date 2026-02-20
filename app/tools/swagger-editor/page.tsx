@@ -222,7 +222,7 @@ export default function SwaggerEditorPage() {
         <div className="px-4 md:px-6 py-2.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <nav aria-label="Breadcrumb">
             <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-              <li><a href="/tools" className="hover:text-[var(--ht-color-primary-500)] transition-colors">Home</a></li>
+              <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
               <li aria-hidden="true">/</li>
               <li aria-current="page" className="text-slate-900 dark:text-white font-medium">Swagger Editor</li>
             </ol>
@@ -287,7 +287,7 @@ export default function SwaggerEditorPage() {
               <div className="flex flex-col h-full bg-white dark:bg-slate-900">
                 <div className="flex items-center justify-between px-3 py-1.5 border-b border-slate-100 dark:border-slate-800 shrink-0">
                   <div className="flex items-center gap-2">
-                    <svg className="w-3.5 h-3.5 text-[var(--ht-color-secondary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg className="w-3.5 h-3.5 text-[var(--tk-color-secondary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">openapi.yaml</span>

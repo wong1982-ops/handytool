@@ -24,10 +24,10 @@ function CheckboxItem({ checked, onToggle, label }: CheckboxItemProps) {
           width: '16px',
           height: '16px',
           borderColor: checked
-            ? 'var(--ht-color-secondary-500, #32A9D9)'
+            ? 'var(--tk-color-secondary-500, #32A9D9)'
             : 'rgba(255, 255, 255, 0.2)',
           backgroundColor: checked
-            ? 'color-mix(in srgb, var(--ht-color-secondary-500, #32A9D9) 20%, transparent)'
+            ? 'color-mix(in srgb, var(--tk-color-secondary-500, #32A9D9) 20%, transparent)'
             : 'transparent',
         }}
         role="presentation"
@@ -36,7 +36,7 @@ function CheckboxItem({ checked, onToggle, label }: CheckboxItemProps) {
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
             <path
               d="M2 5L4 7L8 3"
-              stroke="var(--ht-color-secondary-500, #32A9D9)"
+              stroke="var(--tk-color-secondary-500, #32A9D9)"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -78,7 +78,7 @@ function SliderControl({ label, value, min, max, step = 1, displayValue, ariaLab
         <span className="text-xs font-medium text-slate-300">{label}</span>
         <span
           className="text-[10px] font-mono font-medium"
-          style={{ color: 'var(--ht-color-secondary-500, #32A9D9)' }}
+          style={{ color: 'var(--tk-color-secondary-500, #32A9D9)' }}
         >
           {displayValue}
         </span>
@@ -88,7 +88,7 @@ function SliderControl({ label, value, min, max, step = 1, displayValue, ariaLab
           className="absolute top-0 left-0 h-[6px] rounded-full"
           style={{
             width: `${fillPct}%`,
-            backgroundColor: 'var(--ht-color-secondary-500, #32A9D9)',
+            backgroundColor: 'var(--tk-color-secondary-500, #32A9D9)',
             opacity: 0.6,
           }}
         />
@@ -175,9 +175,9 @@ export function VectorizationSettingsPanel({ settings, onChange }: Vectorization
                   }
                 `}
                 style={isActive ? {
-                  backgroundColor: 'color-mix(in srgb, var(--ht-color-secondary-500, #32A9D9) 20%, transparent)',
-                  color: 'var(--ht-color-secondary-500, #32A9D9)',
-                  boxShadow: 'inset 0 0 0 1px var(--ht-color-secondary-500, #32A9D9)',
+                  backgroundColor: 'color-mix(in srgb, var(--tk-color-secondary-500, #32A9D9) 20%, transparent)',
+                  color: 'var(--tk-color-secondary-500, #32A9D9)',
+                  boxShadow: 'inset 0 0 0 1px var(--tk-color-secondary-500, #32A9D9)',
                 } : undefined}
               >
                 {opt.label}

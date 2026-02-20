@@ -80,7 +80,7 @@ export function StatsRow({ data, to, loading }: StatsRowProps) {
       </div>
 
       {/* Volatility */}
-      <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/30 dark:border-white/10 p-5 rounded-xl shadow-sm border-l-4 border-l-[var(--ht-color-primary-500)]">
+      <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/30 dark:border-white/10 p-5 rounded-xl shadow-sm border-l-4 border-l-[var(--tk-color-primary-500)]">
         <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Volatility Score</p>
         <div className="flex items-baseline gap-2">
           <span className={`text-2xl font-bold ${stats.volatilityColor}`}>{stats.volatilityLabel}</span>

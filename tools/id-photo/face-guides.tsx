@@ -24,7 +24,7 @@ export function FaceGuides({ visible }: FaceGuidesProps) {
       >
         <path
           d={BODY_OUTLINE_PATH}
-          fill="var(--ht-color-secondary-500, #32A9D9)"
+          fill="var(--tk-color-secondary-500, #32A9D9)"
           opacity="0.35"
         />
       </svg>

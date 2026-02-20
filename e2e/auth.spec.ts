@@ -19,7 +19,7 @@ test.describe('Auth UI', () => {
     await expect(dialog).toBeVisible()
 
     // Should have heading
-    await expect(page.getByText('Sign in to HandyTool')).toBeVisible()
+    await expect(page.getByText('Sign in to Toolk1t')).toBeVisible()
 
     // Should have Google and Facebook buttons
     await expect(page.getByRole('button', { name: /Continue with Google/i })).toBeVisible()

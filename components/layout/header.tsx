@@ -14,7 +14,7 @@ interface HeaderProps {
 }
 
 export function Header({
-  brandName = 'HandyTool',
+  brandName = 'Toolk1t',
 }: HeaderProps) {
   const router = useRouter()
   const [dark, setDark] = useState(true)
@@ -215,7 +215,7 @@ export function Header({
             <button
               type="button"
               onClick={showAllTools}
-              className="absolute left-3 top-1/2 -translate-y-1/2 p-0 bg-transparent border-0 cursor-pointer text-slate-400 hover:text-[var(--ht-color-primary-500)] transition-colors"
+              className="absolute left-3 top-1/2 -translate-y-1/2 p-0 bg-transparent border-0 cursor-pointer text-slate-400 hover:text-[var(--tk-color-primary-500)] transition-colors"
               aria-label="Show all tools"
               tabIndex={-1}
             >
@@ -235,7 +235,7 @@ export function Header({
               aria-autocomplete="list"
               aria-controls="search-suggestions-desktop"
               aria-activedescendant={activeIndex >= 0 ? `suggestion-desktop-${activeIndex}` : undefined}
-              className="w-full pl-9 pr-8 py-2 text-sm bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50 rounded-lg focus:ring-2 focus:ring-[var(--ht-color-primary-500)] focus:border-transparent transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+              className="w-full pl-9 pr-8 py-2 text-sm bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50 rounded-lg focus:ring-2 focus:ring-[var(--tk-color-primary-500)] focus:border-transparent transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
             />
             {searchQuery && (
               <button
@@ -312,7 +312,7 @@ export function Header({
           ) : (
             <button
               onClick={() => setSignInOpen(true)}
-              className="hidden md:inline-flex bg-[var(--ht-color-primary-500)] text-white px-5 py-2 rounded-lg text-sm font-bold hover:opacity-90 transition-all shadow-lg shadow-[var(--ht-color-primary-500)]/20 cursor-pointer"
+              className="hidden md:inline-flex bg-[var(--tk-color-primary-500)] text-white px-5 py-2 rounded-lg text-sm font-bold hover:opacity-90 transition-all shadow-lg shadow-[var(--tk-color-primary-500)]/20 cursor-pointer"
             >
               Sign In
             </button>
@@ -380,7 +380,7 @@ export function Header({
                 <button
                   type="button"
                   onClick={showAllTools}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 p-0 bg-transparent border-0 cursor-pointer text-slate-400 hover:text-[var(--ht-color-primary-500)] transition-colors"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 p-0 bg-transparent border-0 cursor-pointer text-slate-400 hover:text-[var(--tk-color-primary-500)] transition-colors"
                   aria-label="Show all tools"
                   tabIndex={-1}
                 >
@@ -400,7 +400,7 @@ export function Header({
                   aria-autocomplete="list"
                   aria-controls="search-suggestions-mobile"
                   aria-activedescendant={activeIndex >= 0 ? `suggestion-mobile-${activeIndex}` : undefined}
-                  className="w-full pl-9 pr-8 py-2.5 text-sm bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50 rounded-lg focus:ring-2 focus:ring-[var(--ht-color-primary-500)] focus:border-transparent transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+                  className="w-full pl-9 pr-8 py-2.5 text-sm bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50 rounded-lg focus:ring-2 focus:ring-[var(--tk-color-primary-500)] focus:border-transparent transition-all text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
                 />
                 {searchQuery && (
                   <button
@@ -447,7 +447,7 @@ export function Header({
             {!loading && !user && (
               <button
                 onClick={() => { setSignInOpen(true); setMobileMenuOpen(false) }}
-                className="inline-flex justify-center bg-[var(--ht-color-primary-500)] text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-all mt-1 cursor-pointer"
+                className="inline-flex justify-center bg-[var(--tk-color-primary-500)] text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-all mt-1 cursor-pointer"
               >
                 Sign In
               </button>

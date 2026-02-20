@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     canonical: "/tools/pdf-converter",
   },
   openGraph: {
-    title: "PDF Converter - Merge, Split, Compress | HandyTool",
+    title: "PDF Converter - Merge, Split, Compress | Toolk1t",
     description:
       "All-in-one free PDF tool: convert, merge, split, compress, and transform PDFs online.",
     url: "/tools/pdf-converter",
@@ -22,18 +22,18 @@ const jsonLd = [
     name: "PDF Converter",
     description:
       "Convert, merge, split, and compress PDF files. Supports PDF to images, Word, and Excel conversions.",
-    url: "https://handytool.app/tools/pdf-converter",
+    url: "https://toolk1t.app/tools/pdf-converter",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Any",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    isPartOf: { "@type": "WebSite", name: "HandyTool", url: "https://handytool.app" },
+    isPartOf: { "@type": "WebSite", name: "Toolk1t", url: "https://toolk1t.app" },
   },
   {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://handytool.app" },
-      { "@type": "ListItem", position: 2, name: "Tools", item: "https://handytool.app/tools" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.app" },
+      { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.app/tools" },
       { "@type": "ListItem", position: 3, name: "PDF Converter" },
     ],
   },

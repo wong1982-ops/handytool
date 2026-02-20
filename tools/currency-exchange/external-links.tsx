@@ -24,7 +24,7 @@ export function ExternalLinks({ from, to, amount }: ExternalLinksProps) {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-between gap-2 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-[var(--ht-color-primary-500)] hover:text-[var(--ht-color-primary-500)] transition-colors"
+            className="inline-flex items-center justify-between gap-2 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-[var(--tk-color-primary-500)] hover:text-[var(--tk-color-primary-500)] transition-colors"
           >
             {link.label}
             <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

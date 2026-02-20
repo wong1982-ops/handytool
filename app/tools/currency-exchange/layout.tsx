@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     canonical: "/tools/currency-exchange",
   },
   openGraph: {
-    title: "Currency Exchange Rate Converter | HandyTool",
+    title: "Currency Exchange Rate Converter | Toolk1t",
     description:
       "Convert currencies with live exchange rates and historical charts. Free online calculator.",
     url: "/tools/currency-exchange",
@@ -22,18 +22,18 @@ const jsonLd = [
     name: "Currency Exchange Rate Converter",
     description:
       "Convert currencies with live exchange rates and historical charts.",
-    url: "https://handytool.app/tools/currency-exchange",
+    url: "https://toolk1t.app/tools/currency-exchange",
     applicationCategory: "FinanceApplication",
     operatingSystem: "Any",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    isPartOf: { "@type": "WebSite", name: "HandyTool", url: "https://handytool.app" },
+    isPartOf: { "@type": "WebSite", name: "Toolk1t", url: "https://toolk1t.app" },
   },
   {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://handytool.app" },
-      { "@type": "ListItem", position: 2, name: "Tools", item: "https://handytool.app/tools" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.app" },
+      { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.app/tools" },
       { "@type": "ListItem", position: 3, name: "Currency Exchange" },
     ],
   },

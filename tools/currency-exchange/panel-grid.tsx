@@ -79,7 +79,7 @@ export function PanelGrid({
         <div className="flex justify-end">
           <button
             onClick={onReset}
-            className="text-xs text-slate-400 hover:text-[var(--ht-color-primary-500)] transition-colors cursor-pointer"
+            className="text-xs text-slate-400 hover:text-[var(--tk-color-primary-500)] transition-colors cursor-pointer"
             aria-label="Reset panel layout to default"
           >
             Reset layout

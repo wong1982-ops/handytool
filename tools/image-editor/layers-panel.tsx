@@ -130,7 +130,7 @@ export function LayersPanel({
               max={100}
               value={activeLayer.opacity}
               onChange={(e) => onOpacityChange(activeLayer.id, Number(e.target.value))}
-              className="flex-1 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[var(--ht-color-primary-500)]"
+              className="flex-1 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[var(--tk-color-primary-500)]"
               aria-label="Layer opacity"
             />
             <span className="text-[10px] text-slate-400 w-7 text-right">{activeLayer.opacity}%</span>
@@ -154,9 +154,9 @@ export function LayersPanel({
               onClick={() => onSelectLayer(layer.id)}
               className={`flex items-center gap-1.5 px-2 py-1.5 rounded cursor-pointer transition-colors group ${
                 activeLayerId === layer.id
-                  ? 'bg-[var(--ht-color-primary-500)]/20 border border-[var(--ht-color-primary-500)]/30'
+                  ? 'bg-[var(--tk-color-primary-500)]/20 border border-[var(--tk-color-primary-500)]/30'
                   : 'hover:bg-slate-800 border border-transparent'
-              } ${dragOverIndex === index ? 'border-t-2 !border-t-[var(--ht-color-primary-500)]' : ''}`}
+              } ${dragOverIndex === index ? 'border-t-2 !border-t-[var(--tk-color-primary-500)]' : ''}`}
             >
               {/* Drag handle */}
               {layer.id !== 'bg' ? (

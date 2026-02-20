@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { LoginForm } from './login-form'
 
 export const metadata: Metadata = {
-  title: 'Login | HandyTool Admin',
+  title: 'Login | Toolk1t Admin',
 }
 
 export default function LoginPage() {

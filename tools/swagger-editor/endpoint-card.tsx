@@ -177,7 +177,7 @@ export function EndpointCard({
                     {parameters.filter((p: Parameter) => p.name && p.in).map((param: Parameter) => (
                       <tr key={`${param.in}-${param.name}`}>
                         <td className="px-3 py-2 font-mono">
-                          <span className="text-[var(--ht-color-secondary-500)]">{param.name}</span>
+                          <span className="text-[var(--tk-color-secondary-500)]">{param.name}</span>
                           {' '}
                           <span className="text-[10px] text-slate-400">({param.in})</span>
                           {param.required && <span className="text-[10px] text-red-400 ml-1">*</span>}

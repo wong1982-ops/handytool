@@ -196,7 +196,7 @@ export default function ImageEditorPage() {
         <div className="flex items-center gap-4">
           <nav aria-label="Breadcrumb" className="hidden sm:block">
             <ol className="flex items-center gap-1.5 text-sm text-slate-400">
-              <li><a href="/tools" className="hover:text-[var(--ht-color-primary-500)] transition-colors">Home</a></li>
+              <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
               <li aria-hidden="true">/</li>
               <li aria-current="page" className="text-white font-medium">Image Editor</li>
             </ol>
@@ -315,7 +315,7 @@ export default function ImageEditorPage() {
                     onClick={() => setActiveFilter(p.id)}
                     className={`w-full text-left px-4 py-1.5 text-sm transition-colors cursor-pointer flex items-center justify-between ${
                       activeFilter === p.id
-                        ? 'text-[var(--ht-color-primary-500)] bg-[var(--ht-color-primary-500)]/10'
+                        ? 'text-[var(--tk-color-primary-500)] bg-[var(--tk-color-primary-500)]/10'
                         : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                     }`}
                   >
@@ -385,7 +385,7 @@ export default function ImageEditorPage() {
           <button
             onClick={handleExport}
             disabled={!fabric.imageSize}
-            className="bg-[var(--ht-color-primary-500)] hover:bg-[var(--ht-color-primary-600,#2d5ad2)] text-white font-bold py-1.5 px-4 rounded-lg text-sm transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600,#2d5ad2)] text-white font-bold py-1.5 px-4 rounded-lg text-sm transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -433,7 +433,7 @@ export default function ImageEditorPage() {
               <div
                 className={`flex flex-col items-center gap-4 p-10 rounded-2xl border-2 border-dashed transition-all ${
                   dragging
-                    ? 'border-[var(--ht-color-primary-500)] bg-[var(--ht-color-primary-500)]/10'
+                    ? 'border-[var(--tk-color-primary-500)] bg-[var(--tk-color-primary-500)]/10'
                     : 'border-slate-600 hover:border-slate-500'
                 }`}
               >
@@ -442,7 +442,7 @@ export default function ImageEditorPage() {
                 </svg>
                 <p className="text-slate-400 text-sm font-medium">Drop an image here or click to upload</p>
                 <span
-                  className="bg-[var(--ht-color-primary-500)] hover:bg-[var(--ht-color-primary-600,#2d5ad2)] text-white font-bold py-2 px-6 rounded-lg text-sm transition-all"
+                  className="bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600,#2d5ad2)] text-white font-bold py-2 px-6 rounded-lg text-sm transition-all"
                 >
                   Choose Image
                 </span>
@@ -523,7 +523,7 @@ export default function ImageEditorPage() {
                 <button
                   onClick={() => setMobileTab('adjustments')}
                   className={`flex-1 py-2.5 text-xs font-medium transition-colors cursor-pointer ${
-                    mobileTab === 'adjustments' ? 'text-white border-b-2 border-[var(--ht-color-primary-500)]' : 'text-slate-400'
+                    mobileTab === 'adjustments' ? 'text-white border-b-2 border-[var(--tk-color-primary-500)]' : 'text-slate-400'
                   }`}
                 >
                   Adjustments
@@ -531,7 +531,7 @@ export default function ImageEditorPage() {
                 <button
                   onClick={() => setMobileTab('layers')}
                   className={`flex-1 py-2.5 text-xs font-medium transition-colors cursor-pointer ${
-                    mobileTab === 'layers' ? 'text-white border-b-2 border-[var(--ht-color-primary-500)]' : 'text-slate-400'
+                    mobileTab === 'layers' ? 'text-white border-b-2 border-[var(--tk-color-primary-500)]' : 'text-slate-400'
                   }`}
                 >
                   Layers
@@ -601,7 +601,7 @@ export default function ImageEditorPage() {
         </div>
         <div className="flex items-center gap-3">
           {activeFilter !== 'natural' && (
-            <span className="text-[var(--ht-color-primary-500)]">Filter: {FILTER_PRESETS.find((p) => p.id === activeFilter)?.name}</span>
+            <span className="text-[var(--tk-color-primary-500)]">Filter: {FILTER_PRESETS.find((p) => p.id === activeFilter)?.name}</span>
           )}
           <span className="hidden sm:inline">Client-side editing</span>
         </div>

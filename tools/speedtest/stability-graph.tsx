@@ -65,7 +65,7 @@ export function StabilityGraph({ downloadSamples, uploadSamples }: StabilityGrap
         <h3 className="font-bold text-slate-900 dark:text-white">Connection Stability Graph</h3>
         <div className="flex gap-4 text-xs font-bold uppercase tracking-tight">
           <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-[var(--ht-color-secondary-500)]" aria-hidden="true" />
+            <span className="size-2 rounded-full bg-[var(--tk-color-secondary-500)]" aria-hidden="true" />
             <span className="text-slate-500 dark:text-slate-400">Download</span>
           </span>
           <span className="flex items-center gap-1.5">
@@ -87,7 +87,7 @@ export function StabilityGraph({ downloadSamples, uploadSamples }: StabilityGrap
           {dlPath && (
             <>
               <path d={`${dlPath} V ${H} H 0 Z`} fill="url(#graphGradFill)" opacity="0.1" />
-              <path d={dlPath} fill="none" stroke="var(--ht-color-secondary-500, #25d1f4)" strokeWidth="2" />
+              <path d={dlPath} fill="none" stroke="var(--tk-color-secondary-500, #25d1f4)" strokeWidth="2" />
             </>
           )}
           {ulPath && (
@@ -114,7 +114,7 @@ export function StabilityGraph({ downloadSamples, uploadSamples }: StabilityGrap
               cx={hover.x}
               cy={H - (hover.dl / maxVal) * H}
               r="4"
-              fill="var(--ht-color-secondary-500, #25d1f4)"
+              fill="var(--tk-color-secondary-500, #25d1f4)"
               stroke="white"
               strokeWidth="1.5"
             />
@@ -132,8 +132,8 @@ export function StabilityGraph({ downloadSamples, uploadSamples }: StabilityGrap
 
           <defs>
             <linearGradient id="graphGradFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--ht-color-secondary-500, #25d1f4)" />
-              <stop offset="100%" stopColor="var(--ht-color-secondary-500, #25d1f4)" stopOpacity="0" />
+              <stop offset="0%" stopColor="var(--tk-color-secondary-500, #25d1f4)" />
+              <stop offset="100%" stopColor="var(--tk-color-secondary-500, #25d1f4)" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>
@@ -146,7 +146,7 @@ export function StabilityGraph({ downloadSamples, uploadSamples }: StabilityGrap
           >
             {hover.dl != null && (
               <div className="flex items-center gap-1.5">
-                <span className="size-1.5 rounded-full bg-[var(--ht-color-secondary-500)]" />
+                <span className="size-1.5 rounded-full bg-[var(--tk-color-secondary-500)]" />
                 <span className="text-slate-300">DL</span>
                 <span className="font-bold tabular-nums">{hover.dl.toFixed(1)} Mbps</span>
               </div>

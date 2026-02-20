@@ -120,7 +120,7 @@ export function ZoomControls({ zoom, showGrid, onZoomChange, onFitScreen, onTogg
           transition-colors cursor-pointer
           ${
             showGrid
-              ? 'text-[var(--ht-color-primary-500)] bg-[var(--ht-color-primary-500)]/10'
+              ? 'text-[var(--tk-color-primary-500)] bg-[var(--tk-color-primary-500)]/10'
               : 'text-slate-400 hover:text-white hover:bg-slate-700/60'
           }
         `}

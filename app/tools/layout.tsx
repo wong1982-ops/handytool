@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     canonical: "/tools",
   },
   openGraph: {
-    title: "Free Online Tools | HandyTool",
+    title: "Free Online Tools | Toolk1t",
     description:
       "Browse all free online tools: IP lookup, speed test, PDF converter, image editor, JSON formatter, currency exchange, and more.",
     url: "/tools",
@@ -22,11 +22,11 @@ const jsonLd = {
   name: "Free Online Tools",
   description:
     "A collection of free online tools for developers and everyday use.",
-  url: "https://handytool.app/tools",
+  url: "https://toolk1t.app/tools",
   isPartOf: {
     "@type": "WebSite",
-    name: "HandyTool",
-    url: "https://handytool.app",
+    name: "Toolk1t",
+    url: "https://toolk1t.app",
   },
 };
 

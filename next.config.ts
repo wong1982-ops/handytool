@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   ],
   experimental: {
     optimizePackageImports: [
-      "@wong1982-ops/handytool-ui",
+      "@wong1982-ops/toolk1t-ui",
       "react-leaflet",
       "leaflet",
     ],

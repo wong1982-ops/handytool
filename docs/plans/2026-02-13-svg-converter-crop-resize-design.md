@@ -12,7 +12,7 @@ Two changes to the SVG Converter tool:
 
 ## Task A: Tool Registry Entry
 
-Add SVG Converter entry to `handytool-client/lib/tools.tsx` after Image Editor (position 9). Uses a bezier-path icon with `from-teal-500 to-cyan-400` gradient. Single change propagates to all navigation surfaces.
+Add SVG Converter entry to `toolk1t-client/lib/tools.tsx` after Image Editor (position 9). Uses a bezier-path icon with `from-teal-500 to-cyan-400` gradient. Single change propagates to all navigation surfaces.
 
 ## Task B: Crop/Resize Before Vectorization
 
@@ -59,3 +59,9 @@ The page currently has: `idle | uploaded+processing | ready`. The new `cropping`
 | `tools/svg-converter/crop-resize-editor.tsx` | New component |
 | `tools/svg-converter/types.ts` | Add `CropData` type |
 | `package.json` | Add `react-image-crop` dependency |
+
+---
+
+## Design Approved Context
+
+This design document references the Toolk1t project for all file paths and tool references.

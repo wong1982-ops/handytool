@@ -20,7 +20,7 @@ export function ProfilePrompt() {
         </p>
         <button
           onClick={() => router.push('/profile')}
-          className="shrink-0 rounded-lg bg-[var(--ht-color-primary-500,#3D6AF2)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity cursor-pointer"
+          className="shrink-0 rounded-lg bg-[var(--tk-color-primary-500,#3D6AF2)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity cursor-pointer"
         >
           Complete Profile
         </button>

@@ -164,7 +164,7 @@ export default function SvgConverterPage() {
           <nav aria-label="Breadcrumb" className="hidden sm:block">
             <ol className="flex items-center gap-1.5 text-sm text-slate-400">
               <li>
-                <a href="/tools" className="hover:text-[var(--ht-color-primary-500)] transition-colors">
+                <a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">
                   Home
                 </a>
               </li>

@@ -103,7 +103,7 @@ const mockData = {
 
 ## Notes
 
-- The design uses "SpeedTestPro" branding but our app is "HandyTool" — we keep shared header
+- The design uses "SpeedTestPro" branding but our app is "Toolk1t" — we keep shared header
 - The design's primary cyan (#25d1f4) is close to our secondary tokens — use CSS vars where possible
 - The dark theme is inherent to this tool's aesthetic, not the global theme toggle
 - The dot-pattern background and gauge glow effects are tool-specific styles

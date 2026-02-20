@@ -6,9 +6,9 @@
 //
 // Example — rebrand to a red theme:
 //   :root {
-//     --ht-color-primary-500: #e11d48;
-//     --ht-color-primary-600: #be123c;
-//     --ht-font-family-sans: 'Poppins', sans-serif;
+//     --tk-color-primary-500: #e11d48;
+//     --tk-color-primary-600: #be123c;
+//     --tk-font-family-sans: 'Poppins', sans-serif;
 //   }
 // ============================================================
 
@@ -16,113 +16,113 @@
 
 :root {
   // Brand palette
-  --ht-color-primary-50:  #{$color-primary-50};
-  --ht-color-primary-100: #{$color-primary-100};
-  --ht-color-primary-200: #{$color-primary-200};
-  --ht-color-primary-300: #{$color-primary-300};
-  --ht-color-primary-400: #{$color-primary-400};
-  --ht-color-primary-500: #{$color-primary-500};
-  --ht-color-primary-600: #{$color-primary-600};
-  --ht-color-primary-700: #{$color-primary-700};
-  --ht-color-primary-800: #{$color-primary-800};
-  --ht-color-primary-900: #{$color-primary-900};
-  --ht-color-primary-950: #{$color-primary-950};
+  --tk-color-primary-50:  #{$color-primary-50};
+  --tk-color-primary-100: #{$color-primary-100};
+  --tk-color-primary-200: #{$color-primary-200};
+  --tk-color-primary-300: #{$color-primary-300};
+  --tk-color-primary-400: #{$color-primary-400};
+  --tk-color-primary-500: #{$color-primary-500};
+  --tk-color-primary-600: #{$color-primary-600};
+  --tk-color-primary-700: #{$color-primary-700};
+  --tk-color-primary-800: #{$color-primary-800};
+  --tk-color-primary-900: #{$color-primary-900};
+  --tk-color-primary-950: #{$color-primary-950};
 
-  --ht-color-secondary-50:  #{$color-secondary-50};
-  --ht-color-secondary-100: #{$color-secondary-100};
-  --ht-color-secondary-200: #{$color-secondary-200};
-  --ht-color-secondary-300: #{$color-secondary-300};
-  --ht-color-secondary-400: #{$color-secondary-400};
-  --ht-color-secondary-500: #{$color-secondary-500};
-  --ht-color-secondary-600: #{$color-secondary-600};
-  --ht-color-secondary-700: #{$color-secondary-700};
-  --ht-color-secondary-800: #{$color-secondary-800};
-  --ht-color-secondary-900: #{$color-secondary-900};
-  --ht-color-secondary-950: #{$color-secondary-950};
+  --tk-color-secondary-50:  #{$color-secondary-50};
+  --tk-color-secondary-100: #{$color-secondary-100};
+  --tk-color-secondary-200: #{$color-secondary-200};
+  --tk-color-secondary-300: #{$color-secondary-300};
+  --tk-color-secondary-400: #{$color-secondary-400};
+  --tk-color-secondary-500: #{$color-secondary-500};
+  --tk-color-secondary-600: #{$color-secondary-600};
+  --tk-color-secondary-700: #{$color-secondary-700};
+  --tk-color-secondary-800: #{$color-secondary-800};
+  --tk-color-secondary-900: #{$color-secondary-900};
+  --tk-color-secondary-950: #{$color-secondary-950};
 
-  --ht-color-accent-50:  #{$color-accent-50};
-  --ht-color-accent-100: #{$color-accent-100};
-  --ht-color-accent-200: #{$color-accent-200};
-  --ht-color-accent-300: #{$color-accent-300};
-  --ht-color-accent-400: #{$color-accent-400};
-  --ht-color-accent-500: #{$color-accent-500};
-  --ht-color-accent-600: #{$color-accent-600};
-  --ht-color-accent-700: #{$color-accent-700};
-  --ht-color-accent-800: #{$color-accent-800};
-  --ht-color-accent-900: #{$color-accent-900};
-  --ht-color-accent-950: #{$color-accent-950};
+  --tk-color-accent-50:  #{$color-accent-50};
+  --tk-color-accent-100: #{$color-accent-100};
+  --tk-color-accent-200: #{$color-accent-200};
+  --tk-color-accent-300: #{$color-accent-300};
+  --tk-color-accent-400: #{$color-accent-400};
+  --tk-color-accent-500: #{$color-accent-500};
+  --tk-color-accent-600: #{$color-accent-600};
+  --tk-color-accent-700: #{$color-accent-700};
+  --tk-color-accent-800: #{$color-accent-800};
+  --tk-color-accent-900: #{$color-accent-900};
+  --tk-color-accent-950: #{$color-accent-950};
 
   // Neutral
-  --ht-color-neutral-0:   #{$color-neutral-0};
-  --ht-color-neutral-50:  #{$color-neutral-50};
-  --ht-color-neutral-100: #{$color-neutral-100};
-  --ht-color-neutral-200: #{$color-neutral-200};
-  --ht-color-neutral-300: #{$color-neutral-300};
-  --ht-color-neutral-400: #{$color-neutral-400};
-  --ht-color-neutral-500: #{$color-neutral-500};
-  --ht-color-neutral-600: #{$color-neutral-600};
-  --ht-color-neutral-700: #{$color-neutral-700};
-  --ht-color-neutral-800: #{$color-neutral-800};
-  --ht-color-neutral-900: #{$color-neutral-900};
-  --ht-color-neutral-950: #{$color-neutral-950};
+  --tk-color-neutral-0:   #{$color-neutral-0};
+  --tk-color-neutral-50:  #{$color-neutral-50};
+  --tk-color-neutral-100: #{$color-neutral-100};
+  --tk-color-neutral-200: #{$color-neutral-200};
+  --tk-color-neutral-300: #{$color-neutral-300};
+  --tk-color-neutral-400: #{$color-neutral-400};
+  --tk-color-neutral-500: #{$color-neutral-500};
+  --tk-color-neutral-600: #{$color-neutral-600};
+  --tk-color-neutral-700: #{$color-neutral-700};
+  --tk-color-neutral-800: #{$color-neutral-800};
+  --tk-color-neutral-900: #{$color-neutral-900};
+  --tk-color-neutral-950: #{$color-neutral-950};
 
   // Semantic
-  --ht-color-success: #{$color-success-500};
-  --ht-color-warning: #{$color-warning-500};
-  --ht-color-error:   #{$color-error-500};
-  --ht-color-info:    #{$color-info-500};
+  --tk-color-success: #{$color-success-500};
+  --tk-color-warning: #{$color-warning-500};
+  --tk-color-error:   #{$color-error-500};
+  --tk-color-info:    #{$color-info-500};
 
   // Surface & text
-  --ht-color-bg:            #{$color-neutral-0};
-  --ht-color-bg-subtle:     #{$color-neutral-50};
-  --ht-color-bg-muted:      #{$color-neutral-100};
-  --ht-color-border:        #{$color-neutral-200};
-  --ht-color-border-strong: #{$color-neutral-300};
-  --ht-color-text:          #{$color-neutral-900};
-  --ht-color-text-subtle:   #{$color-neutral-600};
-  --ht-color-text-muted:    #{$color-neutral-400};
-  --ht-color-text-inverse:  #{$color-neutral-0};
+  --tk-color-bg:            #{$color-neutral-0};
+  --tk-color-bg-subtle:     #{$color-neutral-50};
+  --tk-color-bg-muted:      #{$color-neutral-100};
+  --tk-color-border:        #{$color-neutral-200};
+  --tk-color-border-strong: #{$color-neutral-300};
+  --tk-color-text:          #{$color-neutral-900};
+  --tk-color-text-subtle:   #{$color-neutral-600};
+  --tk-color-text-muted:    #{$color-neutral-400};
+  --tk-color-text-inverse:  #{$color-neutral-0};
 
   // Typography
-  --ht-font-family-sans: #{$font-family-sans};
-  --ht-font-family-mono: #{$font-family-mono};
+  --tk-font-family-sans: #{$font-family-sans};
+  --tk-font-family-mono: #{$font-family-mono};
 
   // Fluid headings
-  --ht-heading-1: #{$heading-1};
-  --ht-heading-2: #{$heading-2};
-  --ht-heading-3: #{$heading-3};
-  --ht-heading-4: #{$heading-4};
-  --ht-heading-5: #{$heading-5};
-  --ht-heading-6: #{$heading-6};
+  --tk-heading-1: #{$heading-1};
+  --tk-heading-2: #{$heading-2};
+  --tk-heading-3: #{$heading-3};
+  --tk-heading-4: #{$heading-4};
+  --tk-heading-5: #{$heading-5};
+  --tk-heading-6: #{$heading-6};
 
   // Radius
-  --ht-radius-sm:   #{$radius-sm};
-  --ht-radius-md:   #{$radius-md};
-  --ht-radius-lg:   #{$radius-lg};
-  --ht-radius-xl:   #{$radius-xl};
-  --ht-radius-2xl:  #{$radius-2xl};
-  --ht-radius-full: #{$radius-full};
+  --tk-radius-sm:   #{$radius-sm};
+  --tk-radius-md:   #{$radius-md};
+  --tk-radius-lg:   #{$radius-lg};
+  --tk-radius-xl:   #{$radius-xl};
+  --tk-radius-2xl:  #{$radius-2xl};
+  --tk-radius-full: #{$radius-full};
 
   // Shadows
-  --ht-shadow-sm: #{$shadow-sm};
-  --ht-shadow-md: #{$shadow-md};
-  --ht-shadow-lg: #{$shadow-lg};
-  --ht-shadow-xl: #{$shadow-xl};
+  --tk-shadow-sm: #{$shadow-sm};
+  --tk-shadow-md: #{$shadow-md};
+  --tk-shadow-lg: #{$shadow-lg};
+  --tk-shadow-xl: #{$shadow-xl};
 
   // Spacing
-  --ht-spacing-1:  #{$spacing-1};
-  --ht-spacing-2:  #{$spacing-2};
-  --ht-spacing-3:  #{$spacing-3};
-  --ht-spacing-4:  #{$spacing-4};
-  --ht-spacing-5:  #{$spacing-5};
-  --ht-spacing-6:  #{$spacing-6};
-  --ht-spacing-8:  #{$spacing-8};
-  --ht-spacing-10: #{$spacing-10};
-  --ht-spacing-12: #{$spacing-12};
-  --ht-spacing-16: #{$spacing-16};
-  --ht-spacing-20: #{$spacing-20};
-  --ht-spacing-24: #{$spacing-24};
-  --ht-spacing-32: #{$spacing-32};
+  --tk-spacing-1:  #{$spacing-1};
+  --tk-spacing-2:  #{$spacing-2};
+  --tk-spacing-3:  #{$spacing-3};
+  --tk-spacing-4:  #{$spacing-4};
+  --tk-spacing-5:  #{$spacing-5};
+  --tk-spacing-6:  #{$spacing-6};
+  --tk-spacing-8:  #{$spacing-8};
+  --tk-spacing-10: #{$spacing-10};
+  --tk-spacing-12: #{$spacing-12};
+  --tk-spacing-16: #{$spacing-16};
+  --tk-spacing-20: #{$spacing-20};
+  --tk-spacing-24: #{$spacing-24};
+  --tk-spacing-32: #{$spacing-32};
 }
 
 // ----------------------------------------------------------
@@ -131,13 +131,13 @@
 
 [data-theme='dark'],
 .dark {
-  --ht-color-bg:            #{$color-neutral-950};
-  --ht-color-bg-subtle:     #{$color-neutral-900};
-  --ht-color-bg-muted:      #{$color-neutral-800};
-  --ht-color-border:        #{$color-neutral-700};
-  --ht-color-border-strong: #{$color-neutral-600};
-  --ht-color-text:          #{$color-neutral-50};
-  --ht-color-text-subtle:   #{$color-neutral-300};
-  --ht-color-text-muted:    #{$color-neutral-500};
-  --ht-color-text-inverse:  #{$color-neutral-900};
+  --tk-color-bg:            #{$color-neutral-950};
+  --tk-color-bg-subtle:     #{$color-neutral-900};
+  --tk-color-bg-muted:      #{$color-neutral-800};
+  --tk-color-border:        #{$color-neutral-700};
+  --tk-color-border-strong: #{$color-neutral-600};
+  --tk-color-text:          #{$color-neutral-50};
+  --tk-color-text-subtle:   #{$color-neutral-300};
+  --tk-color-text-muted:    #{$color-neutral-500};
+  --tk-color-text-inverse:  #{$color-neutral-900};
 }

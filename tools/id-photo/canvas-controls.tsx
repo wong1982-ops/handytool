@@ -18,7 +18,7 @@ export function CanvasControls({
   scale,
 }: CanvasControlsProps) {
   const buttonBase =
-    'w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-[var(--ht-color-secondary-500)] hover:border-[var(--ht-color-secondary-500)] transition-all cursor-pointer'
+    'w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-[var(--tk-color-secondary-500)] hover:border-[var(--tk-color-secondary-500)] transition-all cursor-pointer'
 
   return (
     <div className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">

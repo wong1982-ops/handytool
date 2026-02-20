@@ -172,7 +172,7 @@ export default function IpCheckPage() {
     <main className="max-w-5xl mx-auto px-6 py-8 md:py-5 flex-1">
       <nav aria-label="Breadcrumb" className="mb-6 md:mb-4">
         <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-          <li><a href="/tools" className="hover:text-[var(--ht-color-primary-500)] transition-colors">Home</a></li>
+          <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
           <li aria-hidden="true">/</li>
           <li aria-current="page" className="text-slate-900 dark:text-white font-medium">IP Check</li>
         </ol>
@@ -194,7 +194,7 @@ export default function IpCheckPage() {
               onClick={() => fetchIp(userIp)}
               disabled={state === 'loading'}
               title={`Quick check: ${userIp}`}
-              className="shrink-0 h-[54px] flex items-center gap-1.5 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:border-[var(--ht-color-primary-500)] hover:text-[var(--ht-color-primary-500)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm whitespace-nowrap"
+              className="shrink-0 h-[54px] flex items-center gap-1.5 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:border-[var(--tk-color-primary-500)] hover:text-[var(--tk-color-primary-500)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm whitespace-nowrap"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

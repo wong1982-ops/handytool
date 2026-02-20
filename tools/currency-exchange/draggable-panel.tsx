@@ -61,7 +61,7 @@ export function DraggablePanel({
             ref={setActivatorNodeRef}
             {...attributes}
             {...listeners}
-            className="cursor-grab active:cursor-grabbing p-1 rounded text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-[var(--ht-color-primary-500)] focus-visible:outline-none"
+            className="cursor-grab active:cursor-grabbing p-1 rounded text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-[var(--tk-color-primary-500)] focus-visible:outline-none"
             aria-label={`Drag to reorder ${title}`}
             aria-roledescription="sortable"
           >
@@ -91,7 +91,7 @@ export function DraggablePanel({
                 className={`px-1.5 py-0.5 text-[10px] font-bold rounded transition-colors cursor-pointer
                   ${
                     colSpan === span
-                      ? 'bg-[var(--ht-color-primary-500)]/15 text-[var(--ht-color-primary-500)]'
+                      ? 'bg-[var(--tk-color-primary-500)]/15 text-[var(--tk-color-primary-500)]'
                       : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                   }
                 `}
@@ -118,9 +118,9 @@ export function DraggablePanelOverlay({
   const title = PANEL_TITLES[id] || id
 
   return (
-    <div className="opacity-90 ring-2 ring-[var(--ht-color-primary-500)] rounded-2xl shadow-2xl pointer-events-none">
+    <div className="opacity-90 ring-2 ring-[var(--tk-color-primary-500)] rounded-2xl shadow-2xl pointer-events-none">
       <div className="flex items-center justify-center mb-2 px-1 pt-2">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--ht-color-primary-500)] select-none">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--tk-color-primary-500)] select-none">
           {title}
         </span>
       </div>

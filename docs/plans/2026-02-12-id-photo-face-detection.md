@@ -10,22 +10,22 @@
 
 ---
 
-## Task 1: Install dependencies in handytool-api
+## Task 1: Install dependencies in toolk1t-api
 
 **Files:**
-- Modify: `handytool-api/package.json`
-- Modify: `handytool-api/next.config.ts`
+- Modify: `toolk1t-api/package.json`
+- Modify: `toolk1t-api/next.config.ts`
 
 **Step 1: Install face-api and tfjs-node**
 
 Run:
 ```bash
-cd handytool-api && pnpm add @vladmandic/face-api @tensorflow/tfjs-node
+cd toolk1t-api && pnpm add @vladmandic/face-api @tensorflow/tfjs-node
 ```
 
 **Step 2: Add to serverExternalPackages**
 
-In `handytool-api/next.config.ts`, add both packages to the `serverExternalPackages` array (alongside `@neplex/vectorizer`):
+In `toolk1t-api/next.config.ts`, add both packages to the `serverExternalPackages` array (alongside `@neplex/vectorizer`):
 
 ```typescript
 serverExternalPackages: ['@neplex/vectorizer', '@vladmandic/face-api', '@tensorflow/tfjs-node'],
@@ -37,20 +37,20 @@ These are native Node.js packages that must not be bundled by webpack.
 
 Run:
 ```bash
-ls handytool-api/node_modules/@vladmandic/face-api/model/ | head -20
+ls toolk1t-api/node_modules/@vladmandic/face-api/model/ | head -20
 ```
 
 Expected: Directory contains model manifest files like `ssd_mobilenetv1_model-weights_manifest.json`, `face_landmark_68_model-weights_manifest.json`, etc.
 
 **Step 4: Verify build**
 
-Run: `cd handytool-api && npx tsc --noEmit`
+Run: `cd toolk1t-api && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 5: Commit**
 
 ```bash
-cd handytool-api
+cd toolk1t-api
 git add package.json pnpm-lock.yaml next.config.ts
 git commit -m "feat(id-photo): install @vladmandic/face-api + @tensorflow/tfjs-node"
 ```
@@ -60,8 +60,8 @@ git commit -m "feat(id-photo): install @vladmandic/face-api + @tensorflow/tfjs-n
 ## Task 2: Create types and validation
 
 **Files:**
-- Create: `handytool-api/lib/face/types.ts`
-- Create: `handytool-api/lib/face/validation.ts`
+- Create: `toolk1t-api/lib/face/types.ts`
+- Create: `toolk1t-api/lib/face/validation.ts`
 
 **Step 1: Create `lib/face/types.ts`**
 
@@ -159,13 +159,13 @@ Note: No GIF support — face detection on animated images is not useful.
 
 **Step 3: Verify build**
 
-Run: `cd handytool-api && npx tsc --noEmit`
+Run: `cd toolk1t-api && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 4: Commit**
 
 ```bash
-cd handytool-api
+cd toolk1t-api
 git add lib/face/types.ts lib/face/validation.ts
 git commit -m "feat(id-photo): add face analysis types and image validation"
 ```
@@ -175,7 +175,7 @@ git commit -m "feat(id-photo): add face analysis types and image validation"
 ## Task 3: Create face analysis engine
 
 **Files:**
-- Create: `handytool-api/lib/face/analyze.ts`
+- Create: `toolk1t-api/lib/face/analyze.ts`
 
 This is the core logic. It wraps `@vladmandic/face-api` to detect a single face, extract 68-point landmarks, compute angles, and run 5 compliance checks.
 
@@ -407,7 +407,7 @@ export async function analyzeFace(
 
 **Step 2: Verify build**
 
-Run: `cd handytool-api && npx tsc --noEmit`
+Run: `cd toolk1t-api && npx tsc --noEmit`
 
 Possible issues:
 - `faceapi.tf.node.decodeImage` might not have exact type coverage. If TypeScript complains about `decodeImage`, add `// @ts-expect-error face-api tf.node types` above the call.
@@ -418,7 +418,7 @@ Expected: 0 errors (or fix any type issues)
 **Step 3: Commit**
 
 ```bash
-cd handytool-api
+cd toolk1t-api
 git add lib/face/analyze.ts
 git commit -m "feat(id-photo): face analysis engine with compliance scoring"
 ```
@@ -428,7 +428,7 @@ git commit -m "feat(id-photo): face analysis engine with compliance scoring"
 ## Task 4: Create API route handler
 
 **Files:**
-- Create: `handytool-api/app/api/v1/id-photo/analyze/route.ts`
+- Create: `toolk1t-api/app/api/v1/id-photo/analyze/route.ts`
 
 **Step 1: Create the route**
 
@@ -486,13 +486,13 @@ This follows the exact same pattern as the SVG vectorize route:
 
 **Step 2: Verify build**
 
-Run: `cd handytool-api && npx tsc --noEmit`
+Run: `cd toolk1t-api && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 3: Commit**
 
 ```bash
-cd handytool-api
+cd toolk1t-api
 git add app/api/v1/id-photo/analyze/route.ts
 git commit -m "feat(id-photo): POST /api/v1/id-photo/analyze endpoint"
 ```
@@ -503,7 +503,7 @@ git commit -m "feat(id-photo): POST /api/v1/id-photo/analyze endpoint"
 
 **Step 1: Start the API server**
 
-Run: `cd handytool-api && pnpm dev`
+Run: `cd toolk1t-api && pnpm dev`
 
 **Step 2: Test with a real image**
 
@@ -542,7 +542,7 @@ The first request loads TensorFlow models (~2-5 seconds). Subsequent requests sh
 ## Task 6: Create client hook
 
 **Files:**
-- Create: `handytool-client/tools/id-photo/use-face-analysis.ts`
+- Create: `toolk1t-client/tools/id-photo/use-face-analysis.ts`
 
 **Step 1: Create the hook**
 
@@ -621,7 +621,7 @@ export function useFaceAnalysis(): UseFaceAnalysisReturn {
 
 **Step 2: Add `FaceAnalysisResult` to client types**
 
-In `handytool-client/tools/id-photo/types.ts`, add the response types (mirroring the server types, but without Zod):
+In `toolk1t-client/tools/id-photo/types.ts`, add the response types (mirroring the server types, but without Zod):
 
 ```typescript
 // --- Face analysis API response types ---
@@ -696,13 +696,13 @@ export const DEFAULT_COMPLIANCE: Compliance = {
 
 **Step 3: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: Type errors in page.tsx and compliance-panel.tsx (because we changed the Compliance interface). These are expected and will be fixed in the next tasks.
 
 **Step 4: Commit**
 
 ```bash
-cd handytool-client
+cd toolk1t-client
 git add tools/id-photo/use-face-analysis.ts tools/id-photo/types.ts
 git commit -m "feat(id-photo): face analysis hook and updated types"
 ```
@@ -712,7 +712,7 @@ git commit -m "feat(id-photo): face analysis hook and updated types"
 ## Task 7: Update page.tsx — replace mock with real API
 
 **Files:**
-- Modify: `handytool-client/app/tools/id-photo/page.tsx`
+- Modify: `toolk1t-client/app/tools/id-photo/page.tsx`
 
 **Step 1: Import the hook**
 
@@ -848,13 +848,13 @@ Update the `InteractiveCanvas` usage to pass the analysis result for face overla
 
 **Step 9: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: Errors in compliance-panel.tsx (old keys) and interactive-canvas.tsx (new props). These are fixed in the next tasks.
 
 **Step 10: Commit**
 
 ```bash
-cd handytool-client
+cd toolk1t-client
 git add app/tools/id-photo/page.tsx
 git commit -m "feat(id-photo): wire real face analysis API to page"
 ```
@@ -864,7 +864,7 @@ git commit -m "feat(id-photo): wire real face analysis API to page"
 ## Task 8: Update compliance-panel.tsx for 5 server checks
 
 **Files:**
-- Modify: `handytool-client/tools/id-photo/compliance-panel.tsx`
+- Modify: `toolk1t-client/tools/id-photo/compliance-panel.tsx`
 
 **Step 1: Update the CHECKS array to match the 5 new compliance keys**
 
@@ -916,13 +916,13 @@ Optionally update the allPass banner (lines 139-141) to include the compliance s
 
 **Step 3: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors for this file (page.tsx might still have the InteractiveCanvas prop error — fixed next task)
 
 **Step 4: Commit**
 
 ```bash
-cd handytool-client
+cd toolk1t-client
 git add tools/id-photo/compliance-panel.tsx
 git commit -m "feat(id-photo): update compliance panel for 5 server-side checks"
 ```
@@ -932,7 +932,7 @@ git commit -m "feat(id-photo): update compliance panel for 5 server-side checks"
 ## Task 9: Add face overlay to interactive-canvas.tsx
 
 **Files:**
-- Modify: `handytool-client/tools/id-photo/interactive-canvas.tsx`
+- Modify: `toolk1t-client/tools/id-photo/interactive-canvas.tsx`
 
 **Step 1: Add new props to the interface**
 
@@ -1036,13 +1036,13 @@ Replace the existing badge (lines 241-248) to show the analysis state:
 
 **Step 5: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 6: Commit**
 
 ```bash
-cd handytool-client
+cd toolk1t-client
 git add tools/id-photo/interactive-canvas.tsx
 git commit -m "feat(id-photo): face bounding box overlay and analysis state indicators"
 ```
@@ -1053,8 +1053,8 @@ git commit -m "feat(id-photo): face bounding box overlay and analysis state indi
 
 **Step 1: Start both servers**
 
-Terminal 1: `cd handytool-api && pnpm dev` (port 3001)
-Terminal 2: `cd handytool-client && pnpm dev` (port 3000)
+Terminal 1: `cd toolk1t-api && pnpm dev` (port 3001)
+Terminal 2: `cd toolk1t-client && pnpm dev` (port 3000)
 
 **Step 2: Test in browser**
 
@@ -1084,8 +1084,8 @@ Terminal 2: `cd handytool-client && pnpm dev` (port 3000)
 
 Run:
 ```bash
-cd handytool-api && npx tsc --noEmit
-cd handytool-client && npx tsc --noEmit
+cd toolk1t-api && npx tsc --noEmit
+cd toolk1t-client && npx tsc --noEmit
 ```
 Expected: 0 errors in both
 
@@ -1094,13 +1094,13 @@ Expected: 0 errors in both
 If any fixes were needed during testing, commit them:
 
 ```bash
-cd handytool-client
+cd toolk1t-client
 git add -A
 git commit -m "fix(id-photo): end-to-end verification fixes"
 ```
 
 ```bash
-cd handytool-api
+cd toolk1t-api
 git add -A
 git commit -m "fix(id-photo): end-to-end verification fixes"
 ```

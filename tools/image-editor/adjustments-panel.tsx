@@ -80,7 +80,7 @@ export function AdjustmentsPanel({
               onClick={() => setActiveCategory(cat.id)}
               className={`px-2.5 py-1 rounded-full text-[10px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
                 activeCategory === cat.id
-                  ? 'bg-[var(--ht-color-primary-500)] text-white'
+                  ? 'bg-[var(--tk-color-primary-500)] text-white'
                   : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
               }`}
             >
@@ -97,7 +97,7 @@ export function AdjustmentsPanel({
               onClick={() => onFilterChange(preset.id === activeFilter ? 'natural' : preset.id)}
               className={`rounded-lg text-center transition-all cursor-pointer p-1 ${
                 activeFilter === preset.id
-                  ? 'ring-2 ring-[var(--ht-color-primary-500)] bg-[var(--ht-color-primary-500)]/10'
+                  ? 'ring-2 ring-[var(--tk-color-primary-500)] bg-[var(--tk-color-primary-500)]/10'
                   : 'hover:bg-slate-800'
               }`}
             >
@@ -147,7 +147,7 @@ export function AdjustmentsPanel({
             max={300}
             value={zoom}
             onChange={(e) => onZoomChange(Number(e.target.value))}
-            className="flex-1 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[var(--ht-color-primary-500)]"
+            className="flex-1 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[var(--tk-color-primary-500)]"
             aria-label="Zoom level"
           />
           <span className="text-[10px] text-slate-400 w-8 text-right">{zoom}%</span>
@@ -184,7 +184,7 @@ function SliderControl({
     <div>
       <div className="flex justify-between text-[11px] mb-1.5">
         <span className="text-slate-400 font-medium">{label}</span>
-        <span className="text-[var(--ht-color-primary-500)] font-bold">{value}{suffix}</span>
+        <span className="text-[var(--tk-color-primary-500)] font-bold">{value}{suffix}</span>
       </div>
       <input
         type="range"
@@ -192,7 +192,7 @@ function SliderControl({
         max={max}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[var(--ht-color-primary-500)]"
+        className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[var(--tk-color-primary-500)]"
         aria-label={label}
       />
     </div>

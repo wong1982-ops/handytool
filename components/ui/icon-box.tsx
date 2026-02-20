@@ -8,7 +8,7 @@ interface IconBoxProps {
 export function IconBox({ children, className = '' }: IconBoxProps) {
   return (
     <div
-      className={`w-10 h-10 rounded-lg bg-[var(--ht-color-primary-500)]/10 flex items-center justify-center text-[var(--ht-color-primary-500)] ${className}`}
+      className={`w-10 h-10 rounded-lg bg-[var(--tk-color-primary-500)]/10 flex items-center justify-center text-[var(--tk-color-primary-500)] ${className}`}
     >
       {children}
     </div>

@@ -28,7 +28,7 @@ export function MyIpHero({ ip, ipVersion = 'ipv4', isSecure }: MyIpHeroProps) {
         </p>
         <button
           onClick={handleCopy}
-          className="flex items-center justify-center p-3 rounded-lg bg-[var(--ht-color-primary-500)]/10 hover:bg-[var(--ht-color-primary-500)] transition-all text-[var(--ht-color-primary-500)] hover:text-white cursor-pointer"
+          className="flex items-center justify-center p-3 rounded-lg bg-[var(--tk-color-primary-500)]/10 hover:bg-[var(--tk-color-primary-500)] transition-all text-[var(--tk-color-primary-500)] hover:text-white cursor-pointer"
           title={copied ? 'Copied!' : 'Copy to Clipboard'}
           aria-label={copied ? 'IP address copied' : 'Copy IP address to clipboard'}
         >

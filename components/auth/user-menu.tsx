@@ -58,7 +58,7 @@ export function UserMenu({ user }: UserMenuProps) {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center justify-center w-9 h-9 rounded-full overflow-hidden border-2 border-transparent hover:border-[var(--ht-color-primary-500)] transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--ht-color-primary-500)] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+        className="flex items-center justify-center w-9 h-9 rounded-full overflow-hidden border-2 border-transparent hover:border-[var(--tk-color-primary-500)] transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
         aria-label="User menu"
         aria-expanded={open}
         aria-haspopup="true"
@@ -72,7 +72,7 @@ export function UserMenu({ user }: UserMenuProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <span className="flex items-center justify-center w-full h-full bg-[var(--ht-color-primary-500)] text-white text-sm font-bold">
+          <span className="flex items-center justify-center w-full h-full bg-[var(--tk-color-primary-500)] text-white text-sm font-bold">
             {initials}
           </span>
         )}

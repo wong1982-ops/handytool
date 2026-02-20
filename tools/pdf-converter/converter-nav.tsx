@@ -112,7 +112,7 @@ export function ConverterNav({ activeMode, onModeChange }: ConverterNavProps) {
             onClick={() => onModeChange(mode.id)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-left transition-colors cursor-pointer ${
               activeMode === mode.id
-                ? 'bg-[var(--ht-color-secondary-500)]/10 text-[var(--ht-color-secondary-500)] font-semibold'
+                ? 'bg-[var(--tk-color-secondary-500)]/10 text-[var(--tk-color-secondary-500)] font-semibold'
                 : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >

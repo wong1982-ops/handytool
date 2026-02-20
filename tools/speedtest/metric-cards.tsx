@@ -15,7 +15,7 @@ export function MetricCards({ download, upload, latency }: MetricCardsProps) {
           </svg>
         </div>
         <div className="flex items-center gap-2 mb-4">
-          <svg className="w-5 h-5 text-[var(--ht-color-secondary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className="w-5 h-5 text-[var(--tk-color-secondary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
           <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Download</h3>
@@ -26,7 +26,7 @@ export function MetricCards({ download, upload, latency }: MetricCardsProps) {
         </div>
         <div className="mt-4 h-1 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
           <div
-            className="h-full bg-[var(--ht-color-secondary-500)] rounded-full transition-all duration-700"
+            className="h-full bg-[var(--tk-color-secondary-500)] rounded-full transition-all duration-700"
             style={{
               width: `${Math.min((download.speed / download.maxSpeed) * 100, 100)}%`,
               boxShadow: '0 0 8px rgba(37, 209, 244, 0.6)',

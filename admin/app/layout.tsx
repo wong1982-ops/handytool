@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HandyTool Admin",
-  description: "HandyTool Admin Portal",
+  title: "Toolk1t Admin",
+  description: "Toolk1t Admin Portal",
 };
 
 export default function RootLayout({

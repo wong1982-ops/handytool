@@ -135,7 +135,7 @@ export function SwaggerUIPreview({ spec, lastValidSpec }: SwaggerUIPreviewProps)
                 value={baseUrl}
                 onChange={(e) => setBaseUrl(e.target.value)}
                 placeholder="https://api.example.com/v1"
-                className="w-full px-2.5 py-1.5 text-xs font-mono bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-[var(--ht-color-primary-500)] focus:border-[var(--ht-color-primary-500)]"
+                className="w-full px-2.5 py-1.5 text-xs font-mono bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-[var(--tk-color-primary-500)] focus:border-[var(--tk-color-primary-500)]"
               />
             </div>
 
@@ -147,7 +147,7 @@ export function SwaggerUIPreview({ spec, lastValidSpec }: SwaggerUIPreviewProps)
                 </label>
                 <button
                   onClick={addHeader}
-                  className="text-[10px] font-semibold text-[var(--ht-color-primary-500)] hover:text-[var(--ht-color-primary-600)] cursor-pointer"
+                  className="text-[10px] font-semibold text-[var(--tk-color-primary-500)] hover:text-[var(--tk-color-primary-600)] cursor-pointer"
                 >
                   + Add
                 </button>
@@ -160,14 +160,14 @@ export function SwaggerUIPreview({ spec, lastValidSpec }: SwaggerUIPreviewProps)
                       value={header.key}
                       onChange={(e) => updateHeader(i, 'key', e.target.value)}
                       placeholder="Header name"
-                      className="flex-1 min-w-0 px-2.5 py-1.5 text-xs font-mono bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-[var(--ht-color-primary-500)] focus:border-[var(--ht-color-primary-500)]"
+                      className="flex-1 min-w-0 px-2.5 py-1.5 text-xs font-mono bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-[var(--tk-color-primary-500)] focus:border-[var(--tk-color-primary-500)]"
                     />
                     <input
                       type="text"
                       value={header.value}
                       onChange={(e) => updateHeader(i, 'value', e.target.value)}
                       placeholder="Value"
-                      className="flex-1 min-w-0 px-2.5 py-1.5 text-xs font-mono bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-[var(--ht-color-primary-500)] focus:border-[var(--ht-color-primary-500)]"
+                      className="flex-1 min-w-0 px-2.5 py-1.5 text-xs font-mono bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-700 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-[var(--tk-color-primary-500)] focus:border-[var(--tk-color-primary-500)]"
                     />
                     {headers.length > 1 && (
                       <button

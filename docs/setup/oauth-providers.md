@@ -1,6 +1,6 @@
 # OAuth Provider Setup Guide
 
-This guide covers how to configure Google and Facebook OAuth for HandyTool using Supabase Authentication.
+This guide covers how to configure Google and Facebook OAuth for Toolk1t using Supabase Authentication.
 
 ---
 
@@ -54,12 +54,12 @@ This guide covers how to configure Google and Facebook OAuth for HandyTool using
 1. In the Supabase Dashboard, go to **Authentication** → **URL Configuration**.
 2. Set **Site URL** to your production domain, e.g.:
    ```
-   https://handytool.app
+   https://toolk1t.app
    ```
 3. Under **Redirect URLs**, add all allowed callback URLs:
    ```
    http://localhost:3000/auth/callback
-   https://handytool.app/auth/callback
+   https://toolk1t.app/auth/callback
    ```
 4. Save.
 

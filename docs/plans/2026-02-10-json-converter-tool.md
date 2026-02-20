@@ -43,7 +43,7 @@ This tool is **fully client-side** — no API needed. Conversion logic runs in t
 
 | # | Task | Description | Depends On | Assigned To |
 |---|------|-------------|------------|-------------|
-| U1 | Install js-yaml | Add `js-yaml` + `@types/js-yaml` to handytool-client | — | Dev |
+| U1 | Install js-yaml | Add `js-yaml` + `@types/js-yaml` to toolk1t-client | — | Dev |
 | U2 | Create converter-sidebar | Left sidebar: Core Actions (Beautify, Minify), Conversion (To YAML, To JSON with kbd), Export (Copy, Download). Accepts action callbacks. | — | Dev |
 | U3 | Create code-editor | Textarea with line numbers gutter, monospace font, placeholder. Controlled component with onChange. | — | Dev |
 | U4 | Create status-bar | Bottom bar: format type (JSON/YAML), encoding (UTF-8), line count, char count, validation badge. | — | Dev |

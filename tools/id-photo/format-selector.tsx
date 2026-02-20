@@ -52,7 +52,7 @@ export function FormatSelector({ selectedFormatId, onSelect }: FormatSelectorPro
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search country..."
-            className="w-full pl-8 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[var(--ht-color-secondary-500)] focus:border-[var(--ht-color-secondary-500)]"
+            className="w-full pl-8 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-[var(--tk-color-secondary-500)] focus:border-[var(--tk-color-secondary-500)]"
           />
         </div>
       </div>
@@ -68,7 +68,7 @@ export function FormatSelector({ selectedFormatId, onSelect }: FormatSelectorPro
                 onClick={() => onSelect(format)}
                 className={`w-full text-left px-3 py-2.5 rounded-lg transition-all cursor-pointer flex items-center gap-3 group ${
                   isSelected
-                    ? 'bg-[var(--ht-color-secondary-500)]/10 border border-[var(--ht-color-secondary-500)]/30'
+                    ? 'bg-[var(--tk-color-secondary-500)]/10 border border-[var(--tk-color-secondary-500)]/30'
                     : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent'
                 }`}
                 aria-pressed={isSelected}
@@ -81,7 +81,7 @@ export function FormatSelector({ selectedFormatId, onSelect }: FormatSelectorPro
                 {/* Label */}
                 <div className="flex-1 min-w-0">
                   <div className={`text-xs font-bold truncate ${
-                    isSelected ? 'text-[var(--ht-color-secondary-500)]' : 'text-slate-900 dark:text-white'
+                    isSelected ? 'text-[var(--tk-color-secondary-500)]' : 'text-slate-900 dark:text-white'
                   }`}>
                     {format.name}
                   </div>
@@ -92,7 +92,7 @@ export function FormatSelector({ selectedFormatId, onSelect }: FormatSelectorPro
 
                 {/* Check */}
                 {isSelected && (
-                  <svg className="w-4 h-4 text-[var(--ht-color-secondary-500)] shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg className="w-4 h-4 text-[var(--tk-color-secondary-500)] shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                   </svg>
                 )}

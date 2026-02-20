@@ -13,7 +13,7 @@
 ### Task 1: Add SVG Converter to tool registry
 
 **Files:**
-- Modify: `handytool-client/lib/tools.tsx:100-111` (insert after Image Editor entry, before Currency Exchange)
+- Modify: `toolk1t-client/lib/tools.tsx:100-111` (insert after Image Editor entry, before Currency Exchange)
 
 **Step 1: Add the entry**
 
@@ -40,7 +40,7 @@ Open http://localhost:3000/tools — confirm SVG Converter card appears after Im
 **Step 3: Commit**
 
 ```bash
-git add handytool-client/lib/tools.tsx
+git add toolk1t-client/lib/tools.tsx
 git commit -m "feat(svg-converter): add to tool registry"
 ```
 
@@ -49,12 +49,12 @@ git commit -m "feat(svg-converter): add to tool registry"
 ### Task 2: Install react-image-crop
 
 **Files:**
-- Modify: `handytool-client/package.json` (via pnpm)
+- Modify: `toolk1t-client/package.json` (via pnpm)
 
 **Step 1: Install the package**
 
 ```bash
-cd handytool-client && pnpm add react-image-crop
+cd toolk1t-client && pnpm add react-image-crop
 ```
 
 **Step 2: Verify install**
@@ -68,7 +68,7 @@ Expected: index.js, ReactCrop.css, and type declarations exist.
 **Step 3: Commit**
 
 ```bash
-git add handytool-client/package.json handytool-client/pnpm-lock.yaml
+git add toolk1t-client/package.json toolk1t-client/pnpm-lock.yaml
 git commit -m "chore: add react-image-crop dependency"
 ```
 
@@ -77,7 +77,7 @@ git commit -m "chore: add react-image-crop dependency"
 ### Task 3: Add types for crop/resize and editor phase
 
 **Files:**
-- Modify: `handytool-client/tools/svg-converter/types.ts`
+- Modify: `toolk1t-client/tools/svg-converter/types.ts`
 
 **Step 1: Add new types at the end of the file**
 
@@ -104,7 +104,7 @@ export interface ResizeData {
 **Step 2: Commit**
 
 ```bash
-git add handytool-client/tools/svg-converter/types.ts
+git add toolk1t-client/tools/svg-converter/types.ts
 git commit -m "feat(svg-converter): add crop/resize types and editor phase"
 ```
 
@@ -113,7 +113,7 @@ git commit -m "feat(svg-converter): add crop/resize types and editor phase"
 ### Task 4: Build the CropResizeEditor component
 
 **Files:**
-- Create: `handytool-client/tools/svg-converter/crop-resize-editor.tsx`
+- Create: `toolk1t-client/tools/svg-converter/crop-resize-editor.tsx`
 
 **Step 1: Create the component**
 
@@ -358,7 +358,7 @@ export function CropResizeEditor({ imageMeta, onConfirm, onSkip }: CropResizeEdi
 **Step 2: Commit**
 
 ```bash
-git add handytool-client/tools/svg-converter/crop-resize-editor.tsx
+git add toolk1t-client/tools/svg-converter/crop-resize-editor.tsx
 git commit -m "feat(svg-converter): add CropResizeEditor component"
 ```
 
@@ -367,7 +367,7 @@ git commit -m "feat(svg-converter): add CropResizeEditor component"
 ### Task 5: Wire CropResizeEditor into page.tsx
 
 **Files:**
-- Modify: `handytool-client/app/tools/svg-converter/page.tsx`
+- Modify: `toolk1t-client/app/tools/svg-converter/page.tsx`
 
 **Step 1: Update imports**
 
@@ -560,7 +560,7 @@ And wrap the mobile settings overlay similarly:
 **Step 11: Commit**
 
 ```bash
-git add handytool-client/app/tools/svg-converter/page.tsx
+git add toolk1t-client/app/tools/svg-converter/page.tsx
 git commit -m "feat(svg-converter): wire crop/resize editor into page flow"
 ```
 
@@ -569,7 +569,7 @@ git commit -m "feat(svg-converter): wire crop/resize editor into page flow"
 ### Task 6: Update StatusBar to show crop phase
 
 **Files:**
-- Modify: `handytool-client/tools/svg-converter/status-bar.tsx`
+- Modify: `toolk1t-client/tools/svg-converter/status-bar.tsx`
 
 **Step 1: Add crop state to StatusBar**
 
@@ -618,7 +618,7 @@ In `page.tsx`, update the `<StatusBar>` to include `editorPhase`:
 **Step 3: Commit**
 
 ```bash
-git add handytool-client/tools/svg-converter/status-bar.tsx handytool-client/app/tools/svg-converter/page.tsx
+git add toolk1t-client/tools/svg-converter/status-bar.tsx toolk1t-client/app/tools/svg-converter/page.tsx
 git commit -m "feat(svg-converter): show crop phase in status bar"
 ```
 
@@ -629,7 +629,7 @@ git commit -m "feat(svg-converter): show crop phase in status bar"
 **Step 1: Run lint**
 
 ```bash
-cd handytool-client && pnpm lint
+cd toolk1t-client && pnpm lint
 ```
 
 Fix any issues.
@@ -637,7 +637,7 @@ Fix any issues.
 **Step 2: Run build**
 
 ```bash
-cd handytool-client && pnpm build
+cd toolk1t-client && pnpm build
 ```
 
 Ensure no TypeScript or build errors.

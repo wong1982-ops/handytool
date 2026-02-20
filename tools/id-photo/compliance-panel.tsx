@@ -96,7 +96,7 @@ export function CompliancePanel({ compliance }: CompliancePanelProps) {
       {/* Header with status badge */}
       <div className="flex items-center justify-between">
         <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
-          <svg className={`w-3.5 h-3.5 ${allPass ? 'text-green-500' : hasFailure ? 'text-red-500' : 'text-[var(--ht-color-secondary-500)]'}`} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className={`w-3.5 h-3.5 ${allPass ? 'text-green-500' : hasFailure ? 'text-red-500' : 'text-[var(--tk-color-secondary-500)]'}`} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
           </svg>
           Compliance Checklist

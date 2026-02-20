@@ -53,7 +53,7 @@ export default function SpeedTestPage() {
     <main className="flex-1 flex flex-col items-center justify-start py-8 md:py-4 px-4 max-w-7xl mx-auto w-full">
       <nav aria-label="Breadcrumb" className="w-full mb-6 md:mb-3">
         <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-          <li><a href="/tools" className="hover:text-[var(--ht-color-primary-500)] transition-colors">Home</a></li>
+          <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
           <li aria-hidden="true">/</li>
           <li aria-current="page" className="text-slate-900 dark:text-white font-medium">Speed Test</li>
         </ol>

@@ -171,14 +171,14 @@ Progress indicator: "Profile 60% complete" to encourage completion.
 
 | Component | Repo | Location |
 |---|---|---|
-| Auth callback route | handytool-client | `app/auth/callback/route.ts` |
-| Sign-in modal | handytool-client | `components/auth/` |
-| Header auth state | handytool-client | `components/layout/header.tsx` |
-| `usePageTracking` hook | handytool-client | `lib/hooks/use-page-tracking.ts` |
-| Tool layout wrapper | handytool-client | `app/tools/layout.tsx` |
-| Profile page | handytool-client | `app/profile/page.tsx` |
-| Profile prompt banner | handytool-client | `components/auth/profile-prompt.tsx` |
-| Analytics dashboard | handytool-admin | `app/analytics/page.tsx` |
+| Auth callback route | toolk1t-client | `app/auth/callback/route.ts` |
+| Sign-in modal | toolk1t-client | `components/auth/` |
+| Header auth state | toolk1t-client | `components/layout/header.tsx` |
+| `usePageTracking` hook | toolk1t-client | `lib/hooks/use-page-tracking.ts` |
+| Tool layout wrapper | toolk1t-client | `app/tools/layout.tsx` |
+| Profile page | toolk1t-client | `app/profile/page.tsx` |
+| Profile prompt banner | toolk1t-client | `components/auth/profile-prompt.tsx` |
+| Analytics dashboard | toolk1t-admin | `app/analytics/page.tsx` |
 | DB migrations | Supabase | Applied via Supabase MCP |
 | RLS policies | Supabase | Applied via Supabase MCP |
 

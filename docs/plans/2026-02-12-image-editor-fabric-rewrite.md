@@ -13,13 +13,13 @@
 ## Task 1: Install Fabric.js
 
 **Files:**
-- Modify: `handytool-client/package.json`
+- Modify: `toolk1t-client/package.json`
 
 **Step 1: Install fabric**
 
 Run:
 ```bash
-cd handytool-client && pnpm add fabric
+cd toolk1t-client && pnpm add fabric
 ```
 
 **Step 2: Verify it resolves**
@@ -34,13 +34,13 @@ Expected: Version 7.x.x (or 6.x.x)
 
 Fabric.js uses browser APIs. Verify the Next.js build still passes:
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors (fabric won't be imported at module scope, only inside `'use client'` components)
 
 **Step 4: Commit**
 
 ```bash
-cd handytool-client
+cd toolk1t-client
 git add package.json pnpm-lock.yaml
 git commit -m "feat(image-editor): install fabric.js for canvas rewrite"
 ```
@@ -50,7 +50,7 @@ git commit -m "feat(image-editor): install fabric.js for canvas rewrite"
 ## Task 2: Create useFabricCanvas hook
 
 **Files:**
-- Create: `handytool-client/tools/image-editor/use-fabric-canvas.ts`
+- Create: `toolk1t-client/tools/image-editor/use-fabric-canvas.ts`
 
 This is the core abstraction. It manages the Fabric.js canvas lifecycle and exposes methods for the page component to call. All Fabric.js imports and interactions are contained here.
 
@@ -623,7 +623,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
 
 **Step 2: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 
 Possible issues:
 - Fabric.js v7 types may not perfectly match. Use `any` casts where needed (the hook is the only file touching Fabric internals).
@@ -634,7 +634,7 @@ Expected: 0 errors (or fix type issues with `any` where Fabric types are ambiguo
 **Step 3: Commit**
 
 ```bash
-cd handytool-client
+cd toolk1t-client
 git add tools/image-editor/use-fabric-canvas.ts
 git commit -m "feat(image-editor): Fabric.js canvas hook with tools, filters, undo/redo, export"
 ```
@@ -644,7 +644,7 @@ git commit -m "feat(image-editor): Fabric.js canvas hook with tools, filters, un
 ## Task 3: Rewrite page.tsx to use Fabric canvas
 
 **Files:**
-- Modify: `handytool-client/app/tools/image-editor/page.tsx`
+- Modify: `toolk1t-client/app/tools/image-editor/page.tsx`
 
 This is the biggest rewrite. The UI layout stays the same — only the state management and canvas rendering change.
 
@@ -909,13 +909,13 @@ Remove `imageUrl`, `imageSize` state declarations — these are now managed by t
 
 **Step 10: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 11: Commit**
 
 ```bash
-cd handytool-client
+cd toolk1t-client
 git add app/tools/image-editor/page.tsx
 git commit -m "feat(image-editor): rewrite page to use Fabric.js canvas"
 ```
@@ -925,7 +925,7 @@ git commit -m "feat(image-editor): rewrite page to use Fabric.js canvas"
 ## Task 4: Wire adjustments panel to Fabric filters
 
 **Files:**
-- Modify: `handytool-client/tools/image-editor/adjustments-panel.tsx`
+- Modify: `toolk1t-client/tools/image-editor/adjustments-panel.tsx`
 
 The adjustments panel UI stays unchanged. The only change is removing the CSS filter strings from the `FILTERS` array since they're no longer used (the page component maps preset names to Fabric filters via the hook).
 
@@ -960,13 +960,13 @@ Update imports in page.tsx if `FILTERS` type changed.
 
 **Step 3: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 4: Commit**
 
 ```bash
-cd handytool-client
+cd toolk1t-client
 git add tools/image-editor/adjustments-panel.tsx
 git commit -m "feat(image-editor): remove CSS filter strings, Fabric handles filters"
 ```
@@ -977,7 +977,7 @@ git commit -m "feat(image-editor): remove CSS filter strings, Fabric handles fil
 
 **Step 1: Start client**
 
-Run: `cd handytool-client && pnpm dev`
+Run: `cd toolk1t-client && pnpm dev`
 
 **Step 2: Test basic flow**
 
@@ -1026,7 +1026,7 @@ Run: `cd handytool-client && pnpm dev`
 
 **Step 9: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 10: Commit fixes**
@@ -1034,7 +1034,7 @@ Expected: 0 errors
 If any fixes were needed:
 
 ```bash
-cd handytool-client
+cd toolk1t-client
 git add -A
 git commit -m "fix(image-editor): end-to-end verification fixes"
 ```

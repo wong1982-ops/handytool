@@ -657,7 +657,7 @@ import type { Metadata } from 'next'
 import { ProfileForm } from './profile-form'
 
 export const metadata: Metadata = {
-  title: 'My Profile | HandyTool',
+  title: 'My Profile | Toolk1t',
 }
 
 export default function ProfilePage() {
@@ -876,7 +876,7 @@ import { AnalyticsDashboard } from './analytics-dashboard'
 import { fetchToolPopularity, fetchDailyTraffic, fetchUserStats, fetchDemographics } from '@/lib/analytics'
 
 export const metadata: Metadata = {
-  title: 'Analytics | HandyTool Admin',
+  title: 'Analytics | Toolk1t Admin',
 }
 
 export default async function AnalyticsPage() {

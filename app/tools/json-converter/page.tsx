@@ -360,7 +360,7 @@ export default function JsonConverterPage() {
       <div className="relative z-0 px-4 md:px-6 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between">
         <nav aria-label="Breadcrumb">
           <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-            <li><a href="/tools" className="hover:text-[var(--ht-color-primary-500)] transition-colors">Home</a></li>
+            <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
             <li aria-hidden="true">/</li>
             <li aria-current="page" className="text-slate-900 dark:text-white font-medium">JSON Converter</li>
           </ol>
@@ -445,7 +445,7 @@ export default function JsonConverterPage() {
             <button
               onClick={handleSwap}
               disabled={!output.trim()}
-              className="w-7 h-7 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center text-slate-400 hover:text-[var(--ht-color-secondary-500)] disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+              className="w-7 h-7 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center text-slate-400 hover:text-[var(--tk-color-secondary-500)] disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
               title="Swap result to input"
               aria-label="Swap result to input"
             >
@@ -534,7 +534,7 @@ export default function JsonConverterPage() {
             <button
               onClick={handleSwap}
               disabled={!output.trim()}
-              className="group w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center text-slate-400 hover:text-[var(--ht-color-secondary-500)] hover:border-[var(--ht-color-secondary-500)]/50 hover:shadow-md disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-200 disabled:hover:shadow-sm transition-all cursor-pointer"
+              className="group w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center text-slate-400 hover:text-[var(--tk-color-secondary-500)] hover:border-[var(--tk-color-secondary-500)]/50 hover:shadow-md disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-200 disabled:hover:shadow-sm transition-all cursor-pointer"
               title="Swap result to input"
               aria-label="Swap result to input"
             >
@@ -628,7 +628,7 @@ export default function JsonConverterPage() {
           {activeTab === 'input' && input.trim() && (
             <button
               onClick={handleBeautify}
-              className="absolute bottom-14 right-4 bg-[var(--ht-color-secondary-500)] text-slate-900 h-10 pl-3 pr-4 rounded-full font-bold flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer text-xs"
+              className="absolute bottom-14 right-4 bg-[var(--tk-color-secondary-500)] text-slate-900 h-10 pl-3 pr-4 rounded-full font-bold flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer text-xs"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

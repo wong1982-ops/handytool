@@ -172,7 +172,7 @@ function ToolbarButton({ icon, label, description, kbd, onClick, active, disable
         disabled
           ? 'opacity-30 cursor-not-allowed'
           : active
-            ? 'bg-[var(--ht-color-secondary-500)]/10 text-[var(--ht-color-secondary-500)] font-semibold'
+            ? 'bg-[var(--tk-color-secondary-500)]/10 text-[var(--tk-color-secondary-500)] font-semibold'
             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
       }`}
     >

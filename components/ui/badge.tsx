@@ -7,7 +7,7 @@ interface BadgeProps {
 }
 
 const variantStyles = {
-  default: 'text-[var(--ht-color-primary-500)]',
+  default: 'text-[var(--tk-color-primary-500)]',
   success: 'text-green-500',
   warning: 'text-yellow-500',
   error: 'text-red-500',

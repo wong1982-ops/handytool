@@ -266,7 +266,7 @@ export default function CurrencyExchangePage() {
       <nav aria-label="Breadcrumb" className="mb-6">
         <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
           <li>
-            <a href="/tools" className="hover:text-[var(--ht-color-primary-500)] transition-colors">Home</a>
+            <a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a>
           </li>
           <li aria-hidden="true">/</li>
           <li aria-current="page" className="text-slate-900 dark:text-white font-medium">Currency Exchange</li>

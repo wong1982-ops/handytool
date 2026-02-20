@@ -1,17 +1,18 @@
 # Changelog
 
-## Session 1 — 2026-02-09: Project Bootstrap
+## Session 1 — 2026-02-09: Project Bootstrap (Toolk1t)
 
 ### What was done
-Full project initialization from an empty directory to a working Next.js + Supabase stack with OpenClaw multi-agent AI project management.
+Full project initialization from an empty directory to a working Next.js + Supabase stack with OpenClaw multi-agent AI project management for Toolk1t.
 
 ### Changes
 
-#### 1. Next.js Project Scaffold
+#### 1. Next.js Project Scaffold (Toolk1t)
 - Scaffolded with `create-next-app@16.1.6` (TypeScript, Tailwind CSS, App Router, Turbopack)
 - Root-level `app/` directory (no `src/`)
 - Files: `app/layout.tsx`, `app/page.tsx`, `app/globals.css`, `next.config.ts`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.mjs`, `eslint.config.mjs`
 - Commit: `072c2a7` — "Initial Next.js project scaffold"
+- Project name: Toolk1t
 
 #### 2. Supabase SSR Integration
 - Installed `@supabase/supabase-js` and `@supabase/ssr`
@@ -22,9 +23,9 @@ Full project initialization from an empty directory to a working Next.js + Supab
 - Created `.env.local` with placeholder Supabase credentials
 - Commit: `01e9c00` — "Add Supabase SSR client utilities and middleware"
 
-#### 3. Git Repository
+#### 3. Git Repository (Toolk1t)
 - Initialized git repo on `main` branch
-- Remote origin: `git@github.com:wong1982-ops/handytool.git`
+- Remote origin: `git@github.com:wong1982-ops/toolk1t.git`
 - 2 commits total
 
 #### 4. Claude Code Permissions

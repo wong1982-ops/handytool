@@ -122,7 +122,7 @@ export function CurrencySelect({ id, value, currencies, onChange }: CurrencySele
         id={id}
         type="button"
         onClick={() => (open ? closeDropdown() : openDropdown())}
-        className="w-full flex items-center gap-2.5 pl-3 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[var(--ht-color-primary-500)] focus:border-[var(--ht-color-primary-500)] outline-none font-semibold cursor-pointer text-left"
+        className="w-full flex items-center gap-2.5 pl-3 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[var(--tk-color-primary-500)] focus:border-[var(--tk-color-primary-500)] outline-none font-semibold cursor-pointer text-left"
         aria-haspopup="listbox"
         aria-expanded={open}
       >
@@ -149,7 +149,7 @@ export function CurrencySelect({ id, value, currencies, onChange }: CurrencySele
                 value={filter}
                 onChange={(e) => { setFilter(e.target.value); setActiveIndex(-1) }}
                 placeholder="Search currency..."
-                className="w-full pl-8 pr-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[var(--ht-color-primary-500)] focus:border-transparent outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
+                className="w-full pl-8 pr-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[var(--tk-color-primary-500)] focus:border-transparent outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
                 aria-label="Filter currencies"
                 autoComplete="off"
               />
@@ -175,7 +175,7 @@ export function CurrencySelect({ id, value, currencies, onChange }: CurrencySele
                   onMouseEnter={() => setActiveIndex(index)}
                   className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-colors ${
                     index === activeIndex
-                      ? 'bg-[var(--ht-color-primary-500)]/10'
+                      ? 'bg-[var(--tk-color-primary-500)]/10'
                       : code === value
                         ? 'bg-slate-50 dark:bg-slate-800/50'
                         : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
@@ -185,7 +185,7 @@ export function CurrencySelect({ id, value, currencies, onChange }: CurrencySele
                   <span className="font-semibold text-sm text-slate-900 dark:text-white">{code}</span>
                   <span className="text-xs text-slate-400 truncate">{currencies[code]}</span>
                   {code === value && (
-                    <svg className="w-4 h-4 text-[var(--ht-color-primary-500)] ml-auto shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg className="w-4 h-4 text-[var(--tk-color-primary-500)] ml-auto shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   )}

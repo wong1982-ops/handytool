@@ -1,6 +1,6 @@
 # Implementation Workflow Guideline
 
-This document defines the standard workflow for implementing features in the HandyTool workspace. Every feature — whether API or UI — follows this pipeline to ensure clarity, quality, and accountability.
+This document defines the standard workflow for implementing features in the Toolk1t workspace. Every feature — whether API or UI — follows this pipeline to ensure clarity, quality, and accountability.
 
 ---
 
@@ -199,7 +199,7 @@ What to cache, TTL, invalidation.
 
 1. Read the plan doc and architecture design
 2. Create/update database schema if needed
-3. Implement API endpoints in `handytool-api`
+3. Implement API endpoints in `toolk1t-api`
    - Follow the response helper pattern (`lib/api/response.ts`)
    - Add Zod validation for all inputs
    - Handle all error cases from the architecture doc

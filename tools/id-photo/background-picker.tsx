@@ -38,13 +38,13 @@ export function BackgroundPicker({ bgColor, onChange }: BackgroundPickerProps) {
               <div
                 className={`w-10 h-10 rounded-full border-2 transition-all shadow-sm ${
                   isSelected
-                    ? 'border-[var(--ht-color-secondary-500)] ring-2 ring-[var(--ht-color-secondary-500)]/30 scale-110'
+                    ? 'border-[var(--tk-color-secondary-500)] ring-2 ring-[var(--tk-color-secondary-500)]/30 scale-110'
                     : 'border-slate-200 dark:border-slate-600 group-hover:border-slate-400 dark:group-hover:border-slate-500'
                 }`}
                 style={{ backgroundColor: color }}
               />
               <span className={`text-[9px] font-bold ${
-                isSelected ? 'text-[var(--ht-color-secondary-500)]' : 'text-slate-500 dark:text-slate-400'
+                isSelected ? 'text-[var(--tk-color-secondary-500)]' : 'text-slate-500 dark:text-slate-400'
               }`}>
                 {label}
               </span>
@@ -62,7 +62,7 @@ export function BackgroundPicker({ bgColor, onChange }: BackgroundPickerProps) {
           <div
             className={`w-10 h-10 rounded-full border-2 transition-all shadow-sm flex items-center justify-center ${
               isCustom
-                ? 'border-[var(--ht-color-secondary-500)] ring-2 ring-[var(--ht-color-secondary-500)]/30 scale-110'
+                ? 'border-[var(--tk-color-secondary-500)] ring-2 ring-[var(--tk-color-secondary-500)]/30 scale-110'
                 : 'border-slate-200 dark:border-slate-600 group-hover:border-slate-400 dark:group-hover:border-slate-500'
             }`}
             style={isCustom ? { backgroundColor: bgColor } : undefined}
@@ -74,7 +74,7 @@ export function BackgroundPicker({ bgColor, onChange }: BackgroundPickerProps) {
             )}
           </div>
           <span className={`text-[9px] font-bold ${
-            isCustom ? 'text-[var(--ht-color-secondary-500)]' : 'text-slate-500 dark:text-slate-400'
+            isCustom ? 'text-[var(--tk-color-secondary-500)]' : 'text-slate-500 dark:text-slate-400'
           }`}>
             Custom
           </span>

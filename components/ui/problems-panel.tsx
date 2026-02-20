@@ -65,7 +65,7 @@ export function ProblemsPanel({ errors, onGoToLine }: ProblemsPanelProps) {
               <span className="text-slate-600 dark:text-slate-300">{err.message}</span>
               <button
                 onClick={() => onGoToLine(err.line)}
-                className="shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold text-[var(--ht-color-primary-500)] hover:bg-[var(--ht-color-primary-500)]/10 transition-colors cursor-pointer"
+                className="shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold text-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-500)]/10 transition-colors cursor-pointer"
                 title={`Jump to line ${err.line}`}
               >
                 Ln {err.line}

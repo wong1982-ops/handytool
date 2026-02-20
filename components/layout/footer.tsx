@@ -11,7 +11,7 @@ interface FooterProps {
 }
 
 export function Footer({
-  brandName = 'HandyTool',
+  brandName = 'Toolk1t',
   links = [
     { label: 'Terms of Service', href: '#' },
     { label: 'Privacy Policy', href: '#' },
@@ -34,7 +34,7 @@ export function Footer({
             <Link
               key={link.href + link.label}
               href={link.href}
-              className="text-sm text-slate-500 hover:text-[var(--ht-color-primary-500)] transition-colors"
+              className="text-sm text-slate-500 hover:text-[var(--tk-color-primary-500)] transition-colors"
             >
               {link.label}
             </Link>

@@ -20,7 +20,7 @@ export function CopyButton({ text, label = 'Copy', className = '' }: CopyButtonP
   return (
     <button
       onClick={handleCopy}
-      className={`flex items-center gap-2 px-6 py-3 bg-[var(--ht-color-primary-500)] text-white rounded-xl font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-[var(--ht-color-primary-500)]/30 cursor-pointer ${className}`}
+      className={`flex items-center gap-2 px-6 py-3 bg-[var(--tk-color-primary-500)] text-white rounded-xl font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-[var(--tk-color-primary-500)]/30 cursor-pointer ${className}`}
     >
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         {copied ? (

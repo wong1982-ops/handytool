@@ -22,11 +22,11 @@ html {
 }
 
 body {
-  font-family: var(--ht-font-family-sans);
+  font-family: var(--tk-font-family-sans);
   font-size: $font-size-base;
   line-height: $line-height-normal;
-  color: var(--ht-color-text);
-  background-color: var(--ht-color-bg);
+  color: var(--tk-color-text);
+  background-color: var(--tk-color-bg);
 }
 
 img,
@@ -38,11 +38,11 @@ svg {
 }
 
 a {
-  color: var(--ht-color-primary-600);
+  color: var(--tk-color-primary-600);
   text-decoration: none;
 
   &:hover {
-    color: var(--ht-color-primary-700);
+    color: var(--tk-color-primary-700);
   }
 }
 
@@ -50,12 +50,12 @@ a {
 // Fluid headings
 // ----------------------------------------------------------
 
-h1 { font-size: var(--ht-heading-1); line-height: $line-height-tight; font-weight: $font-weight-bold; }
-h2 { font-size: var(--ht-heading-2); line-height: $line-height-tight; font-weight: $font-weight-bold; }
-h3 { font-size: var(--ht-heading-3); line-height: $line-height-tight; font-weight: $font-weight-semibold; }
-h4 { font-size: var(--ht-heading-4); line-height: $line-height-normal; font-weight: $font-weight-semibold; }
-h5 { font-size: var(--ht-heading-5); line-height: $line-height-normal; font-weight: $font-weight-medium; }
-h6 { font-size: var(--ht-heading-6); line-height: $line-height-normal; font-weight: $font-weight-medium; }
+h1 { font-size: var(--tk-heading-1); line-height: $line-height-tight; font-weight: $font-weight-bold; }
+h2 { font-size: var(--tk-heading-2); line-height: $line-height-tight; font-weight: $font-weight-bold; }
+h3 { font-size: var(--tk-heading-3); line-height: $line-height-tight; font-weight: $font-weight-semibold; }
+h4 { font-size: var(--tk-heading-4); line-height: $line-height-normal; font-weight: $font-weight-semibold; }
+h5 { font-size: var(--tk-heading-5); line-height: $line-height-normal; font-weight: $font-weight-medium; }
+h6 { font-size: var(--tk-heading-6); line-height: $line-height-normal; font-weight: $font-weight-medium; }
 
 // ----------------------------------------------------------
 // Container utility

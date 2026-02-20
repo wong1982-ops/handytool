@@ -115,7 +115,7 @@ function getInitials(name: string, email?: string): string {
 }
 
 const inputClasses =
-  'w-full px-3 py-2.5 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ht-color-primary-500)] transition-shadow'
+  'w-full px-3 py-2.5 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] transition-shadow'
 
 const labelClasses = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5'
 
@@ -256,7 +256,7 @@ export function ProfileForm() {
   if (authLoading || (!user && true)) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-[var(--ht-color-primary-500)]" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-[var(--tk-color-primary-500)]" />
       </div>
     )
   }
@@ -264,7 +264,7 @@ export function ProfileForm() {
   if (profileLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-[var(--ht-color-primary-500)]" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-[var(--tk-color-primary-500)]" />
       </div>
     )
   }
@@ -283,7 +283,7 @@ export function ProfileForm() {
             className="w-20 h-20 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700"
           />
         ) : (
-          <div className="w-20 h-20 rounded-full bg-[var(--ht-color-primary-500)] flex items-center justify-center text-white text-2xl font-bold">
+          <div className="w-20 h-20 rounded-full bg-[var(--tk-color-primary-500)] flex items-center justify-center text-white text-2xl font-bold">
             {initials}
           </div>
         )}
@@ -297,7 +297,7 @@ export function ProfileForm() {
           </div>
           <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
             <div
-              className="h-full rounded-full bg-[var(--ht-color-primary-500)] transition-all duration-300"
+              className="h-full rounded-full bg-[var(--tk-color-primary-500)] transition-all duration-300"
               style={{ width: `${completion}%` }}
             />
           </div>
@@ -416,8 +416,8 @@ export function ProfileForm() {
                   onClick={() => toggleInterest(interest.value)}
                   className={`min-h-[44px] px-4 py-2 rounded-full text-sm font-medium transition-all ${
                     selected
-                      ? 'bg-[var(--ht-color-primary-500)] text-white shadow-md'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-[var(--ht-color-primary-500)] hover:text-[var(--ht-color-primary-500)]'
+                      ? 'bg-[var(--tk-color-primary-500)] text-white shadow-md'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-[var(--tk-color-primary-500)] hover:text-[var(--tk-color-primary-500)]'
                   }`}
                   aria-pressed={selected}
                 >
@@ -446,7 +446,7 @@ export function ProfileForm() {
         <button
           type="submit"
           disabled={saving}
-          className="min-h-[44px] w-full px-6 py-3 rounded-lg bg-[var(--ht-color-primary-500)] text-white font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="min-h-[44px] w-full px-6 py-3 rounded-lg bg-[var(--tk-color-primary-500)] text-white font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {saving && (
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />

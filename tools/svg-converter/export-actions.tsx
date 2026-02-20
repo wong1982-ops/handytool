@@ -37,9 +37,9 @@ export function ExportActions({
           className="text-[10px] font-bold uppercase tracking-wider"
           style={{
             color: isReady
-              ? 'var(--ht-color-secondary-500, #32A9D9)'
+              ? 'var(--tk-color-secondary-500, #32A9D9)'
               : isProcessing
-                ? 'var(--ht-color-secondary-500, #32A9D9)'
+                ? 'var(--tk-color-secondary-500, #32A9D9)'
                 : 'rgba(148, 163, 184, 0.5)',
           }}
         >
@@ -79,7 +79,7 @@ export function ExportActions({
         style={{
           backgroundColor: disabled
             ? 'rgba(50, 169, 217, 0.3)'
-            : 'var(--ht-color-secondary-500, #32A9D9)',
+            : 'var(--tk-color-secondary-500, #32A9D9)',
           boxShadow: disabled
             ? 'none'
             : '0 4px 14px rgba(50, 169, 217, 0.3)',

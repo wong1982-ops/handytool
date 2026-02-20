@@ -104,7 +104,7 @@ export function StatusBar({ conversionState, imageMeta, vectorResult, editorPhas
         {vectorResult && conversionState === 'ready' && (
           <>
             <span className="w-px h-3 bg-slate-700 hidden md:block" aria-hidden="true" />
-            <span className="hidden md:inline text-[var(--ht-color-secondary-500)]">
+            <span className="hidden md:inline text-[var(--tk-color-secondary-500)]">
               {vectorResult.pathCount} paths &middot; {formatBytes(vectorResult.estimatedSize)}
             </span>
           </>

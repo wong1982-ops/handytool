@@ -21,7 +21,7 @@ export function TechInfoPanel({ data }: TechInfoPanelProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-slate-900 dark:text-white text-lg font-bold">Technical Information</h2>
-        <svg className="w-5 h-5 text-[var(--ht-color-primary-500)]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="w-5 h-5 text-[var(--tk-color-primary-500)]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
         </svg>
       </div>
@@ -31,7 +31,7 @@ export function TechInfoPanel({ data }: TechInfoPanelProps) {
         {/* ISP Provider */}
         <InfoCard
           icon={
-            <svg className="w-5 h-5 text-[var(--ht-color-primary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-5 h-5 text-[var(--tk-color-primary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
             </svg>
           }
@@ -42,7 +42,7 @@ export function TechInfoPanel({ data }: TechInfoPanelProps) {
         {/* Country */}
         <InfoCard
           icon={
-            <svg className="w-5 h-5 text-[var(--ht-color-primary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-5 h-5 text-[var(--tk-color-primary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21V3h1l8 5v13H3zm10-13l8-5v18h-8V8z" />
             </svg>
           }
@@ -54,7 +54,7 @@ export function TechInfoPanel({ data }: TechInfoPanelProps) {
         {/* City & Region */}
         <InfoCard
           icon={
-            <svg className="w-5 h-5 text-[var(--ht-color-primary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-5 h-5 text-[var(--tk-color-primary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
@@ -66,7 +66,7 @@ export function TechInfoPanel({ data }: TechInfoPanelProps) {
         {/* Coordinates */}
         <InfoCard
           icon={
-            <svg className="w-5 h-5 text-[var(--ht-color-primary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-5 h-5 text-[var(--tk-color-primary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" />
             </svg>
           }

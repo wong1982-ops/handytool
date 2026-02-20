@@ -4,7 +4,7 @@ import { fetchToolPopularity, fetchDailyTraffic, fetchUserStats, fetchDemographi
 import { AnalyticsDashboard } from './analytics-dashboard'
 
 export const metadata: Metadata = {
-  title: 'Analytics | HandyTool Admin',
+  title: 'Analytics | Toolk1t Admin',
 }
 
 export default async function AnalyticsPage() {

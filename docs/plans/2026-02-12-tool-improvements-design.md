@@ -17,6 +17,10 @@ Three workstreams to fix dead UI, make mock features real, and upgrade the Image
 
 ---
 
+**Note:** All file paths in this design document use the Toolk1t project naming convention.
+
+---
+
 ## Workstream A: Quick Wins (13 fixes, 7 tools)
 
 ### Dead Feature Removal
@@ -89,17 +93,17 @@ interface FaceAnalysisResult {
 
 ### Server Files (new)
 
-- `handytool-api/lib/face/types.ts` — Zod schema + interfaces
-- `handytool-api/lib/face/validation.ts` — image validation (reuse SVG pattern)
-- `handytool-api/lib/face/analyze.ts` — face-api.js wrapper, compliance scoring
-- `handytool-api/app/api/v1/id-photo/analyze/route.ts` — POST endpoint
+- `toolk1t-api/lib/face/types.ts` — Zod schema + interfaces
+- `toolk1t-api/lib/face/validation.ts` — image validation (reuse SVG pattern)
+- `toolk1t-api/lib/face/analyze.ts` — face-api.js wrapper, compliance scoring
+- `toolk1t-api/app/api/v1/id-photo/analyze/route.ts` — POST endpoint
 
 ### Client Changes
 
-- New: `handytool-client/tools/id-photo/use-face-analysis.ts` — hook calling API on photo upload
-- Modify: `handytool-client/app/tools/id-photo/page.tsx` — replace `setTimeout` mock with hook
-- Modify: `handytool-client/tools/id-photo/settings-panel.tsx` — wire real compliance data
-- Modify: `handytool-client/tools/id-photo/photo-canvas.tsx` — add face overlay rectangle (green/amber/red)
+- New: `toolk1t-client/tools/id-photo/use-face-analysis.ts` — hook calling API on photo upload
+- Modify: `toolk1t-client/app/tools/id-photo/page.tsx` — replace `setTimeout` mock with hook
+- Modify: `toolk1t-client/tools/id-photo/settings-panel.tsx` — wire real compliance data
+- Modify: `toolk1t-client/tools/id-photo/photo-canvas.tsx` — add face overlay rectangle (green/amber/red)
 
 ### What stays unchanged
 
@@ -113,7 +117,7 @@ interface FaceAnalysisResult {
 
 ### Dependency
 
-Install: `pnpm add fabric` in handytool-client
+Install: `pnpm add fabric` in toolk1t-client
 
 ### Canvas Architecture
 
@@ -170,10 +174,10 @@ canvas.renderAll()
 
 ### Files Changed
 
-- New: `handytool-client/tools/image-editor/use-fabric-canvas.ts` — Fabric init, tool switching, undo/redo, export
-- Rewrite: `handytool-client/app/tools/image-editor/page.tsx` — replace img canvas with Fabric, wire menus
-- Modify: `handytool-client/tools/image-editor/editor-toolbar.tsx` — wire onClick to Fabric tool modes
-- Modify: `handytool-client/tools/image-editor/adjustments-panel.tsx` — wire sliders to Fabric filters
+- New: `toolk1t-client/tools/image-editor/use-fabric-canvas.ts` — Fabric init, tool switching, undo/redo, export
+- Rewrite: `toolk1t-client/app/tools/image-editor/page.tsx` — replace img canvas with Fabric, wire menus
+- Modify: `toolk1t-client/tools/image-editor/editor-toolbar.tsx` — wire onClick to Fabric tool modes
+- Modify: `toolk1t-client/tools/image-editor/adjustments-panel.tsx` — wire sliders to Fabric filters
 
 ### What stays unchanged
 

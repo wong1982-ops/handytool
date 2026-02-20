@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { ProfileForm } from './profile-form'
 
 export const metadata: Metadata = {
-  title: 'My Profile | HandyTool',
+  title: 'My Profile | Toolk1t',
 }
 
 export default function ProfilePage() {

@@ -139,7 +139,7 @@ export function ComparisonCanvas({
                 cx="12"
                 cy="12"
                 r="10"
-                stroke="var(--ht-color-secondary-500, #32A9D9)"
+                stroke="var(--tk-color-secondary-500, #32A9D9)"
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeDasharray="50 20"
@@ -148,7 +148,7 @@ export function ComparisonCanvas({
             </svg>
             <span
               className="text-xs font-medium tracking-wide"
-              style={{ color: 'var(--ht-color-secondary-500, #32A9D9)' }}
+              style={{ color: 'var(--tk-color-secondary-500, #32A9D9)' }}
             >
               Processing...
             </span>
@@ -173,11 +173,11 @@ export function ComparisonCanvas({
           <span className="w-px h-3 bg-white/20" />
           <span
             className="flex items-center gap-1.5"
-            style={{ color: 'var(--ht-color-secondary-500, #32A9D9)' }}
+            style={{ color: 'var(--tk-color-secondary-500, #32A9D9)' }}
           >
             <span
               className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: 'var(--ht-color-secondary-500, #32A9D9)' }}
+              style={{ backgroundColor: 'var(--tk-color-secondary-500, #32A9D9)' }}
             />
             Live Vector
           </span>
@@ -195,7 +195,7 @@ export function ComparisonCanvas({
       <div className="absolute bottom-3 right-3 z-20">
         <span
           className="font-mono text-[10px] bg-slate-900/70 backdrop-blur-sm rounded px-2 py-1"
-          style={{ color: 'var(--ht-color-secondary-500, #32A9D9)' }}
+          style={{ color: 'var(--tk-color-secondary-500, #32A9D9)' }}
         >
           {pathCount} Paths &middot; {vectorSizeKB} KB
         </span>

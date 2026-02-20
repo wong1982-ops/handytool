@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "HandyTool - Free Online Tools",
-    short_name: "HandyTool",
+    name: "Toolk1t - Free Online Tools",
+    short_name: "Toolk1t",
     description:
       "Free online tools for developers and everyday use: IP lookup, speed test, PDF converter, image editor, JSON formatter, and more.",
     start_url: "/tools",

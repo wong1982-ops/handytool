@@ -29,7 +29,7 @@
   }
 
   &:hover::after {
-    background: var(--ht-color-primary-500, #3d6af2);
+    background: var(--tk-color-primary-500, #3d6af2);
     transform: translate(-50%, -50%) scale(1.15);
   }
 
@@ -46,7 +46,7 @@
     }
 
     &:hover {
-      background-color: var(--ht-color-primary-500, #3d6af2);
+      background-color: var(--tk-color-primary-500, #3d6af2);
     }
 
     &::after {
@@ -69,7 +69,7 @@
     }
 
     &:hover {
-      background-color: var(--ht-color-primary-500, #3d6af2);
+      background-color: var(--tk-color-primary-500, #3d6af2);
     }
 
     &::after {
@@ -138,8 +138,8 @@
         transition: all 0.15s ease;
 
         &:hover {
-          background: var(--ht-color-primary-500, #3d6af2);
-          border-color: var(--ht-color-primary-500, #3d6af2);
+          background: var(--tk-color-primary-500, #3d6af2);
+          border-color: var(--tk-color-primary-500, #3d6af2);
           color: #fff;
         }
       }
@@ -163,7 +163,7 @@
     .description { color: #94a3b8; }
     .base-url { color: #64748b; }
 
-    a { color: var(--ht-color-primary-400, #6b8ff6); }
+    a { color: var(--tk-color-primary-400, #6b8ff6); }
   }
 
   // Headings
@@ -172,7 +172,7 @@
   label { color: #94a3b8; }
 
   // Links
-  a { color: var(--ht-color-primary-400, #6b8ff6); }
+  a { color: var(--tk-color-primary-400, #6b8ff6); }
 
   // Scheme container
   .scheme-container {
@@ -351,7 +351,7 @@
     &.authorize { color: #34d399; border-color: #34d399; }
     &.cancel { color: #f87171; border-color: #f87171; }
 
-    &.execute { background: var(--ht-color-primary-500, #3d6af2); border-color: var(--ht-color-primary-500, #3d6af2); color: #fff; }
+    &.execute { background: var(--tk-color-primary-500, #3d6af2); border-color: var(--tk-color-primary-500, #3d6af2); color: #fff; }
   }
 
   // Try-it-out buttons in section header
@@ -370,7 +370,7 @@
     border-color: #334155;
 
     &::placeholder { color: #475569; }
-    &:focus { border-color: var(--ht-color-primary-500, #3d6af2); outline: none; }
+    &:focus { border-color: var(--tk-color-primary-500, #3d6af2); outline: none; }
   }
 
   select {
@@ -448,8 +448,8 @@
       transition: all 0.15s ease;
 
       &:hover {
-        background: var(--ht-color-primary-500, #3d6af2);
-        border-color: var(--ht-color-primary-500, #3d6af2);
+        background: var(--tk-color-primary-500, #3d6af2);
+        border-color: var(--tk-color-primary-500, #3d6af2);
         color: #fff;
       }
     }
@@ -470,7 +470,7 @@
   // Markdown
   .markdown p, .markdown li { color: #94a3b8; }
   .markdown code { background: #1e293b; color: #e2e8f0; }
-  .markdown a { color: var(--ht-color-primary-400, #6b8ff6); }
+  .markdown a { color: var(--tk-color-primary-400, #6b8ff6); }
 
   // Response code blocks
   .renderedMarkdown p { color: #94a3b8; }

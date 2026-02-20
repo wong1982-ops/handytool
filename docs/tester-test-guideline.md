@@ -1,6 +1,6 @@
 # Tester Test Guideline
 
-This document defines the standard testing checklist for all features in the HandyTool workspace. Every deliverable must pass these checks before it can be marked as **DONE**.
+This document defines the standard testing checklist for all features in the Toolk1t workspace. Every deliverable must pass these checks before it can be marked as **DONE**.
 
 ---
 

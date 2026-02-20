@@ -51,11 +51,11 @@ export function FileList({ stagedFiles, processing, onRemoveFile, onClearFiles, 
         <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-bold text-slate-900 dark:text-white">Converting...</span>
-            <span className="text-sm font-bold text-[var(--ht-color-secondary-500)]">{processing.progress}%</span>
+            <span className="text-sm font-bold text-[var(--tk-color-secondary-500)]">{processing.progress}%</span>
           </div>
           <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[var(--ht-color-secondary-500)] rounded-full transition-all duration-300"
+              className="h-full bg-[var(--tk-color-secondary-500)] rounded-full transition-all duration-300"
               style={{ width: `${processing.progress}%` }}
             />
           </div>
@@ -86,7 +86,7 @@ export function FileList({ stagedFiles, processing, onRemoveFile, onClearFiles, 
             <a
               href={processing.downloadUrl}
               download={processing.downloadFilename}
-              className="bg-[var(--ht-color-secondary-500)] text-slate-900 px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-opacity"
+              className="bg-[var(--tk-color-secondary-500)] text-slate-900 px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-opacity"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

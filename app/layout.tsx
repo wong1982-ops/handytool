@@ -5,8 +5,8 @@ import { ProfilePrompt } from "@/components/auth/profile-prompt";
 import "./globals.scss";
 
 export const metadata: Metadata = {
-  title: "HandyTool",
-  description: "HandyTool - Free online tools",
+  title: "Toolk1t",
+  description: "Toolk1t - Free online tools",
 };
 
 export default function RootLayout({
@@ -19,9 +19,9 @@ export default function RootLayout({
       <body
         className="antialiased min-h-screen flex flex-col"
       >
-        <Header brandName="HandyTool" />
+        <Header brandName="Toolk1t" />
         {children}
-        <Footer brandName="HandyTool" />
+        <Footer brandName="Toolk1t" />
         <ProfilePrompt />
       </body>
     </html>

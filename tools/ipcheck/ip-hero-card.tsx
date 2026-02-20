@@ -18,7 +18,7 @@ export function IpHeroCard({ ip, ipVersion = 'ipv4', ipv6, location, isSecure, o
 
   return (
     <GlassCard glow className="p-8 md:p-6 text-center">
-      <p className="text-[var(--ht-color-primary-500)] text-sm font-bold uppercase tracking-widest mb-3 md:mb-2">
+      <p className="text-[var(--tk-color-primary-500)] text-sm font-bold uppercase tracking-widest mb-3 md:mb-2">
         {label}
       </p>
       <h1 className="text-5xl md:text-5xl font-bold mb-4 md:mb-3 tracking-tight text-slate-900 dark:text-white">

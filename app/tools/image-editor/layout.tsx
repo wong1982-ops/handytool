@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     canonical: "/tools/image-editor",
   },
   openGraph: {
-    title: "Online Image Editor | HandyTool",
+    title: "Online Image Editor | Toolk1t",
     description:
       "Edit images with adjustments, filters, and zoom. Free online tool, no upload to server.",
     url: "/tools/image-editor",
@@ -22,18 +22,18 @@ const jsonLd = [
     name: "Online Image Editor",
     description:
       "Edit images with brightness, contrast, saturation adjustments, creative filters, and zoom controls.",
-    url: "https://handytool.app/tools/image-editor",
+    url: "https://toolk1t.app/tools/image-editor",
     applicationCategory: "MultimediaApplication",
     operatingSystem: "Any",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    isPartOf: { "@type": "WebSite", name: "HandyTool", url: "https://handytool.app" },
+    isPartOf: { "@type": "WebSite", name: "Toolk1t", url: "https://toolk1t.app" },
   },
   {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://handytool.app" },
-      { "@type": "ListItem", position: 2, name: "Tools", item: "https://handytool.app/tools" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.app" },
+      { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.app/tools" },
       { "@type": "ListItem", position: 3, name: "Image Editor" },
     ],
   },

@@ -19,7 +19,7 @@ DiffMaster is a fully client-side text/code diff comparison tool. Two CodeMirror
 |---|---|
 | `@codemirror/view`, `@codemirror/state` | Core editor framework |
 | `@codemirror/lang-javascript`, `lang-python`, `lang-html`, `lang-css`, `lang-json`, `lang-markdown`, `lang-java`, `lang-xml`, `lang-sql`, `lang-php`, `lang-rust`, `lang-go`, `lang-cpp` | Language support (dynamically imported) |
-| `@codemirror/theme-one-dark` | Dark theme matching HandyTool palette |
+| `@codemirror/theme-one-dark` | Dark theme matching Toolk1t palette |
 | `diff` (jsdiff) | Line-level and character-level diff computation |
 
 All client-side. No server component needed.
@@ -273,7 +273,7 @@ Default filenames: `original.txt` / `modified.txt` if no filename set.
 
 ## What Stays Unchanged
 
-- HandyTool header/footer layout
+- Toolk1t header/footer layout
 - Brand colors and dark theme
 - CSS custom properties (`--ht-*`)
 - Tool directory pattern (`app/tools/` + `tools/`)

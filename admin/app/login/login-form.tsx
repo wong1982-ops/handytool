@@ -53,7 +53,7 @@ export function LoginForm() {
           </svg>
         </div>
         <h1 className="text-xl font-bold text-zinc-900 dark:text-white">
-          HandyTool Admin
+          Toolk1t Admin
         </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           Sign in with your authorized Google account

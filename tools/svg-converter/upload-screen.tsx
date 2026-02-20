@@ -79,8 +79,8 @@ export function UploadScreen({ onFileSelect, isDragging, onDragStateChange }: Up
           border-2 border-dashed transition-all duration-200 cursor-pointer
           ${
             isDragging
-              ? 'border-[var(--ht-color-secondary-500)] bg-[var(--ht-color-secondary-500)]/10 scale-[1.02]'
-              : 'border-slate-600 hover:border-[var(--ht-color-secondary-500)]/60 hover:bg-slate-800/30'
+              ? 'border-[var(--tk-color-secondary-500)] bg-[var(--tk-color-secondary-500)]/10 scale-[1.02]'
+              : 'border-slate-600 hover:border-[var(--tk-color-secondary-500)]/60 hover:bg-slate-800/30'
           }
         `}
       >
@@ -88,12 +88,12 @@ export function UploadScreen({ onFileSelect, isDragging, onDragStateChange }: Up
         <div
           className={`
             w-20 h-20 rounded-2xl flex items-center justify-center transition-colors duration-200
-            ${isDragging ? 'bg-[var(--ht-color-secondary-500)]/15' : 'bg-slate-800'}
+            ${isDragging ? 'bg-[var(--tk-color-secondary-500)]/15' : 'bg-slate-800'}
           `}
         >
           <svg
             className={`w-10 h-10 transition-colors duration-200 ${
-              isDragging ? 'text-[var(--ht-color-secondary-500)]' : 'text-slate-500'
+              isDragging ? 'text-[var(--tk-color-secondary-500)]' : 'text-slate-500'
             }`}
             fill="none"
             stroke="currentColor"
@@ -125,7 +125,7 @@ export function UploadScreen({ onFileSelect, isDragging, onDragStateChange }: Up
             fileInputRef.current?.click()
           }}
           className="
-            bg-[var(--ht-color-secondary-500)] hover:bg-[var(--ht-color-secondary-500)]/80
+            bg-[var(--tk-color-secondary-500)] hover:bg-[var(--tk-color-secondary-500)]/80
             text-white font-bold py-2.5 px-8 rounded-lg text-sm transition-all
             cursor-pointer min-h-[44px]
           "
@@ -159,7 +159,7 @@ export function UploadScreen({ onFileSelect, isDragging, onDragStateChange }: Up
           </div>
 
           <svg
-            className="w-4 h-4 text-[var(--ht-color-secondary-500)]"
+            className="w-4 h-4 text-[var(--tk-color-secondary-500)]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -168,11 +168,11 @@ export function UploadScreen({ onFileSelect, isDragging, onDragStateChange }: Up
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
 
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--ht-color-secondary-500)]/10 border border-[var(--ht-color-secondary-500)]/30">
-            <svg className="w-3.5 h-3.5 text-[var(--ht-color-secondary-500)]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--tk-color-secondary-500)]/10 border border-[var(--tk-color-secondary-500)]/30">
+            <svg className="w-3.5 h-3.5 text-[var(--tk-color-secondary-500)]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-4-4 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z" />
             </svg>
-            <span className="text-xs font-bold text-[var(--ht-color-secondary-500)]">SVG</span>
+            <span className="text-xs font-bold text-[var(--tk-color-secondary-500)]">SVG</span>
           </div>
         </div>
 

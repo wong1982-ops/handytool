@@ -127,7 +127,7 @@ export function RateChart({ data, from, to, period, onPeriodChange, loading }: R
               onClick={() => onPeriodChange(p)}
               className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
                 period === p
-                  ? 'bg-white dark:bg-slate-700 text-[var(--ht-color-primary-500)] shadow-sm'
+                  ? 'bg-white dark:bg-slate-700 text-[var(--tk-color-primary-500)] shadow-sm'
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -141,7 +141,7 @@ export function RateChart({ data, from, to, period, onPeriodChange, loading }: R
       <div className="p-6 relative" style={{ minHeight: 340 }}>
         {loading ? (
           <div className="flex items-center justify-center h-[300px]" aria-busy="true" aria-label="Loading chart">
-            <svg className="w-8 h-8 animate-spin text-[var(--ht-color-primary-500)]" fill="none" viewBox="0 0 24 24">
+            <svg className="w-8 h-8 animate-spin text-[var(--tk-color-primary-500)]" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
@@ -162,8 +162,8 @@ export function RateChart({ data, from, to, period, onPeriodChange, loading }: R
           >
             <defs>
               <linearGradient id="chartGrad" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="var(--ht-color-primary-500)" stopOpacity="0.2" />
-                <stop offset="100%" stopColor="var(--ht-color-primary-500)" stopOpacity="0" />
+                <stop offset="0%" stopColor="var(--tk-color-primary-500)" stopOpacity="0.2" />
+                <stop offset="100%" stopColor="var(--tk-color-primary-500)" stopOpacity="0" />
               </linearGradient>
             </defs>
 
@@ -214,7 +214,7 @@ export function RateChart({ data, from, to, period, onPeriodChange, loading }: R
             <polyline
               points={points}
               fill="none"
-              stroke="var(--ht-color-primary-500)"
+              stroke="var(--tk-color-primary-500)"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -228,7 +228,7 @@ export function RateChart({ data, from, to, period, onPeriodChange, loading }: R
                   x2={hoverPoint.x}
                   y1={PAD_T}
                   y2={CHART_H - PAD_B}
-                  stroke="var(--ht-color-primary-500)"
+                  stroke="var(--tk-color-primary-500)"
                   strokeWidth="1"
                   strokeDasharray="4 2"
                   opacity="0.5"
@@ -237,7 +237,7 @@ export function RateChart({ data, from, to, period, onPeriodChange, loading }: R
                   cx={hoverPoint.x}
                   cy={hoverPoint.y}
                   r="5"
-                  fill="var(--ht-color-primary-500)"
+                  fill="var(--tk-color-primary-500)"
                   stroke="white"
                   strokeWidth="2"
                 />

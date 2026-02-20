@@ -13,8 +13,8 @@
 ## Task 1: Remove VPN/Tor badges from My IP
 
 **Files:**
-- Modify: `handytool-client/tools/myip/tech-info-panel.tsx`
-- Modify: `handytool-client/app/tools/myip/page.tsx`
+- Modify: `toolk1t-client/tools/myip/tech-info-panel.tsx`
+- Modify: `toolk1t-client/app/tools/myip/page.tsx`
 
 **Step 1: Remove vpn and tor from TechInfoData interface**
 
@@ -54,7 +54,7 @@ In `app/tools/myip/page.tsx`, remove the hardcoded `vpn: false, tor: false` line
 
 **Step 4: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 5: Commit**
@@ -69,7 +69,7 @@ git commit -m "fix(myip): remove fake VPN/Tor badges, fix proxy variant"
 ## Task 2: Remove non-functional fullscreen button from My IP map
 
 **Files:**
-- Modify: `handytool-client/tools/myip/live-location-panel.tsx`
+- Modify: `toolk1t-client/tools/myip/live-location-panel.tsx`
 
 **Step 1: Remove the fullscreen button**
 
@@ -96,7 +96,7 @@ In `tools/myip/live-location-panel.tsx`, replace lines 26-37 (the header div) wi
 
 **Step 2: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 3: Commit**
@@ -111,7 +111,7 @@ git commit -m "fix(myip): remove non-functional fullscreen button from map panel
 ## Task 3: Fix Speed Test silent ISP failure + metric card timing
 
 **Files:**
-- Modify: `handytool-client/app/tools/speedtest/page.tsx`
+- Modify: `toolk1t-client/app/tools/speedtest/page.tsx`
 
 **Step 1: Add error handling for ISP detection**
 
@@ -169,7 +169,7 @@ This hides the metric cards during the ping phase (where they show confusing zer
 
 **Step 3: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 4: Commit**
@@ -184,7 +184,7 @@ git commit -m "fix(speedtest): handle ISP detection failure, hide metrics until 
 ## Task 4: Increase PDF Converter reorder button touch targets
 
 **Files:**
-- Modify: `handytool-client/tools/pdf-converter/file-list.tsx`
+- Modify: `toolk1t-client/tools/pdf-converter/file-list.tsx`
 
 **Step 1: Increase button padding from p-0.5 to p-2**
 
@@ -204,7 +204,7 @@ Also increase icon size from `w-3.5 h-3.5` to `w-4 h-4` on both SVGs (lines 151,
 
 **Step 2: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 3: Commit**
@@ -219,7 +219,7 @@ git commit -m "fix(pdf-converter): increase reorder button touch targets to 44px
 ## Task 5: Add confirmation before Clear in JSON Converter
 
 **Files:**
-- Modify: `handytool-client/app/tools/json-converter/page.tsx`
+- Modify: `toolk1t-client/app/tools/json-converter/page.tsx`
 
 **Step 1: Add confirmation to handleClearAll**
 
@@ -247,7 +247,7 @@ const handleClearAll = useCallback(() => {
 
 **Step 2: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 3: Commit**
@@ -262,7 +262,7 @@ git commit -m "fix(json-converter): add confirmation before clearing all content
 ## Task 6: Fix download MIME types in JSON Converter
 
 **Files:**
-- Modify: `handytool-client/app/tools/json-converter/page.tsx`
+- Modify: `toolk1t-client/app/tools/json-converter/page.tsx`
 
 **Step 1: Fix input download MIME type**
 
@@ -292,7 +292,7 @@ const blob = new Blob([output], { type: mimeType })
 
 **Step 3: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 4: Commit**
@@ -307,7 +307,7 @@ git commit -m "fix(json-converter): use correct MIME types for download (json, y
 ## Task 7: Fix "% today" label in Currency Exchange
 
 **Files:**
-- Modify: `handytool-client/tools/currency-exchange/converter-bar.tsx`
+- Modify: `toolk1t-client/tools/currency-exchange/converter-bar.tsx`
 
 **Step 1: Change label text**
 
@@ -323,7 +323,7 @@ Find line 146:
 
 **Step 2: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 3: Commit**
@@ -338,7 +338,7 @@ git commit -m "fix(currency-exchange): correct rate change label from 'today' to
 ## Task 8: Dynamic "Convert Now" text per PDF mode
 
 **Files:**
-- Modify: `handytool-client/app/tools/pdf-converter/page.tsx`
+- Modify: `toolk1t-client/app/tools/pdf-converter/page.tsx`
 
 **Step 1: Add a mode-to-label map and replace button text**
 
@@ -369,7 +369,7 @@ Convert Now
 
 **Step 2: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 3: Commit**
@@ -384,7 +384,7 @@ git commit -m "fix(pdf-converter): dynamic convert button text per conversion mo
 ## Task 9: Add ARIA tab semantics to Swagger Editor mobile tabs
 
 **Files:**
-- Modify: `handytool-client/app/tools/swagger-editor/page.tsx`
+- Modify: `toolk1t-client/app/tools/swagger-editor/page.tsx`
 
 **Step 1: Add role="tablist" to tab container**
 
@@ -444,7 +444,7 @@ Find the validation badge (around line 232-241):
 
 **Step 4: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 5: Commit**
@@ -459,7 +459,7 @@ git commit -m "fix(swagger-editor): add ARIA tab semantics and live validation s
 ## Task 10: Add role="alert" to PDF Converter error state
 
 **Files:**
-- Modify: `handytool-client/tools/pdf-converter/file-list.tsx`
+- Modify: `toolk1t-client/tools/pdf-converter/file-list.tsx`
 
 **Step 1: Find the error display in FileList**
 
@@ -482,7 +482,7 @@ If the error is displayed inline (e.g., in a `<p>` or `<div>`), wrap it:
 
 **Step 2: Verify build**
 
-Run: `cd handytool-client && npx tsc --noEmit`
+Run: `cd toolk1t-client && npx tsc --noEmit`
 Expected: 0 errors
 
 **Step 3: Commit**

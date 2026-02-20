@@ -69,7 +69,7 @@ export function SearchBar({
           className={`w-full h-[54px] pl-12 pr-36 bg-white dark:bg-slate-900 border rounded-xl focus:ring-2 focus:border-transparent transition-all shadow-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 ${
             error
               ? 'border-red-500 dark:border-red-400 focus:ring-red-500'
-              : 'border-slate-200 dark:border-slate-800 focus:ring-[var(--ht-color-primary-500)]'
+              : 'border-slate-200 dark:border-slate-800 focus:ring-[var(--tk-color-primary-500)]'
           }`}
           placeholder={placeholder}
         />
@@ -87,7 +87,7 @@ export function SearchBar({
         )}
         <button
           type="submit"
-          className="absolute right-2 top-2 bottom-2 px-6 bg-[var(--ht-color-primary-500)] text-white rounded-lg font-bold text-sm hover:opacity-90 transition-all cursor-pointer"
+          className="absolute right-2 top-2 bottom-2 px-6 bg-[var(--tk-color-primary-500)] text-white rounded-lg font-bold text-sm hover:opacity-90 transition-all cursor-pointer"
         >
           {buttonLabel}
         </button>

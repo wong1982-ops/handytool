@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-10
 **Design source:** `designs/ipcheck/screen.png`, `designs/ipcheck/code.html`
-**Current implementation:** `handytool-client/app/tools/ipcheck/`
+**Current implementation:** `toolk1t-client/app/tools/ipcheck/`
 
 ---
 
@@ -203,6 +203,6 @@ The IP Check tool is functionally complete with all major sections built (hero c
 ## Notes
 
 - Brand colors (#3D79F2 vs design's #137fec): The implementation uses the brand spec from CLAUDE.md. This is **intentional**, not a gap.
-- Branding (HandyTool vs IPCheck): Intentional rebrand. Not a gap.
+- Branding (Toolk1t vs IPCheck): Intentional rebrand. Not a gap.
 - Country flag (emoji vs image): Emoji approach is cleaner and doesn't depend on external image URLs. Not a gap.
 - Interactive Leaflet map vs static image: Interactive is better than the design's static image. Not a gap.

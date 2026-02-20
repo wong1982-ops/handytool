@@ -6,7 +6,7 @@ export function SpeedFooter() {
           Test completed at {new Date().toLocaleTimeString()}
         </div>
         <div className="text-slate-400 dark:text-slate-500 text-xs">
-          Powered by HandyTool Performance Analytics
+          Powered by Toolk1t Performance Analytics
         </div>
       </div>
     </footer>

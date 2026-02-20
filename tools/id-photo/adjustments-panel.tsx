@@ -41,7 +41,7 @@ export function AdjustmentsPanel({ adjustments, onChange }: AdjustmentsPanelProp
               <label htmlFor={`adj-${key}`} className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 {label}
               </label>
-              <span className="text-xs font-bold text-[var(--ht-color-secondary-500)] tabular-nums">
+              <span className="text-xs font-bold text-[var(--tk-color-secondary-500)] tabular-nums">
                 {displayValue}
               </span>
             </div>
@@ -52,7 +52,7 @@ export function AdjustmentsPanel({ adjustments, onChange }: AdjustmentsPanelProp
               max={max}
               value={value}
               onChange={(e) => handleChange(key, Number(e.target.value))}
-              className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-[var(--ht-color-secondary-500)] [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--ht-color-secondary-500)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:dark:border-slate-800"
+              className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-[var(--tk-color-secondary-500)] [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--tk-color-secondary-500)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:dark:border-slate-800"
             />
           </div>
         )

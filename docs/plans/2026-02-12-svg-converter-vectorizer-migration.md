@@ -4,7 +4,7 @@
 
 **Goal:** Replace the client-side vtracer WASM engine with a server-side `@neplex/vectorizer` API endpoint, simplifying the client and improving reliability.
 
-**Architecture:** The current SVG Converter uses `vtracer-webapp` (WASM) entirely client-side, with complex DOM manipulation (hidden canvas/SVG elements, tick loops, manual WASM loading). `@neplex/vectorizer` is a Node.js-only library wrapping VTracer with native bindings — it cannot run in the browser. We add a `POST /api/v1/svg/vectorize` endpoint to `handytool-api` that accepts an image + settings and returns SVG. The client hook changes from WASM processing to a fetch call. All UI components remain unchanged.
+**Architecture:** The current SVG Converter uses `vtracer-webapp` (WASM) entirely client-side, with complex DOM manipulation (hidden canvas/SVG elements, tick loops, manual WASM loading). `@neplex/vectorizer` is a Node.js-only library wrapping VTracer with native bindings — it cannot run in the browser. We add a `POST /api/v1/svg/vectorize` endpoint to `toolk1t-api` that accepts an image + settings and returns SVG. The client hook changes from WASM processing to a fetch call. All UI components remain unchanged.
 
 **Tech Stack:** @neplex/vectorizer, Next.js 16 API routes, FormData, Zod validation
 
@@ -39,22 +39,22 @@ AFTER:
 
 ---
 
-## Task 1: Install @neplex/vectorizer in handytool-api
+## Task 1: Install @neplex/vectorizer in toolk1t-api
 
 **Files:**
-- Modify: `handytool-api/package.json`
-- Modify: `handytool-api/next.config.ts`
+- Modify: `toolk1t-api/package.json`
+- Modify: `toolk1t-api/next.config.ts`
 
 **Step 1: Install the dependency**
 
-Run: `cd /Users/mercury/WebstormProjects/handytool-workspace/handytool-api && pnpm add @neplex/vectorizer`
+Run: `cd /Users/mercury/WebstormProjects/toolk1t-workspace/toolk1t-api && pnpm add @neplex/vectorizer`
 
 **Step 2: Add to serverExternalPackages in next.config.ts**
 
 `@neplex/vectorizer` uses native bindings and must not be bundled by Webpack/Turbopack. Add it to `serverExternalPackages`.
 
 ```typescript
-// handytool-api/next.config.ts
+// toolk1t-api/next.config.ts
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
@@ -66,28 +66,28 @@ export default nextConfig
 
 **Step 3: Verify installation**
 
-Run: `cd /Users/mercury/WebstormProjects/handytool-workspace/handytool-api && node -e "const v = require('@neplex/vectorizer'); console.log('OK', Object.keys(v))"`
+Run: `cd /Users/mercury/WebstormProjects/toolk1t-workspace/toolk1t-api && node -e "const v = require('@neplex/vectorizer'); console.log('OK', Object.keys(v))"`
 Expected: OK with exported keys (vectorize, vectorizeSync, ColorMode, etc.)
 
 **Step 4: Commit**
 
 ```bash
-git add handytool-api/package.json handytool-api/pnpm-lock.yaml handytool-api/next.config.ts
+git add toolk1t-api/package.json toolk1t-api/pnpm-lock.yaml toolk1t-api/next.config.ts
 git commit -m "feat(api): add @neplex/vectorizer dependency for SVG conversion"
 ```
 
 ---
 
-## Task 2: Create SVG validation & types in handytool-api
+## Task 2: Create SVG validation & types in toolk1t-api
 
 **Files:**
-- Create: `handytool-api/lib/svg/types.ts`
-- Create: `handytool-api/lib/svg/validation.ts`
+- Create: `toolk1t-api/lib/svg/types.ts`
+- Create: `toolk1t-api/lib/svg/validation.ts`
 
 **Step 1: Create the types file**
 
 ```typescript
-// handytool-api/lib/svg/types.ts
+// toolk1t-api/lib/svg/types.ts
 import { z } from 'zod'
 
 export const vectorizeSettingsSchema = z.object({
@@ -114,7 +114,7 @@ export interface VectorizeResult {
 **Step 2: Create the validation file**
 
 ```typescript
-// handytool-api/lib/svg/validation.ts
+// toolk1t-api/lib/svg/validation.ts
 export class SvgValidationError extends Error {
   constructor(message: string) {
     super(message)
@@ -140,23 +140,23 @@ export function validateImageFile(file: File): void {
 **Step 3: Commit**
 
 ```bash
-git add handytool-api/lib/svg/
+git add toolk1t-api/lib/svg/
 git commit -m "feat(api): add SVG vectorization types and validation"
 ```
 
 ---
 
-## Task 3: Create the vectorize processor in handytool-api
+## Task 3: Create the vectorize processor in toolk1t-api
 
 **Files:**
-- Create: `handytool-api/lib/svg/vectorize.ts`
+- Create: `toolk1t-api/lib/svg/vectorize.ts`
 
 **Step 1: Write the processor**
 
 This is the core function that wraps `@neplex/vectorizer`. It takes a `File` and settings, returns an SVG string with metadata.
 
 ```typescript
-// handytool-api/lib/svg/vectorize.ts
+// toolk1t-api/lib/svg/vectorize.ts
 import {
   vectorize,
   ColorMode,
@@ -213,7 +213,7 @@ export async function vectorizeImage(
 **Step 2: Commit**
 
 ```bash
-git add handytool-api/lib/svg/vectorize.ts
+git add toolk1t-api/lib/svg/vectorize.ts
 git commit -m "feat(api): add vectorize processor using @neplex/vectorizer"
 ```
 
@@ -222,14 +222,14 @@ git commit -m "feat(api): add vectorize processor using @neplex/vectorizer"
 ## Task 4: Create the API route handler
 
 **Files:**
-- Create: `handytool-api/app/api/v1/svg/vectorize/route.ts`
+- Create: `toolk1t-api/app/api/v1/svg/vectorize/route.ts`
 
 **Step 1: Write the route handler**
 
 Follow existing patterns from `lib/pdf/form-data.ts` and `lib/api/response.ts`.
 
 ```typescript
-// handytool-api/app/api/v1/svg/vectorize/route.ts
+// toolk1t-api/app/api/v1/svg/vectorize/route.ts
 import { NextRequest } from 'next/server'
 import { apiSuccess, API_ERRORS } from '@/lib/api/response'
 import { parseFormData, getFileFromFormData, getStringField } from '@/lib/pdf/form-data'
@@ -270,13 +270,13 @@ export async function POST(request: NextRequest) {
 
 **Step 2: Smoke-test the endpoint**
 
-Run: `cd /Users/mercury/WebstormProjects/handytool-workspace/handytool-api && pnpm dev &`
+Run: `cd /Users/mercury/WebstormProjects/toolk1t-workspace/toolk1t-api && pnpm dev &`
 
 Then test with curl using a test image from the designs folder:
 
 ```bash
 curl -X POST http://localhost:3001/api/v1/svg/vectorize \
-  -F "image=@/Users/mercury/WebstormProjects/handytool-workspace/designs/10.SVGConverter/loic_avatar.png" \
+  -F "image=@/Users/mercury/WebstormProjects/toolk1t-workspace/designs/10.SVGConverter/loic_avatar.png" \
   -F 'settings={"mode":"spline","filterSpeckle":4,"colorPrecision":6}' \
   | head -c 500
 ```
@@ -286,7 +286,7 @@ Expected: JSON response with `{ "data": { "svg": "<svg ...", "pathCount": ..., "
 **Step 3: Commit**
 
 ```bash
-git add handytool-api/app/api/v1/svg/vectorize/
+git add toolk1t-api/app/api/v1/svg/vectorize/
 git commit -m "feat(api): add POST /api/v1/svg/vectorize endpoint"
 ```
 
@@ -295,7 +295,7 @@ git commit -m "feat(api): add POST /api/v1/svg/vectorize endpoint"
 ## Task 5: Update client types — remove vtracer-specific mapping
 
 **Files:**
-- Modify: `handytool-client/tools/svg-converter/types.ts`
+- Modify: `toolk1t-client/tools/svg-converter/types.ts`
 
 **Step 1: Remove the `settingsToVtracerParams` function**
 
@@ -304,7 +304,7 @@ This function maps settings to vtracer-webapp's DOM-based params (canvas_id, svg
 Update `types.ts`: remove `settingsToVtracerParams` function entirely. Keep all interfaces and `DEFAULT_SETTINGS` unchanged since the settings shape is the same.
 
 ```typescript
-// handytool-client/tools/svg-converter/types.ts
+// toolk1t-client/tools/svg-converter/types.ts
 export interface VectorizationSettings {
   // Curve Fitting
   mode: 'spline' | 'polygon' | 'pixel'
@@ -358,7 +358,7 @@ export const DEFAULT_SETTINGS: VectorizationSettings = {
 **Step 2: Commit**
 
 ```bash
-git add handytool-client/tools/svg-converter/types.ts
+git add toolk1t-client/tools/svg-converter/types.ts
 git commit -m "refactor(client): remove vtracer-specific param mapping from types"
 ```
 
@@ -367,14 +367,14 @@ git commit -m "refactor(client): remove vtracer-specific param mapping from type
 ## Task 6: Rewrite the useSvgTracer hook to use the API
 
 **Files:**
-- Modify: `handytool-client/tools/svg-converter/use-svg-tracer.ts`
+- Modify: `toolk1t-client/tools/svg-converter/use-svg-tracer.ts`
 
 This is the core change. Replace the entire WASM-based conversion with a fetch call to the API.
 
 **Step 1: Rewrite the hook**
 
 ```typescript
-// handytool-client/tools/svg-converter/use-svg-tracer.ts
+// toolk1t-client/tools/svg-converter/use-svg-tracer.ts
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
@@ -560,7 +560,7 @@ Key changes:
 **Step 2: Commit**
 
 ```bash
-git add handytool-client/tools/svg-converter/use-svg-tracer.ts
+git add toolk1t-client/tools/svg-converter/use-svg-tracer.ts
 git commit -m "feat(client): rewrite useSvgTracer hook to use API instead of WASM"
 ```
 
@@ -569,37 +569,37 @@ git commit -m "feat(client): rewrite useSvgTracer hook to use API instead of WAS
 ## Task 7: Remove obsolete WASM files
 
 **Files:**
-- Delete: `handytool-client/tools/svg-converter/vtracer-loader.ts`
-- Delete: `handytool-client/tools/svg-converter/vtracer_webapp_bg.js`
-- Delete: `handytool-client/public/vtracer_webapp_bg.wasm` (if it exists)
+- Delete: `toolk1t-client/tools/svg-converter/vtracer-loader.ts`
+- Delete: `toolk1t-client/tools/svg-converter/vtracer_webapp_bg.js`
+- Delete: `toolk1t-client/public/vtracer_webapp_bg.wasm` (if it exists)
 
 **Step 1: Verify no remaining imports of deleted files**
 
 Search for any imports of `vtracer-loader` or `vtracer_webapp_bg` in the codebase:
 
-Run: `grep -r "vtracer-loader\|vtracer_webapp" handytool-client/tools/ handytool-client/app/`
+Run: `grep -r "vtracer-loader\|vtracer_webapp" toolk1t-client/tools/ toolk1t-client/app/`
 
 Expected: Only hits in `use-svg-tracer.ts` (which we already rewrote, so those imports should be gone)
 
 **Step 2: Delete the files**
 
 ```bash
-rm handytool-client/tools/svg-converter/vtracer-loader.ts
-rm handytool-client/tools/svg-converter/vtracer_webapp_bg.js
-rm -f handytool-client/public/vtracer_webapp_bg.wasm
+rm toolk1t-client/tools/svg-converter/vtracer-loader.ts
+rm toolk1t-client/tools/svg-converter/vtracer_webapp_bg.js
+rm -f toolk1t-client/public/vtracer_webapp_bg.wasm
 ```
 
 **Step 3: Check if vtracer-webapp can be uninstalled**
 
-Run: `grep -r "vtracer" handytool-client/package.json`
+Run: `grep -r "vtracer" toolk1t-client/package.json`
 
 If `vtracer-webapp` is listed as a dependency, remove it:
-Run: `cd /Users/mercury/WebstormProjects/handytool-workspace/handytool-client && pnpm remove vtracer-webapp`
+Run: `cd /Users/mercury/WebstormProjects/toolk1t-workspace/toolk1t-client && pnpm remove vtracer-webapp`
 
 **Step 4: Commit**
 
 ```bash
-git add -A handytool-client/tools/svg-converter/ handytool-client/public/
+git add -A toolk1t-client/tools/svg-converter/ toolk1t-client/public/
 git commit -m "chore(client): remove obsolete vtracer WASM files and loader"
 ```
 
@@ -608,12 +608,12 @@ git commit -m "chore(client): remove obsolete vtracer WASM files and loader"
 ## Task 8: Add NEXT_PUBLIC_API_URL env variable to client
 
 **Files:**
-- Modify: `handytool-client/.env.local` (create if not exists)
+- Modify: `toolk1t-client/.env.local` (create if not exists)
 
 **Step 1: Add the environment variable**
 
 ```bash
-# handytool-client/.env.local
+# toolk1t-client/.env.local
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
@@ -622,17 +622,17 @@ This allows the client to find the API server. In production, this would be set 
 **Step 2: Commit** (do NOT commit .env.local — add to .env.example instead if one exists)
 
 Check for `.env.example`:
-Run: `ls handytool-client/.env.example 2>/dev/null`
+Run: `ls toolk1t-client/.env.example 2>/dev/null`
 
 If it exists, add the variable there. If not, create `.env.example`:
 
 ```bash
-# handytool-client/.env.example
+# toolk1t-client/.env.example
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 ```bash
-git add handytool-client/.env.example
+git add toolk1t-client/.env.example
 git commit -m "docs(client): add NEXT_PUBLIC_API_URL to env example"
 ```
 
@@ -642,12 +642,12 @@ git commit -m "docs(client): add NEXT_PUBLIC_API_URL to env example"
 
 **Step 1: Start the API server**
 
-Run: `cd /Users/mercury/WebstormProjects/handytool-workspace/handytool-api && pnpm dev`
+Run: `cd /Users/mercury/WebstormProjects/toolk1t-workspace/toolk1t-api && pnpm dev`
 Expected: Server starts on port 3001
 
 **Step 2: Start the client**
 
-Run: `cd /Users/mercury/WebstormProjects/handytool-workspace/handytool-client && pnpm dev`
+Run: `cd /Users/mercury/WebstormProjects/toolk1t-workspace/toolk1t-client && pnpm dev`
 Expected: Client starts on port 3000
 
 **Step 3: Manual test**
@@ -677,7 +677,7 @@ Expected: Client starts on port 3000
 The client (port 3000) calls the API (port 3001) — this is a cross-origin request. If the API doesn't already handle CORS, we need to add it.
 
 **Files:**
-- Create: `handytool-api/middleware.ts` (if CORS fails in Task 9)
+- Create: `toolk1t-api/middleware.ts` (if CORS fails in Task 9)
 
 **Step 1: Test if CORS is an issue**
 
@@ -686,7 +686,7 @@ During Task 9, check the browser console for CORS errors. If none, skip this tas
 **Step 2: Add CORS middleware (only if needed)**
 
 ```typescript
-// handytool-api/middleware.ts
+// toolk1t-api/middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -726,7 +726,7 @@ export const config = {
 **Step 3: Commit (only if CORS middleware was added)**
 
 ```bash
-git add handytool-api/middleware.ts
+git add toolk1t-api/middleware.ts
 git commit -m "feat(api): add CORS middleware for cross-origin client requests"
 ```
 
@@ -736,14 +736,14 @@ git commit -m "feat(api): add CORS middleware for cross-origin client requests"
 
 | Repo | Action | Files |
 |------|--------|-------|
-| handytool-api | Add dependency | `package.json`, `next.config.ts` |
-| handytool-api | New validation | `lib/svg/types.ts`, `lib/svg/validation.ts` |
-| handytool-api | New processor | `lib/svg/vectorize.ts` |
-| handytool-api | New endpoint | `app/api/v1/svg/vectorize/route.ts` |
-| handytool-api | CORS (if needed) | `middleware.ts` |
-| handytool-client | Rewrite hook | `tools/svg-converter/use-svg-tracer.ts` |
-| handytool-client | Simplify types | `tools/svg-converter/types.ts` |
-| handytool-client | Delete WASM | `vtracer-loader.ts`, `vtracer_webapp_bg.js`, WASM binary |
-| handytool-client | Env config | `.env.example` |
+| toolk1t-api | Add dependency | `package.json`, `next.config.ts` |
+| toolk1t-api | New validation | `lib/svg/types.ts`, `lib/svg/validation.ts` |
+| toolk1t-api | New processor | `lib/svg/vectorize.ts` |
+| toolk1t-api | New endpoint | `app/api/v1/svg/vectorize/route.ts` |
+| toolk1t-api | CORS (if needed) | `middleware.ts` |
+| toolk1t-client | Rewrite hook | `tools/svg-converter/use-svg-tracer.ts` |
+| toolk1t-client | Simplify types | `tools/svg-converter/types.ts` |
+| toolk1t-client | Delete WASM | `vtracer-loader.ts`, `vtracer_webapp_bg.js`, WASM binary |
+| toolk1t-client | Env config | `.env.example` |
 
 **UI components unchanged:** `upload-screen.tsx`, `comparison-canvas.tsx`, `comparison-slider.tsx`, `vectorization-settings.tsx`, `export-actions.tsx`, `canvas-toolbar.tsx`, `zoom-controls.tsx`, `status-bar.tsx`, `svg-converter.scss`

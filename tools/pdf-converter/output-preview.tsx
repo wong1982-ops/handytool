@@ -158,7 +158,7 @@ function PdfPreview({ downloadUrl }: { downloadUrl: string }) {
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage <= 1}
-            className="p-2.5 rounded-lg text-slate-500 hover:text-[var(--ht-color-primary-500)] hover:bg-[var(--ht-color-primary-500)]/10 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            className="p-2.5 rounded-lg text-slate-500 hover:text-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-500)]/10 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors"
             aria-label="Previous page"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -171,7 +171,7 @@ function PdfPreview({ downloadUrl }: { downloadUrl: string }) {
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage >= totalPages}
-            className="p-2.5 rounded-lg text-slate-500 hover:text-[var(--ht-color-primary-500)] hover:bg-[var(--ht-color-primary-500)]/10 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            className="p-2.5 rounded-lg text-slate-500 hover:text-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-500)]/10 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors"
             aria-label="Next page"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

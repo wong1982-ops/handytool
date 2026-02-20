@@ -53,7 +53,7 @@ export function ExportSettings({
 
       {/* Mode description */}
       <div className="flex items-start gap-2 text-[10px] text-slate-500 dark:text-slate-400">
-        <svg className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[var(--ht-color-secondary-500)]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[var(--tk-color-secondary-500)]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
           <circle cx="12" cy="12" r="3" />
         </svg>
@@ -72,7 +72,7 @@ export function ExportSettings({
             id="paper-size"
             value={paperSize}
             onChange={(e) => onPaperSizeChange(e.target.value as PaperSize)}
-            className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[var(--ht-color-secondary-500)] focus:border-[var(--ht-color-secondary-500)] cursor-pointer"
+            className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[var(--tk-color-secondary-500)] focus:border-[var(--tk-color-secondary-500)] cursor-pointer"
           >
             {PAPER_SIZES.map(({ id, label, detail }) => (
               <option key={id} value={id}>
@@ -94,7 +94,7 @@ export function ExportSettings({
       <button
         onClick={onDownload}
         disabled={!photoUrl}
-        className="w-full bg-[var(--ht-color-secondary-500)] text-slate-900 py-3 rounded-xl font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+        className="w-full bg-[var(--tk-color-secondary-500)] text-slate-900 py-3 rounded-xl font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

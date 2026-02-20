@@ -55,7 +55,7 @@ export function UploadZone({ accept, fromLabel, toLabel, multiple, onFilesSelect
 
   return (
     <div className="relative group">
-      <div className={`absolute -inset-1 bg-gradient-to-r from-[var(--ht-color-secondary-500)] to-cyan-400 rounded-2xl blur transition duration-500 ${isDragging ? 'opacity-30' : 'opacity-10 group-hover:opacity-20'}`} />
+      <div className={`absolute -inset-1 bg-gradient-to-r from-[var(--tk-color-secondary-500)] to-cyan-400 rounded-2xl blur transition duration-500 ${isDragging ? 'opacity-30' : 'opacity-10 group-hover:opacity-20'}`} />
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -63,8 +63,8 @@ export function UploadZone({ accept, fromLabel, toLabel, multiple, onFilesSelect
         onClick={() => fileInputRef.current?.click()}
         className={`relative bg-white dark:bg-slate-900 border-2 border-dashed rounded-2xl p-12 transition-all flex flex-col items-center justify-center text-center cursor-pointer ${
           isDragging
-            ? 'border-[var(--ht-color-secondary-500)] bg-[var(--ht-color-secondary-500)]/5'
-            : 'border-slate-300 dark:border-slate-700 hover:border-[var(--ht-color-secondary-500)]'
+            ? 'border-[var(--tk-color-secondary-500)] bg-[var(--tk-color-secondary-500)]/5'
+            : 'border-slate-300 dark:border-slate-700 hover:border-[var(--tk-color-secondary-500)]'
         }`}
         role="button"
         tabIndex={0}
@@ -100,7 +100,7 @@ export function UploadZone({ accept, fromLabel, toLabel, multiple, onFilesSelect
             ? 'Select one or more files to get started.'
             : 'Select a file to get started.'}
         </p>
-        <span className="bg-[var(--ht-color-secondary-500)] text-slate-900 px-8 py-3 rounded-xl font-bold text-base flex items-center gap-2 shadow-lg hover:opacity-90 transition-opacity">
+        <span className="bg-[var(--tk-color-secondary-500)] text-slate-900 px-8 py-3 rounded-xl font-bold text-base flex items-center gap-2 shadow-lg hover:opacity-90 transition-opacity">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
           </svg>

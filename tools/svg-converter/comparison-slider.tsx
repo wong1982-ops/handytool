@@ -59,7 +59,7 @@ export function ComparisonSlider({ position, onChange, containerRef }: Compariso
         className="absolute inset-y-0 -translate-x-1/2"
         style={{
           width: '2px',
-          backgroundColor: 'var(--ht-color-secondary-500, #32A9D9)',
+          backgroundColor: 'var(--tk-color-secondary-500, #32A9D9)',
           boxShadow: '0 0 8px rgba(50, 169, 217, 0.4)',
         }}
       />
@@ -71,7 +71,7 @@ export function ComparisonSlider({ position, onChange, containerRef }: Compariso
           width: '32px',
           height: '32px',
           borderRadius: '50%',
-          backgroundColor: 'var(--ht-color-secondary-500, #32A9D9)',
+          backgroundColor: 'var(--tk-color-secondary-500, #32A9D9)',
           cursor: 'ew-resize',
         }}
         onPointerDown={handlePointerDown}

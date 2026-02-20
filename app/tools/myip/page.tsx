@@ -72,7 +72,7 @@ export default function MyIpPage() {
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb">
           <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-            <li><a href="/tools" className="hover:text-[var(--ht-color-primary-500)] transition-colors">Home</a></li>
+            <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
             <li aria-hidden="true">/</li>
             <li aria-current="page" className="text-slate-900 dark:text-white font-medium">My IP</li>
           </ol>

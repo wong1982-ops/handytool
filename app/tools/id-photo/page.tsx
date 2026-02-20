@@ -232,7 +232,7 @@ export default function IdPhotoPage() {
 
           <nav aria-label="Breadcrumb">
             <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-              <li><a href="/tools" className="hover:text-[var(--ht-color-primary-500)] transition-colors">Home</a></li>
+              <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
               <li aria-hidden="true">/</li>
               <li aria-current="page" className="text-slate-900 dark:text-white font-medium">ID Photo Editor</li>
             </ol>
@@ -245,7 +245,7 @@ export default function IdPhotoPage() {
             onClick={() => setShowGuides(!showGuides)}
             className={`p-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               showGuides
-                ? 'bg-[var(--ht-color-secondary-500)]/10 text-[var(--ht-color-secondary-500)]'
+                ? 'bg-[var(--tk-color-secondary-500)]/10 text-[var(--tk-color-secondary-500)]'
                 : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
             aria-label={showGuides ? 'Hide guides' : 'Show guides'}
@@ -269,7 +269,7 @@ export default function IdPhotoPage() {
           </button>
 
           {/* Format badge */}
-          <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[var(--ht-color-secondary-500)]/10 text-[var(--ht-color-secondary-500)] rounded-lg text-xs font-bold">
+          <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[var(--tk-color-secondary-500)]/10 text-[var(--tk-color-secondary-500)] rounded-lg text-xs font-bold">
             {selectedFormat.name} ({selectedFormat.dimensions.split('(')[0].trim()})
           </span>
         </div>
@@ -438,7 +438,7 @@ export default function IdPhotoPage() {
           <button
             onClick={handleDownload}
             disabled={!photoUrl || downloading}
-            className="bg-[var(--ht-color-secondary-500)] text-slate-900 px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-lg flex items-center gap-2 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="bg-[var(--tk-color-secondary-500)] text-slate-900 px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-lg flex items-center gap-2 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {downloading ? (
               <div className="w-4 h-4 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin" />

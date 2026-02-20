@@ -26,7 +26,7 @@ export function LiveLocationPanel({ lat, lng }: LiveLocationPanelProps) {
       <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <h2 className="text-slate-900 dark:text-white text-lg font-bold">Live Location</h2>
         <button
-          className="text-[var(--ht-color-primary-500)] text-sm font-semibold flex items-center gap-1 hover:underline cursor-pointer"
+          className="text-[var(--tk-color-primary-500)] text-sm font-semibold flex items-center gap-1 hover:underline cursor-pointer"
           aria-label="Open map fullscreen"
         >
           <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
