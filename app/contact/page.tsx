@@ -76,8 +76,8 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <GlassCard className="p-6 sm:p-8">
+    <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <GlassCard className="p-6 sm:p-10">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">
           Contact Support
         </h1>
