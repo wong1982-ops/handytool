@@ -35,3 +35,28 @@ test.describe('Privacy Policy', () => {
     await expect(page.getByRole('heading', { level: 1, name: /Privacy Policy/i })).toBeVisible()
   })
 })
+
+test.describe('Contact Support', () => {
+  test('renders contact form with all fields', async ({ page }) => {
+    await page.goto('/contact')
+    await expect(page.getByRole('heading', { level: 1, name: /Contact Support/i })).toBeVisible()
+    await expect(page.getByLabel(/Name/i)).toBeVisible()
+    await expect(page.getByLabel(/Email/i)).toBeVisible()
+    await expect(page.getByLabel(/Subject/i)).toBeVisible()
+    await expect(page.getByLabel(/Message/i)).toBeVisible()
+    await expect(page.getByRole('button', { name: /Send Message/i })).toBeVisible()
+  })
+
+  test('shows validation errors for empty form submission', async ({ page }) => {
+    await page.goto('/contact')
+    await page.getByRole('button', { name: /Send Message/i }).click()
+    await expect(page.getByText(/required/i).first()).toBeVisible()
+  })
+
+  test('footer link navigates to Contact page', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('link', { name: 'Contact Support' }).click()
+    await expect(page).toHaveURL('/contact')
+    await expect(page.getByRole('heading', { level: 1, name: /Contact Support/i })).toBeVisible()
+  })
+})
