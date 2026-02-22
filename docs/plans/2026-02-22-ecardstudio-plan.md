@@ -1,6 +1,7 @@
 # ECard Studio Implementation Plan
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+> **After implementation:** Use the `webapp-testing` skill to perform E2E testing of the completed feature via Playwright browser automation.
 
 **Goal:** Build a professional e-card design tool with template discovery and a 3-panel editor, supporting customization and PNG export.
 
@@ -677,6 +678,8 @@ git commit -m "feat(ecard-studio): add page route and register tool"
 
 ### Task 10: E2E Tests
 
+> **REQUIRED SKILL:** Use the `webapp-testing` skill to run interactive browser-based E2E testing after writing the test file. The skill uses Playwright MCP to navigate the app, fill forms, click buttons, take screenshots, and verify behavior visually.
+
 **Files:**
 - Create: `e2e/ecard-studio.spec.ts`
 
@@ -774,20 +777,18 @@ git commit -m "test(ecard-studio): add E2E tests for discovery and editor views"
 
 ### Task 11: Visual Polish & Final Verification
 
+> **REQUIRED SKILL:** Use the `webapp-testing` skill to perform visual verification. Navigate the app in the browser, take screenshots of each view, compare against the design files, and verify all interactions work correctly.
+
 **Files:**
 - Various files in `tools/ecard-studio/`
 
-**Step 1: Visual verification**
+**Step 1: Visual verification using webapp-testing skill**
 
-Run the dev server and visually verify against the design screenshots:
+Use the webapp-testing skill to launch the browser and visually verify against the design screenshots:
 - `designs/12.ECardStudio/screen.png` (editor)
 - `designs/12.ECardStudio/screen_1.png` (discovery)
 
-```bash
-pnpm dev --port 3002
-```
-
-Visit `http://localhost:3002/tools/ecard-studio` and verify:
+Navigate to `http://localhost:3002/tools/ecard-studio` and verify:
 1. Discovery page matches Screen 2 design (dark theme, template grid, intent pills)
 2. Editor matches Screen 1 design (3-panel layout, canvas, customization controls)
 3. Mobile responsive (panels collapse, canvas fills width)
