@@ -17,3 +17,21 @@ test.describe('Terms of Service', () => {
     await expect(page.getByRole('heading', { level: 1, name: /Terms of Service/i })).toBeVisible()
   })
 })
+
+test.describe('Privacy Policy', () => {
+  test('renders Privacy Policy page with all sections', async ({ page }) => {
+    await page.goto('/privacy')
+    await expect(page.getByRole('heading', { level: 1, name: /Privacy Policy/i })).toBeVisible()
+    await expect(page.getByText('Last updated')).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Information We Collect/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Your Rights/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Contact/i })).toBeVisible()
+  })
+
+  test('footer link navigates to Privacy page', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('link', { name: 'Privacy Policy' }).click()
+    await expect(page).toHaveURL('/privacy')
+    await expect(page.getByRole('heading', { level: 1, name: /Privacy Policy/i })).toBeVisible()
+  })
+})
