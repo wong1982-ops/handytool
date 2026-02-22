@@ -27,29 +27,29 @@ test.describe('ECard Studio - Editor', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/tools/ecard-studio')
     await page.getByText('The Executive').click()
+    await expect(page.getByText(/CUSTOMIZATION/i)).toBeVisible()
   })
 
   test('renders 3-panel editor layout', async ({ page }) => {
     await expect(page.getByText(/DESIGN LIBRARY/i)).toBeVisible()
     await expect(page.getByText(/CUSTOMIZATION/i)).toBeVisible()
-    await expect(page.getByText('Thank You')).toBeVisible()
+    await expect(page.getByText('Acme Corporation').first()).toBeVisible()
   })
 
   test('font family dropdown changes card text', async ({ page }) => {
     const fontSelect = page.locator('select').first()
     await fontSelect.selectOption('Inter')
-    await expect(page.getByText('Thank You')).toBeVisible()
+    await expect(page.getByText('Acme Corporation').first()).toBeVisible()
   })
 
   test('color preset changes card colors', async ({ page }) => {
-    // Color presets use aria-label like "Royal Blue palette"
     const preset = page.getByRole('button', { name: /Royal Blue palette/i })
     await preset.click()
-    await expect(page.getByText('Thank You')).toBeVisible()
+    await expect(page.getByText('Acme Corporation').first()).toBeVisible()
   })
 
   test('back button returns to discovery', async ({ page }) => {
-    await page.getByRole('button', { name: /back/i }).click()
+    await page.getByRole('button', { name: 'Back to Templates' }).click()
     await expect(page.getByRole('heading', { name: /what.?s the occasion/i })).toBeVisible()
   })
 
