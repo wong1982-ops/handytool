@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     "jspdf",
     "jszip",
     "@neplex/vectorizer",
+    "nodemailer",
   ],
   experimental: {
     optimizePackageImports: [

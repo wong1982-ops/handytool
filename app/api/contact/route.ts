@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import nodemailer from 'nodemailer'
 
 const contactSchema = z.object({
   name: z.string().min(1),
@@ -45,32 +46,52 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Call Supabase Edge Function
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!supabaseUrl || !supabaseAnonKey) {
+  const { name, email, subject, message } = result.data
+
+  const smtpUser = process.env.SMTP_USER
+  const smtpPass = process.env.SMTP_PASS
+  const contactTo = process.env.CONTACT_TO_EMAIL || 'loicwong1982@gmail.com'
+
+  if (!smtpUser || !smtpPass) {
+    console.error('SMTP credentials not configured')
     return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
   }
 
   try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/send-contact-email`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseAnonKey}`,
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
       },
-      body: JSON.stringify(result.data),
     })
 
-    if (!response.ok) {
-      const errText = await response.text()
-      console.error('Edge function error:', errText)
-      return NextResponse.json({ error: 'Failed to send message' }, { status: 502 })
-    }
+    await transporter.sendMail({
+      from: smtpUser,
+      to: contactTo,
+      replyTo: email,
+      subject: `[Toolk1t Contact] ${subject}`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #3D6AF2;">New Contact Message</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr><td style="padding: 8px 0; color: #666;">Name:</td><td style="padding: 8px 0;">${name}</td></tr>
+            <tr><td style="padding: 8px 0; color: #666;">Email:</td><td style="padding: 8px 0;"><a href="mailto:${email}">${email}</a></td></tr>
+            <tr><td style="padding: 8px 0; color: #666;">Subject:</td><td style="padding: 8px 0;">${subject}</td></tr>
+          </table>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 16px 0;" />
+          <div style="white-space: pre-wrap; line-height: 1.6;">${message}</div>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 16px 0;" />
+          <p style="color: #999; font-size: 12px;">Sent from Toolk1t Contact Form at ${new Date().toISOString()}</p>
+        </div>
+      `,
+    })
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('Contact API error:', err)
+    console.error('Email send error:', err)
     return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
   }
 }
