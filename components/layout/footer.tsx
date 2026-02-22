@@ -13,9 +13,9 @@ interface FooterProps {
 export function Footer({
   brandName = 'Toolk1t',
   links = [
-    { label: 'Terms of Service', href: '#' },
-    { label: 'Privacy Policy', href: '#' },
-    { label: 'Contact Support', href: '#' },
+    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Contact Support', href: '/contact' },
   ],
 }: FooterProps) {
   return (
