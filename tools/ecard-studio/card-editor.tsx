@@ -41,7 +41,7 @@ export function CardEditor() {
   }, [cardData.template])
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] bg-slate-950">
+    <div className="flex flex-col flex-1 min-h-0 bg-slate-950">
       {/* Top Bar */}
       <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between flex-shrink-0">
         {/* Left: Breadcrumb */}
