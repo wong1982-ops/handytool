@@ -11,7 +11,7 @@ function getRandomPassage(): string {
   return TYPING_PASSAGES[Math.floor(Math.random() * TYPING_PASSAGES.length)]
 }
 
-export function TypingTest({ onComplete, onBack, bestScore }: TestComponentProps) {
+export function TypingTest({ onComplete, bestScore }: TestComponentProps) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [passage, setPassage] = useState(() => getRandomPassage())
   const [cursorPos, setCursorPos] = useState(0)

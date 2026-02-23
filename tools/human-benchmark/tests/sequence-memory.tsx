@@ -16,7 +16,7 @@ function getGridSize(level: number): number {
   return 3
 }
 
-export function SequenceMemory({ onComplete, onBack, bestScore }: TestComponentProps) {
+export function SequenceMemory({ onComplete, bestScore }: TestComponentProps) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [level, setLevel] = useState(1)
   const [sequence, setSequence] = useState<number[]>([])

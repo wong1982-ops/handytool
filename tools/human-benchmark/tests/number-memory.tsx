@@ -15,7 +15,7 @@ function generateNumber(level: number): string {
   return String(Math.floor(Math.random() * (max - min + 1)) + min)
 }
 
-export function NumberMemory({ onComplete, onBack, bestScore }: TestComponentProps) {
+export function NumberMemory({ onComplete, bestScore }: TestComponentProps) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [level, setLevel] = useState(1)
   const [currentNumber, setCurrentNumber] = useState('')

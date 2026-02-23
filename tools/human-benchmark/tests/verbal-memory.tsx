@@ -16,7 +16,7 @@ function pickRandomFromSet(set: Set<string>): string {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
-export function VerbalMemory({ onComplete, onBack, bestScore }: TestComponentProps) {
+export function VerbalMemory({ onComplete, bestScore }: TestComponentProps) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [lives, setLives] = useState(3)
   const [score, setScore] = useState(0)

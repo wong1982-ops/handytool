@@ -8,7 +8,7 @@ type Phase = 'intro' | 'waiting' | 'ready' | 'too-early' | 'result' | 'complete'
 
 const MAX_ATTEMPTS = 5
 
-export function ReactionTime({ onComplete, onBack, bestScore }: TestComponentProps) {
+export function ReactionTime({ onComplete, bestScore }: TestComponentProps) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [attempt, setAttempt] = useState(1)
   const [results, setResults] = useState<number[]>([])

@@ -33,7 +33,7 @@ function heartsString(lives: number): string {
   return '♥'.repeat(lives) + '♡'.repeat(Math.max(0, 3 - lives))
 }
 
-export function VisualMemory({ onComplete, onBack, bestScore }: TestComponentProps) {
+export function VisualMemory({ onComplete, bestScore }: TestComponentProps) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [level, setLevel] = useState(1)
   const [lives, setLives] = useState(3)
