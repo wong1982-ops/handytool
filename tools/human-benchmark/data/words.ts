@@ -17,6 +17,6 @@ export const WORD_LIST: string[] = [
   'puzzle', 'salmon', 'ticket', 'turtle', 'vessel',
   'winter', 'butter', 'copper', 'daisy', 'eagle',
   'flower', 'goblet', 'handle', 'ivory', 'jersey',
-  'kitten', 'locket', 'melon', 'nutmeg', 'pepper',
+  'lumber', 'locket', 'melon', 'nutmeg', 'pepper',
   'quiver', 'raisin', 'socket', 'trophy', 'wagon',
 ]

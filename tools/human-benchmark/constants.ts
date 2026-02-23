@@ -175,7 +175,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     iconBgLight: 'bg-orange-100',
     iconColorLight: 'text-orange-600',
     gameBgColor: '#db2777',
-    unit: 'numbers',
+    unit: 'level',
     lowerIsBetter: false,
   },
   {
