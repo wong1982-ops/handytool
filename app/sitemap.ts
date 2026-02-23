@@ -1,21 +1,9 @@
 import type { MetadataRoute } from "next";
+import { tools } from "@/lib/tools";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://toolk1t.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const tools = [
-    { slug: "ipcheck", priority: 0.8 },
-    { slug: "myip", priority: 0.8 },
-    { slug: "speedtest", priority: 0.8 },
-    { slug: "json-converter", priority: 0.8 },
-    { slug: "swagger-editor", priority: 0.7 },
-    { slug: "id-photo", priority: 0.8 },
-    { slug: "pdf-converter", priority: 0.9 },
-    { slug: "image-editor", priority: 0.8 },
-    { slug: "currency-exchange", priority: 0.8 },
-    { slug: "svg-converter", priority: 0.7 },
-  ];
-
   const now = new Date();
 
   return [
@@ -32,10 +20,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     ...tools.map((tool) => ({
-      url: `${SITE_URL}/tools/${tool.slug}`,
+      url: `${SITE_URL}${tool.href}`,
       lastModified: now,
       changeFrequency: "monthly" as const,
-      priority: tool.priority,
+      priority: 0.8,
     })),
+    {
+      url: `${SITE_URL}/contact`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${SITE_URL}/terms`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${SITE_URL}/privacy`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
   ];
 }
