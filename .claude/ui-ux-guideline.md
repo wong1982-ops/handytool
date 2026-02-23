@@ -490,160 +490,36 @@ Every page MUST include a breadcrumb navigation at the top of the content area.
 - Render breadcrumbs as the first child inside the page `<main>` element, before any other content
 - Use the reusable `Breadcrumb` component from `components/ui/breadcrumb.tsx`
 
-## End-to-End Testing with Playwright (MANDATORY)
+## Testing with webapp-testing Skill (MANDATORY)
 
-Every tool page MUST have Playwright E2E tests covering its core user flows. Tests live in the `toolk1t-client` project.
+Every tool page MUST be verified using the `webapp-testing` skill, which uses the Playwright MCP browser tools to interact with the running app in a real browser.
 
-### Setup
+### How It Works
 
-- **Config**: `toolk1t-client/playwright.config.ts`
-- **Test dir**: `toolk1t-client/e2e/`
-- **Test naming**: `e2e/<toolname>.spec.ts` (one spec file per tool)
-- **Run**: `pnpm test:e2e` (all tests) or `pnpm test:e2e -- e2e/ipcheck.spec.ts` (single file)
-- **Dependencies**: `@playwright/test` as devDependency, browsers installed via `npx playwright install`
+Instead of writing standalone E2E test files, invoke the `webapp-testing` skill to:
+1. Navigate to the tool page in a real browser
+2. Interact with UI elements (click, type, fill forms)
+3. Take screenshots to verify visual state
+4. Check accessibility snapshots for element presence
+5. Inspect console logs and network requests for errors
 
-### Test Structure
+### What to Verify (per tool)
 
-```
-toolk1t-client/
-  e2e/
-    ipcheck.spec.ts
-    myip.spec.ts
-    speedtest.spec.ts
-    json-converter.spec.ts
-    swagger-editor.spec.ts
-    id-photo.spec.ts
-    image-editor.spec.ts
-    pdf-converter.spec.ts
-  playwright.config.ts
-```
-
-### What to Test (per tool)
-
-Each tool spec MUST cover:
+Each tool MUST be verified for:
 
 1. **Page load** — Page renders without errors, key elements visible
 2. **Core user flow** — The primary use case works end-to-end (e.g., search IP → results shown, upload file → preview rendered)
-3. **Error states** — Invalid input shows error message, network failures handled gracefully
+3. **Error states** — Invalid input shows error message, failures handled gracefully
 4. **Loading states** — Loading skeleton/spinner appears during async operations
 5. **Responsive layout** — Key layout works on mobile (375px) and desktop (1280px) viewports
 6. **Keyboard accessibility** — Primary actions reachable via Tab + Enter
-7. **Dark mode** — Page renders correctly in `prefers-color-scheme: dark`
+7. **Dark mode** — Page renders correctly in dark mode
 
-### Writing Tests — Rules
+### When to Test
 
-- Use `page.getByRole()`, `page.getByText()`, `page.getByLabel()`, `page.getByPlaceholder()` — prefer accessible locators over CSS selectors
-- Use `test.describe()` to group related tests
-- Mock API calls with `page.route()` for deterministic results — E2E tests must not depend on external services
-- Set viewport with `page.setViewportSize()` for responsive tests
-- Use `await expect(locator).toBeVisible()` over `waitForSelector`
-- Keep tests independent — no shared state between `test()` blocks
-- Use `test.beforeEach()` for common navigation (e.g., `page.goto('/tools/ipcheck')`)
-
-### Example Test
-
-```typescript
-import { test, expect } from '@playwright/test'
-
-test.describe('IP Check Tool', () => {
-  test.beforeEach(async ({ page }) => {
-    // Mock API response for deterministic testing
-    await page.route('**/api/v1/ipcheck*', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          data: {
-            ip: '8.8.8.8',
-            location: { city: 'Mountain View', state: 'California', country: 'United States', countryCode: 'US', postalCode: '94035', lat: 37.386, lng: -122.084 },
-            network: { isp: 'Google LLC', org: 'Google LLC', asn: 'AS15169', proxy: false, hosting: true },
-            timezone: 'America/Los_Angeles',
-          },
-        }),
-      }),
-    )
-    await page.goto('/tools/ipcheck')
-  })
-
-  test('shows idle state on load', async ({ page }) => {
-    await expect(page.getByText('Enter an IP address or domain to get started')).toBeVisible()
-  })
-
-  test('searches an IP and displays results', async ({ page }) => {
-    await page.getByPlaceholder(/lookup any ip/i).fill('8.8.8.8')
-    await page.getByRole('button', { name: /lookup/i }).click()
-    await expect(page.getByText('8.8.8.8')).toBeVisible()
-    await expect(page.getByText('Mountain View')).toBeVisible()
-  })
-
-  test('shows error for failed lookup', async ({ page }) => {
-    await page.route('**/api/v1/ipcheck*', (route) =>
-      route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'Lookup failed' }) }),
-    )
-    await page.getByPlaceholder(/lookup any ip/i).fill('invalid')
-    await page.getByRole('button', { name: /lookup/i }).click()
-    await expect(page.getByRole('alert')).toBeVisible()
-    await expect(page.getByText(/retry/i)).toBeVisible()
-  })
-
-  test('is keyboard accessible', async ({ page }) => {
-    await page.getByPlaceholder(/lookup any ip/i).focus()
-    await page.keyboard.type('8.8.8.8')
-    await page.keyboard.press('Enter')
-    await expect(page.getByText('8.8.8.8')).toBeVisible()
-  })
-
-  test('responsive layout on mobile', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 })
-    await expect(page.getByPlaceholder(/lookup any ip/i)).toBeVisible()
-  })
-})
-```
-
-### Playwright Config
-
-```typescript
-// playwright.config.ts
-import { defineConfig, devices } from '@playwright/test'
-
-export default defineConfig({
-  testDir: './e2e',
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
-  use: {
-    baseURL: 'http://localhost:3000',
-    trace: 'on-first-retry',
-  },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-    { name: 'mobile-chrome', use: { ...devices['Pixel 5'] } },
-    { name: 'mobile-safari', use: { ...devices['iPhone 12'] } },
-  ],
-  webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-  },
-})
-```
-
-### CI Integration
-
-- Run `npx playwright install --with-deps` in CI setup step
-- Run `pnpm test:e2e` as part of the PR check pipeline
-- Playwright HTML report should be uploaded as a CI artifact on failure
-- Tests MUST pass on all 3 desktop browsers (Chromium, Firefox, WebKit) and 2 mobile viewports
-
-### When to Write Tests
-
-- **New tool**: Write E2E tests as part of the tool implementation — tests are a delivery requirement, not optional
-- **Bug fix**: Add a regression test covering the bug scenario before marking the fix as done
-- **UI change**: Update affected tests to match new behavior; failing tests must not be deleted without replacement
+- **New tool**: Verify using `webapp-testing` as part of the tool delivery — not optional
+- **Bug fix**: Verify the fix via browser before marking done
+- **UI change**: Verify affected flows still work correctly
 
 ## New Tool Development Checklist (MANDATORY)
 
@@ -721,7 +597,7 @@ When adding a new tool to toolk1t-client, EVERY item below must be addressed bef
 - [ ] Core tool functionality works end-to-end
 - [ ] Keyboard accessible (Tab navigation, Enter to submit, Escape to close)
 - [ ] `pnpm build` passes with zero errors
-- [ ] E2E tests written (see Playwright section above)
+- [ ] Verified using `webapp-testing` skill (see Testing section above)
 
 ## Input Components
 

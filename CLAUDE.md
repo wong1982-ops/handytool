@@ -13,7 +13,7 @@
 - **Styling**: Tailwind CSS v4 + SCSS (always `.scss`, never `.css`) + system font stack (no external fonts)
 - **UI**: shadcn/ui + Tailwind, CSS custom properties for theming (`--tk-*`)
 - **Framework**: Next.js 16 App Router, React 19, TypeScript strict
-- **E2E Testing**: Playwright — every tool MUST have E2E tests (see `.claude/ui-ux-guideline.md`)
+- **Testing**: Use `webapp-testing` skill for verifying UI functionality via browser automation
 
 ## Repo Responsibilities (MUST follow — put code in the correct repo)
 
@@ -128,7 +128,7 @@ Key rules: WCAG 2.1 AA, 4.5:1 contrast for text, 44px touch targets, mobile-firs
 ## Development Lifecycle (MANDATORY)
 All features MUST follow the 3-phase lifecycle defined in [.claude/dev-lifecycle.md](.claude/dev-lifecycle.md):
 - **Phase 1 — Discovery**: PO + BA + UX + UI + Architect + QA Lead collaborate on PRD
-- **Phase 2 — Build**: Dev + QA work in parallel (implementation + E2E tests)
+- **Phase 2 — Build**: Dev + QA work in parallel (implementation + webapp-testing verification)
 - **Phase 3 — Review**: PO + UX + UI + QA + Architect review, score 7 dimensions, APPROVED or NEEDS ITERATION
 - **Iteration**: Back to Phase 1 with refined PRD, max 3 cycles per feature
 
@@ -147,7 +147,7 @@ All features MUST follow the 3-phase lifecycle defined in [.claude/dev-lifecycle
 - **seo-expert** — Meta tags, structured data, Core Web Vitals, semantic HTML
 
 ### Review & Quality (Phase 3)
-- **qa-engineer** — Test planning, E2E automation (Playwright), manual testing, bug reports, QA sign-off
+- **qa-engineer** — Test planning, `webapp-testing` skill for browser verification, manual testing, bug reports, QA sign-off
 
 ## Session Continuity (MANDATORY)
 Before starting any implementation, write a summary to [.claude/session-log.md](.claude/session-log.md).
