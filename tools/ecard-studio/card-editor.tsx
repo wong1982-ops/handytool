@@ -29,6 +29,10 @@ export function CardEditor() {
     setCardData((prev) => ({ ...prev, ...updates }))
   }, [])
 
+  const handleLogoMove = useCallback((logoX: number, logoY: number) => {
+    setCardData((prev) => ({ ...prev, logoX, logoY }))
+  }, [])
+
   const handleTemplateSelect = useCallback((templateId: TemplateId) => {
     const template = TEMPLATES.find((t) => t.id === templateId)
     if (template) setCardData({ ...template.defaults })
@@ -119,6 +123,7 @@ export function CardEditor() {
             cardRef={cardRef}
             zoom={zoom}
             onZoomChange={setZoom}
+            onLogoMove={handleLogoMove}
           />
         </div>
 

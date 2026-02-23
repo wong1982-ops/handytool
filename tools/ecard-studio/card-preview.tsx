@@ -1,7 +1,7 @@
 'use client'
 
-import { forwardRef } from 'react'
-import type { ECardData, LogoPosition } from '@/tools/ecard-studio/types'
+import { forwardRef, useCallback, useRef } from 'react'
+import type { ECardData } from '@/tools/ecard-studio/types'
 import { getPatternBackground } from '@/tools/ecard-studio/patterns'
 
 /* ------------------------------------------------------------------ */
@@ -17,17 +17,6 @@ function isDarkBackground(hex: string): boolean {
   return (r + g + b) / 3 < 128
 }
 
-/** Map logo position to CSS positioning. */
-function getLogoStyle(position: LogoPosition): React.CSSProperties {
-  const base: React.CSSProperties = { position: 'absolute', width: 60, height: 60, objectFit: 'contain' }
-  switch (position) {
-    case 'top-left': return { ...base, top: 16, left: 16 }
-    case 'top-right': return { ...base, top: 16, right: 16 }
-    case 'bottom-left': return { ...base, bottom: 16, left: 16 }
-    case 'bottom-right': return { ...base, bottom: 16, right: 16 }
-  }
-}
-
 /* ------------------------------------------------------------------ */
 /*  Card Preview Component                                            */
 /* ------------------------------------------------------------------ */
@@ -36,10 +25,50 @@ export interface CardPreviewProps {
   data: ECardData
   scale?: number
   className?: string
+  /** Called when the user drags the logo to a new position (percentage 0-100). */
+  onLogoMove?: (logoX: number, logoY: number) => void
 }
 
 const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
-  function CardPreview({ data, scale = 1, className }, ref) {
+  function CardPreview({ data, scale = 1, className, onLogoMove }, ref) {
+    const draggingRef = useRef(false)
+    const cardElRef = useRef<HTMLDivElement | null>(null)
+
+    const setRefs = useCallback(
+      (el: HTMLDivElement | null) => {
+        cardElRef.current = el
+        if (typeof ref === 'function') ref(el)
+        else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = el
+      },
+      [ref],
+    )
+
+    const handlePointerDown = useCallback(
+      (e: React.PointerEvent) => {
+        if (!onLogoMove || !data.logoUrl) return
+        const target = e.target as HTMLElement
+        if (!target.closest('[data-logo]')) return
+        draggingRef.current = true
+        ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+        e.preventDefault()
+      },
+      [onLogoMove, data.logoUrl],
+    )
+
+    const handlePointerMove = useCallback(
+      (e: React.PointerEvent) => {
+        if (!draggingRef.current || !cardElRef.current || !onLogoMove) return
+        const rect = cardElRef.current.getBoundingClientRect()
+        const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100))
+        const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100))
+        onLogoMove(Math.round(x), Math.round(y))
+      },
+      [onLogoMove],
+    )
+
+    const handlePointerUp = useCallback(() => {
+      draggingRef.current = false
+    }, [])
     const dark = isDarkBackground(data.backgroundColor)
     const patternBg = getPatternBackground(data.backgroundPattern, data.accentColor)
 
@@ -61,7 +90,10 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
         }}
       >
         <div
-          ref={ref}
+          ref={setRefs}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
           style={{
             width: 600,
             height: 400,
@@ -69,6 +101,7 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
             backgroundImage: patternBg,
             transform: scale !== 1 ? `scale(${scale})` : undefined,
             transformOrigin: 'top left',
+            cursor: data.logoUrl && onLogoMove ? 'default' : undefined,
           }}
           className="relative select-none"
         >
@@ -159,13 +192,22 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
             )}
           </div>
 
-          {/* Logo overlay */}
+          {/* Logo — rendered under text content */}
           {data.logoUrl && (
             <img
               src={data.logoUrl}
               alt="Logo"
-              className="z-20 pointer-events-none"
-              style={getLogoStyle(data.logoPosition)}
+              data-logo
+              className={`z-[5] ${onLogoMove ? 'pointer-events-auto cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
+              style={{
+                position: 'absolute',
+                width: 60,
+                height: 60,
+                objectFit: 'contain',
+                left: `${data.logoX}%`,
+                top: `${data.logoY}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
             />
           )}
 

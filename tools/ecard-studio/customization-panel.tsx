@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useCallback } from 'react'
-import type { ECardData, TextAlign, LogoPosition } from '@/tools/ecard-studio/types'
+import type { ECardData, TextAlign } from '@/tools/ecard-studio/types'
 import { PATTERNS } from '@/tools/ecard-studio/patterns'
 import { COLOR_PRESETS, FONT_OPTIONS } from '@/tools/ecard-studio/templates'
 
@@ -441,38 +441,14 @@ export function CustomizationPanel({ cardData, onChange }: CustomizationPanelPro
             </button>
           )}
 
-          {/* Logo Position */}
+          {/* Logo Position hint */}
           {cardData.logoUrl && (
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-slate-500 uppercase tracking-wider">
-                Logo Position
-              </label>
-              <div className="grid grid-cols-4 gap-1.5">
-                {([
-                  { value: 'top-left' as LogoPosition, label: 'Top Left' },
-                  { value: 'top-right' as LogoPosition, label: 'Top Right' },
-                  { value: 'bottom-left' as LogoPosition, label: 'Bottom Left' },
-                  { value: 'bottom-right' as LogoPosition, label: 'Bottom Right' },
-                ]).map(({ value, label }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    aria-label={label}
-                    aria-pressed={cardData.logoPosition === value}
-                    onClick={() => onChange({ logoPosition: value })}
-                    className={`px-2 py-1.5 rounded-md text-[10px] transition-colors ${
-                      cardData.logoPosition === value
-                        ? 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/50'
-                        : 'bg-slate-800 text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    {label.replace(' ', '\n').split('\n').map((line, i) => (
-                      <span key={i} className={i > 0 ? 'block' : ''}>{line}</span>
-                    ))}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <p className="text-[11px] text-slate-500 flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M7 1V13M1 7H13M3 3L7 1L11 3M3 11L7 13L11 11M1 7L3 3M1 7L3 11M13 7L11 3M13 7L11 11" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
+              </svg>
+              Drag the logo on the card to reposition
+            </p>
           )}
         </div>
       </section>

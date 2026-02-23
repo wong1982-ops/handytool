@@ -19,8 +19,6 @@ export type TemplateCategory = 'classic-marble' | 'corporate' | 'modernist' | 'e
 
 export type TextAlign = 'left' | 'center' | 'right' | 'justify'
 
-export type LogoPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
-
 export interface ECardData {
   template: TemplateId
   heading: string
@@ -38,7 +36,10 @@ export interface ECardData {
   borderAccents: boolean
   backgroundPattern: BackgroundPattern
   logoUrl: string
-  logoPosition: LogoPosition
+  /** Logo X position as percentage (0–100) of the card width */
+  logoX: number
+  /** Logo Y position as percentage (0–100) of the card height */
+  logoY: number
 }
 
 export interface Template {

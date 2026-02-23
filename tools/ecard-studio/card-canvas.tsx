@@ -69,9 +69,10 @@ export interface CardCanvasProps {
   cardRef: React.RefObject<HTMLDivElement | null>
   zoom: number
   onZoomChange: (zoom: number) => void
+  onLogoMove?: (logoX: number, logoY: number) => void
 }
 
-export function CardCanvas({ cardData, cardRef, zoom, onZoomChange }: CardCanvasProps) {
+export function CardCanvas({ cardData, cardRef, zoom, onZoomChange, onLogoMove }: CardCanvasProps) {
   const [showBanner, setShowBanner] = useState(true)
 
   const handleZoomOut = () => {
@@ -196,7 +197,7 @@ export function CardCanvas({ cardData, cardRef, zoom, onZoomChange }: CardCanvas
             transformOrigin: 'center center',
           }}
         >
-          <CardPreview data={cardData} ref={cardRef} />
+          <CardPreview data={cardData} ref={cardRef} onLogoMove={onLogoMove} />
         </div>
       </div>
 

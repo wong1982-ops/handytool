@@ -40,7 +40,8 @@ export const TEMPLATES: Template[] = [
       borderAccents: true,
       backgroundPattern: 'formal-invitation',
       logoUrl: '',
-      logoPosition: 'bottom-right',
+      logoX: 85,
+      logoY: 80,
     },
   },
   {
@@ -66,7 +67,8 @@ export const TEMPLATES: Template[] = [
       borderAccents: true,
       backgroundPattern: 'diagonal-stripes',
       logoUrl: '',
-      logoPosition: 'bottom-right',
+      logoX: 85,
+      logoY: 80,
     },
   },
   {
@@ -92,7 +94,8 @@ export const TEMPLATES: Template[] = [
       borderAccents: true,
       backgroundPattern: 'plus',
       logoUrl: '',
-      logoPosition: 'bottom-right',
+      logoX: 85,
+      logoY: 80,
     },
   },
   {
@@ -118,7 +121,8 @@ export const TEMPLATES: Template[] = [
       borderAccents: true,
       backgroundPattern: 'four-point-stars',
       logoUrl: '',
-      logoPosition: 'bottom-right',
+      logoX: 85,
+      logoY: 80,
     },
   },
   {
@@ -144,7 +148,8 @@ export const TEMPLATES: Template[] = [
       borderAccents: true,
       backgroundPattern: 'none',
       logoUrl: '',
-      logoPosition: 'bottom-right',
+      logoX: 85,
+      logoY: 80,
     },
   },
 ]
@@ -166,5 +171,6 @@ export const BLANK_DEFAULTS: ECardData = {
   borderAccents: true,
   backgroundPattern: 'none',
   logoUrl: '',
-  logoPosition: 'bottom-right',
+  logoX: 85,
+  logoY: 80,
 }
