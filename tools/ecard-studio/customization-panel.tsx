@@ -39,9 +39,91 @@ export function CustomizationPanel({ cardData, onChange }: CustomizationPanelPro
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
         <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-          Customization
+          Editor
         </span>
       </div>
+
+      {/* CONTENT Section */}
+      <section className="flex flex-col gap-3">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500">
+          Content
+        </h3>
+
+        {/* Name */}
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="content-name" className="text-xs text-slate-500 uppercase tracking-wider">
+            Name
+          </label>
+          <input
+            id="content-name"
+            type="text"
+            value={cardData.heading}
+            onChange={(e) => onChange({ heading: e.target.value })}
+            placeholder="e.g. Jane Smith"
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg text-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Title */}
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="content-title" className="text-xs text-slate-500 uppercase tracking-wider">
+            Title
+          </label>
+          <input
+            id="content-title"
+            type="text"
+            value={cardData.subheading}
+            onChange={(e) => onChange({ subheading: e.target.value })}
+            placeholder="e.g. Senior Product Designer"
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg text-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Message */}
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="content-message" className="text-xs text-slate-500 uppercase tracking-wider">
+            Message
+          </label>
+          <textarea
+            id="content-message"
+            rows={2}
+            value={cardData.body}
+            onChange={(e) => onChange({ body: e.target.value })}
+            placeholder="e.g. Wishing you a wonderful holiday season!"
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg text-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+          />
+        </div>
+
+        {/* Company */}
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="content-company" className="text-xs text-slate-500 uppercase tracking-wider">
+            Company
+          </label>
+          <input
+            id="content-company"
+            type="text"
+            value={cardData.companyName}
+            onChange={(e) => onChange({ companyName: e.target.value })}
+            placeholder="e.g. Acme Corporation"
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg text-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Tagline */}
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="content-tagline" className="text-xs text-slate-500 uppercase tracking-wider">
+            Tagline
+          </label>
+          <input
+            id="content-tagline"
+            type="text"
+            value={cardData.companyTagline}
+            onChange={(e) => onChange({ companyTagline: e.target.value })}
+            placeholder="e.g. Innovation meets excellence"
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg text-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+      </section>
 
       {/* TYPOGRAPHY Section */}
       <section className="flex flex-col gap-3">
