@@ -1,6 +1,19 @@
 export type TemplateId = 'executive' | 'midnight-pinstripe' | 'tech-blueprint' | 'aura-signature' | 'black-tie-matte' | 'blank'
 
-export type BackgroundPattern = 'arcs' | 'stripes' | 'grid' | 'gradient' | 'solid'
+export type BackgroundPattern =
+  | 'none'
+  | 'diagonal-stripes'
+  | 'hexagons'
+  | 'plus'
+  | 'polka-dots'
+  | 'texture'
+  | 'flipped-diamonds'
+  | 'four-point-stars'
+  | 'falling-triangles'
+  | 'zig-zag'
+  | 'signal'
+  | 'overlapping-circles'
+  | 'formal-invitation'
 
 export type TemplateCategory = 'classic-marble' | 'corporate' | 'modernist' | 'ethereal' | 'noir'
 
@@ -35,7 +48,6 @@ export interface Template {
   category: TemplateCategory
   categoryLabel: string
   defaults: ECardData
-  backgroundPattern: BackgroundPattern
 }
 
 export interface ColorPreset {

@@ -1,7 +1,8 @@
 'use client'
 
 import { forwardRef } from 'react'
-import type { ECardData, BackgroundPattern, LogoPosition } from '@/tools/ecard-studio/types'
+import type { ECardData, LogoPosition } from '@/tools/ecard-studio/types'
+import { getPatternBackground } from '@/tools/ecard-studio/patterns'
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -28,150 +29,6 @@ function getLogoStyle(position: LogoPosition): React.CSSProperties {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Decorative SVG overlays                                           */
-/* ------------------------------------------------------------------ */
-
-function ArcsOverlay({ accent }: { accent: string }) {
-  return (
-    <svg
-      className="absolute inset-0 pointer-events-none"
-      width="600"
-      height="400"
-      viewBox="0 0 600 400"
-      fill="none"
-      style={{ opacity: 0.1 }}
-      aria-hidden="true"
-    >
-      <circle
-        cx="520"
-        cy="60"
-        r="180"
-        stroke={accent}
-        strokeWidth="1.5"
-        fill="none"
-      />
-      <circle
-        cx="540"
-        cy="40"
-        r="120"
-        stroke={accent}
-        strokeWidth="1"
-        fill="none"
-      />
-    </svg>
-  )
-}
-
-function StripesOverlay({ accent }: { accent: string }) {
-  const lines = Array.from({ length: 30 }, (_, i) => i * 20)
-  return (
-    <svg
-      className="absolute inset-0 pointer-events-none"
-      width="600"
-      height="400"
-      viewBox="0 0 600 400"
-      fill="none"
-      style={{ opacity: 0.1 }}
-      aria-hidden="true"
-    >
-      {lines.map((x) => (
-        <line
-          key={x}
-          x1={x}
-          y1={0}
-          x2={x}
-          y2={400}
-          stroke={accent}
-          strokeWidth="0.5"
-        />
-      ))}
-    </svg>
-  )
-}
-
-function GridOverlay({ accent }: { accent: string }) {
-  const cols = Array.from({ length: 13 }, (_, i) => i * 50)
-  const rows = Array.from({ length: 9 }, (_, i) => i * 50)
-  return (
-    <svg
-      className="absolute inset-0 pointer-events-none"
-      width="600"
-      height="400"
-      viewBox="0 0 600 400"
-      fill="none"
-      style={{ opacity: 0.1 }}
-      aria-hidden="true"
-    >
-      {cols.map((x) => (
-        <line
-          key={`v${x}`}
-          x1={x}
-          y1={0}
-          x2={x}
-          y2={400}
-          stroke={accent}
-          strokeWidth="0.5"
-        />
-      ))}
-      {rows.map((y) => (
-        <line
-          key={`h${y}`}
-          x1={0}
-          y1={y}
-          x2={600}
-          y2={y}
-          stroke={accent}
-          strokeWidth="0.5"
-        />
-      ))}
-    </svg>
-  )
-}
-
-function GradientOverlay({ accent }: { accent: string }) {
-  return (
-    <svg
-      className="absolute inset-0 pointer-events-none"
-      width="600"
-      height="400"
-      viewBox="0 0 600 400"
-      style={{ opacity: 0.1 }}
-      aria-hidden="true"
-    >
-      <defs>
-        <radialGradient id="rg-center" cx="50%" cy="50%" r="60%">
-          <stop offset="0%" stopColor={accent} stopOpacity="0.6" />
-          <stop offset="100%" stopColor={accent} stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <rect width="600" height="400" fill="url(#rg-center)" />
-    </svg>
-  )
-}
-
-function PatternOverlay({
-  pattern,
-  accent,
-}: {
-  pattern: BackgroundPattern
-  accent: string
-}) {
-  switch (pattern) {
-    case 'arcs':
-      return <ArcsOverlay accent={accent} />
-    case 'stripes':
-      return <StripesOverlay accent={accent} />
-    case 'grid':
-      return <GridOverlay accent={accent} />
-    case 'gradient':
-      return <GradientOverlay accent={accent} />
-    case 'solid':
-    default:
-      return null
-  }
-}
-
-/* ------------------------------------------------------------------ */
 /*  Card Preview Component                                            */
 /* ------------------------------------------------------------------ */
 
@@ -184,7 +41,7 @@ export interface CardPreviewProps {
 const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
   function CardPreview({ data, scale = 1, className }, ref) {
     const dark = isDarkBackground(data.backgroundColor)
-    const pattern = data.backgroundPattern ?? 'solid'
+    const patternBg = getPatternBackground(data.backgroundPattern, data.accentColor)
 
     const mutedTextColor = dark
       ? 'rgba(255,255,255,0.55)'
@@ -209,14 +66,12 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
             width: 600,
             height: 400,
             backgroundColor: data.backgroundColor,
+            backgroundImage: patternBg,
             transform: scale !== 1 ? `scale(${scale})` : undefined,
             transformOrigin: 'top left',
           }}
           className="relative select-none"
         >
-          {/* Decorative overlay */}
-          <PatternOverlay pattern={pattern} accent={data.accentColor} />
-
           {/* Content area */}
           <div
             className="relative z-10 flex flex-col justify-center h-full"

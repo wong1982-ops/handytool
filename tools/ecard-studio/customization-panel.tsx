@@ -1,7 +1,8 @@
 'use client'
 
 import { useRef, useCallback } from 'react'
-import type { ECardData, TextAlign, BackgroundPattern, LogoPosition } from '@/tools/ecard-studio/types'
+import type { ECardData, TextAlign, LogoPosition } from '@/tools/ecard-studio/types'
+import { PATTERNS } from '@/tools/ecard-studio/patterns'
 import { COLOR_PRESETS, FONT_OPTIONS } from '@/tools/ecard-studio/templates'
 
 interface CustomizationPanelProps {
@@ -358,21 +359,21 @@ export function CustomizationPanel({ cardData, onChange }: CustomizationPanelPro
           <label className="text-xs text-slate-500 uppercase tracking-wider">
             Background Pattern
           </label>
-          <div className="flex items-center gap-1.5">
-            {(['arcs', 'stripes', 'grid', 'gradient', 'solid'] as BackgroundPattern[]).map((p) => (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {PATTERNS.map((p) => (
               <button
-                key={p}
+                key={p.id}
                 type="button"
-                aria-label={`${p} pattern`}
-                aria-pressed={cardData.backgroundPattern === p}
-                onClick={() => onChange({ backgroundPattern: p })}
-                className={`flex-1 px-1.5 py-1.5 rounded-md text-[10px] capitalize transition-colors ${
-                  cardData.backgroundPattern === p
+                aria-label={`${p.label} pattern`}
+                aria-pressed={cardData.backgroundPattern === p.id}
+                onClick={() => onChange({ backgroundPattern: p.id })}
+                className={`px-2 py-1.5 rounded-md text-[10px] transition-colors ${
+                  cardData.backgroundPattern === p.id
                     ? 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/50'
                     : 'bg-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
-                {p}
+                {p.label}
               </button>
             ))}
           </div>
