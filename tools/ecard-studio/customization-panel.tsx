@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
-import type { ECardData, TextAlign } from '@/tools/ecard-studio/types'
+import { useRef, useCallback } from 'react'
+import type { ECardData, TextAlign, BackgroundPattern, LogoPosition } from '@/tools/ecard-studio/types'
 import { COLOR_PRESETS, FONT_OPTIONS } from '@/tools/ecard-studio/templates'
 
 interface CustomizationPanelProps {
@@ -12,6 +12,19 @@ interface CustomizationPanelProps {
 export function CustomizationPanel({ cardData, onChange }: CustomizationPanelProps) {
   const bgColorRef = useRef<HTMLInputElement>(null)
   const accentColorRef = useRef<HTMLInputElement>(null)
+  const logoInputRef = useRef<HTMLInputElement>(null)
+
+  const handleLogoUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        onChange({ logoUrl: reader.result })
+      }
+    }
+    reader.readAsDataURL(file)
+  }, [onChange])
 
   const alignments: { value: TextAlign; label: string }[] = [
     { value: 'left', label: 'Align left' },
@@ -340,6 +353,31 @@ export function CustomizationPanel({ cardData, onChange }: CustomizationPanelPro
           Card Elements
         </h3>
 
+        {/* Background Pattern */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-slate-500 uppercase tracking-wider">
+            Background Pattern
+          </label>
+          <div className="flex items-center gap-1.5">
+            {(['arcs', 'stripes', 'grid', 'gradient', 'solid'] as BackgroundPattern[]).map((p) => (
+              <button
+                key={p}
+                type="button"
+                aria-label={`${p} pattern`}
+                aria-pressed={cardData.backgroundPattern === p}
+                onClick={() => onChange({ backgroundPattern: p })}
+                className={`flex-1 px-1.5 py-1.5 rounded-md text-[10px] capitalize transition-colors ${
+                  cardData.backgroundPattern === p
+                    ? 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/50'
+                    : 'bg-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Border Accents Toggle */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-slate-300">Border Accents</span>
@@ -354,23 +392,87 @@ export function CustomizationPanel({ cardData, onChange }: CustomizationPanelPro
           </label>
         </div>
 
-        {/* Logo Overlay Toggle (disabled) */}
-        <div className="flex items-center justify-between opacity-50">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-300">Logo Overlay</span>
-            <span className="text-[10px] text-slate-600 uppercase tracking-wider">
-              Coming soon
-            </span>
-          </div>
-          <label className="relative inline-flex items-center cursor-not-allowed">
-            <input
-              type="checkbox"
-              checked={cardData.logoOverlay}
-              disabled
-              className="sr-only peer"
-            />
-            <div className="w-9 h-5 bg-slate-700 rounded-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white/50 after:rounded-full after:h-4 after:w-4" />
+        {/* Logo Upload */}
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-slate-500 uppercase tracking-wider">
+            Logo
           </label>
+          <input
+            ref={logoInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleLogoUpload}
+            className="sr-only"
+            aria-label="Upload logo"
+          />
+          {cardData.logoUrl ? (
+            <div className="flex items-center gap-2">
+              <img
+                src={cardData.logoUrl}
+                alt="Uploaded logo"
+                className="w-10 h-10 rounded-md object-contain bg-slate-800 border border-slate-700"
+              />
+              <button
+                type="button"
+                onClick={() => logoInputRef.current?.click()}
+                className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Change
+              </button>
+              <button
+                type="button"
+                onClick={() => onChange({ logoUrl: '' })}
+                className="text-xs text-slate-500 hover:text-red-400 transition-colors"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => logoInputRef.current?.click()}
+              className="flex items-center justify-center gap-2 w-full py-2 bg-slate-800 border border-dashed border-slate-600 rounded-lg text-sm text-slate-400 hover:text-white hover:border-slate-400 transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              Upload Logo
+            </button>
+          )}
+
+          {/* Logo Position */}
+          {cardData.logoUrl && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-slate-500 uppercase tracking-wider">
+                Logo Position
+              </label>
+              <div className="grid grid-cols-4 gap-1.5">
+                {([
+                  { value: 'top-left' as LogoPosition, label: 'Top Left' },
+                  { value: 'top-right' as LogoPosition, label: 'Top Right' },
+                  { value: 'bottom-left' as LogoPosition, label: 'Bottom Left' },
+                  { value: 'bottom-right' as LogoPosition, label: 'Bottom Right' },
+                ]).map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-label={label}
+                    aria-pressed={cardData.logoPosition === value}
+                    onClick={() => onChange({ logoPosition: value })}
+                    className={`px-2 py-1.5 rounded-md text-[10px] transition-colors ${
+                      cardData.logoPosition === value
+                        ? 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/50'
+                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {label.replace(' ', '\n').split('\n').map((line, i) => (
+                      <span key={i} className={i > 0 ? 'block' : ''}>{line}</span>
+                    ))}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

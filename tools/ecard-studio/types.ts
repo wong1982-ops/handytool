@@ -6,6 +6,8 @@ export type TemplateCategory = 'classic-marble' | 'corporate' | 'modernist' | 'e
 
 export type TextAlign = 'left' | 'center' | 'right' | 'justify'
 
+export type LogoPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+
 export interface ECardData {
   template: TemplateId
   heading: string
@@ -21,7 +23,9 @@ export interface ECardData {
   backgroundColor: string
   accentColor: string
   borderAccents: boolean
-  logoOverlay: boolean
+  backgroundPattern: BackgroundPattern
+  logoUrl: string
+  logoPosition: LogoPosition
 }
 
 export interface Template {

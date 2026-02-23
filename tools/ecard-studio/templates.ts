@@ -39,7 +39,9 @@ export const TEMPLATES: Template[] = [
       backgroundColor: '#101922',
       accentColor: '#D4AF37',
       borderAccents: true,
-      logoOverlay: false,
+      backgroundPattern: 'arcs',
+      logoUrl: '',
+      logoPosition: 'bottom-right',
     },
   },
   {
@@ -64,7 +66,9 @@ export const TEMPLATES: Template[] = [
       backgroundColor: '#0A1628',
       accentColor: '#1173D4',
       borderAccents: true,
-      logoOverlay: false,
+      backgroundPattern: 'stripes',
+      logoUrl: '',
+      logoPosition: 'bottom-right',
     },
   },
   {
@@ -89,7 +93,9 @@ export const TEMPLATES: Template[] = [
       backgroundColor: '#F5F5F0',
       accentColor: '#18181B',
       borderAccents: true,
-      logoOverlay: false,
+      backgroundPattern: 'grid',
+      logoUrl: '',
+      logoPosition: 'bottom-right',
     },
   },
   {
@@ -114,7 +120,9 @@ export const TEMPLATES: Template[] = [
       backgroundColor: '#2D3B2D',
       accentColor: '#C4956A',
       borderAccents: true,
-      logoOverlay: false,
+      backgroundPattern: 'gradient',
+      logoUrl: '',
+      logoPosition: 'bottom-right',
     },
   },
   {
@@ -139,7 +147,9 @@ export const TEMPLATES: Template[] = [
       backgroundColor: '#18181B',
       accentColor: '#A1A1AA',
       borderAccents: true,
-      logoOverlay: false,
+      backgroundPattern: 'solid',
+      logoUrl: '',
+      logoPosition: 'bottom-right',
     },
   },
 ]
@@ -159,5 +169,7 @@ export const BLANK_DEFAULTS: ECardData = {
   backgroundColor: '#101922',
   accentColor: '#3D6AF2',
   borderAccents: true,
-  logoOverlay: false,
+  backgroundPattern: 'solid',
+  logoUrl: '',
+  logoPosition: 'bottom-right',
 }

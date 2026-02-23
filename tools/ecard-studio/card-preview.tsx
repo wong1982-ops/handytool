@@ -1,8 +1,7 @@
 'use client'
 
 import { forwardRef } from 'react'
-import type { ECardData, BackgroundPattern } from '@/tools/ecard-studio/types'
-import { TEMPLATES } from '@/tools/ecard-studio/templates'
+import type { ECardData, BackgroundPattern, LogoPosition } from '@/tools/ecard-studio/types'
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -17,10 +16,15 @@ function isDarkBackground(hex: string): boolean {
   return (r + g + b) / 3 < 128
 }
 
-/** Resolve the background pattern for the active template. */
-function getPatternForTemplate(data: ECardData): BackgroundPattern {
-  const tpl = TEMPLATES.find((t) => t.id === data.template)
-  return tpl?.backgroundPattern ?? 'solid'
+/** Map logo position to CSS positioning. */
+function getLogoStyle(position: LogoPosition): React.CSSProperties {
+  const base: React.CSSProperties = { position: 'absolute', width: 60, height: 60, objectFit: 'contain' }
+  switch (position) {
+    case 'top-left': return { ...base, top: 16, left: 16 }
+    case 'top-right': return { ...base, top: 16, right: 16 }
+    case 'bottom-left': return { ...base, bottom: 16, left: 16 }
+    case 'bottom-right': return { ...base, bottom: 16, right: 16 }
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -180,7 +184,7 @@ export interface CardPreviewProps {
 const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
   function CardPreview({ data, scale = 1, className }, ref) {
     const dark = isDarkBackground(data.backgroundColor)
-    const pattern = getPatternForTemplate(data)
+    const pattern = data.backgroundPattern ?? 'solid'
 
     const mutedTextColor = dark
       ? 'rgba(255,255,255,0.55)'
@@ -299,6 +303,16 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
               </p>
             )}
           </div>
+
+          {/* Logo overlay */}
+          {data.logoUrl && (
+            <img
+              src={data.logoUrl}
+              alt="Logo"
+              className="z-20 pointer-events-none"
+              style={getLogoStyle(data.logoPosition)}
+            />
+          )}
 
           {/* Bottom accent bar */}
           {data.borderAccents && (
