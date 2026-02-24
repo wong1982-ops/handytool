@@ -54,6 +54,7 @@ const jsonLd = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
+      <style dangerouslySetInnerHTML={{ __html: 'body > footer { display: none; }' }} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -45,14 +45,21 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
 
     const handlePointerDown = useCallback(
       (e: React.PointerEvent) => {
-        if (!onLogoMove || !data.logoUrl) return
-        const target = e.target as HTMLElement
-        if (!target.closest('[data-logo]')) return
+        if (!onLogoMove || !data.logoUrl || !cardElRef.current) return
+        // Check if the click is near the logo position (within logo bounds)
+        const rect = cardElRef.current.getBoundingClientRect()
+        const clickX = ((e.clientX - rect.left) / rect.width) * 100
+        const clickY = ((e.clientY - rect.top) / rect.height) * 100
+        const logoPxW = (60 / 600) * 100 // logo width as % of card
+        const logoPxH = (60 / 400) * 100 // logo height as % of card
+        const dx = Math.abs(clickX - data.logoX)
+        const dy = Math.abs(clickY - data.logoY)
+        if (dx > logoPxW && dy > logoPxH) return
         draggingRef.current = true
-        ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+        cardElRef.current.setPointerCapture(e.pointerId)
         e.preventDefault()
       },
-      [onLogoMove, data.logoUrl],
+      [onLogoMove, data.logoUrl, data.logoX, data.logoY],
     )
 
     const handlePointerMove = useCallback(
@@ -101,7 +108,7 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
             backgroundImage: patternBg,
             transform: scale !== 1 ? `scale(${scale})` : undefined,
             transformOrigin: 'top left',
-            cursor: data.logoUrl && onLogoMove ? 'default' : undefined,
+            touchAction: data.logoUrl && onLogoMove ? 'none' : undefined,
           }}
           className="relative select-none"
         >
@@ -198,7 +205,7 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
               src={data.logoUrl}
               alt="Logo"
               data-logo
-              className={`z-[5] ${onLogoMove ? 'pointer-events-auto cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
+              className="z-[5] pointer-events-none"
               style={{
                 position: 'absolute',
                 width: 60,
