@@ -248,7 +248,7 @@ export function ChimpTest({ onComplete, onBack, bestScore }: TestComponentProps)
 
         {/* Grid */}
         <div
-          className="grid gap-1.5"
+          className="grid gap-1 sm:gap-1.5"
           style={{
             gridTemplateColumns: `repeat(${GRID_COLS}, 1fr)`,
             gridTemplateRows: `repeat(${GRID_ROWS}, 1fr)`,
@@ -265,7 +265,7 @@ export function ChimpTest({ onComplete, onBack, bestScore }: TestComponentProps)
                 return (
                   <div
                     key={`${row}-${col}`}
-                    className="w-12 h-12 md:w-14 md:h-14 rounded-lg"
+                    className="size-9 sm:size-12 md:size-14 rounded-lg"
                     role="gridcell"
                   />
                 )
@@ -276,7 +276,7 @@ export function ChimpTest({ onComplete, onBack, bestScore }: TestComponentProps)
                 return (
                   <div
                     key={`${row}-${col}`}
-                    className="w-12 h-12 md:w-14 md:h-14 rounded-lg opacity-0"
+                    className="size-9 sm:size-12 md:size-14 rounded-lg opacity-0"
                     role="gridcell"
                   />
                 )
@@ -291,7 +291,7 @@ export function ChimpTest({ onComplete, onBack, bestScore }: TestComponentProps)
                   key={`${row}-${col}`}
                   type="button"
                   role="gridcell"
-                  className={`w-12 h-12 md:w-14 md:h-14 rounded-lg font-bold text-lg transition-colors duration-150 cursor-pointer border-none outline-none ${
+                  className={`size-9 sm:size-12 md:size-14 rounded-lg font-bold text-sm sm:text-lg transition-colors duration-150 cursor-pointer border-none outline-none ${
                     isWrong
                       ? 'bg-red-500 text-white'
                       : isShowing

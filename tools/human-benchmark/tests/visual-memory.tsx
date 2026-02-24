@@ -130,7 +130,7 @@ export function VisualMemory({ onComplete, bestScore }: TestComponentProps) {
   const totalSquares = gridSize * gridSize
 
   const getSquareStyle = (index: number): string => {
-    const base = 'w-14 h-14 md:w-16 md:h-16 rounded-lg cursor-pointer transition-colors'
+    const base = 'w-14 h-14 md:w-16 md:h-16 rounded-lg cursor-pointer disabled:cursor-default transition-colors'
 
     if (phase === 'result') {
       const isHighlighted = highlighted.has(index)

@@ -25,6 +25,8 @@ export function TypingTest({ onComplete, bestScore }: TestComponentProps) {
   const [finalAccuracy, setFinalAccuracy] = useState(0)
   const [finalTime, setFinalTime] = useState(0)
 
+  const [isFocused, setIsFocused] = useState(true)
+
   const inputRef = useRef<HTMLInputElement>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -187,6 +189,8 @@ export function TypingTest({ onComplete, bestScore }: TestComponentProps) {
           className="sr-only"
           autoFocus
           onKeyDown={handleKeyDown}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           aria-label="Type the displayed passage"
           autoComplete="off"
           autoCapitalize="off"
@@ -225,10 +229,17 @@ export function TypingTest({ onComplete, bestScore }: TestComponentProps) {
       {phase === 'typing' && (
         <div
           ref={containerRef}
-          className="w-full h-full min-h-[350px] md:min-h-[400px] flex flex-col items-center justify-center cursor-text px-4 md:px-8"
+          className="relative w-full h-full min-h-[350px] md:min-h-[400px] flex flex-col items-center justify-center cursor-text px-4 md:px-8"
           onClick={focusInput}
         >
-          <div className="w-full max-w-2xl">
+          {/* Focus-lost overlay */}
+          {!isFocused && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-xl cursor-pointer">
+              <p className="text-white text-lg font-semibold">Click here to continue typing</p>
+            </div>
+          )}
+
+          <div className={`w-full max-w-2xl ${!isFocused ? 'opacity-50' : ''}`}>
             {/* Passage display */}
             <div
               className="font-mono text-lg md:text-xl leading-relaxed mb-6 select-none"

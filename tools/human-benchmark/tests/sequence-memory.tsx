@@ -153,7 +153,7 @@ export function SequenceMemory({ onComplete, bestScore }: TestComponentProps) {
   const totalSquares = gridSize * gridSize
 
   const getSquareStyle = (index: number): string => {
-    const base = 'w-16 h-16 md:w-20 md:h-20 rounded-lg cursor-pointer transition-colors'
+    const base = 'w-16 h-16 md:w-20 md:h-20 rounded-lg cursor-pointer disabled:cursor-default transition-colors'
 
     if (feedbackIndex === index && feedbackType === 'correct') {
       return `${base} bg-green-400`
