@@ -35,6 +35,12 @@ export interface ECardData {
   accentColor: string
   borderAccents: boolean
   backgroundPattern: BackgroundPattern
+  /** Pattern opacity 0–100 (maps to fill-opacity 0–1) */
+  patternOpacity: number
+  /** Pattern tile scale as percentage (50–300, default 100) */
+  patternScale: number
+  /** Custom pattern image data URL (overrides backgroundPattern when set) */
+  customPatternUrl: string
   logoUrl: string
   /** Logo X position as percentage (0–100) of the card width */
   logoX: number

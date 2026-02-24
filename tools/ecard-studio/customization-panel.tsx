@@ -14,6 +14,19 @@ export function CustomizationPanel({ cardData, onChange }: CustomizationPanelPro
   const bgColorRef = useRef<HTMLInputElement>(null)
   const accentColorRef = useRef<HTMLInputElement>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
+  const patternInputRef = useRef<HTMLInputElement>(null)
+
+  const handlePatternUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        onChange({ customPatternUrl: reader.result })
+      }
+    }
+    reader.readAsDataURL(file)
+  }, [onChange])
 
   const handleLogoUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -378,6 +391,99 @@ export function CustomizationPanel({ cardData, onChange }: CustomizationPanelPro
             ))}
           </div>
         </div>
+
+        {/* Custom Pattern Upload */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-slate-500 uppercase tracking-wider">
+            Custom Pattern
+          </label>
+          <input
+            ref={patternInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handlePatternUpload}
+            className="sr-only"
+            aria-label="Upload custom pattern"
+          />
+          {cardData.customPatternUrl ? (
+            <div className="flex items-center gap-2">
+              <div
+                className="w-10 h-10 rounded-md border border-slate-700"
+                style={{
+                  backgroundImage: `url("${cardData.customPatternUrl}")`,
+                  backgroundSize: '100%',
+                  backgroundRepeat: 'repeat',
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => patternInputRef.current?.click()}
+                className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Change
+              </button>
+              <button
+                type="button"
+                onClick={() => onChange({ customPatternUrl: '' })}
+                className="text-xs text-slate-500 hover:text-red-400 transition-colors"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => patternInputRef.current?.click()}
+              className="flex items-center justify-center gap-2 w-full py-1.5 bg-slate-800 border border-dashed border-slate-600 rounded-lg text-[11px] text-slate-400 hover:text-white hover:border-slate-400 transition-colors"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M7 3V11M3 7H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              Upload Pattern
+            </button>
+          )}
+        </div>
+
+        {/* Pattern Opacity */}
+        {(cardData.backgroundPattern !== 'none' || cardData.customPatternUrl) && (
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-slate-500 uppercase tracking-wider">
+                Pattern Opacity
+              </label>
+              <span className="text-xs text-slate-400 tabular-nums">{cardData.patternOpacity}%</span>
+            </div>
+            <input
+              type="range"
+              min={1}
+              max={100}
+              value={cardData.patternOpacity}
+              onChange={(e) => onChange({ patternOpacity: Number(e.target.value) })}
+              className="w-full h-1.5 bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-500"
+            />
+          </div>
+        )}
+
+        {/* Pattern Scale */}
+        {(cardData.backgroundPattern !== 'none' || cardData.customPatternUrl) && (
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-slate-500 uppercase tracking-wider">
+                Pattern Size
+              </label>
+              <span className="text-xs text-slate-400 tabular-nums">{cardData.patternScale}%</span>
+            </div>
+            <input
+              type="range"
+              min={25}
+              max={400}
+              step={5}
+              value={cardData.patternScale}
+              onChange={(e) => onChange({ patternScale: Number(e.target.value) })}
+              className="w-full h-1.5 bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-500"
+            />
+          </div>
+        )}
 
         {/* Border Accents Toggle */}
         <div className="flex items-center justify-between">

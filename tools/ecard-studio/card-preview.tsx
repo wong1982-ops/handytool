@@ -77,7 +77,12 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
       draggingRef.current = false
     }, [])
     const dark = isDarkBackground(data.backgroundColor)
-    const patternBg = getPatternBackground(data.backgroundPattern, data.accentColor)
+    const patternBg = getPatternBackground(data.backgroundPattern, {
+      accentColor: data.accentColor,
+      opacity: data.patternOpacity,
+      scale: data.patternScale,
+      customPatternUrl: data.customPatternUrl,
+    })
 
     const mutedTextColor = dark
       ? 'rgba(255,255,255,0.55)'
@@ -105,7 +110,8 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
             width: 600,
             height: 400,
             backgroundColor: data.backgroundColor,
-            backgroundImage: patternBg,
+            backgroundImage: patternBg.backgroundImage,
+            backgroundSize: patternBg.backgroundSize,
             transform: scale !== 1 ? `scale(${scale})` : undefined,
             transformOrigin: 'top left',
             touchAction: data.logoUrl && onLogoMove ? 'none' : undefined,
