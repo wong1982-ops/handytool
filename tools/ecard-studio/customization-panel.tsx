@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useCallback } from 'react'
-import type { ECardData, TextAlign } from '@/tools/ecard-studio/types'
+import type { CardLayout, ECardData, TextAlign } from '@/tools/ecard-studio/types'
 import { PATTERNS } from '@/tools/ecard-studio/patterns'
 import { COLOR_PRESETS, FONT_OPTIONS } from '@/tools/ecard-studio/templates'
 
@@ -39,6 +39,14 @@ export function CustomizationPanel({ cardData, onChange }: CustomizationPanelPro
     }
     reader.readAsDataURL(file)
   }, [onChange])
+
+  const layouts: { value: CardLayout; label: string; icon: string }[] = [
+    { value: 'centered', label: 'Centered', icon: '⊞' },
+    { value: 'left', label: 'Left', icon: '◧' },
+    { value: 'split', label: 'Split', icon: '◫' },
+    { value: 'right-banner', label: 'Right', icon: '◨' },
+    { value: 'minimal', label: 'Minimal', icon: '◱' },
+  ]
 
   const alignments: { value: TextAlign; label: string }[] = [
     { value: 'left', label: 'Align left' },
@@ -149,6 +157,32 @@ export function CustomizationPanel({ cardData, onChange }: CustomizationPanelPro
             placeholder="e.g. Innovation meets excellence"
             className="w-full bg-slate-800 border border-slate-700 rounded-lg text-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
+        </div>
+      </section>
+
+      {/* LAYOUT Section */}
+      <section className="flex flex-col gap-3">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-500">
+          Layout
+        </h3>
+        <div className="grid grid-cols-5 gap-1.5">
+          {layouts.map(({ value, label, icon }) => (
+            <button
+              key={value}
+              type="button"
+              aria-label={`${label} layout`}
+              aria-pressed={cardData.layout === value}
+              onClick={() => onChange({ layout: value })}
+              className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-[10px] transition-colors ${
+                cardData.layout === value
+                  ? 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/50'
+                  : 'bg-slate-800 text-slate-400 hover:text-white'
+              }`}
+            >
+              <span className="text-base leading-none">{icon}</span>
+              {label}
+            </button>
+          ))}
         </div>
       </section>
 

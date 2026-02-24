@@ -18,6 +18,213 @@ function isDarkBackground(hex: string): boolean {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Shared text style builders                                        */
+/* ------------------------------------------------------------------ */
+
+function headingStyle(data: ECardData) {
+  return {
+    fontFamily: data.fontFamily,
+    fontSize: data.fontSize,
+    lineHeight: data.lineHeight,
+    fontStyle: 'italic' as const,
+    fontWeight: data.bold ? 700 : 400,
+    color: data.accentColor,
+    margin: 0,
+  }
+}
+
+function subheadingStyle(data: ECardData, bodyTextColor: string) {
+  return {
+    fontFamily: data.fontFamily,
+    fontSize: 16,
+    lineHeight: 1.4,
+    color: bodyTextColor,
+    margin: '8px 0 0',
+  }
+}
+
+function bodyStyle(data: ECardData, bodyTextColor: string) {
+  return {
+    fontFamily: data.fontFamily,
+    fontSize: 14,
+    lineHeight: 1.6,
+    color: bodyTextColor,
+    margin: '16px 0 0',
+  }
+}
+
+function companyNameStyle(data: ECardData) {
+  return {
+    fontFamily: data.fontFamily,
+    fontSize: 14,
+    fontWeight: 600,
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
+    color: data.accentColor,
+    margin: 0,
+  }
+}
+
+function companyTaglineStyle(data: ECardData, mutedTextColor: string) {
+  return {
+    fontFamily: data.fontFamily,
+    fontSize: 12,
+    color: mutedTextColor,
+    margin: '4px 0 0',
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Layout renderers                                                  */
+/* ------------------------------------------------------------------ */
+
+/** Classic centered layout — content vertically centered, company at bottom. */
+function LayoutCentered({ data, bodyTextColor, mutedTextColor }: LayoutProps) {
+  return (
+    <div
+      className="relative z-10 flex flex-col justify-center h-full"
+      style={{ padding: 40, textAlign: data.textAlign }}
+    >
+      {data.heading && <h2 style={headingStyle(data)}>{data.heading}</h2>}
+      {data.subheading && <p style={subheadingStyle(data, bodyTextColor)}>{data.subheading}</p>}
+      {data.body && <p style={bodyStyle(data, bodyTextColor)}>{data.body}</p>}
+      <div className="flex-1 min-h-4" />
+      {data.companyName && <p style={companyNameStyle(data)}>{data.companyName}</p>}
+      {data.companyTagline && <p style={companyTaglineStyle(data, mutedTextColor)}>{data.companyTagline}</p>}
+    </div>
+  )
+}
+
+/** Left layout — left accent bar, content left-aligned. */
+function LayoutLeft({ data, bodyTextColor, mutedTextColor }: LayoutProps) {
+  return (
+    <div className="relative z-10 flex h-full">
+      {/* Left accent bar */}
+      <div
+        style={{ width: 6, backgroundColor: data.accentColor, flexShrink: 0 }}
+      />
+      <div
+        className="flex flex-col justify-center flex-1"
+        style={{ padding: '36px 40px', textAlign: data.textAlign }}
+      >
+        {data.heading && <h2 style={headingStyle(data)}>{data.heading}</h2>}
+        {data.subheading && <p style={subheadingStyle(data, bodyTextColor)}>{data.subheading}</p>}
+        {data.body && <p style={bodyStyle(data, bodyTextColor)}>{data.body}</p>}
+        <div className="flex-1 min-h-4" />
+        {data.companyName && <p style={companyNameStyle(data)}>{data.companyName}</p>}
+        {data.companyTagline && <p style={companyTaglineStyle(data, mutedTextColor)}>{data.companyTagline}</p>}
+      </div>
+    </div>
+  )
+}
+
+/** Split layout — accent panel on left with company info, content on right. */
+function LayoutSplit({ data, bodyTextColor, mutedTextColor }: LayoutProps) {
+  return (
+    <div className="relative z-10 flex h-full">
+      {/* Left panel — accent area with company info */}
+      <div
+        className="flex flex-col justify-end"
+        style={{
+          width: 200,
+          flexShrink: 0,
+          padding: '32px 24px',
+          backgroundColor: `${data.accentColor}18`,
+        }}
+      >
+        {data.companyName && (
+          <p style={{ ...companyNameStyle(data), fontSize: 13 }}>{data.companyName}</p>
+        )}
+        {data.companyTagline && (
+          <p style={companyTaglineStyle(data, mutedTextColor)}>{data.companyTagline}</p>
+        )}
+      </div>
+      {/* Right panel — main content */}
+      <div
+        className="flex flex-col justify-center flex-1"
+        style={{ padding: '32px 36px', textAlign: data.textAlign }}
+      >
+        {data.heading && <h2 style={headingStyle(data)}>{data.heading}</h2>}
+        {data.subheading && <p style={subheadingStyle(data, bodyTextColor)}>{data.subheading}</p>}
+        {data.body && <p style={{ ...bodyStyle(data, bodyTextColor), margin: '12px 0 0' }}>{data.body}</p>}
+      </div>
+    </div>
+  )
+}
+
+/** Right-banner layout — decorative left area, content right-aligned. */
+function LayoutRightBanner({ data, bodyTextColor, mutedTextColor }: LayoutProps) {
+  return (
+    <div className="relative z-10 flex h-full">
+      {/* Left decorative area */}
+      <div style={{ width: 160, flexShrink: 0 }} />
+      {/* Right content area */}
+      <div
+        className="flex flex-col justify-center flex-1"
+        style={{ padding: '32px 36px', textAlign: data.textAlign }}
+      >
+        {data.heading && <h2 style={headingStyle(data)}>{data.heading}</h2>}
+        {data.subheading && <p style={subheadingStyle(data, bodyTextColor)}>{data.subheading}</p>}
+        {data.body && <p style={bodyStyle(data, bodyTextColor)}>{data.body}</p>}
+        <div className="flex-1 min-h-4" />
+        {data.companyName && <p style={companyNameStyle(data)}>{data.companyName}</p>}
+        {data.companyTagline && <p style={companyTaglineStyle(data, mutedTextColor)}>{data.companyTagline}</p>}
+      </div>
+      {/* Right accent bar */}
+      <div
+        style={{ width: 6, backgroundColor: data.accentColor, flexShrink: 0 }}
+      />
+    </div>
+  )
+}
+
+/** Minimal layout — name large top-left, company bottom-right, airy spacing. */
+function LayoutMinimal({ data, bodyTextColor, mutedTextColor }: LayoutProps) {
+  return (
+    <div className="relative z-10 flex flex-col h-full" style={{ padding: '40px 48px' }}>
+      {/* Top: heading + subheading */}
+      <div style={{ textAlign: 'left' }}>
+        {data.heading && (
+          <h2 style={{ ...headingStyle(data), fontSize: data.fontSize * 1.1 }}>
+            {data.heading}
+          </h2>
+        )}
+        {data.subheading && <p style={subheadingStyle(data, bodyTextColor)}>{data.subheading}</p>}
+      </div>
+
+      {/* Middle: body text centered */}
+      <div className="flex-1 flex items-center">
+        {data.body && (
+          <p style={{ ...bodyStyle(data, bodyTextColor), margin: 0, maxWidth: 320 }}>
+            {data.body}
+          </p>
+        )}
+      </div>
+
+      {/* Bottom: company info right-aligned */}
+      <div style={{ textAlign: 'right' }}>
+        {data.companyName && <p style={companyNameStyle(data)}>{data.companyName}</p>}
+        {data.companyTagline && <p style={companyTaglineStyle(data, mutedTextColor)}>{data.companyTagline}</p>}
+      </div>
+    </div>
+  )
+}
+
+interface LayoutProps {
+  data: ECardData
+  bodyTextColor: string
+  mutedTextColor: string
+}
+
+const LAYOUT_RENDERERS: Record<ECardData['layout'], React.FC<LayoutProps>> = {
+  centered: LayoutCentered,
+  left: LayoutLeft,
+  split: LayoutSplit,
+  'right-banner': LayoutRightBanner,
+  minimal: LayoutMinimal,
+}
+
+/* ------------------------------------------------------------------ */
 /*  Card Preview Component                                            */
 /* ------------------------------------------------------------------ */
 
@@ -46,12 +253,11 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
     const handlePointerDown = useCallback(
       (e: React.PointerEvent) => {
         if (!onLogoMove || !data.logoUrl || !cardElRef.current) return
-        // Check if the click is near the logo position (within logo bounds)
         const rect = cardElRef.current.getBoundingClientRect()
         const clickX = ((e.clientX - rect.left) / rect.width) * 100
         const clickY = ((e.clientY - rect.top) / rect.height) * 100
-        const logoPxW = (60 / 600) * 100 // logo width as % of card
-        const logoPxH = (60 / 400) * 100 // logo height as % of card
+        const logoPxW = (60 / 600) * 100
+        const logoPxH = (60 / 400) * 100
         const dx = Math.abs(clickX - data.logoX)
         const dy = Math.abs(clickY - data.logoY)
         if (dx > logoPxW && dy > logoPxH) return
@@ -76,6 +282,7 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
     const handlePointerUp = useCallback(() => {
       draggingRef.current = false
     }, [])
+
     const dark = isDarkBackground(data.backgroundColor)
     const patternBg = getPatternBackground(data.backgroundPattern, {
       accentColor: data.accentColor,
@@ -84,12 +291,10 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
       customPatternUrl: data.customPatternUrl,
     })
 
-    const mutedTextColor = dark
-      ? 'rgba(255,255,255,0.55)'
-      : 'rgba(0,0,0,0.45)'
-    const bodyTextColor = dark
-      ? 'rgba(255,255,255,0.8)'
-      : 'rgba(0,0,0,0.7)'
+    const mutedTextColor = dark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.45)'
+    const bodyTextColor = dark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)'
+
+    const LayoutRenderer = LAYOUT_RENDERERS[data.layout] ?? LayoutCentered
 
     return (
       <div
@@ -118,94 +323,13 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
           }}
           className="relative select-none"
         >
-          {/* Content area */}
-          <div
-            className="relative z-10 flex flex-col justify-center h-full"
-            style={{ padding: 40, textAlign: data.textAlign }}
-          >
-            {/* Heading */}
-            {data.heading && (
-              <h2
-                style={{
-                  fontFamily: data.fontFamily,
-                  fontSize: data.fontSize,
-                  lineHeight: data.lineHeight,
-                  fontStyle: 'italic',
-                  fontWeight: data.bold ? 700 : 400,
-                  color: data.accentColor,
-                  margin: 0,
-                }}
-              >
-                {data.heading}
-              </h2>
-            )}
+          <LayoutRenderer
+            data={data}
+            bodyTextColor={bodyTextColor}
+            mutedTextColor={mutedTextColor}
+          />
 
-            {/* Subheading */}
-            {data.subheading && (
-              <p
-                style={{
-                  fontFamily: data.fontFamily,
-                  fontSize: 16,
-                  lineHeight: 1.4,
-                  color: bodyTextColor,
-                  margin: '8px 0 0',
-                }}
-              >
-                {data.subheading}
-              </p>
-            )}
-
-            {/* Body */}
-            {data.body && (
-              <p
-                style={{
-                  fontFamily: data.fontFamily,
-                  fontSize: 14,
-                  lineHeight: 1.6,
-                  color: bodyTextColor,
-                  margin: '16px 0 0',
-                }}
-              >
-                {data.body}
-              </p>
-            )}
-
-            {/* Spacer pushes company info toward bottom */}
-            <div className="flex-1 min-h-4" />
-
-            {/* Company name */}
-            {data.companyName && (
-              <p
-                style={{
-                  fontFamily: data.fontFamily,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  color: data.accentColor,
-                  margin: 0,
-                }}
-              >
-                {data.companyName}
-              </p>
-            )}
-
-            {/* Company tagline */}
-            {data.companyTagline && (
-              <p
-                style={{
-                  fontFamily: data.fontFamily,
-                  fontSize: 12,
-                  color: mutedTextColor,
-                  margin: '4px 0 0',
-                }}
-              >
-                {data.companyTagline}
-              </p>
-            )}
-          </div>
-
-          {/* Logo — rendered under text content */}
+          {/* Logo — absolute positioned, draggable */}
           {data.logoUrl && (
             <img
               src={data.logoUrl}
@@ -224,14 +348,11 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
             />
           )}
 
-          {/* Bottom accent bar */}
-          {data.borderAccents && (
+          {/* Bottom accent bar — only for centered layout, others handle accents differently */}
+          {data.borderAccents && data.layout === 'centered' && (
             <div
               className="absolute bottom-0 left-0 w-full"
-              style={{
-                height: 4,
-                backgroundColor: data.accentColor,
-              }}
+              style={{ height: 4, backgroundColor: data.accentColor }}
             />
           )}
         </div>

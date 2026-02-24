@@ -17,10 +17,13 @@ export type BackgroundPattern =
 
 export type TemplateCategory = 'classic-marble' | 'corporate' | 'modernist' | 'ethereal' | 'noir'
 
+export type CardLayout = 'centered' | 'left' | 'split' | 'right-banner' | 'minimal'
+
 export type TextAlign = 'left' | 'center' | 'right' | 'justify'
 
 export interface ECardData {
   template: TemplateId
+  layout: CardLayout
   heading: string
   subheading: string
   body: string

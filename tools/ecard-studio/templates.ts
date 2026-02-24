@@ -25,6 +25,7 @@ export const TEMPLATES: Template[] = [
     categoryLabel: 'Classic Marble',
     defaults: {
       template: 'executive',
+      layout: 'centered',
       heading: 'Your Name',
       subheading: 'Chief Executive Officer',
       body: 'Leading innovation with vision and purpose.',
@@ -55,6 +56,7 @@ export const TEMPLATES: Template[] = [
     categoryLabel: 'Corporate',
     defaults: {
       template: 'midnight-pinstripe',
+      layout: 'left',
       heading: 'Your Name',
       subheading: 'Managing Director',
       body: 'Driving results through strategic leadership.',
@@ -63,7 +65,7 @@ export const TEMPLATES: Template[] = [
       fontFamily: 'Inter',
       fontSize: 42,
       lineHeight: 1.5,
-      textAlign: 'center',
+      textAlign: 'left',
       bold: false,
       backgroundColor: '#0A1628',
       accentColor: '#1173D4',
@@ -85,6 +87,7 @@ export const TEMPLATES: Template[] = [
     categoryLabel: 'Modernist',
     defaults: {
       template: 'tech-blueprint',
+      layout: 'split',
       heading: 'Your Name',
       subheading: 'Head of Engineering',
       body: 'Building the future, one line of code at a time.',
@@ -93,7 +96,7 @@ export const TEMPLATES: Template[] = [
       fontFamily: 'Space Grotesk',
       fontSize: 44,
       lineHeight: 1.5,
-      textAlign: 'center',
+      textAlign: 'left',
       bold: false,
       backgroundColor: '#F5F5F0',
       accentColor: '#18181B',
@@ -115,6 +118,7 @@ export const TEMPLATES: Template[] = [
     categoryLabel: 'Ethereal',
     defaults: {
       template: 'aura-signature',
+      layout: 'right-banner',
       heading: 'Your Name',
       subheading: 'Creative Director',
       body: 'Crafting experiences that resonate and inspire.',
@@ -123,7 +127,7 @@ export const TEMPLATES: Template[] = [
       fontFamily: 'Georgia',
       fontSize: 46,
       lineHeight: 1.4,
-      textAlign: 'center',
+      textAlign: 'right',
       bold: false,
       backgroundColor: '#2D3B2D',
       accentColor: '#C4956A',
@@ -145,6 +149,7 @@ export const TEMPLATES: Template[] = [
     categoryLabel: 'Noir',
     defaults: {
       template: 'black-tie-matte',
+      layout: 'minimal',
       heading: 'Your Name',
       subheading: 'Principal Architect',
       body: 'Designing spaces that define generations.',
@@ -153,7 +158,7 @@ export const TEMPLATES: Template[] = [
       fontFamily: 'Playfair Display',
       fontSize: 48,
       lineHeight: 1.4,
-      textAlign: 'center',
+      textAlign: 'left',
       bold: false,
       backgroundColor: '#18181B',
       accentColor: '#A1A1AA',
@@ -171,6 +176,7 @@ export const TEMPLATES: Template[] = [
 
 export const BLANK_DEFAULTS: ECardData = {
   template: 'blank',
+  layout: 'centered',
   heading: '',
   subheading: '',
   body: '',
