@@ -56,3 +56,17 @@ export async function fetchTopTools(days: number = 30, limit: number = 5) {
   if (error) throw error
   return (data ?? []).slice(0, limit)
 }
+
+export async function fetchDeviceBreakdown(days: number = 30) {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase.rpc('device_breakdown', { time_range_days: days })
+  if (error) throw error
+  return data ?? []
+}
+
+export async function fetchTopReferrers(days: number = 30) {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase.rpc('top_referrers', { time_range_days: days })
+  if (error) throw error
+  return data ?? []
+}
