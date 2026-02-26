@@ -1,4 +1,7 @@
+import { useState, useRef, useEffect } from 'react'
 import type { DetectedFormat } from './use-json-validator'
+
+export type IndentSize = 2 | 4 | 'tab'
 
 interface ConverterToolbarProps {
   onBeautify: () => void
@@ -14,6 +17,10 @@ interface ConverterToolbarProps {
   onFormat: () => void
   activeAction?: string
   detectedFormat?: DetectedFormat
+  indentSize?: IndentSize
+  onIndentSizeChange?: (size: IndentSize) => void
+  sortKeys?: boolean
+  onSortKeysChange?: (sort: boolean) => void
 }
 
 export function ConverterToolbar({
@@ -30,6 +37,10 @@ export function ConverterToolbar({
   onFormat,
   activeAction,
   detectedFormat = 'unknown',
+  indentSize = 2,
+  onIndentSizeChange,
+  sortKeys = false,
+  onSortKeysChange,
 }: ConverterToolbarProps) {
   const isJson = detectedFormat === 'json'
   const isYaml = detectedFormat === 'yaml'
@@ -215,6 +226,104 @@ export function ConverterToolbar({
           />
         )}
       </ToolbarGroup>
+
+      <ToolbarDivider />
+
+      {/* Options */}
+      <OptionsPopover
+        indentSize={indentSize}
+        onIndentSizeChange={onIndentSizeChange}
+        sortKeys={sortKeys}
+        onSortKeysChange={onSortKeysChange}
+      />
+    </div>
+  )
+}
+
+// --- Options Popover ---
+
+function OptionsPopover({
+  indentSize,
+  onIndentSizeChange,
+  sortKeys,
+  onSortKeysChange,
+}: {
+  indentSize: IndentSize
+  onIndentSizeChange?: (size: IndentSize) => void
+  sortKeys: boolean
+  onSortKeysChange?: (sort: boolean) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [open])
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className={`group relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
+          open
+            ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
+        }`}
+        aria-label="Formatting options"
+        title="Formatting options"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span className="hidden sm:inline">Options</span>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1 z-50 w-56 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xl p-3 space-y-3">
+          {/* Indent Size */}
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Indent Size</label>
+            <div className="flex p-0.5 bg-slate-100 dark:bg-slate-900 rounded-lg">
+              {([2, 4, 'tab'] as IndentSize[]).map((size) => (
+                <button
+                  key={String(size)}
+                  onClick={() => onIndentSizeChange?.(size)}
+                  className={`flex-1 py-1 rounded-md text-[11px] font-bold transition-colors cursor-pointer ${
+                    indentSize === size
+                      ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                  }`}
+                >
+                  {size === 'tab' ? 'Tab' : `${size} sp`}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sort Keys */}
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={sortKeys}
+                onChange={(e) => onSortKeysChange?.(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-[var(--tk-color-primary-500)] focus:ring-[var(--tk-color-primary-500)] cursor-pointer"
+              />
+              <span className="text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                Sort object keys
+              </span>
+            </label>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

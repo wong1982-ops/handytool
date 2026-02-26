@@ -3,10 +3,13 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import yaml from 'js-yaml'
 import { XMLParser, XMLBuilder } from 'fast-xml-parser'
-import { ConverterToolbar } from '@/tools/json-converter/converter-sidebar'
+import { ConverterToolbar, type IndentSize } from '@/tools/json-converter/converter-sidebar'
 import { CodeEditor, type CodeEditorHandle } from '@/tools/json-converter/code-editor'
 import { StatusBar } from '@/tools/json-converter/status-bar'
 import { TreeView } from '@/tools/json-converter/tree-view'
+import { DiffView } from '@/tools/json-converter/diff-view'
+import { SchemaValidator } from '@/tools/json-converter/schema-validator'
+import { QueryPanel } from '@/tools/json-converter/query-panel'
 import { ProblemsPanel } from '@/components/ui/problems-panel'
 import { useJsonValidator } from '@/tools/json-converter/use-json-validator'
 
@@ -30,7 +33,7 @@ const sampleJson = `{
 }`
 
 type Tab = 'input' | 'output'
-type ViewMode = 'editor' | 'tree'
+type ViewMode = 'editor' | 'tree' | 'diff'
 
 export default function JsonConverterPage() {
   const editorRef = useRef<CodeEditorHandle>(null)
@@ -41,14 +44,47 @@ export default function JsonConverterPage() {
   const [outputFormat, setOutputFormat] = useState('JSON')
   const [copiedPanel, setCopiedPanel] = useState<'input' | 'output' | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('editor')
+  const [diffInput, setDiffInput] = useState('')
+  const [isDragOver, setIsDragOver] = useState(false)
+
+  // Formatting options
+  const [indentSize, setIndentSize] = useState<IndentSize>(2)
+  const [sortKeys, setSortKeys] = useState(false)
+
+  // Schema validation errors
+  const [schemaErrors, setSchemaErrors] = useState<{ path: string; message: string }[]>([])
+
+  // JMESPath query result
+  const [queryResult, setQueryResult] = useState<string | null>(null)
 
   // Validation with structured errors
   const { errors, format: detectedFormat, isValid, label: validationLabel } = useJsonValidator(input)
+
+  // Combine validation errors with schema errors
+  const allErrors = useMemo(() => {
+    const combined = [...errors]
+    for (const se of schemaErrors) {
+      combined.push({
+        line: 1,
+        column: 0,
+        message: se.message,
+        severity: 'error' as const,
+        path: se.path,
+      })
+    }
+    return combined
+  }, [errors, schemaErrors])
 
   const handleGoToLine = useCallback((line: number) => {
     setActiveTab('input')
     editorRef.current?.goToLine(line)
   }, [])
+
+  // Get the indent string from indentSize
+  const getIndent = useCallback((): string | number => {
+    if (indentSize === 'tab') return '\t'
+    return indentSize
+  }, [indentSize])
 
   // Undo / Redo history for the input editor
   const undoStack = useRef<string[]>([])
@@ -132,11 +168,30 @@ export default function JsonConverterPage() {
   const inputLineCount = input ? input.split('\n').length : 1
   const outputLineCount = output ? output.split('\n').length : 1
 
+  // Determine what to show in the output editor
+  const displayOutput = queryResult !== null ? queryResult : output
+
+  // Helper to get a sorted replacer
+  const getSortedReplacer = useCallback((): ((this: unknown, key: string, value: unknown) => unknown) | undefined => {
+    if (!sortKeys) return undefined
+    return function (_key: string, value: unknown) {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const sorted: Record<string, unknown> = {}
+        for (const k of Object.keys(value as Record<string, unknown>).sort()) {
+          sorted[k] = (value as Record<string, unknown>)[k]
+        }
+        return sorted
+      }
+      return value
+    }
+  }, [sortKeys])
+
   // Actions
   const handleBeautify = useCallback(() => {
     try {
       const parsed = JSON.parse(input)
-      const result = JSON.stringify(parsed, null, 2)
+      const replacer = getSortedReplacer()
+      const result = JSON.stringify(parsed, replacer, getIndent())
       setOutput(result)
       setOutputFormat('JSON')
       setActiveAction('beautify')
@@ -144,25 +199,27 @@ export default function JsonConverterPage() {
     } catch {
       setOutput('Error: Invalid JSON input')
     }
-  }, [input])
+  }, [input, getIndent, getSortedReplacer])
 
   const handleFormat = useCallback(() => {
     try {
       const parsed = JSON.parse(input)
-      const formatted = JSON.stringify(parsed, null, 2)
+      const replacer = getSortedReplacer()
+      const formatted = JSON.stringify(parsed, replacer, getIndent())
       setInput(formatted)
       setActiveAction('format')
     } catch {
       try {
         const parsed = yaml.load(input)
         if (typeof parsed === 'object' && parsed !== null) {
-          const formatted = yaml.dump(parsed, { indent: 2, lineWidth: -1 })
+          const indent = indentSize === 'tab' ? 4 : indentSize
+          const formatted = yaml.dump(parsed, { indent, lineWidth: -1, sortKeys })
           setInput(formatted)
           setActiveAction('format')
         }
       } catch { /* ignore */ }
     }
-  }, [input])
+  }, [input, getIndent, getSortedReplacer, indentSize, sortKeys])
 
   const handleMinify = useCallback(() => {
     try {
@@ -202,7 +259,8 @@ export default function JsonConverterPage() {
       } catch { /* not csv */ }
     }
     if (parsed !== undefined) {
-      const result = yaml.dump(parsed, { indent: 2, lineWidth: -1 })
+      const indent = indentSize === 'tab' ? 4 : indentSize
+      const result = yaml.dump(parsed, { indent, lineWidth: -1, sortKeys })
       setOutput(result)
       setOutputFormat('YAML')
       setActiveAction('toYaml')
@@ -210,7 +268,7 @@ export default function JsonConverterPage() {
     } else {
       setOutput('Error: Could not parse input as JSON, YAML, or CSV')
     }
-  }, [input])
+  }, [input, indentSize, sortKeys])
 
   const handleToJson = useCallback(() => {
     // Try XML
@@ -218,7 +276,8 @@ export default function JsonConverterPage() {
       try {
         const parser = new XMLParser(xmlParserOptions)
         const parsed = parser.parse(input)
-        setOutput(JSON.stringify(parsed, null, 2))
+        const replacer = getSortedReplacer()
+        setOutput(JSON.stringify(parsed, replacer, getIndent()))
         setOutputFormat('JSON')
         setActiveAction('toJson')
         setActiveTab('output')
@@ -229,7 +288,8 @@ export default function JsonConverterPage() {
       // Try YAML first (also parses JSON)
       const parsed = yaml.load(input)
       if (typeof parsed === 'object' && parsed !== null) {
-        const result = JSON.stringify(parsed, null, 2)
+        const replacer = getSortedReplacer()
+        const result = JSON.stringify(parsed, replacer, getIndent())
         setOutput(result)
         setOutputFormat('JSON')
         setActiveAction('toJson')
@@ -243,7 +303,8 @@ export default function JsonConverterPage() {
       if (rows.length > 1) {
         const headers = rows[0]
         const data = rows.slice(1).map((row) => csvRowToObject(headers, row))
-        setOutput(JSON.stringify(data, null, 2))
+        const replacer = getSortedReplacer()
+        setOutput(JSON.stringify(data, replacer, getIndent()))
         setOutputFormat('JSON')
         setActiveAction('toJson')
         setActiveTab('output')
@@ -251,7 +312,7 @@ export default function JsonConverterPage() {
       }
     } catch { /* not CSV either */ }
     setOutput('Error: Invalid YAML, XML, or CSV input')
-  }, [input])
+  }, [input, getIndent, getSortedReplacer])
 
   const handleToCsv = useCallback(() => {
     try {
@@ -297,14 +358,15 @@ export default function JsonConverterPage() {
       }
       const headers = rows[0]
       const data = rows.slice(1).map((row) => csvRowToObject(headers, row))
-      setOutput(JSON.stringify(data, null, 2))
+      const replacer = getSortedReplacer()
+      setOutput(JSON.stringify(data, replacer, getIndent()))
       setOutputFormat('JSON')
       setActiveAction('csvToJson')
       setActiveTab('output')
     } catch {
       setOutput('Error: Invalid CSV input')
     }
-  }, [input])
+  }, [input, getIndent, getSortedReplacer])
 
   // --- XML conversions ---
 
@@ -333,7 +395,8 @@ export default function JsonConverterPage() {
       if (parsed !== undefined) {
         // Wrap non-object top-level values or arrays for valid XML
         const wrapped = Array.isArray(parsed) ? { items: { item: parsed } } : (typeof parsed === 'object' && parsed !== null) ? parsed : { root: parsed }
-        const builder = new XMLBuilder(xmlBuilderOptions)
+        const indentBy = indentSize === 'tab' ? '\t' : ' '.repeat(indentSize)
+        const builder = new XMLBuilder({ ...xmlBuilderOptions, indentBy })
         const result = '<?xml version="1.0" encoding="UTF-8"?>\n' + builder.build(wrapped)
         setOutput(result)
         setOutputFormat('XML')
@@ -345,33 +408,35 @@ export default function JsonConverterPage() {
     } catch {
       setOutput('Error: Failed to convert to XML')
     }
-  }, [input])
+  }, [input, indentSize])
 
   const handleXmlToJson = useCallback(() => {
     try {
       const parser = new XMLParser(xmlParserOptions)
       const parsed = parser.parse(input)
-      setOutput(JSON.stringify(parsed, null, 2))
+      const replacer = getSortedReplacer()
+      setOutput(JSON.stringify(parsed, replacer, getIndent()))
       setOutputFormat('JSON')
       setActiveAction('xmlToJson')
       setActiveTab('output')
     } catch {
       setOutput('Error: Invalid XML input')
     }
-  }, [input])
+  }, [input, getIndent, getSortedReplacer])
 
   const handleXmlToYaml = useCallback(() => {
     try {
       const parser = new XMLParser(xmlParserOptions)
       const parsed = parser.parse(input)
-      setOutput(yaml.dump(parsed, { indent: 2, lineWidth: -1 }))
+      const indent = indentSize === 'tab' ? 4 : indentSize
+      setOutput(yaml.dump(parsed, { indent, lineWidth: -1, sortKeys }))
       setOutputFormat('YAML')
       setActiveAction('xmlToYaml')
       setActiveTab('output')
     } catch {
       setOutput('Error: Invalid XML input')
     }
-  }, [input])
+  }, [input, indentSize, sortKeys])
 
   const handleXmlToCsv = useCallback(() => {
     try {
@@ -423,11 +488,11 @@ export default function JsonConverterPage() {
   }, [input])
 
   const handleCopyOutput = useCallback(async () => {
-    if (!output.trim()) return
-    await navigator.clipboard.writeText(output)
+    if (!displayOutput.trim()) return
+    await navigator.clipboard.writeText(displayOutput)
     setCopiedPanel('output')
     setTimeout(() => setCopiedPanel(null), 2000)
-  }, [output])
+  }, [displayOutput])
 
   const handleDownloadInput = useCallback(() => {
     if (!input.trim()) return
@@ -442,16 +507,16 @@ export default function JsonConverterPage() {
   }, [input, inputLanguage])
 
   const handleDownloadOutput = useCallback(() => {
-    if (!output.trim()) return
+    if (!displayOutput.trim()) return
     const ext = outputFormat === 'YAML' ? 'yaml' : outputFormat === 'CSV' ? 'csv' : outputFormat === 'XML' ? 'xml' : 'json'
-    const blob = new Blob([output], { type: 'text/plain' })
+    const blob = new Blob([displayOutput], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
     a.download = `output.${ext}`
     a.click()
     URL.revokeObjectURL(url)
-  }, [output, outputFormat])
+  }, [displayOutput, outputFormat])
 
   const handleSwap = useCallback(() => {
     if (!output.trim()) return
@@ -468,9 +533,69 @@ export default function JsonConverterPage() {
   const handleClearAll = useCallback(() => {
     setInput('')
     setOutput('')
+    setDiffInput('')
     setActiveTab('input')
     setActiveAction(undefined)
+    setQueryResult(null)
+    setSchemaErrors([])
   }, [])
+
+  // --- Drag and Drop ---
+  const dragCounter = useRef(0)
+
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter.current++
+    if (e.dataTransfer.types.includes('Files')) {
+      setIsDragOver(true)
+    }
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter.current--
+    if (dragCounter.current === 0) {
+      setIsDragOver(false)
+    }
+  }, [])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragOver(false)
+    dragCounter.current = 0
+
+    const files = e.dataTransfer.files
+    if (files.length === 0) return
+
+    const file = files[0]
+    const validExtensions = ['.json', '.yaml', '.yml', '.csv', '.xml', '.toml']
+    const ext = '.' + file.name.split('.').pop()?.toLowerCase()
+
+    if (!validExtensions.includes(ext)) {
+      setOutput(`Error: Unsupported file type "${ext}". Supported: ${validExtensions.join(', ')}`)
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const text = event.target?.result as string
+      if (text) {
+        undoStack.current.push(input)
+        redoStack.current = []
+        setInput(text)
+        setActiveTab('input')
+      }
+    }
+    reader.readAsText(file)
+  }, [input])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -505,7 +630,26 @@ export default function JsonConverterPage() {
   }, [handleToYaml, handleToJson, handleUndo, handleRedo, handleFormat])
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div
+      className="flex-1 flex flex-col relative"
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      {/* Drag overlay */}
+      {isDragOver && (
+        <div className="absolute inset-0 z-50 bg-[var(--tk-color-primary-500)]/10 backdrop-blur-sm border-2 border-dashed border-[var(--tk-color-primary-500)] rounded-lg flex items-center justify-center pointer-events-none">
+          <div className="bg-white dark:bg-slate-800 rounded-xl px-8 py-6 shadow-2xl text-center">
+            <svg className="w-12 h-12 mx-auto mb-3 text-[var(--tk-color-primary-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <p className="text-sm font-bold text-slate-900 dark:text-white">Drop file here</p>
+            <p className="text-xs text-slate-500 mt-1">.json, .yaml, .yml, .csv, .xml, or .toml</p>
+          </div>
+        </div>
+      )}
+
       {/* Top Bar: Breadcrumb + Undo/Redo + Clear */}
       <div className="relative z-0 px-4 md:px-6 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between">
         <nav aria-label="Breadcrumb">
@@ -567,6 +711,10 @@ export default function JsonConverterPage() {
         onFormat={handleFormat}
         activeAction={activeAction}
         detectedFormat={detectedFormat}
+        indentSize={indentSize}
+        onIndentSizeChange={setIndentSize}
+        sortKeys={sortKeys}
+        onSortKeysChange={setSortKeys}
       />
 
       {/* Editor Area */}
@@ -667,13 +815,23 @@ export default function JsonConverterPage() {
                 </button>
               </div>
             </div>
-            <CodeEditor
-              ref={editorRef}
-              value={input}
-              onChange={handleInputChange}
-              placeholder='{ "paste": "your JSON or YAML here" }'
-              language={inputLanguage}
-            />
+            {viewMode === 'diff' ? (
+              <CodeEditor
+                ref={editorRef}
+                value={input}
+                onChange={handleInputChange}
+                placeholder='{ "paste": "your JSON or YAML here" }'
+                language={inputLanguage}
+              />
+            ) : (
+              <CodeEditor
+                ref={editorRef}
+                value={input}
+                onChange={handleInputChange}
+                placeholder='{ "paste": "your JSON or YAML here" }'
+                language={inputLanguage}
+              />
+            )}
             <StatusBar
               format={validation.label.includes('YAML') ? 'YAML' : validation.label.includes('CSV') ? 'CSV' : validation.label.includes('XML') ? 'XML' : 'JSON'}
               lineCount={inputLineCount}
@@ -722,11 +880,21 @@ export default function JsonConverterPage() {
                 >
                   Tree
                 </button>
+                <button
+                  onClick={() => setViewMode('diff')}
+                  className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                    viewMode === 'diff'
+                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                      : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                  }`}
+                >
+                  Diff
+                </button>
               </div>
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={handleCopyOutput}
-                  disabled={!output.trim()}
+                  disabled={!displayOutput.trim()}
                   className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   title="Copy result"
                   aria-label="Copy result"
@@ -743,7 +911,7 @@ export default function JsonConverterPage() {
                 </button>
                 <button
                   onClick={handleDownloadOutput}
-                  disabled={!output.trim()}
+                  disabled={!displayOutput.trim()}
                   className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   title="Download result"
                   aria-label="Download result"
@@ -756,9 +924,24 @@ export default function JsonConverterPage() {
             </div>
             {viewMode === 'tree' ? (
               <TreeView data={treeData} />
+            ) : viewMode === 'diff' ? (
+              <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                <div className="px-3 py-1.5 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Paste text to compare against input</span>
+                </div>
+                <div className="shrink-0 border-b border-slate-100 dark:border-slate-800">
+                  <textarea
+                    value={diffInput}
+                    onChange={(e) => setDiffInput(e.target.value)}
+                    placeholder="Paste second JSON/text here to compare..."
+                    className="w-full h-28 bg-transparent px-3 py-2 font-mono text-[13px] text-slate-700 dark:text-slate-300 placeholder:text-slate-400 dark:placeholder:text-slate-600 resize-none focus:outline-none"
+                  />
+                </div>
+                <DiffView leftText={input} rightText={diffInput} />
+              </div>
             ) : (
               <CodeEditor
-                value={output}
+                value={displayOutput}
                 onChange={() => {}}
                 readOnly
                 placeholder="Run an action to see results..."
@@ -769,7 +952,7 @@ export default function JsonConverterPage() {
               <StatusBar
                 format={outputFormat}
                 lineCount={outputLineCount}
-                charCount={output.length}
+                charCount={displayOutput.length}
                 isValid={null}
               />
             )}
@@ -787,7 +970,7 @@ export default function JsonConverterPage() {
             />
           ) : (
             <CodeEditor
-              value={output}
+              value={displayOutput}
               onChange={() => {}}
               readOnly
               placeholder="Run an action to see results..."
@@ -798,7 +981,7 @@ export default function JsonConverterPage() {
           <StatusBar
             format={activeTab === 'input' ? (validation.label.includes('YAML') ? 'YAML' : validation.label.includes('CSV') ? 'CSV' : 'JSON') : outputFormat}
             lineCount={activeTab === 'input' ? inputLineCount : outputLineCount}
-            charCount={activeTab === 'input' ? input.length : output.length}
+            charCount={activeTab === 'input' ? input.length : displayOutput.length}
             isValid={activeTab === 'input' ? validation.valid : null}
             validationLabel={activeTab === 'input' ? validation.label : undefined}
           />
@@ -817,10 +1000,14 @@ export default function JsonConverterPage() {
           )}
         </div>
 
+        {/* Panels below editors */}
+        <SchemaValidator input={input} onErrors={setSchemaErrors} />
+        <QueryPanel input={input} onResult={setQueryResult} />
+
         {/* Problems Panel — only shown when there are errors, full-width at bottom */}
-        {errors.length > 0 && (
+        {allErrors.length > 0 && (
           <div className="mx-3 mb-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-            <ProblemsPanel errors={errors} onGoToLine={handleGoToLine} />
+            <ProblemsPanel errors={allErrors} onGoToLine={handleGoToLine} />
           </div>
         )}
       </main>
