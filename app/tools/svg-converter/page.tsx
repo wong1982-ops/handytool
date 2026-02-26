@@ -9,6 +9,8 @@ import { ExportActions } from '@/tools/svg-converter/export-actions'
 import { ZoomControls } from '@/tools/svg-converter/zoom-controls'
 import { StatusBar } from '@/tools/svg-converter/status-bar'
 import { useSvgTracer } from '@/tools/svg-converter/use-svg-tracer'
+import { svgToEps } from '@/tools/svg-converter/exporters/svg-to-eps'
+import { svgToPdf } from '@/tools/svg-converter/exporters/svg-to-pdf'
 import { DEFAULT_SETTINGS } from '@/tools/svg-converter/types'
 import type { ImageMeta, VectorizationSettings } from '@/tools/svg-converter/types'
 import type { EditorPhase } from '@/tools/svg-converter/types'
@@ -85,34 +87,51 @@ export default function SvgConverterPage() {
     setEditorPhase('crop')
   }, [reset])
 
+  // Download helper
+  const downloadBlob = useCallback((blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [])
+
+  // Derive base filename from original image name
+  const baseFilename = useCallback(
+    (ext: string) =>
+      imageMeta ? imageMeta.name.replace(/\.[^.]+$/, ext) : `converted${ext}`,
+    [imageMeta],
+  )
+
   // Export handlers
   const handleDownloadSvg = useCallback(() => {
     if (!vectorResult) return
     const blob = new Blob([vectorResult.svgString], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = imageMeta ? imageMeta.name.replace(/\.[^.]+$/, '.svg') : 'converted.svg'
-    a.click()
-    URL.revokeObjectURL(url)
-  }, [vectorResult, imageMeta])
+    downloadBlob(blob, baseFilename('.svg'))
+  }, [vectorResult, downloadBlob, baseFilename])
 
   const handleExportEps = useCallback(() => {
-    // EPS export placeholder — would need server-side conversion
-    alert('EPS export is not yet implemented.')
-  }, [])
-
-  const handleExportPdf = useCallback(() => {
     if (!vectorResult) return
-    // Simple PDF wrapping of SVG using data URI
-    const svgBlob = new Blob([vectorResult.svgString], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(svgBlob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = imageMeta ? imageMeta.name.replace(/\.[^.]+$/, '.svg') : 'converted.svg'
-    a.click()
-    URL.revokeObjectURL(url)
-  }, [vectorResult, imageMeta])
+    try {
+      const blob = svgToEps(vectorResult.svgString)
+      downloadBlob(blob, baseFilename('.eps'))
+    } catch (err) {
+      console.error('EPS export failed:', err)
+      alert('EPS export failed. Please try again.')
+    }
+  }, [vectorResult, downloadBlob, baseFilename])
+
+  const handleExportPdf = useCallback(async () => {
+    if (!vectorResult) return
+    try {
+      const blob = await svgToPdf(vectorResult.svgString)
+      downloadBlob(blob, baseFilename('.pdf'))
+    } catch (err) {
+      console.error('PDF export failed:', err)
+      alert('PDF export failed. Please try again.')
+    }
+  }, [vectorResult, downloadBlob, baseFilename])
 
   // Zoom handlers
   const handleZoomChange = useCallback((z: number) => setZoom(z), [])
