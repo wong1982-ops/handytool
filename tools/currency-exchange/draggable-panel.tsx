@@ -10,6 +10,7 @@ const PANEL_TITLES: Record<string, string> = {
   'currency-pairs': 'Top Pairs',
   'external-links': 'External Rates',
   'multi-currency': 'Multi-Currency',
+  'rate-alerts': 'Rate Alerts',
 }
 
 interface DraggablePanelProps {

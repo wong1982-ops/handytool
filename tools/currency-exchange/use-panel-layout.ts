@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 
-export type PanelId = 'rate-chart' | 'stats-row' | 'currency-pairs' | 'external-links' | 'multi-currency'
+export type PanelId = 'rate-chart' | 'stats-row' | 'currency-pairs' | 'external-links' | 'multi-currency' | 'rate-alerts'
 
 export interface PanelConfig {
   id: PanelId
@@ -16,7 +16,7 @@ export interface PanelLayoutConfig {
 
 const STORAGE_KEY = 'ht-currency-exchange-layout'
 
-const ALL_IDS: PanelId[] = ['rate-chart', 'stats-row', 'currency-pairs', 'external-links', 'multi-currency']
+const ALL_IDS: PanelId[] = ['rate-chart', 'stats-row', 'currency-pairs', 'external-links', 'multi-currency', 'rate-alerts']
 
 const DEFAULT_LAYOUT: PanelLayoutConfig = {
   version: 1,
@@ -26,6 +26,7 @@ const DEFAULT_LAYOUT: PanelLayoutConfig = {
     { id: 'stats-row', colSpan: 2 },
     { id: 'external-links', colSpan: 1 },
     { id: 'multi-currency', colSpan: 3 },
+    { id: 'rate-alerts', colSpan: 1 },
   ],
 }
 

@@ -13,6 +13,7 @@ import { useFavorites } from '@/tools/currency-exchange/use-favorites'
 import { useOfflineRates } from '@/tools/currency-exchange/use-offline-rates'
 import { FavoritesBar } from '@/tools/currency-exchange/favorites-bar'
 import { MultiCurrency } from '@/tools/currency-exchange/multi-currency'
+import { RateAlerts } from '@/tools/currency-exchange/rate-alerts'
 import {
   isCrypto,
   getCryptoId,
@@ -451,6 +452,8 @@ export default function CurrencyExchangePage() {
               currencies={currencies}
             />
           )
+        case 'rate-alerts':
+          return <RateAlerts from={from} to={to} />
       }
     },
     [chartData, from, to, period, handlePeriodChange, chartLoading, topPairs, pairsLoading, handlePairClick, amount, currencies]
