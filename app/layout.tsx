@@ -18,6 +18,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Toolk1t",
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Toolk1t - Free Online Tools",
+    description:
+      "Free online tools for developers and creators — IP lookup, JSON converter, image editor, PDF tools, speed test, and more.",
   },
 };
 

@@ -4,6 +4,14 @@ import { GlassCard } from '@/components/ui/glass-card'
 export const metadata: Metadata = {
   title: 'Privacy Policy — Toolk1t',
   description: 'Privacy Policy for Toolk1t. Learn how we handle your data.',
+  alternates: {
+    canonical: '/privacy',
+  },
+  openGraph: {
+    title: 'Privacy Policy | Toolk1t',
+    description: 'Privacy Policy for Toolk1t. Learn how we handle your data.',
+    url: '/privacy',
+  },
 }
 
 export default function PrivacyPolicyPage() {

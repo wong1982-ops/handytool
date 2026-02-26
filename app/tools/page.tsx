@@ -4,6 +4,9 @@ import { tools } from '@/lib/tools'
 export default function ToolsPage() {
   return (
     <main className="max-w-5xl mx-auto px-6 py-12 flex-1">
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">
+        Free Online Tools
+      </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {tools.map((tool) => (
           <Link

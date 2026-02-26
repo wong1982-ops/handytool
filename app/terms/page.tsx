@@ -4,6 +4,14 @@ import { GlassCard } from '@/components/ui/glass-card'
 export const metadata: Metadata = {
   title: 'Terms of Service — Toolk1t',
   description: 'Terms of Service for Toolk1t, your free online toolkit.',
+  alternates: {
+    canonical: '/terms',
+  },
+  openGraph: {
+    title: 'Terms of Service | Toolk1t',
+    description: 'Terms of Service for Toolk1t, your free online toolkit.',
+    url: '/terms',
+  },
 }
 
 export default function TermsOfServicePage() {
