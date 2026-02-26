@@ -4,35 +4,26 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/hooks/use-auth'
 
-const STORAGE_KEY = 'ht-profile-prompt'
 const MAX_PROMPTS = 3
 const COOLDOWN_DAYS = 7
 const MIN_UNIQUE_TOOLS = 3
+const STORAGE_KEY = 'ht-profile-tools'
 
-interface PromptState {
-  promptCount: number
-  lastDismissed: string | null
-  uniqueTools: string[]
-}
-
-function getState(): PromptState {
+/** Track unique tool visits in localStorage (anonymous-safe) */
+function getVisitedTools(): string[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : { promptCount: 0, lastDismissed: null, uniqueTools: [] }
+    return raw ? JSON.parse(raw) : []
   } catch {
-    return { promptCount: 0, lastDismissed: null, uniqueTools: [] }
+    return []
   }
 }
 
-function setState(state: PromptState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-}
-
 export function trackToolVisit(toolSlug: string) {
-  const state = getState()
-  if (!state.uniqueTools.includes(toolSlug)) {
-    state.uniqueTools.push(toolSlug)
-    setState(state)
+  const tools = getVisitedTools()
+  if (!tools.includes(toolSlug)) {
+    tools.push(toolSlug)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tools))
   }
 }
 
@@ -44,35 +35,44 @@ export function useProfilePrompt() {
     if (!user) { setShowPrompt(false); return }
 
     async function check() {
-      const state = getState()
-      if (state.promptCount >= MAX_PROMPTS) return
-      if (state.lastDismissed) {
-        const cooldownEnd = new Date(state.lastDismissed)
-        cooldownEnd.setDate(cooldownEnd.getDate() + COOLDOWN_DAYS)
-        if (new Date() < cooldownEnd) return
-      }
-      if (state.uniqueTools.length < MIN_UNIQUE_TOOLS) return
+      // Must have visited enough tools first
+      if (getVisitedTools().length < MIN_UNIQUE_TOOLS) return
 
       const supabase = createClient()
       const { data } = await supabase
         .from('user_profiles')
-        .select('profile_completed')
+        .select('profile_completed, prompt_dismiss_count, prompt_last_dismissed')
         .eq('id', user!.id)
         .single()
 
-      if (data?.profile_completed) return
+      if (!data) return
+
+      // Already completed — never show
+      if (data.profile_completed) return
+
+      // Exceeded max dismissals — stop prompting permanently
+      if (data.prompt_dismiss_count >= MAX_PROMPTS) return
+
+      // Within cooldown period
+      if (data.prompt_last_dismissed) {
+        const cooldownEnd = new Date(data.prompt_last_dismissed)
+        cooldownEnd.setDate(cooldownEnd.getDate() + COOLDOWN_DAYS)
+        if (new Date() < cooldownEnd) return
+      }
+
       setShowPrompt(true)
     }
 
     check()
   }, [user])
 
-  function dismiss() {
-    const state = getState()
-    state.promptCount++
-    state.lastDismissed = new Date().toISOString()
-    setState(state)
+  async function dismiss() {
     setShowPrompt(false)
+    if (!user) return
+
+    const supabase = createClient()
+    // Atomically increment dismiss count and set timestamp in DB
+    await supabase.rpc('increment_prompt_dismiss', { user_id: user.id })
   }
 
   return { showPrompt, dismiss }
