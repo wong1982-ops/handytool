@@ -1,6 +1,7 @@
 'use client'
 
 import { CurrencySelect, getFlag } from './currency-select'
+import { isCrypto } from './crypto-api'
 
 interface ConverterBarProps {
   amount: string
@@ -18,6 +19,22 @@ interface ConverterBarProps {
 
 function formatNumber(n: number, decimals = 2): string {
   return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+}
+
+// Smart formatting for crypto values: more decimals for small numbers
+function formatSmart(n: number, currencyCode: string): string {
+  if (!isCrypto(currencyCode)) return formatNumber(n)
+  if (n >= 1000) return formatNumber(n, 2)
+  if (n >= 1) return formatNumber(n, 4)
+  if (n >= 0.01) return formatNumber(n, 6)
+  return formatNumber(n, 8)
+}
+
+function formatRate(n: number): string {
+  if (n >= 1000) return formatNumber(n, 2)
+  if (n >= 1) return formatNumber(n, 4)
+  if (n >= 0.01) return formatNumber(n, 6)
+  return formatNumber(n, 8)
 }
 
 export { getFlag }
@@ -130,10 +147,10 @@ export function ConverterBar({
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-slate-500 mb-1">
-                {formatNumber(parseFloat(amount) || 0)} {fromName} =
+                {formatSmart(parseFloat(amount) || 0, from)} {fromName} =
               </p>
               <p className="text-3xl font-extrabold text-slate-900 dark:text-white">
-                {formatNumber(result.converted)}{' '}
+                {formatSmart(result.converted, to)}{' '}
                 <span className="text-slate-400 dark:text-slate-500 font-normal">{toName}</span>
               </p>
             </div>
@@ -147,7 +164,7 @@ export function ConverterBar({
                 </p>
               )}
               <p className="text-xs text-slate-400 mt-1 italic">
-                1 {from} = {formatNumber(result.rate, 4)} {to}
+                1 {from} = {formatRate(result.rate)} {to}
               </p>
             </div>
           </div>

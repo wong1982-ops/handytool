@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { isCrypto, getCryptoInfo } from './crypto-api'
 
 const FLAG_MAP: Record<string, string> = {
   AUD: '\u{1F1E6}\u{1F1FA}', BGN: '\u{1F1E7}\u{1F1EC}', BRL: '\u{1F1E7}\u{1F1F7}',
@@ -17,8 +18,13 @@ const FLAG_MAP: Record<string, string> = {
 }
 
 export function getFlag(code: string): string {
+  if (isCrypto(code)) {
+    return getCryptoInfo(code)?.flag || '\u{1F4B0}'
+  }
   return FLAG_MAP[code] || '\u{1F3F3}\u{FE0F}'
 }
+
+type DropdownItem = { type: 'currency'; code: string } | { type: 'separator'; label: string }
 
 interface CurrencySelectProps {
   id: string
@@ -36,14 +42,57 @@ export function CurrencySelect({ id, value, currencies, onChange }: CurrencySele
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
 
-  const sortedCodes = Object.keys(currencies).sort()
+  const allCodes = Object.keys(currencies).sort()
 
-  const filtered = filter
-    ? sortedCodes.filter((code) => {
-        const q = filter.toLowerCase()
-        return code.toLowerCase().includes(q) || (currencies[code] || '').toLowerCase().includes(q)
-      })
-    : sortedCodes
+  // Separate fiat and crypto codes
+  const { fiatCodes, cryptoCodes } = useMemo(() => {
+    const fiat: string[] = []
+    const crypto: string[] = []
+    for (const code of allCodes) {
+      if (isCrypto(code)) {
+        crypto.push(code)
+      } else {
+        fiat.push(code)
+      }
+    }
+    return { fiatCodes: fiat, cryptoCodes: crypto }
+  }, [allCodes])
+
+  // Build filtered list with separators
+  const { items, selectableCodes } = useMemo(() => {
+    const q = filter.toLowerCase()
+    const filterFn = (code: string) =>
+      !filter || code.toLowerCase().includes(q) || (currencies[code] || '').toLowerCase().includes(q)
+
+    const filteredFiat = fiatCodes.filter(filterFn)
+    const filteredCrypto = cryptoCodes.filter(filterFn)
+
+    const itemList: DropdownItem[] = []
+    const codes: string[] = []
+
+    if (filteredFiat.length > 0) {
+      if (filteredCrypto.length > 0) {
+        itemList.push({ type: 'separator', label: 'FIAT CURRENCIES' })
+      }
+      for (const code of filteredFiat) {
+        itemList.push({ type: 'currency', code })
+        codes.push(code)
+      }
+    }
+
+    if (filteredCrypto.length > 0) {
+      itemList.push({ type: 'separator', label: 'CRYPTO' })
+      for (const code of filteredCrypto) {
+        itemList.push({ type: 'currency', code })
+        codes.push(code)
+      }
+    }
+
+    return { items: itemList, selectableCodes: codes }
+  }, [filter, fiatCodes, cryptoCodes, currencies])
+
+  // Keep filtered as selectableCodes for keyboard navigation compatibility
+  const filtered = selectableCodes
 
   const openDropdown = useCallback(() => {
     setOpen(true)
@@ -166,31 +215,51 @@ export function CurrencySelect({ id, value, currencies, onChange }: CurrencySele
             {filtered.length === 0 ? (
               <li className="px-4 py-3 text-sm text-slate-400 text-center">No currencies found</li>
             ) : (
-              filtered.map((code, index) => (
-                <li
-                  key={code}
-                  role="option"
-                  aria-selected={code === value}
-                  onMouseDown={(e) => { e.preventDefault(); selectCode(code) }}
-                  onMouseEnter={() => setActiveIndex(index)}
-                  className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-colors ${
-                    index === activeIndex
-                      ? 'bg-[var(--tk-color-primary-500)]/10'
-                      : code === value
-                        ? 'bg-slate-50 dark:bg-slate-800/50'
-                        : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
-                  }`}
-                >
-                  <span className="text-lg" aria-hidden="true">{getFlag(code)}</span>
-                  <span className="font-semibold text-sm text-slate-900 dark:text-white">{code}</span>
-                  <span className="text-xs text-slate-400 truncate">{currencies[code]}</span>
-                  {code === value && (
-                    <svg className="w-4 h-4 text-[var(--tk-color-primary-500)] ml-auto shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </li>
-              ))
+              items.map((item, itemIdx) => {
+                if (item.type === 'separator') {
+                  return (
+                    <li
+                      key={`sep-${item.label}`}
+                      role="presentation"
+                      className="px-3 pt-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 select-none"
+                    >
+                      {item.label}
+                    </li>
+                  )
+                }
+                const code = item.code
+                const index = filtered.indexOf(code)
+                const cryptoItem = isCrypto(code)
+                return (
+                  <li
+                    key={code}
+                    role="option"
+                    aria-selected={code === value}
+                    onMouseDown={(e) => { e.preventDefault(); selectCode(code) }}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-colors ${
+                      index === activeIndex
+                        ? 'bg-[var(--tk-color-primary-500)]/10'
+                        : code === value
+                          ? 'bg-slate-50 dark:bg-slate-800/50'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                    }`}
+                  >
+                    {cryptoItem ? (
+                      <span className="text-lg w-6 text-center font-bold text-amber-500" aria-hidden="true">{getFlag(code)}</span>
+                    ) : (
+                      <span className="text-lg" aria-hidden="true">{getFlag(code)}</span>
+                    )}
+                    <span className="font-semibold text-sm text-slate-900 dark:text-white">{code}</span>
+                    <span className="text-xs text-slate-400 truncate">{currencies[code]}</span>
+                    {code === value && (
+                      <svg className="w-4 h-4 text-[var(--tk-color-primary-500)] ml-auto shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </li>
+                )
+              })
             )}
           </ul>
         </div>

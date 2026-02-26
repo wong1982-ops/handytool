@@ -9,6 +9,13 @@ import { ExternalLinks } from '@/tools/currency-exchange/external-links'
 import { PanelGrid } from '@/tools/currency-exchange/panel-grid'
 import { usePanelLayout, type PanelId } from '@/tools/currency-exchange/use-panel-layout'
 import { useIsDesktop } from '@/tools/currency-exchange/use-is-desktop'
+import {
+  isCrypto,
+  getCryptoId,
+  getCryptoCurrencies,
+  fetchCryptoRates,
+  fetchCryptoHistory,
+} from '@/tools/currency-exchange/crypto-api'
 
 const API_BASE = 'https://api.frankfurter.app'
 
@@ -45,6 +52,24 @@ function getYesterdayStr(): string {
   return d.toISOString().slice(0, 10)
 }
 
+function periodToDays(period: Period): number {
+  switch (period) {
+    case '1W': return 7
+    case '1M': return 30
+    case '3M': return 90
+    case '6M': return 180
+    case '1Y': return 365
+  }
+}
+
+// Format numbers appropriately for crypto (high precision for small values, low for large)
+function formatCryptoRate(rate: number): string {
+  if (rate >= 1000) return rate.toFixed(2)
+  if (rate >= 1) return rate.toFixed(4)
+  if (rate >= 0.01) return rate.toFixed(6)
+  return rate.toFixed(8)
+}
+
 export default function CurrencyExchangePage() {
   const [currencies, setCurrencies] = useState<Record<string, string>>({})
   const [amount, setAmount] = useState('1000.00')
@@ -68,11 +93,15 @@ export default function CurrencyExchangePage() {
   const { panels, reorderPanels, setColSpan, resetLayout, isDefault } = usePanelLayout()
   const isDesktop = useIsDesktop()
 
-  // Fetch currencies list on mount
+  // Fetch currencies list on mount (fiat from frankfurter + crypto)
   useEffect(() => {
     fetch(`${API_BASE}/currencies`)
       .then((r) => r.json())
-      .then((data: Record<string, string>) => setCurrencies(data))
+      .then((data: Record<string, string>) => {
+        // Merge fiat and crypto currencies
+        const merged = { ...data, ...getCryptoCurrencies() }
+        setCurrencies(merged)
+      })
       .catch(() => setError('Failed to load currency list'))
   }, [])
 
@@ -108,7 +137,7 @@ export default function CurrencyExchangePage() {
     fetchPairs()
   }, [])
 
-  // Convert currency
+  // Convert currency — handles fiat-fiat, crypto-fiat, fiat-crypto, crypto-crypto
   const doConvert = useCallback(async (amt: string, fromCode: string, toCode: string) => {
     if (!amt || parseFloat(amt) <= 0) return
     if (fromCode === toCode) {
@@ -118,23 +147,69 @@ export default function CurrencyExchangePage() {
     setConvertLoading(true)
     setError(null)
     try {
-      const yesterday = getYesterdayStr()
-      const [latestRes, yesterdayRes] = await Promise.all([
-        fetch(`${API_BASE}/latest?amount=${parseFloat(amt)}&from=${fromCode}&to=${toCode}`),
-        fetch(`${API_BASE}/${yesterday}?from=${fromCode}&to=${toCode}`),
-      ])
-      const latestData = await latestRes.json()
-      const yesterdayData = await yesterdayRes.json()
+      const fromIsCrypto = isCrypto(fromCode)
+      const toIsCrypto = isCrypto(toCode)
+      const parsedAmt = parseFloat(amt)
 
-      const converted = latestData.rates?.[toCode]
-      const rate = converted / parseFloat(amt)
-      const yesterdayRate = yesterdayData.rates?.[toCode] ?? null
-      const changePercent = yesterdayRate !== null ? ((rate - yesterdayRate) / yesterdayRate) * 100 : null
+      if (!fromIsCrypto && !toIsCrypto) {
+        // Fiat -> Fiat: use frankfurter (existing logic)
+        const yesterday = getYesterdayStr()
+        const [latestRes, yesterdayRes] = await Promise.all([
+          fetch(`${API_BASE}/latest?amount=${parsedAmt}&from=${fromCode}&to=${toCode}`),
+          fetch(`${API_BASE}/${yesterday}?from=${fromCode}&to=${toCode}`),
+        ])
+        const latestData = await latestRes.json()
+        const yesterdayData = await yesterdayRes.json()
 
-      if (converted !== undefined) {
+        const converted = latestData.rates?.[toCode]
+        const rate = converted / parsedAmt
+        const yesterdayRate = yesterdayData.rates?.[toCode] ?? null
+        const changePercent = yesterdayRate !== null ? ((rate - yesterdayRate) / yesterdayRate) * 100 : null
+
+        if (converted !== undefined) {
+          setResult({ converted, rate, changePercent })
+        } else {
+          throw new Error('No rate returned')
+        }
+      } else if (fromIsCrypto && !toIsCrypto) {
+        // Crypto -> Fiat: get crypto price in fiat currency
+        const cryptoId = getCryptoId(fromCode)!
+        const fiatLower = toCode.toLowerCase()
+        const data = await fetchCryptoRates([cryptoId], [fiatLower])
+        const price = data[cryptoId]?.[fiatLower]
+        const change24h = data[cryptoId]?.[`${fiatLower}_24h_change`] ?? null
+        if (price === undefined) throw new Error('No rate returned')
+        const rate = price
+        const converted = parsedAmt * rate
+        setResult({ converted, rate, changePercent: change24h })
+      } else if (!fromIsCrypto && toIsCrypto) {
+        // Fiat -> Crypto: inverse of crypto price in fiat
+        const cryptoId = getCryptoId(toCode)!
+        const fiatLower = fromCode.toLowerCase()
+        const data = await fetchCryptoRates([cryptoId], [fiatLower])
+        const cryptoPrice = data[cryptoId]?.[fiatLower]
+        const change24h = data[cryptoId]?.[`${fiatLower}_24h_change`] ?? null
+        if (cryptoPrice === undefined) throw new Error('No rate returned')
+        const rate = 1 / cryptoPrice
+        const converted = parsedAmt * rate
+        // Invert the change direction since we're going fiat->crypto
+        const changePercent = change24h !== null ? -change24h : null
         setResult({ converted, rate, changePercent })
       } else {
-        throw new Error('No rate returned')
+        // Crypto -> Crypto: intermediate USD conversion
+        const fromId = getCryptoId(fromCode)!
+        const toId = getCryptoId(toCode)!
+        const data = await fetchCryptoRates([fromId, toId], ['usd'])
+        const fromPrice = data[fromId]?.usd
+        const toPrice = data[toId]?.usd
+        const fromChange = data[fromId]?.usd_24h_change ?? null
+        const toChange = data[toId]?.usd_24h_change ?? null
+        if (fromPrice === undefined || toPrice === undefined) throw new Error('No rate returned')
+        const rate = fromPrice / toPrice
+        const converted = parsedAmt * rate
+        // Approximate change: difference between the two 24h changes
+        const changePercent = fromChange !== null && toChange !== null ? fromChange - toChange : null
+        setResult({ converted, rate, changePercent })
       }
     } catch {
       setError('Failed to fetch exchange rate. Please try again.')
@@ -143,7 +218,7 @@ export default function CurrencyExchangePage() {
     }
   }, [])
 
-  // Fetch chart data
+  // Fetch chart data — handles fiat and crypto pairs
   const fetchChart = useCallback(async (fromCode: string, toCode: string, p: Period) => {
     if (fromCode === toCode) {
       setChartData([])
@@ -151,18 +226,80 @@ export default function CurrencyExchangePage() {
     }
     setChartLoading(true)
     try {
-      const { start, end } = getDateRange(p)
-      const res = await fetch(`${API_BASE}/${start}..${end}?from=${fromCode}&to=${toCode}`)
-      const data = await res.json()
-      if (data.rates) {
-        const entries = Object.entries(data.rates)
-          .map(([date, rates]) => ({
-            date,
-            rate: (rates as Record<string, number>)[toCode],
-          }))
-          .filter((d) => d.rate !== undefined)
-          .sort((a, b) => a.date.localeCompare(b.date))
-        setChartData(entries)
+      const fromIsCrypto = isCrypto(fromCode)
+      const toIsCrypto = isCrypto(toCode)
+
+      if (!fromIsCrypto && !toIsCrypto) {
+        // Fiat -> Fiat: use frankfurter (existing logic)
+        const { start, end } = getDateRange(p)
+        const res = await fetch(`${API_BASE}/${start}..${end}?from=${fromCode}&to=${toCode}`)
+        const data = await res.json()
+        if (data.rates) {
+          const entries = Object.entries(data.rates)
+            .map(([date, rates]) => ({
+              date,
+              rate: (rates as Record<string, number>)[toCode],
+            }))
+            .filter((d) => d.rate !== undefined)
+            .sort((a, b) => a.date.localeCompare(b.date))
+          setChartData(entries)
+        }
+      } else if (fromIsCrypto && !toIsCrypto) {
+        // Crypto -> Fiat: CoinGecko history
+        const cryptoId = getCryptoId(fromCode)!
+        const days = periodToDays(p)
+        const history = await fetchCryptoHistory(cryptoId, toCode.toLowerCase(), days)
+        const entries = history.prices.map(([timestamp, price]) => ({
+          date: new Date(timestamp).toISOString().slice(0, 10),
+          rate: price,
+        }))
+        // Deduplicate by date (CoinGecko returns multiple points per day for short periods)
+        const deduped = new Map<string, { date: string; rate: number }>()
+        for (const entry of entries) {
+          deduped.set(entry.date, entry)
+        }
+        setChartData(Array.from(deduped.values()).sort((a, b) => a.date.localeCompare(b.date)))
+      } else if (!fromIsCrypto && toIsCrypto) {
+        // Fiat -> Crypto: inverse of crypto price in fiat
+        const cryptoId = getCryptoId(toCode)!
+        const days = periodToDays(p)
+        const history = await fetchCryptoHistory(cryptoId, fromCode.toLowerCase(), days)
+        const entries = history.prices.map(([timestamp, price]) => ({
+          date: new Date(timestamp).toISOString().slice(0, 10),
+          rate: price > 0 ? 1 / price : 0,
+        }))
+        const deduped = new Map<string, { date: string; rate: number }>()
+        for (const entry of entries) {
+          deduped.set(entry.date, entry)
+        }
+        setChartData(Array.from(deduped.values()).sort((a, b) => a.date.localeCompare(b.date)))
+      } else {
+        // Crypto -> Crypto: get both in USD and compute ratio
+        const fromId = getCryptoId(fromCode)!
+        const toId = getCryptoId(toCode)!
+        const days = periodToDays(p)
+        const [fromHistory, toHistory] = await Promise.all([
+          fetchCryptoHistory(fromId, 'usd', days),
+          fetchCryptoHistory(toId, 'usd', days),
+        ])
+        // Build a map of toCode prices by date for lookup
+        const toPriceMap = new Map<string, number>()
+        for (const [timestamp, price] of toHistory.prices) {
+          const date = new Date(timestamp).toISOString().slice(0, 10)
+          toPriceMap.set(date, price)
+        }
+        const entries: { date: string; rate: number }[] = []
+        const seen = new Set<string>()
+        for (const [timestamp, fromPrice] of fromHistory.prices) {
+          const date = new Date(timestamp).toISOString().slice(0, 10)
+          if (seen.has(date)) continue
+          seen.add(date)
+          const toPrice = toPriceMap.get(date)
+          if (toPrice && toPrice > 0) {
+            entries.push({ date, rate: fromPrice / toPrice })
+          }
+        }
+        setChartData(entries.sort((a, b) => a.date.localeCompare(b.date)))
       }
     } catch {
       setChartData([])
