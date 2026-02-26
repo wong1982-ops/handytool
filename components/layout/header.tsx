@@ -284,6 +284,14 @@ export function Header({
             </button>
           </div>
 
+          {/* Blog link (desktop) */}
+          <Link
+            href="/blog"
+            className="hidden md:flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors"
+          >
+            Blog
+          </Link>
+
           <button
             onClick={toggleTheme}
             className="relative flex items-center w-14 h-7 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors cursor-pointer"
@@ -425,6 +433,22 @@ export function Header({
                 )}
               </div>
             </div>
+            {/* Blog link (mobile) */}
+            <Link
+              href="/blog"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 shadow-sm flex items-center justify-center text-white shrink-0">
+                <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">Blog</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">Tips, guides & updates</p>
+              </div>
+            </Link>
             {/* Mobile tools grid */}
             <div className="grid grid-cols-2 gap-2 pt-1">
               {tools.map((tool) => (
