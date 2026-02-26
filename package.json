@@ -57,6 +57,7 @@
     "react18-split-pane": "^0.1.95",
     "svgo": "^4.0.0",
     "swagger-ui-react": "^5.31.1",
+    "ua-parser-js": "^2.0.9",
     "zod": "^3.24.0"
   },
   "devDependencies": {
@@ -70,6 +71,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/swagger-ui-react": "^5.18.0",
+    "@types/ua-parser-js": "^0.7.39",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "sass": "^1.97.3",
