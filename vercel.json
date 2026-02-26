@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/aggregate-stats",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/generate-blog",
+      "schedule": "0 3 * * 1"
+    },
+    {
+      "path": "/api/cron/ping-google",
+      "schedule": "0 4 * * *"
+    }
+  ]
+}

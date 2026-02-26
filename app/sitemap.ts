@@ -1,47 +1,58 @@
-import type { MetadataRoute } from "next";
-import { tools } from "@/lib/tools";
+import type { MetadataRoute } from 'next'
+import { tools } from '@/lib/tools'
+import { landingPages } from '@/lib/seo/landing-pages'
+import { useCases } from '@/lib/seo/use-cases'
+import { createClient } from '@/lib/supabase/server'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://toolk1t.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://toolk1t.app'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date()
+
+  let blogEntries: MetadataRoute.Sitemap = []
+  try {
+    const supabase = await createClient()
+    const { data: posts } = await supabase
+      .from('blog_posts')
+      .select('slug, published_at')
+      .not('published_at', 'is', null)
+      .order('published_at', { ascending: false })
+
+    blogEntries = (posts ?? []).map((post) => ({
+      url: `${SITE_URL}/blog/${post.slug}`,
+      lastModified: new Date(post.published_at),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }))
+  } catch {
+    // Supabase unavailable during build — skip blog entries
+  }
 
   return [
-    {
-      url: SITE_URL,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 1.0,
-    },
-    {
-      url: `${SITE_URL}/tools`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
+    { url: SITE_URL, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
+    { url: `${SITE_URL}/tools`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     ...tools.map((tool) => ({
       url: `${SITE_URL}${tool.href}`,
       lastModified: now,
-      changeFrequency: "monthly" as const,
+      changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
-    {
-      url: `${SITE_URL}/contact`,
+    ...landingPages.map((p) => ({
+      url: `${SITE_URL}/free/${p.slug}`,
       lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${SITE_URL}/terms`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
+    ...useCases.map((uc) => ({
+      url: `${SITE_URL}/use-cases/${uc.slug}`,
       lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${SITE_URL}/privacy`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-  ];
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
+    { url: `${SITE_URL}/blog`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
+    ...blogEntries,
+    { url: `${SITE_URL}/contact`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/terms`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+  ]
 }
