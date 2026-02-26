@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 
-export type PanelId = 'rate-chart' | 'stats-row' | 'currency-pairs' | 'external-links'
+export type PanelId = 'rate-chart' | 'stats-row' | 'currency-pairs' | 'external-links' | 'multi-currency'
 
 export interface PanelConfig {
   id: PanelId
@@ -16,7 +16,7 @@ export interface PanelLayoutConfig {
 
 const STORAGE_KEY = 'ht-currency-exchange-layout'
 
-const ALL_IDS: PanelId[] = ['rate-chart', 'stats-row', 'currency-pairs', 'external-links']
+const ALL_IDS: PanelId[] = ['rate-chart', 'stats-row', 'currency-pairs', 'external-links', 'multi-currency']
 
 const DEFAULT_LAYOUT: PanelLayoutConfig = {
   version: 1,
@@ -25,13 +25,14 @@ const DEFAULT_LAYOUT: PanelLayoutConfig = {
     { id: 'currency-pairs', colSpan: 1 },
     { id: 'stats-row', colSpan: 2 },
     { id: 'external-links', colSpan: 1 },
+    { id: 'multi-currency', colSpan: 3 },
   ],
 }
 
 function isValidLayout(parsed: unknown): parsed is PanelLayoutConfig {
   if (!parsed || typeof parsed !== 'object') return false
   const obj = parsed as Record<string, unknown>
-  if (obj.version !== 1 || !Array.isArray(obj.panels) || obj.panels.length !== 4) return false
+  if (obj.version !== 1 || !Array.isArray(obj.panels) || obj.panels.length !== ALL_IDS.length) return false
   const ids = new Set((obj.panels as PanelConfig[]).map((p) => p.id))
   return ALL_IDS.every((id) => ids.has(id))
 }

@@ -9,6 +9,10 @@ import { ExternalLinks } from '@/tools/currency-exchange/external-links'
 import { PanelGrid } from '@/tools/currency-exchange/panel-grid'
 import { usePanelLayout, type PanelId } from '@/tools/currency-exchange/use-panel-layout'
 import { useIsDesktop } from '@/tools/currency-exchange/use-is-desktop'
+import { useFavorites } from '@/tools/currency-exchange/use-favorites'
+import { useOfflineRates } from '@/tools/currency-exchange/use-offline-rates'
+import { FavoritesBar } from '@/tools/currency-exchange/favorites-bar'
+import { MultiCurrency } from '@/tools/currency-exchange/multi-currency'
 import {
   isCrypto,
   getCryptoId,
@@ -71,10 +75,16 @@ function formatCryptoRate(rate: number): string {
 }
 
 export default function CurrencyExchangePage() {
+  // Read URL params for initial values
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
+  const initialFrom = urlParams?.get('from') || 'USD'
+  const initialTo = urlParams?.get('to') || 'EUR'
+  const initialAmount = urlParams?.get('amount') || '1000.00'
+
   const [currencies, setCurrencies] = useState<Record<string, string>>({})
-  const [amount, setAmount] = useState('1000.00')
-  const [from, setFrom] = useState('USD')
-  const [to, setTo] = useState('EUR')
+  const [amount, setAmount] = useState(initialAmount)
+  const [from, setFrom] = useState(initialFrom)
+  const [to, setTo] = useState(initialTo)
   const [period, setPeriod] = useState<Period>('1M')
 
   const [result, setResult] = useState<{ converted: number; rate: number; changePercent: number | null } | null>(null)
@@ -92,6 +102,8 @@ export default function CurrencyExchangePage() {
 
   const { panels, reorderPanels, setColSpan, resetLayout, isDefault } = usePanelLayout()
   const isDesktop = useIsDesktop()
+  const { favorites, recent, addFavorite, removeFavorite, isFavorite, addRecent } = useFavorites()
+  const { cacheRates, getCachedRate, isUsingCache, lastUpdated } = useOfflineRates()
 
   // Fetch currencies list on mount (fiat from frankfurter + crypto)
   useEffect(() => {
@@ -137,11 +149,23 @@ export default function CurrencyExchangePage() {
     fetchPairs()
   }, [])
 
+  // Update URL params after conversion
+  const updateUrlParams = useCallback((fromCode: string, toCode: string, amt: string) => {
+    if (typeof window === 'undefined') return
+    const url = new URL(window.location.href)
+    url.searchParams.set('from', fromCode)
+    url.searchParams.set('to', toCode)
+    url.searchParams.set('amount', amt)
+    window.history.replaceState({}, '', url.toString())
+  }, [])
+
   // Convert currency — handles fiat-fiat, crypto-fiat, fiat-crypto, crypto-crypto
   const doConvert = useCallback(async (amt: string, fromCode: string, toCode: string) => {
     if (!amt || parseFloat(amt) <= 0) return
     if (fromCode === toCode) {
       setResult({ converted: parseFloat(amt), rate: 1, changePercent: null })
+      addRecent(fromCode, toCode)
+      updateUrlParams(fromCode, toCode, amt)
       return
     }
     setConvertLoading(true)
@@ -150,6 +174,10 @@ export default function CurrencyExchangePage() {
       const fromIsCrypto = isCrypto(fromCode)
       const toIsCrypto = isCrypto(toCode)
       const parsedAmt = parseFloat(amt)
+
+      let rate: number | undefined
+      let converted: number | undefined
+      let changePercent: number | null = null
 
       if (!fromIsCrypto && !toIsCrypto) {
         // Fiat -> Fiat: use frankfurter (existing logic)
@@ -161,14 +189,14 @@ export default function CurrencyExchangePage() {
         const latestData = await latestRes.json()
         const yesterdayData = await yesterdayRes.json()
 
-        const converted = latestData.rates?.[toCode]
-        const rate = converted / parsedAmt
-        const yesterdayRate = yesterdayData.rates?.[toCode] ?? null
-        const changePercent = yesterdayRate !== null ? ((rate - yesterdayRate) / yesterdayRate) * 100 : null
-
+        converted = latestData.rates?.[toCode]
         if (converted !== undefined) {
-          setResult({ converted, rate, changePercent })
-        } else {
+          rate = converted / parsedAmt
+        }
+        const yesterdayRate = yesterdayData.rates?.[toCode] ?? null
+        changePercent = rate !== undefined && yesterdayRate !== null ? ((rate - yesterdayRate) / yesterdayRate) * 100 : null
+
+        if (converted === undefined) {
           throw new Error('No rate returned')
         }
       } else if (fromIsCrypto && !toIsCrypto) {
@@ -177,11 +205,10 @@ export default function CurrencyExchangePage() {
         const fiatLower = toCode.toLowerCase()
         const data = await fetchCryptoRates([cryptoId], [fiatLower])
         const price = data[cryptoId]?.[fiatLower]
-        const change24h = data[cryptoId]?.[`${fiatLower}_24h_change`] ?? null
+        changePercent = data[cryptoId]?.[`${fiatLower}_24h_change`] ?? null
         if (price === undefined) throw new Error('No rate returned')
-        const rate = price
-        const converted = parsedAmt * rate
-        setResult({ converted, rate, changePercent: change24h })
+        rate = price
+        converted = parsedAmt * rate
       } else if (!fromIsCrypto && toIsCrypto) {
         // Fiat -> Crypto: inverse of crypto price in fiat
         const cryptoId = getCryptoId(toCode)!
@@ -190,11 +217,10 @@ export default function CurrencyExchangePage() {
         const cryptoPrice = data[cryptoId]?.[fiatLower]
         const change24h = data[cryptoId]?.[`${fiatLower}_24h_change`] ?? null
         if (cryptoPrice === undefined) throw new Error('No rate returned')
-        const rate = 1 / cryptoPrice
-        const converted = parsedAmt * rate
+        rate = 1 / cryptoPrice
+        converted = parsedAmt * rate
         // Invert the change direction since we're going fiat->crypto
-        const changePercent = change24h !== null ? -change24h : null
-        setResult({ converted, rate, changePercent })
+        changePercent = change24h !== null ? -change24h : null
       } else {
         // Crypto -> Crypto: intermediate USD conversion
         const fromId = getCryptoId(fromCode)!
@@ -205,18 +231,32 @@ export default function CurrencyExchangePage() {
         const fromChange = data[fromId]?.usd_24h_change ?? null
         const toChange = data[toId]?.usd_24h_change ?? null
         if (fromPrice === undefined || toPrice === undefined) throw new Error('No rate returned')
-        const rate = fromPrice / toPrice
-        const converted = parsedAmt * rate
+        rate = fromPrice / toPrice
+        converted = parsedAmt * rate
         // Approximate change: difference between the two 24h changes
-        const changePercent = fromChange !== null && toChange !== null ? fromChange - toChange : null
+        changePercent = fromChange !== null && toChange !== null ? fromChange - toChange : null
+      }
+
+      if (rate !== undefined && converted !== undefined) {
         setResult({ converted, rate, changePercent })
+        cacheRates(fromCode, toCode, rate)
+        addRecent(fromCode, toCode)
+        updateUrlParams(fromCode, toCode, amt)
       }
     } catch {
-      setError('Failed to fetch exchange rate. Please try again.')
+      // Try offline fallback
+      const cachedRate = getCachedRate(fromCode, toCode)
+      if (cachedRate !== null) {
+        const parsedAmt = parseFloat(amt)
+        setResult({ converted: parsedAmt * cachedRate, rate: cachedRate, changePercent: null })
+        setError(null)
+      } else {
+        setError('Failed to fetch exchange rate. Please try again.')
+      }
     } finally {
       setConvertLoading(false)
     }
-  }, [])
+  }, [cacheRates, getCachedRate, addRecent, updateUrlParams])
 
   // Fetch chart data — handles fiat and crypto pairs
   const fetchChart = useCallback(async (fromCode: string, toCode: string, p: Period) => {
@@ -366,6 +406,17 @@ export default function CurrencyExchangePage() {
     [amount, period, doConvert, fetchChart]
   )
 
+  const handleToggleFavorite = useCallback(
+    (favFrom: string, favTo: string) => {
+      if (isFavorite(favFrom, favTo)) {
+        removeFavorite(favFrom, favTo)
+      } else {
+        addFavorite(favFrom, favTo)
+      }
+    },
+    [isFavorite, addFavorite, removeFavorite]
+  )
+
   const renderPanel = useCallback(
     (id: PanelId): ReactNode => {
       switch (id) {
@@ -392,9 +443,17 @@ export default function CurrencyExchangePage() {
           )
         case 'external-links':
           return <ExternalLinks from={from} to={to} amount={amount} />
+        case 'multi-currency':
+          return (
+            <MultiCurrency
+              amount={parseFloat(amount) || 0}
+              from={from}
+              currencies={currencies}
+            />
+          )
       }
     },
-    [chartData, from, to, period, handlePeriodChange, chartLoading, topPairs, pairsLoading, handlePairClick, amount]
+    [chartData, from, to, period, handlePeriodChange, chartLoading, topPairs, pairsLoading, handlePairClick, amount, currencies]
   )
 
   return (
@@ -432,11 +491,26 @@ export default function CurrencyExchangePage() {
           currencies={currencies}
           result={result}
           loading={convertLoading}
+          isOffline={isUsingCache}
+          offlineTimeAgo={lastUpdated}
           onAmountChange={setAmount}
           onFromChange={handleFromChange}
           onToChange={handleToChange}
           onSwap={handleSwap}
           onConvert={handleConvert}
+        />
+      </div>
+
+      {/* Favorites & Recent Bar */}
+      <div className="mb-6">
+        <FavoritesBar
+          favorites={favorites}
+          recent={recent}
+          currentFrom={from}
+          currentTo={to}
+          isFavorite={isFavorite}
+          onSelectPair={handlePairClick}
+          onToggleFavorite={handleToggleFavorite}
         />
       </div>
 
