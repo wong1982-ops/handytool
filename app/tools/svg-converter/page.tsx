@@ -12,6 +12,7 @@ import { BatchPanel } from '@/tools/svg-converter/batch-panel'
 import { useSvgTracer } from '@/tools/svg-converter/use-svg-tracer'
 import { svgToEps } from '@/tools/svg-converter/exporters/svg-to-eps'
 import { svgToPdf } from '@/tools/svg-converter/exporters/svg-to-pdf'
+import { svgToPng } from '@/tools/svg-converter/exporters/svg-to-png'
 import { DEFAULT_SETTINGS } from '@/tools/svg-converter/types'
 import type { ImageMeta, VectorizationSettings } from '@/tools/svg-converter/types'
 import type { EditorPhase } from '@/tools/svg-converter/types'
@@ -167,6 +168,17 @@ export default function SvgConverterPage() {
     } catch (err) {
       console.error('PDF export failed:', err)
       alert('PDF export failed. Please try again.')
+    }
+  }, [vectorResult, downloadBlob, baseFilename])
+
+  const handleExportPng = useCallback(async (targetWidth: number) => {
+    if (!vectorResult) return
+    try {
+      const blob = await svgToPng(vectorResult.svgString, targetWidth)
+      downloadBlob(blob, baseFilename('.png'))
+    } catch (err) {
+      console.error('PNG export failed:', err)
+      alert('PNG export failed. Please try again.')
     }
   }, [vectorResult, downloadBlob, baseFilename])
 
@@ -367,6 +379,7 @@ export default function SvgConverterPage() {
               onDownloadSvg={handleDownloadSvg}
               onExportEps={handleExportEps}
               onExportPdf={handleExportPdf}
+              onExportPng={handleExportPng}
             />
           </aside>
         )}
@@ -413,6 +426,7 @@ export default function SvgConverterPage() {
                 onDownloadSvg={handleDownloadSvg}
                 onExportEps={handleExportEps}
                 onExportPdf={handleExportPdf}
+                onExportPng={handleExportPng}
               />
             </div>
           </>

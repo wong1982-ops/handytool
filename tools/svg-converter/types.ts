@@ -4,6 +4,7 @@ export interface VectorizationSettings {
   filterSpeckle: number         // 1-128, discard small patches (px)
 
   // Color
+  colorMode: 'color' | 'bw'
   colorPrecision: number        // 1-8, significant bits per RGB channel
   layerDifference: number       // 1-64, color difference between layers
 
@@ -40,6 +41,7 @@ export type ConversionState = 'idle' | 'processing' | 'ready' | 'error'
 export const DEFAULT_SETTINGS: VectorizationSettings = {
   mode: 'spline',
   filterSpeckle: 4,
+  colorMode: 'color',
   colorPrecision: 6,
   layerDifference: 16,
   cornerThreshold: 60,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import type { VectorizationSettings } from './types'
 import './svg-converter.scss'
 
@@ -113,11 +113,29 @@ const MODE_OPTIONS: { value: VectorizationSettings['mode']; label: string }[] = 
   { value: 'pixel', label: 'Pixel' },
 ]
 
+const COLOR_MODE_OPTIONS: { value: VectorizationSettings['colorMode']; label: string }[] = [
+  { value: 'color', label: 'Color' },
+  { value: 'bw', label: 'B&W' },
+]
+
 export function VectorizationSettingsPanel({ settings, onChange }: VectorizationSettingsProps) {
   const [advancedOpen, setAdvancedOpen] = useState(false)
+  const prevColorDepthRef = useRef(settings.colorPrecision)
 
   const update = (patch: Partial<VectorizationSettings>) => {
     onChange({ ...settings, ...patch })
+  }
+
+  const handleColorModeChange = (mode: VectorizationSettings['colorMode']) => {
+    if (mode === 'bw') {
+      // Store current color depth before switching to B&W
+      prevColorDepthRef.current = settings.colorPrecision
+      update({ colorMode: 'bw', colorPrecision: 1 })
+    } else {
+      // Restore previous color depth
+      const restored = prevColorDepthRef.current > 1 ? prevColorDepthRef.current : 4
+      update({ colorMode: 'color', colorPrecision: restored })
+    }
   }
 
   return (
@@ -243,16 +261,50 @@ export function VectorizationSettingsPanel({ settings, onChange }: Vectorization
         </span>
       </div>
 
+      {/* Color Mode Toggle */}
+      <div className="flex flex-col gap-2">
+        <span className="text-xs font-medium text-slate-300">Color Mode</span>
+        <div className="grid grid-cols-2 gap-1">
+          {COLOR_MODE_OPTIONS.map((opt) => {
+            const isActive = settings.colorMode === opt.value
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => handleColorModeChange(opt.value)}
+                aria-pressed={isActive}
+                className={`
+                  py-2 rounded-lg text-[11px] font-medium transition-all cursor-pointer
+                  ${isActive
+                    ? 'text-white'
+                    : 'text-slate-400 bg-white/5 hover:bg-white/10'
+                  }
+                `}
+                style={isActive ? {
+                  backgroundColor: 'color-mix(in srgb, var(--tk-color-secondary-500, #32A9D9) 20%, transparent)',
+                  color: 'var(--tk-color-secondary-500, #32A9D9)',
+                  boxShadow: 'inset 0 0 0 1px var(--tk-color-secondary-500, #32A9D9)',
+                } : undefined}
+              >
+                {opt.label}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       {/* Color Precision */}
-      <SliderControl
-        label="Color Depth"
-        value={settings.colorPrecision}
-        min={1}
-        max={8}
-        displayValue={`${settings.colorPrecision} bits`}
-        ariaLabel="Color precision bits per channel"
-        onChange={(v) => update({ colorPrecision: v })}
-      />
+      <div className={settings.colorMode === 'bw' ? 'opacity-40 pointer-events-none' : ''}>
+        <SliderControl
+          label="Color Depth"
+          value={settings.colorPrecision}
+          min={1}
+          max={8}
+          displayValue={`${settings.colorPrecision} bits`}
+          ariaLabel="Color precision bits per channel"
+          onChange={(v) => update({ colorPrecision: v })}
+        />
+      </div>
 
       {/* Layer Difference */}
       <SliderControl
