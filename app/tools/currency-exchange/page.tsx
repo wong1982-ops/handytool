@@ -67,13 +67,6 @@ function periodToDays(period: Period): number {
   }
 }
 
-// Format numbers appropriately for crypto (high precision for small values, low for large)
-function formatCryptoRate(rate: number): string {
-  if (rate >= 1000) return rate.toFixed(2)
-  if (rate >= 1) return rate.toFixed(4)
-  if (rate >= 0.01) return rate.toFixed(6)
-  return rate.toFixed(8)
-}
 
 export default function CurrencyExchangePage() {
   // Read URL params for initial values

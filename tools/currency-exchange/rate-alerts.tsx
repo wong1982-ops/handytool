@@ -25,7 +25,7 @@ export function RateAlerts({ from, to }: RateAlertsProps) {
   const activeAlerts = alerts.filter((a) => !a.triggered)
   const triggeredAlerts = alerts.filter((a) => a.triggered)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const rate = parseFloat(targetRate)
     if (isNaN(rate) || rate <= 0) return
