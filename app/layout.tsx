@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ProfilePrompt } from "@/components/auth/profile-prompt";
+import { PageTracker } from "@/lib/hooks/use-page-tracker";
 import "./globals.scss";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://toolk1t.app";
@@ -46,6 +47,7 @@ export default function RootLayout({
         {children}
         <Footer brandName="Toolk1t" />
         <ProfilePrompt />
+        <PageTracker />
       </body>
     </html>
   );
