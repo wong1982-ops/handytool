@@ -253,7 +253,7 @@ export default function PdfConverterPage() {
         })
 
         try {
-          const result = await processSingleFile(sf.file, activeMode, (pct, msg) => {
+          const result = await processSingleFile(sf.file, activeMode, (pct, _msg) => {
             completedResults[i] = { ...completedResults[i], progress: pct, status: 'processing' }
             setBatchResults([...completedResults])
           })
