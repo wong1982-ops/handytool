@@ -8,6 +8,7 @@ import { VectorizationSettingsPanel } from '@/tools/svg-converter/vectorization-
 import { ExportActions } from '@/tools/svg-converter/export-actions'
 import { ZoomControls } from '@/tools/svg-converter/zoom-controls'
 import { StatusBar } from '@/tools/svg-converter/status-bar'
+import { BatchPanel } from '@/tools/svg-converter/batch-panel'
 import { useSvgTracer } from '@/tools/svg-converter/use-svg-tracer'
 import { svgToEps } from '@/tools/svg-converter/exporters/svg-to-eps'
 import { svgToPdf } from '@/tools/svg-converter/exporters/svg-to-pdf'
@@ -33,6 +34,10 @@ export default function SvgConverterPage() {
   const [sliderPosition, setSliderPosition] = useState(50)
   const [zoom, setZoom] = useState(100)
   const [showGrid, setShowGrid] = useState(true)
+  // Batch mode state
+  const [batchFiles, setBatchFiles] = useState<File[]>([])
+  const [isBatchMode, setIsBatchMode] = useState(false)
+
   // Mobile state
   const [showMobileSettings, setShowMobileSettings] = useState(false)
 
@@ -69,7 +74,39 @@ export default function SvgConverterPage() {
     setProcessedImageMeta(null)
     setSettings(DEFAULT_SETTINGS)
     setEditorPhase('upload')
+    setIsBatchMode(false)
+    setBatchFiles([])
   }, [reset])
+
+  // Batch mode handlers
+  const handleBatchSelect = useCallback((files: File[]) => {
+    setBatchFiles(files)
+    setIsBatchMode(true)
+    setEditorPhase('vectorize')
+  }, [])
+
+  const handleBatchRemoveFile = useCallback((index: number) => {
+    setBatchFiles((prev) => {
+      const next = prev.filter((_, i) => i !== index)
+      if (next.length === 0) {
+        setIsBatchMode(false)
+        setEditorPhase('upload')
+      }
+      return next
+    })
+  }, [])
+
+  const handleBatchClearAll = useCallback(() => {
+    setBatchFiles([])
+    setIsBatchMode(false)
+    setEditorPhase('upload')
+  }, [])
+
+  const handleBatchBack = useCallback(() => {
+    setBatchFiles([])
+    setIsBatchMode(false)
+    setEditorPhase('upload')
+  }, [])
 
   const handleCropConfirm = useCallback((processed: ImageMeta) => {
     setProcessedImageMeta(processed)
@@ -274,6 +311,7 @@ export default function SvgConverterPage() {
           {editorPhase === 'upload' && (
             <UploadScreen
               onFileSelect={handleFileSelect}
+              onBatchSelect={handleBatchSelect}
               isDragging={isDragging}
               onDragStateChange={setIsDragging}
             />
@@ -285,7 +323,16 @@ export default function SvgConverterPage() {
               onSkip={handleCropSkip}
             />
           )}
-          {editorPhase === 'vectorize' && (
+          {editorPhase === 'vectorize' && isBatchMode && (
+            <BatchPanel
+              files={batchFiles}
+              settings={settings}
+              onRemoveFile={handleBatchRemoveFile}
+              onClearAll={handleBatchClearAll}
+              onBack={handleBatchBack}
+            />
+          )}
+          {editorPhase === 'vectorize' && !isBatchMode && (
             <>
               <ComparisonCanvas
                 imageMeta={processedImageMeta}
@@ -309,7 +356,7 @@ export default function SvgConverterPage() {
         </section>
 
         {/* Right panel (desktop) */}
-        {editorPhase === 'vectorize' && (
+        {editorPhase === 'vectorize' && !isBatchMode && (
           <aside className="hidden lg:flex flex-col w-80 border-l border-slate-700 bg-[#1a2333] shrink-0 overflow-hidden">
             <div className="flex-1 overflow-y-auto p-4">
               <VectorizationSettingsPanel settings={settings} onChange={setSettings} />
@@ -321,6 +368,13 @@ export default function SvgConverterPage() {
               onExportEps={handleExportEps}
               onExportPdf={handleExportPdf}
             />
+          </aside>
+        )}
+        {editorPhase === 'vectorize' && isBatchMode && (
+          <aside className="hidden lg:flex flex-col w-80 border-l border-slate-700 bg-[#1a2333] shrink-0 overflow-hidden">
+            <div className="flex-1 overflow-y-auto p-4">
+              <VectorizationSettingsPanel settings={settings} onChange={setSettings} />
+            </div>
           </aside>
         )}
 

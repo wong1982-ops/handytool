@@ -4,6 +4,7 @@ import { useRef, useCallback, type DragEvent } from 'react'
 
 interface UploadScreenProps {
   onFileSelect: (file: File) => void
+  onBatchSelect?: (files: File[]) => void
   isDragging: boolean
   onDragStateChange: (dragging: boolean) => void
 }
@@ -11,7 +12,7 @@ interface UploadScreenProps {
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif']
 const ACCEPT_STRING = ACCEPTED_TYPES.join(',')
 
-export function UploadScreen({ onFileSelect, isDragging, onDragStateChange }: UploadScreenProps) {
+export function UploadScreen({ onFileSelect, onBatchSelect, isDragging, onDragStateChange }: UploadScreenProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleDragOver = useCallback(
@@ -38,24 +39,40 @@ export function UploadScreen({ onFileSelect, isDragging, onDragStateChange }: Up
       e.stopPropagation()
       onDragStateChange(false)
 
-      const file = e.dataTransfer.files[0]
-      if (file && ACCEPTED_TYPES.includes(file.type)) {
-        onFileSelect(file)
+      const droppedFiles = Array.from(e.dataTransfer.files).filter((f) =>
+        ACCEPTED_TYPES.includes(f.type),
+      )
+
+      if (droppedFiles.length === 0) return
+
+      if (droppedFiles.length >= 2 && onBatchSelect) {
+        onBatchSelect(droppedFiles)
+      } else if (droppedFiles[0]) {
+        onFileSelect(droppedFiles[0])
       }
     },
-    [onFileSelect, onDragStateChange],
+    [onFileSelect, onBatchSelect, onDragStateChange],
   )
 
   const handleFileInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (file) {
-        onFileSelect(file)
+      const selectedFiles = e.target.files
+      if (!selectedFiles || selectedFiles.length === 0) return
+
+      const validFiles = Array.from(selectedFiles).filter((f) =>
+        ACCEPTED_TYPES.includes(f.type),
+      )
+
+      if (validFiles.length >= 2 && onBatchSelect) {
+        onBatchSelect(validFiles)
+      } else if (validFiles[0]) {
+        onFileSelect(validFiles[0])
       }
+
       // Reset input so the same file can be re-selected
       e.target.value = ''
     },
-    [onFileSelect],
+    [onFileSelect, onBatchSelect],
   )
 
   return (
@@ -138,6 +155,7 @@ export function UploadScreen({ onFileSelect, isDragging, onDragStateChange }: Up
           ref={fileInputRef}
           type="file"
           accept={ACCEPT_STRING}
+          multiple
           onChange={handleFileInputChange}
           className="hidden"
           aria-hidden="true"
