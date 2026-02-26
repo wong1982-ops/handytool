@@ -7,6 +7,10 @@ interface ConverterToolbarProps {
   onToJson: () => void
   onToCsv: () => void
   onCsvToJson: () => void
+  onToXml: () => void
+  onXmlToJson: () => void
+  onXmlToYaml: () => void
+  onXmlToCsv: () => void
   onFormat: () => void
   activeAction?: string
   detectedFormat?: DetectedFormat
@@ -19,6 +23,10 @@ export function ConverterToolbar({
   onToJson,
   onToCsv,
   onCsvToJson,
+  onToXml,
+  onXmlToJson,
+  onXmlToYaml,
+  onXmlToCsv,
   onFormat,
   activeAction,
   detectedFormat = 'unknown',
@@ -26,6 +34,7 @@ export function ConverterToolbar({
   const isJson = detectedFormat === 'json'
   const isYaml = detectedFormat === 'yaml'
   const isCsv = detectedFormat === 'csv'
+  const isXml = detectedFormat === 'xml'
   const hasInput = detectedFormat !== 'unknown'
 
   return (
@@ -39,7 +48,7 @@ export function ConverterToolbar({
           kbd="Shift+Alt+F"
           onClick={onFormat}
           active={activeAction === 'format'}
-          disabled={!hasInput || isCsv}
+          disabled={!hasInput || isCsv || isXml}
         />
         {(isJson || !hasInput) && (
           <>
@@ -91,6 +100,18 @@ export function ConverterToolbar({
           />
         )}
 
+        {/* JSON → XML */}
+        {(isJson || !hasInput) && (
+          <ToolbarButton
+            icon={<XmlIcon />}
+            label="To XML"
+            description="Convert JSON to XML"
+            onClick={onToXml}
+            active={activeAction === 'toXml'}
+            disabled={!isJson}
+          />
+        )}
+
         {/* YAML → JSON */}
         {(isYaml || !hasInput) && (
           <ToolbarButton
@@ -115,6 +136,17 @@ export function ConverterToolbar({
           />
         )}
 
+        {/* YAML → XML */}
+        {isYaml && (
+          <ToolbarButton
+            icon={<XmlIcon />}
+            label="To XML"
+            description="Convert YAML to XML"
+            onClick={onToXml}
+            active={activeAction === 'toXml'}
+          />
+        )}
+
         {/* CSV → JSON */}
         {(isCsv || !hasInput) && (
           <ToolbarButton
@@ -135,6 +167,51 @@ export function ConverterToolbar({
             description="Convert CSV to YAML"
             onClick={onToYaml}
             active={activeAction === 'toYaml'}
+          />
+        )}
+
+        {/* CSV → XML */}
+        {isCsv && (
+          <ToolbarButton
+            icon={<XmlIcon />}
+            label="To XML"
+            description="Convert CSV to XML"
+            onClick={onToXml}
+            active={activeAction === 'toXml'}
+          />
+        )}
+
+        {/* XML → JSON */}
+        {(isXml || !hasInput) && (
+          <ToolbarButton
+            icon={<CodeIcon />}
+            label="To JSON"
+            description="Convert XML to JSON"
+            onClick={onXmlToJson}
+            active={activeAction === 'xmlToJson'}
+            disabled={!isXml}
+          />
+        )}
+
+        {/* XML → YAML */}
+        {isXml && (
+          <ToolbarButton
+            icon={<ConvertIcon />}
+            label="To YAML"
+            description="Convert XML to YAML"
+            onClick={onXmlToYaml}
+            active={activeAction === 'xmlToYaml'}
+          />
+        )}
+
+        {/* XML → CSV */}
+        {isXml && (
+          <ToolbarButton
+            icon={<CsvIcon />}
+            label="To CSV"
+            description="Convert XML to CSV"
+            onClick={onXmlToCsv}
+            active={activeAction === 'xmlToCsv'}
           />
         )}
       </ToolbarGroup>
@@ -241,6 +318,14 @@ function CsvIcon() {
   return (
     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18M8 6v12M16 6v12" />
+    </svg>
+  )
+}
+
+function XmlIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8l-4 4 4 4m10-8l4 4-4 4M14 4l-4 16" />
     </svg>
   )
 }

@@ -7,6 +7,7 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { syntaxHighlighting, HighlightStyle, foldGutter, bracketMatching, indentOnInput } from '@codemirror/language'
 import { json, jsonParseLinter } from '@codemirror/lang-json'
 import { yaml } from '@codemirror/lang-yaml'
+import { xml } from '@codemirror/lang-xml'
 import { linter, lintGutter } from '@codemirror/lint'
 import { tags } from '@lezer/highlight'
 import { indentationMarkers } from '@replit/codemirror-indentation-markers'
@@ -219,7 +220,7 @@ interface CodeEditorProps {
   onChange: (value: string) => void
   readOnly?: boolean
   placeholder?: string
-  language?: 'json' | 'yaml' | 'csv'
+  language?: 'json' | 'yaml' | 'csv' | 'xml'
   onLintError?: (message: string | null) => void
   onScrollPercent?: (percent: number) => void
 }
@@ -282,9 +283,11 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
     const dark = isDark()
     const langExt = language === 'yaml'
       ? yaml()
-      : language === 'csv'
-        ? []
-        : [json(), linter(jsonParseLinter()), lintGutter()]
+      : language === 'xml'
+        ? xml()
+        : language === 'csv'
+          ? []
+          : [json(), linter(jsonParseLinter()), lintGutter()]
 
     const state = EditorState.create({
       doc: value,
@@ -358,9 +361,11 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
     if (!view) return
     const langExt = language === 'yaml'
       ? yaml()
-      : language === 'csv'
-        ? []
-        : [json(), linter(jsonParseLinter()), lintGutter()]
+      : language === 'xml'
+        ? xml()
+        : language === 'csv'
+          ? []
+          : [json(), linter(jsonParseLinter()), lintGutter()]
     view.dispatch({ effects: langCompartment.current.reconfigure(langExt) })
   }, [language])
 

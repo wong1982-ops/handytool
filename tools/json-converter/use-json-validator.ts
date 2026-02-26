@@ -2,9 +2,10 @@
 
 import { useMemo } from 'react'
 import yaml from 'js-yaml'
+import { XMLParser } from 'fast-xml-parser'
 import type { ValidationError } from '@/components/ui/problems-panel'
 
-export type DetectedFormat = 'json' | 'yaml' | 'csv' | 'unknown'
+export type DetectedFormat = 'json' | 'yaml' | 'csv' | 'xml' | 'unknown'
 
 interface JsonValidatorResult {
   errors: ValidationError[]
@@ -38,6 +39,24 @@ export function useJsonValidator(input: string): JsonValidatorResult {
           severity: 'error',
         })
         return { errors, format: 'json', isValid: false, label: 'Invalid JSON' }
+      }
+    }
+
+    // Try XML (before YAML, since YAML can parse some XML-like strings)
+    if (trimmed.startsWith('<')) {
+      try {
+        const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@_' })
+        parser.parse(trimmed)
+        return { errors: [], format: 'xml', isValid: true, label: 'Valid XML' }
+      } catch (e) {
+        const xmlErr = e as Error
+        errors.push({
+          line: 1,
+          column: 0,
+          message: xmlErr.message || 'Invalid XML syntax',
+          severity: 'error',
+        })
+        return { errors, format: 'xml', isValid: false, label: 'Invalid XML' }
       }
     }
 
@@ -91,7 +110,7 @@ export function useJsonValidator(input: string): JsonValidatorResult {
     errors.push({
       line: 1,
       column: 0,
-      message: 'Unable to detect format. Expected JSON, YAML, or CSV.',
+      message: 'Unable to detect format. Expected JSON, YAML, XML, or CSV.',
       severity: 'error',
     })
     return { errors, format: 'unknown', isValid: false, label: 'Invalid' }

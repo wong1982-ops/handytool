@@ -2,11 +2,16 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import yaml from 'js-yaml'
+import { XMLParser, XMLBuilder } from 'fast-xml-parser'
 import { ConverterToolbar } from '@/tools/json-converter/converter-sidebar'
 import { CodeEditor, type CodeEditorHandle } from '@/tools/json-converter/code-editor'
 import { StatusBar } from '@/tools/json-converter/status-bar'
+import { TreeView } from '@/tools/json-converter/tree-view'
 import { ProblemsPanel } from '@/components/ui/problems-panel'
 import { useJsonValidator } from '@/tools/json-converter/use-json-validator'
+
+const xmlParserOptions = { ignoreAttributes: false, attributeNamePrefix: '@_' }
+const xmlBuilderOptions = { format: true, indentBy: '  ', ignoreAttributes: false, attributeNamePrefix: '@_' }
 
 const sampleJson = `{
   "project": "DevFlow Utility",
@@ -25,6 +30,7 @@ const sampleJson = `{
 }`
 
 type Tab = 'input' | 'output'
+type ViewMode = 'editor' | 'tree'
 
 export default function JsonConverterPage() {
   const editorRef = useRef<CodeEditorHandle>(null)
@@ -34,6 +40,7 @@ export default function JsonConverterPage() {
   const [activeAction, setActiveAction] = useState<string | undefined>('beautify')
   const [outputFormat, setOutputFormat] = useState('JSON')
   const [copiedPanel, setCopiedPanel] = useState<'input' | 'output' | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>('editor')
 
   // Validation with structured errors
   const { errors, format: detectedFormat, isValid, label: validationLabel } = useJsonValidator(input)
@@ -84,19 +91,42 @@ export default function JsonConverterPage() {
   }), [isValid, validationLabel])
 
   // Input language from detected format
-  const inputLanguage = useMemo<'json' | 'yaml' | 'csv'>(() => {
+  const inputLanguage = useMemo<'json' | 'yaml' | 'csv' | 'xml'>(() => {
     if (detectedFormat === 'json') return 'json'
     if (detectedFormat === 'yaml') return 'yaml'
     if (detectedFormat === 'csv') return 'csv'
+    if (detectedFormat === 'xml') return 'xml'
     return 'json'
   }, [detectedFormat])
 
   // Output language for read-only editor highlighting
-  const outputLanguage = useMemo<'json' | 'yaml' | 'csv'>(() => {
+  const outputLanguage = useMemo<'json' | 'yaml' | 'csv' | 'xml'>(() => {
     if (outputFormat === 'YAML') return 'yaml'
     if (outputFormat === 'CSV') return 'csv'
+    if (outputFormat === 'XML') return 'xml'
     return 'json'
   }, [outputFormat])
+
+  // Parsed data for tree view
+  const treeData = useMemo(() => {
+    const trimmed = input.trim()
+    if (!trimmed) return undefined
+    // Try JSON
+    try { return JSON.parse(trimmed) } catch { /* not json */ }
+    // Try XML
+    if (trimmed.startsWith('<')) {
+      try {
+        const parser = new XMLParser(xmlParserOptions)
+        return parser.parse(trimmed)
+      } catch { /* not xml */ }
+    }
+    // Try YAML
+    try {
+      const parsed = yaml.load(trimmed)
+      if (typeof parsed === 'object' && parsed !== null) return parsed
+    } catch { /* not yaml */ }
+    return undefined
+  }, [input])
 
   // Line counts for status bar
   const inputLineCount = input ? input.split('\n').length : 1
@@ -183,6 +213,18 @@ export default function JsonConverterPage() {
   }, [input])
 
   const handleToJson = useCallback(() => {
+    // Try XML
+    if (input.trim().startsWith('<')) {
+      try {
+        const parser = new XMLParser(xmlParserOptions)
+        const parsed = parser.parse(input)
+        setOutput(JSON.stringify(parsed, null, 2))
+        setOutputFormat('JSON')
+        setActiveAction('toJson')
+        setActiveTab('output')
+        return
+      } catch { /* not XML */ }
+    }
     try {
       // Try YAML first (also parses JSON)
       const parsed = yaml.load(input)
@@ -208,7 +250,7 @@ export default function JsonConverterPage() {
         return
       }
     } catch { /* not CSV either */ }
-    setOutput('Error: Invalid YAML or CSV input')
+    setOutput('Error: Invalid YAML, XML, or CSV input')
   }, [input])
 
   const handleToCsv = useCallback(() => {
@@ -264,6 +306,115 @@ export default function JsonConverterPage() {
     }
   }, [input])
 
+  // --- XML conversions ---
+
+  const handleToXml = useCallback(() => {
+    try {
+      let parsed: unknown
+      // Try JSON
+      try { parsed = JSON.parse(input) } catch { /* not json */ }
+      // Try YAML
+      if (parsed === undefined) {
+        try {
+          const yamlParsed = yaml.load(input)
+          if (typeof yamlParsed === 'object' && yamlParsed !== null) parsed = yamlParsed
+        } catch { /* not yaml */ }
+      }
+      // Try CSV
+      if (parsed === undefined) {
+        try {
+          const rows = parseCsvToArray(input)
+          if (rows.length > 1) {
+            const headers = rows[0]
+            parsed = { items: { item: rows.slice(1).map((row) => csvRowToObject(headers, row)) } }
+          }
+        } catch { /* not csv */ }
+      }
+      if (parsed !== undefined) {
+        // Wrap non-object top-level values or arrays for valid XML
+        const wrapped = Array.isArray(parsed) ? { items: { item: parsed } } : (typeof parsed === 'object' && parsed !== null) ? parsed : { root: parsed }
+        const builder = new XMLBuilder(xmlBuilderOptions)
+        const result = '<?xml version="1.0" encoding="UTF-8"?>\n' + builder.build(wrapped)
+        setOutput(result)
+        setOutputFormat('XML')
+        setActiveAction('toXml')
+        setActiveTab('output')
+      } else {
+        setOutput('Error: Could not parse input as JSON, YAML, or CSV')
+      }
+    } catch {
+      setOutput('Error: Failed to convert to XML')
+    }
+  }, [input])
+
+  const handleXmlToJson = useCallback(() => {
+    try {
+      const parser = new XMLParser(xmlParserOptions)
+      const parsed = parser.parse(input)
+      setOutput(JSON.stringify(parsed, null, 2))
+      setOutputFormat('JSON')
+      setActiveAction('xmlToJson')
+      setActiveTab('output')
+    } catch {
+      setOutput('Error: Invalid XML input')
+    }
+  }, [input])
+
+  const handleXmlToYaml = useCallback(() => {
+    try {
+      const parser = new XMLParser(xmlParserOptions)
+      const parsed = parser.parse(input)
+      setOutput(yaml.dump(parsed, { indent: 2, lineWidth: -1 }))
+      setOutputFormat('YAML')
+      setActiveAction('xmlToYaml')
+      setActiveTab('output')
+    } catch {
+      setOutput('Error: Invalid XML input')
+    }
+  }, [input])
+
+  const handleXmlToCsv = useCallback(() => {
+    try {
+      const parser = new XMLParser(xmlParserOptions)
+      const parsed = parser.parse(input)
+      // Find the first array in the parsed result
+      const findArray = (obj: unknown): unknown[] | null => {
+        if (Array.isArray(obj)) return obj
+        if (typeof obj === 'object' && obj !== null) {
+          for (const val of Object.values(obj)) {
+            const found = findArray(val)
+            if (found) return found
+          }
+        }
+        return null
+      }
+      const array = findArray(parsed)
+      if (!array || array.length === 0 || typeof array[0] !== 'object' || array[0] === null) {
+        setOutput('Error: XML must contain a repeated element (array of objects) for CSV conversion')
+        return
+      }
+      const headers = Object.keys(array[0] as Record<string, unknown>)
+      const csvRows = [
+        headers.map(escapeCsvField).join(','),
+        ...array.map((row) => {
+          const obj = row as Record<string, unknown>
+          return headers.map((h) => {
+            const val = obj[h]
+            if (val === null || val === undefined) return ''
+            if (typeof val === 'object') return escapeCsvField(JSON.stringify(val))
+            return escapeCsvField(String(val))
+          }).join(',')
+        }),
+      ]
+      setOutput(csvRows.join('\n'))
+      setOutputFormat('CSV')
+      setActiveAction('xmlToCsv')
+      setActiveTab('output')
+    } catch {
+      setOutput('Error: Invalid XML input for CSV conversion')
+    }
+  }, [input])
+
   const handleCopyInput = useCallback(async () => {
     if (!input.trim()) return
     await navigator.clipboard.writeText(input)
@@ -280,8 +431,7 @@ export default function JsonConverterPage() {
 
   const handleDownloadInput = useCallback(() => {
     if (!input.trim()) return
-    const isYaml = inputLanguage === 'yaml'
-    const ext = isYaml ? 'yaml' : 'json'
+    const ext = inputLanguage === 'yaml' ? 'yaml' : inputLanguage === 'xml' ? 'xml' : inputLanguage === 'csv' ? 'csv' : 'json'
     const blob = new Blob([input], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -293,7 +443,7 @@ export default function JsonConverterPage() {
 
   const handleDownloadOutput = useCallback(() => {
     if (!output.trim()) return
-    const ext = outputFormat === 'YAML' ? 'yaml' : outputFormat === 'CSV' ? 'csv' : 'json'
+    const ext = outputFormat === 'YAML' ? 'yaml' : outputFormat === 'CSV' ? 'csv' : outputFormat === 'XML' ? 'xml' : 'json'
     const blob = new Blob([output], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -410,6 +560,10 @@ export default function JsonConverterPage() {
         onToJson={handleToJson}
         onToCsv={handleToCsv}
         onCsvToJson={handleCsvToJson}
+        onToXml={handleToXml}
+        onXmlToJson={handleXmlToJson}
+        onXmlToYaml={handleXmlToYaml}
+        onXmlToCsv={handleXmlToCsv}
         onFormat={handleFormat}
         activeAction={activeAction}
         detectedFormat={detectedFormat}
@@ -521,7 +675,7 @@ export default function JsonConverterPage() {
               language={inputLanguage}
             />
             <StatusBar
-              format={validation.label.includes('YAML') ? 'YAML' : validation.label.includes('CSV') ? 'CSV' : 'JSON'}
+              format={validation.label.includes('YAML') ? 'YAML' : validation.label.includes('CSV') ? 'CSV' : validation.label.includes('XML') ? 'XML' : 'JSON'}
               lineCount={inputLineCount}
               charCount={input.length}
               isValid={validation.valid}
@@ -547,9 +701,28 @@ export default function JsonConverterPage() {
           {/* Output Panel */}
           <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-slate-100 dark:border-slate-800 shrink-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                {output ? `Result (${outputFormat})` : 'Result'}
-              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setViewMode('editor')}
+                  className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                    viewMode === 'editor'
+                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                      : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                  }`}
+                >
+                  {output ? `Result (${outputFormat})` : 'Result'}
+                </button>
+                <button
+                  onClick={() => setViewMode('tree')}
+                  className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                    viewMode === 'tree'
+                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                      : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                  }`}
+                >
+                  Tree
+                </button>
+              </div>
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={handleCopyOutput}
@@ -581,19 +754,25 @@ export default function JsonConverterPage() {
                 </button>
               </div>
             </div>
-            <CodeEditor
-              value={output}
-              onChange={() => {}}
-              readOnly
-              placeholder="Run an action to see results..."
-              language={outputLanguage}
-            />
-            <StatusBar
-              format={outputFormat}
-              lineCount={outputLineCount}
-              charCount={output.length}
-              isValid={null}
-            />
+            {viewMode === 'tree' ? (
+              <TreeView data={treeData} />
+            ) : (
+              <CodeEditor
+                value={output}
+                onChange={() => {}}
+                readOnly
+                placeholder="Run an action to see results..."
+                language={outputLanguage}
+              />
+            )}
+            {viewMode === 'editor' && (
+              <StatusBar
+                format={outputFormat}
+                lineCount={outputLineCount}
+                charCount={output.length}
+                isValid={null}
+              />
+            )}
           </div>
         </div>
 
