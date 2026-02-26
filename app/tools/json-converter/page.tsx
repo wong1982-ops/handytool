@@ -171,27 +171,26 @@ export default function JsonConverterPage() {
   // Determine what to show in the output editor
   const displayOutput = queryResult !== null ? queryResult : output
 
-  // Helper to get a sorted replacer
-  const getSortedReplacer = useCallback((): ((this: unknown, key: string, value: unknown) => unknown) | undefined => {
-    if (!sortKeys) return undefined
-    return function (_key: string, value: unknown) {
-      if (value && typeof value === 'object' && !Array.isArray(value)) {
+  // Helper to stringify with optional sorted keys
+  const stringifyJson = useCallback((value: unknown, indent?: string | number): string => {
+    if (!sortKeys) return JSON.stringify(value, null, indent)
+    return JSON.stringify(value, (_key: string, val: unknown) => {
+      if (val && typeof val === 'object' && !Array.isArray(val)) {
         const sorted: Record<string, unknown> = {}
-        for (const k of Object.keys(value as Record<string, unknown>).sort()) {
-          sorted[k] = (value as Record<string, unknown>)[k]
+        for (const k of Object.keys(val as Record<string, unknown>).sort()) {
+          sorted[k] = (val as Record<string, unknown>)[k]
         }
         return sorted
       }
-      return value
-    }
+      return val
+    }, indent)
   }, [sortKeys])
 
   // Actions
   const handleBeautify = useCallback(() => {
     try {
       const parsed = JSON.parse(input)
-      const replacer = getSortedReplacer()
-      const result = JSON.stringify(parsed, replacer, getIndent())
+      const result = stringifyJson(parsed, getIndent())
       setOutput(result)
       setOutputFormat('JSON')
       setActiveAction('beautify')
@@ -199,13 +198,12 @@ export default function JsonConverterPage() {
     } catch {
       setOutput('Error: Invalid JSON input')
     }
-  }, [input, getIndent, getSortedReplacer])
+  }, [input, getIndent, stringifyJson])
 
   const handleFormat = useCallback(() => {
     try {
       const parsed = JSON.parse(input)
-      const replacer = getSortedReplacer()
-      const formatted = JSON.stringify(parsed, replacer, getIndent())
+      const formatted = stringifyJson(parsed, getIndent())
       setInput(formatted)
       setActiveAction('format')
     } catch {
@@ -219,7 +217,7 @@ export default function JsonConverterPage() {
         }
       } catch { /* ignore */ }
     }
-  }, [input, getIndent, getSortedReplacer, indentSize, sortKeys])
+  }, [input, getIndent, stringifyJson, indentSize, sortKeys])
 
   const handleMinify = useCallback(() => {
     try {
@@ -276,8 +274,7 @@ export default function JsonConverterPage() {
       try {
         const parser = new XMLParser(xmlParserOptions)
         const parsed = parser.parse(input)
-        const replacer = getSortedReplacer()
-        setOutput(JSON.stringify(parsed, replacer, getIndent()))
+        setOutput(stringifyJson(parsed, getIndent()))
         setOutputFormat('JSON')
         setActiveAction('toJson')
         setActiveTab('output')
@@ -288,8 +285,7 @@ export default function JsonConverterPage() {
       // Try YAML first (also parses JSON)
       const parsed = yaml.load(input)
       if (typeof parsed === 'object' && parsed !== null) {
-        const replacer = getSortedReplacer()
-        const result = JSON.stringify(parsed, replacer, getIndent())
+        const result = stringifyJson(parsed, getIndent())
         setOutput(result)
         setOutputFormat('JSON')
         setActiveAction('toJson')
@@ -303,8 +299,7 @@ export default function JsonConverterPage() {
       if (rows.length > 1) {
         const headers = rows[0]
         const data = rows.slice(1).map((row) => csvRowToObject(headers, row))
-        const replacer = getSortedReplacer()
-        setOutput(JSON.stringify(data, replacer, getIndent()))
+        setOutput(stringifyJson(data, getIndent()))
         setOutputFormat('JSON')
         setActiveAction('toJson')
         setActiveTab('output')
@@ -312,7 +307,7 @@ export default function JsonConverterPage() {
       }
     } catch { /* not CSV either */ }
     setOutput('Error: Invalid YAML, XML, or CSV input')
-  }, [input, getIndent, getSortedReplacer])
+  }, [input, getIndent, stringifyJson])
 
   const handleToCsv = useCallback(() => {
     try {
@@ -358,15 +353,14 @@ export default function JsonConverterPage() {
       }
       const headers = rows[0]
       const data = rows.slice(1).map((row) => csvRowToObject(headers, row))
-      const replacer = getSortedReplacer()
-      setOutput(JSON.stringify(data, replacer, getIndent()))
+      setOutput(stringifyJson(data, getIndent()))
       setOutputFormat('JSON')
       setActiveAction('csvToJson')
       setActiveTab('output')
     } catch {
       setOutput('Error: Invalid CSV input')
     }
-  }, [input, getIndent, getSortedReplacer])
+  }, [input, getIndent, stringifyJson])
 
   // --- XML conversions ---
 
@@ -414,15 +408,14 @@ export default function JsonConverterPage() {
     try {
       const parser = new XMLParser(xmlParserOptions)
       const parsed = parser.parse(input)
-      const replacer = getSortedReplacer()
-      setOutput(JSON.stringify(parsed, replacer, getIndent()))
+      setOutput(stringifyJson(parsed, getIndent()))
       setOutputFormat('JSON')
       setActiveAction('xmlToJson')
       setActiveTab('output')
     } catch {
       setOutput('Error: Invalid XML input')
     }
-  }, [input, getIndent, getSortedReplacer])
+  }, [input, getIndent, stringifyJson])
 
   const handleXmlToYaml = useCallback(() => {
     try {
