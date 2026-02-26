@@ -121,5 +121,5 @@ export async function svgToPdf(svgString: string): Promise<Blob> {
 
   // Serialize to bytes
   const pdfBytes = await pdfDoc.save()
-  return new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' })
+  return new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' })
 }
