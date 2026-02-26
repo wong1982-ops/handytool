@@ -1,4 +1,4 @@
-export type ConversionMode = 'pdf-to-images' | 'images-to-pdf' | 'merge-pdf' | 'split-pdf' | 'compress-pdf' | 'pdf-to-word' | 'word-to-pdf' | 'pdf-to-excel'
+export type ConversionMode = 'pdf-to-images' | 'images-to-pdf' | 'merge-pdf' | 'split-pdf' | 'compress-pdf' | 'pdf-to-word' | 'word-to-pdf' | 'pdf-to-excel' | 'watermark' | 'manage-pages'
 
 interface ConverterNavProps {
   activeMode: ConversionMode
@@ -78,6 +78,24 @@ const MODES: { id: ConversionMode; label: string; icon: React.ReactNode }[] = [
       </svg>
     ),
   },
+  {
+    id: 'watermark',
+    label: 'Watermark',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+      </svg>
+    ),
+  },
+  {
+    id: 'manage-pages',
+    label: 'Page Manager',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+      </svg>
+    ),
+  },
 ]
 
 export interface ModeDescription {
@@ -98,6 +116,8 @@ const MODE_DESCRIPTIONS: Record<ConversionMode, ModeDescription> = {
   'pdf-to-word': { title: 'PDF to Word', desc: 'Extract text from PDF into a Word document.', accept: '.pdf', fromLabel: 'PDF', toLabel: 'DOCX', multiple: false },
   'word-to-pdf': { title: 'Word to PDF', desc: 'Convert Word documents into PDF format.', accept: '.docx', fromLabel: 'DOCX', toLabel: 'PDF', multiple: false },
   'pdf-to-excel': { title: 'PDF to Excel', desc: 'Extract tabular data from PDF into a spreadsheet.', accept: '.pdf', fromLabel: 'PDF', toLabel: 'XLSX', multiple: false },
+  'watermark': { title: 'Add Watermark', desc: 'Add text or image watermarks to your PDF pages.', accept: '.pdf', fromLabel: 'PDF', toLabel: 'PDF', multiple: false },
+  'manage-pages': { title: 'Page Manager', desc: 'Reorder, rotate, and delete PDF pages visually.', accept: '.pdf', fromLabel: 'PDF', toLabel: 'PDF', multiple: false },
 }
 
 export { MODES, MODE_DESCRIPTIONS }
