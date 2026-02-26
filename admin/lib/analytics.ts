@@ -34,3 +34,25 @@ export async function fetchToolDetail(slug: string, days: number = 30) {
   if (error) throw error
   return data ?? []
 }
+
+export async function fetchDashboardSummary() {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase.rpc('dashboard_summary')
+  if (error) throw error
+  return data?.[0] ?? {
+    total_views_30d: 0,
+    unique_visitors_30d: 0,
+    avg_duration_30d: 0,
+    total_views_7d: 0,
+    unique_visitors_7d: 0,
+    avg_duration_7d: 0,
+    active_today: 0,
+  }
+}
+
+export async function fetchTopTools(days: number = 30, limit: number = 5) {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase.rpc('tool_popularity', { time_range_days: days })
+  if (error) throw error
+  return (data ?? []).slice(0, limit)
+}
