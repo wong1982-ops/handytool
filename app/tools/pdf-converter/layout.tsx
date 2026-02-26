@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "PDF Converter - Merge, Split, Compress & Convert PDFs",
+  title: "PDF Converter - Merge, Split, Compress, Watermark & Manage Pages",
   description:
-    "All-in-one PDF tool: convert PDF to images, merge multiple PDFs, split by pages, compress file size, and convert between PDF, Word, and Excel. Free online.",
+    "All-in-one PDF tool: convert, merge, split, compress, watermark, and manage pages. Batch processing with ZIP download. Supports PDF, Word, Excel, and images. Free.",
   alternates: {
     canonical: "/tools/pdf-converter",
   },
   openGraph: {
-    title: "PDF Converter - Merge, Split, Compress | Toolk1t",
+    title: "PDF Converter - Merge, Split, Watermark, Manage Pages | Toolk1t",
     description:
-      "All-in-one free PDF tool: convert, merge, split, compress, and transform PDFs online.",
+      "All-in-one free PDF tool: convert, merge, split, compress, watermark, and manage pages with batch processing.",
     url: "/tools/pdf-converter",
   },
 };
@@ -21,7 +21,7 @@ const jsonLd = [
     "@type": "WebApplication",
     name: "PDF Converter",
     description:
-      "Convert, merge, split, and compress PDF files. Supports PDF to images, Word, and Excel conversions.",
+      "Convert, merge, split, compress, watermark, and manage PDF pages. Batch processing with ZIP download. Supports PDF, Word, Excel, and image conversions.",
     url: "https://toolk1t.com/tools/pdf-converter",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Any",

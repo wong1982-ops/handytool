@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "JSON Formatter & Converter - JSON, YAML, CSV",
+  title: "JSON/XML Formatter & Converter - JSON, YAML, CSV, XML",
   description:
-    "Format, validate, and convert between JSON, YAML, and CSV. Beautify or minify JSON, find syntax errors, and transform data formats. Free online tool.",
+    "Format, validate, and convert between JSON, YAML, CSV, and XML. Tree view, diff comparison, JSON Schema validation, JMESPath queries. Free online tool.",
   alternates: {
     canonical: "/tools/json-converter",
   },
   openGraph: {
-    title: "JSON Formatter & Converter | Toolk1t",
+    title: "JSON/XML Formatter & Converter | Toolk1t",
     description:
-      "Format, validate, and convert between JSON, YAML, and CSV. Free online tool with syntax highlighting.",
+      "Convert between JSON, YAML, CSV, and XML. Tree view, diff, schema validation, and JMESPath queries. Free online tool.",
     url: "/tools/json-converter",
   },
 };
@@ -19,9 +19,9 @@ const jsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "JSON Formatter & Converter",
+    name: "JSON/XML Formatter & Converter",
     description:
-      "Format, validate, and convert between JSON, YAML, and CSV formats with syntax highlighting.",
+      "Format, validate, and convert between JSON, YAML, CSV, and XML. Includes tree view, diff comparison, JSON Schema validation, and JMESPath queries.",
     url: "https://toolk1t.com/tools/json-converter",
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Any",

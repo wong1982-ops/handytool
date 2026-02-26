@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SVG Converter - Convert Images to Vector Graphics",
+  title: "SVG Converter - Vectorize Images to SVG, EPS, PDF & PNG",
   description:
-    "Convert PNG, JPEG, and WebP images to scalable SVG vector graphics. Adjust vectorization settings, compare side-by-side, and download optimized SVGs. Free tool.",
+    "Convert raster images to vector graphics with batch processing. Export to SVG, EPS, PDF, and high-res PNG. Color and B&W modes, optimization stats. Free online tool.",
   alternates: {
     canonical: "/tools/svg-converter",
   },
   openGraph: {
-    title: "SVG Converter - Raster to Vector | Toolk1t",
+    title: "SVG Converter - Vectorize to SVG, EPS, PDF, PNG | Toolk1t",
     description:
-      "Convert raster images to scalable SVG vector graphics with adjustable settings. Free online converter.",
+      "Batch convert images to vector graphics. Export SVG, EPS, PDF, PNG with color/B&W modes. Free online converter.",
     url: "/tools/svg-converter",
   },
 };
@@ -21,7 +21,7 @@ const jsonLd = [
     "@type": "WebApplication",
     name: "SVG Converter",
     description:
-      "Convert raster images (PNG, JPEG, WebP) to scalable SVG vector graphics with adjustable vectorization settings.",
+      "Convert raster images (PNG, JPEG, WebP) to vector graphics. Batch processing, multi-format export (SVG, EPS, PDF, PNG), color and B&W modes.",
     url: "https://toolk1t.com/tools/svg-converter",
     applicationCategory: "DesignApplication",
     operatingSystem: "Any",

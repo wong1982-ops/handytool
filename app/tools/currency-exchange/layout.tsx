@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Currency Exchange Rate Converter - Live Rates",
+  title: "Currency & Crypto Exchange Rate Converter - Live Rates",
   description:
-    "Convert currencies with live exchange rates. View historical rate charts, compare top currency pairs, and track daily changes. Free currency calculator.",
+    "Convert fiat currencies and cryptocurrencies with live rates. Multi-currency comparison, rate alerts, favorites, offline mode, and historical charts. Free calculator.",
   alternates: {
     canonical: "/tools/currency-exchange",
   },
   openGraph: {
-    title: "Currency Exchange Rate Converter | Toolk1t",
+    title: "Currency & Crypto Exchange Converter | Toolk1t",
     description:
-      "Convert currencies with live exchange rates and historical charts. Free online calculator.",
+      "Convert fiat and crypto with live rates. Multi-currency view, rate alerts, favorites, and offline support. Free calculator.",
     url: "/tools/currency-exchange",
   },
 };
@@ -19,9 +19,9 @@ const jsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "Currency Exchange Rate Converter",
+    name: "Currency & Crypto Exchange Rate Converter",
     description:
-      "Convert currencies with live exchange rates and historical charts.",
+      "Convert fiat currencies and cryptocurrencies with live rates. Includes multi-currency comparison, rate alerts, favorites, and offline support.",
     url: "https://toolk1t.com/tools/currency-exchange",
     applicationCategory: "FinanceApplication",
     operatingSystem: "Any",
