@@ -4,7 +4,7 @@ import { landingPages } from '@/lib/seo/landing-pages'
 import { useCases } from '@/lib/seo/use-cases'
 import { createClient } from '@/lib/supabase/server'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://toolk1t.app'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://toolk1t.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()

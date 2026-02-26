@@ -22,18 +22,18 @@ const jsonLd = [
     name: "SVG Converter",
     description:
       "Convert raster images (PNG, JPEG, WebP) to scalable SVG vector graphics with adjustable vectorization settings.",
-    url: "https://toolk1t.app/tools/svg-converter",
+    url: "https://toolk1t.com/tools/svg-converter",
     applicationCategory: "DesignApplication",
     operatingSystem: "Any",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    isPartOf: { "@type": "WebSite", name: "Toolk1t", url: "https://toolk1t.app" },
+    isPartOf: { "@type": "WebSite", name: "Toolk1t", url: "https://toolk1t.com" },
   },
   {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.app" },
-      { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.app/tools" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.com" },
+      { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.com/tools" },
       { "@type": "ListItem", position: 3, name: "SVG Converter" },
     ],
   },

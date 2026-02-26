@@ -22,18 +22,18 @@ const jsonLd = [
     name: "JSON Formatter & Converter",
     description:
       "Format, validate, and convert between JSON, YAML, and CSV formats with syntax highlighting.",
-    url: "https://toolk1t.app/tools/json-converter",
+    url: "https://toolk1t.com/tools/json-converter",
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Any",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    isPartOf: { "@type": "WebSite", name: "Toolk1t", url: "https://toolk1t.app" },
+    isPartOf: { "@type": "WebSite", name: "Toolk1t", url: "https://toolk1t.com" },
   },
   {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.app" },
-      { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.app/tools" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.com" },
+      { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.com/tools" },
       { "@type": "ListItem", position: 3, name: "JSON Converter" },
     ],
   },

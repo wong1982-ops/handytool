@@ -5,7 +5,7 @@ import { pingSitemap, submitUrl } from '@/lib/seo/google-indexing'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://toolk1t.app'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://toolk1t.com'
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')

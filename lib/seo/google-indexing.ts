@@ -1,4 +1,4 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://toolk1t.app'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://toolk1t.com'
 
 export async function pingSitemap(): Promise<boolean> {
   try {

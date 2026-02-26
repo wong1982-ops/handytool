@@ -20,14 +20,14 @@ const jsonLd = [
     name: 'ECard Studio',
     description:
       'Design and customize professional e-cards for business occasions. Choose templates, personalize messages, and download instantly.',
-    url: 'https://toolk1t.app/tools/ecard-studio',
+    url: 'https://toolk1t.com/tools/ecard-studio',
     applicationCategory: 'DesignApplication',
     operatingSystem: 'Any',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     isPartOf: {
       '@type': 'WebSite',
       name: 'Toolk1t',
-      url: 'https://toolk1t.app',
+      url: 'https://toolk1t.com',
     },
   },
   {
@@ -38,13 +38,13 @@ const jsonLd = [
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://toolk1t.app',
+        item: 'https://toolk1t.com',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Tools',
-        item: 'https://toolk1t.app/tools',
+        item: 'https://toolk1t.com/tools',
       },
       { '@type': 'ListItem', position: 3, name: 'ECard Studio' },
     ],

@@ -5,7 +5,7 @@ import { ProfilePrompt } from "@/components/auth/profile-prompt";
 import { PageTracker } from "@/lib/hooks/use-page-tracker";
 import "./globals.scss";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://toolk1t.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://toolk1t.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -25,6 +25,9 @@ export const metadata: Metadata = {
     title: "Toolk1t - Free Online Tools",
     description:
       "Free online tools for developers and creators — IP lookup, JSON converter, image editor, PDF tools, speed test, and more.",
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
 };
 

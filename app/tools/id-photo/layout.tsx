@@ -22,18 +22,18 @@ const jsonLd = [
     name: "ID Photo Editor",
     description:
       "Create compliant passport and visa photos with face detection, background adjustment, and compliance checking.",
-    url: "https://toolk1t.app/tools/id-photo",
+    url: "https://toolk1t.com/tools/id-photo",
     applicationCategory: "MultimediaApplication",
     operatingSystem: "Any",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    isPartOf: { "@type": "WebSite", name: "Toolk1t", url: "https://toolk1t.app" },
+    isPartOf: { "@type": "WebSite", name: "Toolk1t", url: "https://toolk1t.com" },
   },
   {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.app" },
-      { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.app/tools" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.com" },
+      { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.com/tools" },
       { "@type": "ListItem", position: 3, name: "ID Photo Editor" },
     ],
   },

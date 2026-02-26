@@ -22,18 +22,18 @@ const jsonLd = [
     name: "Swagger Editor",
     description:
       "Edit OpenAPI/Swagger YAML specifications with live preview, validation, and Swagger UI rendering.",
-    url: "https://toolk1t.app/tools/swagger-editor",
+    url: "https://toolk1t.com/tools/swagger-editor",
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Any",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    isPartOf: { "@type": "WebSite", name: "Toolk1t", url: "https://toolk1t.app" },
+    isPartOf: { "@type": "WebSite", name: "Toolk1t", url: "https://toolk1t.com" },
   },
   {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.app" },
-      { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.app/tools" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.com" },
+      { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.com/tools" },
       { "@type": "ListItem", position: 3, name: "Swagger Editor" },
     ],
   },

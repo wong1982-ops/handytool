@@ -22,11 +22,11 @@ const jsonLd = {
   name: "Free Online Tools",
   description:
     "A collection of free online tools for developers and everyday use.",
-  url: "https://toolk1t.app/tools",
+  url: "https://toolk1t.com/tools",
   isPartOf: {
     "@type": "WebSite",
     name: "Toolk1t",
-    url: "https://toolk1t.app",
+    url: "https://toolk1t.com",
   },
 };
 
