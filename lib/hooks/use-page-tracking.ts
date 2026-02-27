@@ -29,7 +29,7 @@ function getToolSlug(pathname: string): string | null {
 
 export function usePageTracking() {
   const pathname = usePathname()
-  const rowIdRef = useRef<number | null>(null)
+  const clientRowIdRef = useRef<string | null>(null)
   const startTimeRef = useRef<number>(Date.now())
 
   useEffect(() => {
@@ -40,37 +40,35 @@ export function usePageTracking() {
 
     const supabase = createClient()
     const sessionId = getSessionId()
+    const clientRowId = crypto.randomUUID()
     const startTime = Date.now()
     startTimeRef.current = startTime
-    rowIdRef.current = null
+    clientRowIdRef.current = clientRowId
 
-    // Insert page view row
+    // Insert page view row (no .select() needed — avoids RLS SELECT issue for anon users)
     async function insertView() {
       const { data: { user } } = await supabase.auth.getUser()
-      const { data } = await supabase
+      await supabase
         .from('page_views')
         .insert({
           user_id: user?.id ?? null,
           session_id: sessionId,
+          client_row_id: clientRowId,
           tool_slug: toolSlug,
           page_path: pathname,
           referrer: document.referrer || null,
           device_type: getDeviceType(),
         })
-        .select('id')
-        .single()
-
-      if (data) rowIdRef.current = data.id
     }
 
     insertView()
 
     // Flush duration on page leave
     function flushDuration() {
-      if (rowIdRef.current === null) return
+      if (!clientRowIdRef.current) return
       const duration = Math.round((Date.now() - startTime) / 1000)
       // Use sendBeacon for reliability on page close
-      const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/page_views?id=eq.${rowIdRef.current}`
+      const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/page_views?client_row_id=eq.${clientRowIdRef.current}`
       const body = JSON.stringify({ duration_seconds: duration })
       const headers = {
         'Content-Type': 'application/json',
