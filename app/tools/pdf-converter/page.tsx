@@ -7,11 +7,13 @@ import { UploadZone } from '@/tools/pdf-converter/upload-zone'
 import { FileList, createStagedFile } from '@/tools/pdf-converter/file-list'
 import type { StagedFile, ProcessingState } from '@/tools/pdf-converter/file-list'
 import { ModeOptions } from '@/tools/pdf-converter/mode-options'
-import type { ImageToPdfOptions } from '@/tools/pdf-converter/mode-options'
+import type { ImageToPdfOptions, PdfToImagesOutputOptions } from '@/tools/pdf-converter/mode-options'
 import type { CompressionQuality } from '@/tools/pdf-converter/processors/compress-pdf'
 import type { ExtractionMode } from '@/tools/pdf-converter/processors/pdf-to-excel'
 import type { WatermarkOptions } from '@/tools/pdf-converter/processors/watermark'
 import { PageManager } from '@/tools/pdf-converter/page-manager'
+import { useConversionHistory } from '@/tools/pdf-converter/use-conversion-history'
+import { ConversionHistory } from '@/tools/pdf-converter/conversion-history'
 
 // Modes that support batch (single-file modes that produce per-file output)
 const BATCH_MODES: ConversionMode[] = ['compress-pdf', 'watermark', 'pdf-to-images', 'split-pdf']
@@ -58,6 +60,10 @@ export default function PdfConverterPage() {
     margin: 'none',
     fit: 'fit',
   })
+  const [pdfToImagesOutput, setPdfToImagesOutput] = useState<PdfToImagesOutputOptions>({
+    outputFormat: 'png',
+    outputQuality: 80,
+  })
 
   // Page manager state
   const [pageManagerFile, setPageManagerFile] = useState<File | null>(null)
@@ -67,6 +73,8 @@ export default function PdfConverterPage() {
   const [batchZipUrl, setBatchZipUrl] = useState<string | null>(null)
 
   const downloadUrlRef = useRef<string | null>(null)
+
+  const { records: historyRecords, addRecord: addHistoryRecord, clearHistory } = useConversionHistory()
 
   const modeInfo = MODE_DESCRIPTIONS[activeMode]
 
@@ -158,22 +166,8 @@ export default function PdfConverterPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleMoveUp = useCallback((index: number) => {
-    if (index === 0) return
-    setStagedFiles((prev) => {
-      const arr = [...prev]
-      ;[arr[index - 1], arr[index]] = [arr[index], arr[index - 1]]
-      return arr
-    })
-  }, [])
-
-  const handleMoveDown = useCallback((index: number) => {
-    setStagedFiles((prev) => {
-      if (index >= prev.length - 1) return prev
-      const arr = [...prev]
-      ;[arr[index], arr[index + 1]] = [arr[index + 1], arr[index]]
-      return arr
-    })
+  const handleReorder = useCallback((files: StagedFile[]) => {
+    setStagedFiles(files)
   }, [])
 
   const onProgress = useCallback((percent: number, message: string) => {
@@ -193,7 +187,7 @@ export default function PdfConverterPage() {
     switch (mode) {
       case 'pdf-to-images': {
         const { pdfToImages } = await import('@/tools/pdf-converter/processors/pdf-to-images')
-        return pdfToImages(file, { scale }, progressCb)
+        return pdfToImages(file, { scale, outputFormat: pdfToImagesOutput.outputFormat, outputQuality: pdfToImagesOutput.outputQuality }, progressCb)
       }
       case 'split-pdf': {
         if (!pageRanges.trim()) throw new Error('Please enter page ranges.')
@@ -314,7 +308,7 @@ export default function PdfConverterPage() {
       switch (activeMode) {
         case 'pdf-to-images': {
           const { pdfToImages } = await import('@/tools/pdf-converter/processors/pdf-to-images')
-          result = await pdfToImages(stagedFiles[0].file, { scale }, onProgress)
+          result = await pdfToImages(stagedFiles[0].file, { scale, outputFormat: pdfToImagesOutput.outputFormat, outputQuality: pdfToImagesOutput.outputQuality }, onProgress)
           break
         }
         case 'images-to-pdf': {
@@ -376,6 +370,13 @@ export default function PdfConverterPage() {
         downloadUrl: url,
         downloadFilename: result!.filename,
       })
+      addHistoryRecord({
+        filename: stagedFiles[0].name,
+        mode: activeMode,
+        inputSize: stagedFiles[0].file.size,
+        outputSize: result!.blob.size,
+        status: 'success',
+      })
     } catch (err) {
       setProcessing({
         status: 'error',
@@ -383,9 +384,16 @@ export default function PdfConverterPage() {
         statusText: '',
         error: err instanceof Error ? err.message : 'An unexpected error occurred.',
       })
+      addHistoryRecord({
+        filename: stagedFiles[0].name,
+        mode: activeMode,
+        inputSize: stagedFiles[0].file.size,
+        outputSize: 0,
+        status: 'error',
+      })
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMode, stagedFiles, scale, quality, pageRanges, preserveLayout, extractionMode, watermarkOptions, imageToPdfOptions, onProgress])
+  }, [activeMode, stagedFiles, scale, quality, pageRanges, preserveLayout, extractionMode, watermarkOptions, imageToPdfOptions, pdfToImagesOutput, onProgress, addHistoryRecord])
 
   const handlePageManagerExport = useCallback((blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob)
@@ -545,6 +553,8 @@ export default function PdfConverterPage() {
                     onWatermarkOptionsChange={setWatermarkOptions}
                     imageToPdfOptions={imageToPdfOptions}
                     onImageToPdfOptionsChange={setImageToPdfOptions}
+                    pdfToImagesOutput={pdfToImagesOutput}
+                    onPdfToImagesOutputChange={setPdfToImagesOutput}
                   />
                 )}
 
@@ -555,8 +565,7 @@ export default function PdfConverterPage() {
                     processing={processing}
                     onRemoveFile={handleRemoveFile}
                     onClearFiles={handleClearFiles}
-                    onMoveUp={handleMoveUp}
-                    onMoveDown={handleMoveDown}
+                    onReorder={handleReorder}
                     showReorder={showReorder}
                   />
                 )}
@@ -681,6 +690,9 @@ export default function PdfConverterPage() {
                       : 'Convert Now'}
                   </button>
                 )}
+
+                {/* Conversion history */}
+                <ConversionHistory records={historyRecords} onClear={clearHistory} />
               </>
             )}
           </div>

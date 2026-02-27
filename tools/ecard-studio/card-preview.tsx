@@ -225,6 +225,101 @@ const LAYOUT_RENDERERS: Record<ECardData['layout'], React.FC<LayoutProps>> = {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Business Card Layout                                              */
+/* ------------------------------------------------------------------ */
+
+/** Contact info icon components for business card layout */
+function PhoneIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+    </svg>
+  )
+}
+
+function EmailIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22,6 12,13 2,6" />
+    </svg>
+  )
+}
+
+function GlobeIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+    </svg>
+  )
+}
+
+function MapPinIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  )
+}
+
+/** Business card 2-column layout: left (name/title/company) + right (contact info) */
+function LayoutBusinessCard({ data, bodyTextColor, mutedTextColor }: LayoutProps) {
+  const contactFields = [
+    { icon: <PhoneIcon />, value: data.phone },
+    { icon: <EmailIcon />, value: data.email },
+    { icon: <GlobeIcon />, value: data.website },
+    { icon: <MapPinIcon />, value: data.address },
+  ].filter((f) => f.value?.trim())
+
+  return (
+    <div
+      className="relative z-10 flex h-full"
+      style={{ padding: '28px 32px' }}
+    >
+      {/* LEFT column (60%) — Name, title, company */}
+      <div
+        className="flex flex-col justify-center"
+        style={{ width: '60%', flexShrink: 0, paddingRight: 24 }}
+      >
+        {data.heading && <h2 style={headingStyle(data)}>{data.heading}</h2>}
+        {data.subheading && <p style={subheadingStyle(data, bodyTextColor)}>{data.subheading}</p>}
+        <div className="flex-1 min-h-3" />
+        {data.companyName && <p style={companyNameStyle(data)}>{data.companyName}</p>}
+        {data.companyTagline && <p style={companyTaglineStyle(data, mutedTextColor)}>{data.companyTagline}</p>}
+      </div>
+
+      {/* RIGHT column (40%) — Contact info */}
+      <div
+        className="flex flex-col justify-center gap-2"
+        style={{ width: '40%', flexShrink: 0, borderLeft: `1px solid ${data.accentColor}30`, paddingLeft: 24 }}
+      >
+        {contactFields.map((field, i) => (
+          <div key={i} className="flex items-start gap-2" style={{ color: bodyTextColor }}>
+            <span style={{ color: data.accentColor, flexShrink: 0, marginTop: 1 }}>
+              {field.icon}
+            </span>
+            <span
+              style={{
+                fontFamily: data.fontFamily,
+                fontSize: 14,
+                lineHeight: 1.4,
+                color: bodyTextColor,
+                wordBreak: 'break-word',
+              }}
+            >
+              {field.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
 /*  Card Preview Component                                            */
 /* ------------------------------------------------------------------ */
 
@@ -241,6 +336,11 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
     const draggingRef = useRef(false)
     const cardElRef = useRef<HTMLDivElement | null>(null)
 
+    /* Business card uses 3.5:2 ratio, ecards use default 600x400 (3:2) */
+    const isBusinessCard = data.cardType === 'business-card'
+    const cardWidth = isBusinessCard ? 630 : 600
+    const cardHeight = isBusinessCard ? 360 : 400
+
     const setRefs = useCallback(
       (el: HTMLDivElement | null) => {
         cardElRef.current = el
@@ -256,8 +356,8 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
         const rect = cardElRef.current.getBoundingClientRect()
         const clickX = ((e.clientX - rect.left) / rect.width) * 100
         const clickY = ((e.clientY - rect.top) / rect.height) * 100
-        const logoPxW = (60 / 600) * 100
-        const logoPxH = (60 / 400) * 100
+        const logoPxW = (60 / cardWidth) * 100
+        const logoPxH = (60 / cardHeight) * 100
         const dx = Math.abs(clickX - data.logoX)
         const dy = Math.abs(clickY - data.logoY)
         if (dx > logoPxW && dy > logoPxH) return
@@ -265,7 +365,7 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
         cardElRef.current.setPointerCapture(e.pointerId)
         e.preventDefault()
       },
-      [onLogoMove, data.logoUrl, data.logoX, data.logoY],
+      [onLogoMove, data.logoUrl, data.logoX, data.logoY, cardWidth, cardHeight],
     )
 
     const handlePointerMove = useCallback(
@@ -294,14 +394,16 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
     const mutedTextColor = dark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.45)'
     const bodyTextColor = dark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)'
 
-    const LayoutRenderer = LAYOUT_RENDERERS[data.layout] ?? LayoutCentered
+    const LayoutRenderer = isBusinessCard
+      ? LayoutBusinessCard
+      : (LAYOUT_RENDERERS[data.layout] ?? LayoutCentered)
 
     return (
       <div
         className={className}
         style={{
-          width: 600 * scale,
-          height: 400 * scale,
+          width: cardWidth * scale,
+          height: cardHeight * scale,
           overflow: 'hidden',
           flexShrink: 0,
         }}
@@ -312,8 +414,8 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           style={{
-            width: 600,
-            height: 400,
+            width: cardWidth,
+            height: cardHeight,
             backgroundColor: data.backgroundColor,
             backgroundImage: patternBg.backgroundImage,
             backgroundSize: patternBg.backgroundSize,

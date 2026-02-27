@@ -11,11 +11,18 @@ export type ImageToPdfOrientation = 'portrait' | 'landscape' | 'auto'
 export type ImageToPdfMargin = 'none' | 'small' | 'medium' | 'large'
 export type ImageToPdfFit = 'fit' | 'fill' | 'stretch'
 
+export type OutputImageFormat = 'png' | 'jpeg' | 'webp'
+
 export interface ImageToPdfOptions {
   pageSize: ImageToPdfPageSize
   orientation: ImageToPdfOrientation
   margin: ImageToPdfMargin
   fit: ImageToPdfFit
+}
+
+export interface PdfToImagesOutputOptions {
+  outputFormat: OutputImageFormat
+  outputQuality: number // 10-100
 }
 
 interface ModeOptionsProps {
@@ -37,6 +44,9 @@ interface ModeOptionsProps {
   // Image-to-PDF options
   imageToPdfOptions: ImageToPdfOptions
   onImageToPdfOptionsChange: (options: ImageToPdfOptions) => void
+  // PDF-to-images output options
+  pdfToImagesOutput: PdfToImagesOutputOptions
+  onPdfToImagesOutputChange: (options: PdfToImagesOutputOptions) => void
 }
 
 const POSITION_LABELS: Record<WatermarkPosition, string> = {
@@ -74,27 +84,71 @@ export function ModeOptions({
   onWatermarkOptionsChange,
   imageToPdfOptions,
   onImageToPdfOptionsChange,
+  pdfToImagesOutput,
+  onPdfToImagesOutputChange,
 }: ModeOptionsProps) {
   const imageInputRef = useRef<HTMLInputElement>(null)
 
   if (mode === 'pdf-to-images') {
+    const fmt = pdfToImagesOutput
+    const updateOutput = (partial: Partial<PdfToImagesOutputOptions>) =>
+      onPdfToImagesOutputChange({ ...fmt, ...partial })
+
     return (
-      <div className="flex items-center gap-4">
-        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Scale:</label>
-        <div className="flex gap-2">
-          {[1, 2, 3].map((s) => (
-            <button
-              key={s}
-              onClick={() => onScaleChange(s)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
-                scale === s ? btnActive : btnInactive
-              }`}
-            >
-              {s}x
-            </button>
-          ))}
+      <div className="space-y-4">
+        {/* Scale */}
+        <div className="flex items-center gap-4">
+          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Scale:</label>
+          <div className="flex gap-2">
+            {[1, 2, 3].map((s) => (
+              <button
+                key={s}
+                onClick={() => onScaleChange(s)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+                  scale === s ? btnActive : btnInactive
+                }`}
+              >
+                {s}x
+              </button>
+            ))}
+          </div>
+          <span className="text-xs text-slate-400">Higher = better quality, larger files</span>
         </div>
-        <span className="text-xs text-slate-400">Higher = better quality, larger files</span>
+
+        {/* Output format */}
+        <div className="flex items-center gap-4">
+          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Format:</label>
+          <div className="flex gap-2">
+            {(['png', 'jpeg', 'webp'] as OutputImageFormat[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => updateOutput({ outputFormat: f })}
+                className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors uppercase cursor-pointer ${
+                  fmt.outputFormat === f ? btnActive : btnInactive
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Quality slider — only for JPEG / WEBP */}
+        {(fmt.outputFormat === 'jpeg' || fmt.outputFormat === 'webp') && (
+          <div className="flex items-center gap-4">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Quality:</label>
+            <input
+              type="range"
+              min={10}
+              max={100}
+              step={5}
+              value={fmt.outputQuality}
+              onChange={(e) => updateOutput({ outputQuality: parseInt(e.target.value) })}
+              className="flex-1 accent-[var(--tk-color-secondary-500)]"
+            />
+            <span className="text-sm font-bold text-slate-500 w-12 text-right">{fmt.outputQuality}%</span>
+          </div>
+        )}
       </div>
     )
   }

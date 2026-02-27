@@ -1,8 +1,9 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ECardData, TemplateId } from '@/tools/ecard-studio/types'
-import { TEMPLATES, BLANK_DEFAULTS } from '@/tools/ecard-studio/templates'
+import { useHistory } from '@/tools/ecard-studio/use-history'
+import { ALL_TEMPLATES, BLANK_DEFAULTS } from '@/tools/ecard-studio/templates'
 import { TemplateStrip } from '@/tools/ecard-studio/template-strip'
 import { CardCanvas } from '@/tools/ecard-studio/card-canvas'
 import { CustomizationPanel } from '@/tools/ecard-studio/customization-panel'
@@ -11,14 +12,12 @@ import { exportCardAsPng } from '@/tools/ecard-studio/export'
 
 function getInitialCardData(templateId: TemplateId): ECardData {
   if (templateId === 'blank') return { ...BLANK_DEFAULTS }
-  const template = TEMPLATES.find((t) => t.id === templateId)
+  const template = ALL_TEMPLATES.find((t) => t.id === templateId)
   return template ? { ...template.defaults } : { ...BLANK_DEFAULTS }
 }
 
-export function CardEditor() {
-  const [cardData, setCardData] = useState<ECardData>(() =>
-    getInitialCardData('executive')
-  )
+export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }) {
+  const { state: cardData, set: setCardData, update: updateCardData, undo, redo, canUndo, canRedo } = useHistory<ECardData>(getInitialCardData(initialTemplate ?? 'executive'))
   const [zoom, setZoom] = useState(100)
   const [showPreview, setShowPreview] = useState(false)
   const [showMobilePanel, setShowMobilePanel] = useState(false)
@@ -26,18 +25,30 @@ export function CardEditor() {
   const cardRef = useRef<HTMLDivElement>(null)
 
   const handleCardChange = useCallback((updates: Partial<ECardData>) => {
-    setCardData((prev) => ({ ...prev, ...updates }))
-  }, [])
+    updateCardData(updates)
+  }, [updateCardData])
 
   const handleLogoMove = useCallback((logoX: number, logoY: number) => {
-    setCardData((prev) => ({ ...prev, logoX, logoY }))
-  }, [])
+    updateCardData({ logoX, logoY })
+  }, [updateCardData])
 
   const handleTemplateSelect = useCallback((templateId: TemplateId) => {
-    const template = TEMPLATES.find((t) => t.id === templateId)
+    const template = ALL_TEMPLATES.find((t) => t.id === templateId)
     if (template) setCardData({ ...template.defaults })
     else if (templateId === 'blank') setCardData({ ...BLANK_DEFAULTS })
-  }, [])
+  }, [setCardData])
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+        e.preventDefault()
+        if (e.shiftKey) redo()
+        else undo()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [undo, redo])
 
   const handleDownload = useCallback(async () => {
     if (!cardRef.current) return
@@ -80,6 +91,32 @@ export function CardEditor() {
                 strokeWidth="1.5"
                 strokeLinecap="round"
               />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={undo}
+            disabled={!canUndo}
+            className="p-2 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            aria-label="Undo"
+            title="Undo (Ctrl+Z)"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <path d="M4 8h8a3 3 0 0 1 0 6H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M7 5L4 8l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={redo}
+            disabled={!canRedo}
+            className="p-2 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            aria-label="Redo"
+            title="Redo (Ctrl+Shift+Z)"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <path d="M14 8H6a3 3 0 0 0 0 6h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M11 5l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button

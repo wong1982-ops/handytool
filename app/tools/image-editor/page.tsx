@@ -6,12 +6,15 @@ import { AdjustmentsPanel, type Adjustments } from '@/tools/image-editor/adjustm
 import { FILTER_PRESETS } from '@/tools/image-editor/filter-presets'
 import { useFabricCanvas } from '@/tools/image-editor/use-fabric-canvas'
 import { LayersPanel } from '@/tools/image-editor/layers-panel'
+import { ExportDialog, type ExportOptions } from '@/tools/image-editor/export-dialog'
+import { HistoryStrip } from '@/tools/image-editor/history-strip'
 
 const DEFAULT_ADJUSTMENTS: Adjustments = {
   brightness: 0,
   contrast: 0,
   saturate: 0,
   hueRotate: 0,
+  sharpen: 0,
 }
 
 export default function ImageEditorPage() {
@@ -25,6 +28,7 @@ export default function ImageEditorPage() {
   const [bgColor, setBgColor] = useState('#000000')
   const [dragging, setDragging] = useState(false)
   const [showMobileAdjustments, setShowMobileAdjustments] = useState(false)
+  const [showExport, setShowExport] = useState(false)
   const [mobileTab, setMobileTab] = useState<'adjustments' | 'layers'>('adjustments')
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -177,6 +181,18 @@ export default function ImageEditorPage() {
     fabric.exportJPEG()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.exportJPEG])
+
+  const handleExportWithOptions = useCallback((options: ExportOptions) => {
+    // Simple export — download current canvas in the selected format
+    // Resize support will be added in use-fabric-canvas.ts later
+    if (options.format === 'jpeg') {
+      fabric.exportJPEG(options.quality)
+    } else {
+      fabric.exportPNG()
+    }
+    setShowExport(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.exportPNG, fabric.exportJPEG])
 
   const handleReset = useCallback(() => {
     setAdjustments(DEFAULT_ADJUSTMENTS)
@@ -383,7 +399,7 @@ export default function ImageEditorPage() {
 
           {/* Export */}
           <button
-            onClick={handleExport}
+            onClick={() => setShowExport(true)}
             disabled={!fabric.imageSize}
             className="bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600,#2d5ad2)] text-white font-bold py-1.5 px-4 rounded-lg text-sm transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
@@ -492,6 +508,7 @@ export default function ImageEditorPage() {
               zoom={zoom}
               onZoomChange={setZoom}
               imageSize={fabric.imageSize}
+              canvasRef={fabric.canvasRef}
             />
           </div>
 
@@ -561,6 +578,7 @@ export default function ImageEditorPage() {
                     zoom={zoom}
                     onZoomChange={setZoom}
                     imageSize={fabric.imageSize}
+                    canvasRef={fabric.canvasRef}
                   />
                 ) : (
                   <LayersPanel
@@ -582,6 +600,13 @@ export default function ImageEditorPage() {
           </>
         )}
       </main>
+
+      {/* History filmstrip */}
+      <HistoryStrip
+        entries={fabric.historyEntries}
+        currentIndex={fabric.historyIndex}
+        onGoToIndex={fabric.goToHistory}
+      />
 
       {/* Bottom status bar */}
       <footer className="h-7 border-t border-slate-700 bg-[#101622] flex items-center justify-between px-4 text-[10px] font-medium text-slate-500 shrink-0">
@@ -606,6 +631,14 @@ export default function ImageEditorPage() {
           <span className="hidden sm:inline">Client-side editing</span>
         </div>
       </footer>
+
+      {/* Export dialog */}
+      <ExportDialog
+        isOpen={showExport}
+        onClose={() => setShowExport(false)}
+        onExport={handleExportWithOptions}
+        currentSize={fabric.imageSize}
+      />
     </div>
   )
 }

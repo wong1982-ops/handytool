@@ -4,6 +4,7 @@ import { TEST_CONFIGS } from './constants'
 import { TestCard } from './test-card'
 import { useTestScores } from './use-test-scores'
 import type { TestId } from './types'
+import DailyChallenge from './daily-challenge'
 
 interface DashboardProps {
   onSelectTest: (testId: TestId) => void
@@ -75,6 +76,9 @@ export function Dashboard({ onSelectTest }: DashboardProps) {
             </div>
           </div>
         </div>
+
+        {/* Daily challenge */}
+        <DailyChallenge onStartChallenge={onSelectTest} />
 
         {/* Section heading */}
         <div className="flex items-center gap-2 mb-6">

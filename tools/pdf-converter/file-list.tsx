@@ -1,5 +1,7 @@
 'use client'
 
+import { useRef, useState } from 'react'
+
 export interface StagedFile {
   id: string
   file: File
@@ -21,8 +23,7 @@ interface FileListProps {
   processing: ProcessingState
   onRemoveFile: (id: string) => void
   onClearFiles: () => void
-  onMoveUp: (index: number) => void
-  onMoveDown: (index: number) => void
+  onReorder: (files: StagedFile[]) => void
   showReorder: boolean
 }
 
@@ -41,8 +42,47 @@ export function createStagedFile(file: File, index: number): StagedFile {
   }
 }
 
-export function FileList({ stagedFiles, processing, onRemoveFile, onClearFiles, onMoveUp, onMoveDown, showReorder }: FileListProps) {
+export function FileList({ stagedFiles, processing, onRemoveFile, onClearFiles, onReorder, showReorder }: FileListProps) {
+  const dragIndexRef = useRef<number | null>(null)
+  const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null)
+
   if (stagedFiles.length === 0 && processing.status === 'idle') return null
+
+  const handleDragStart = (index: number) => {
+    dragIndexRef.current = index
+  }
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    if (dragIndexRef.current === null || dragIndexRef.current === index) {
+      setDropTargetIndex(null)
+      return
+    }
+    setDropTargetIndex(index)
+  }
+
+  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault()
+    const fromIndex = dragIndexRef.current
+    if (fromIndex === null || fromIndex === targetIndex) {
+      cleanup()
+      return
+    }
+    const reordered = [...stagedFiles]
+    const [moved] = reordered.splice(fromIndex, 1)
+    reordered.splice(targetIndex, 0, moved)
+    onReorder(reordered)
+    cleanup()
+  }
+
+  const handleDragEnd = () => {
+    cleanup()
+  }
+
+  const cleanup = () => {
+    dragIndexRef.current = null
+    setDropTargetIndex(null)
+  }
 
   return (
     <div className="space-y-6">
@@ -130,49 +170,57 @@ export function FileList({ stagedFiles, processing, onRemoveFile, onClearFiles, 
           </div>
           <div className="space-y-2">
             {stagedFiles.map((sf, index) => (
-              <div key={sf.id} className="bg-white dark:bg-slate-900 rounded-lg p-3 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
-                <div className="w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center shrink-0">
-                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{sf.name}</p>
-                  <p className="text-xs text-slate-400">{sf.size}</p>
-                </div>
-                {showReorder && stagedFiles.length > 1 && (
-                  <div className="flex flex-col gap-0.5">
-                    <button
-                      onClick={() => onMoveUp(index)}
-                      disabled={index === 0}
-                      className="p-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
-                      aria-label="Move up"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => onMoveDown(index)}
-                      disabled={index === stagedFiles.length - 1}
-                      className="p-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
-                      aria-label="Move down"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                  </div>
+              <div key={sf.id}>
+                {/* Drop indicator line above this item */}
+                {showReorder && dropTargetIndex === index && dragIndexRef.current !== null && dragIndexRef.current > index && (
+                  <div className="h-0.5 bg-[var(--tk-color-primary-500)] rounded-full mx-3 mb-1" />
                 )}
-                <button
-                  onClick={() => onRemoveFile(sf.id)}
-                  className="p-1 text-slate-400 hover:text-red-500 transition-colors cursor-pointer shrink-0"
-                  aria-label={`Remove ${sf.name}`}
+                <div
+                  draggable={showReorder && stagedFiles.length > 1}
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDrop={(e) => handleDrop(e, index)}
+                  onDragEnd={handleDragEnd}
+                  className={`bg-white dark:bg-slate-900 rounded-lg p-3 border border-slate-200 dark:border-slate-800 flex items-center gap-3 ${
+                    showReorder && stagedFiles.length > 1 ? 'cursor-grab active:cursor-grabbing' : ''
+                  }`}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                  {/* Drag handle */}
+                  {showReorder && stagedFiles.length > 1 && (
+                    <div className="text-slate-300 dark:text-slate-600 shrink-0" aria-hidden="true">
+                      <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="5" cy="3" r="1.5" />
+                        <circle cx="11" cy="3" r="1.5" />
+                        <circle cx="5" cy="8" r="1.5" />
+                        <circle cx="11" cy="8" r="1.5" />
+                        <circle cx="5" cy="13" r="1.5" />
+                        <circle cx="11" cy="13" r="1.5" />
+                      </svg>
+                    </div>
+                  )}
+                  <div className="w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{sf.name}</p>
+                    <p className="text-xs text-slate-400">{sf.size}</p>
+                  </div>
+                  <button
+                    onClick={() => onRemoveFile(sf.id)}
+                    className="p-1 text-slate-400 hover:text-red-500 transition-colors cursor-pointer shrink-0"
+                    aria-label={`Remove ${sf.name}`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                {/* Drop indicator line below this item */}
+                {showReorder && dropTargetIndex === index && dragIndexRef.current !== null && dragIndexRef.current < index && (
+                  <div className="h-0.5 bg-[var(--tk-color-primary-500)] rounded-full mx-3 mt-1" />
+                )}
               </div>
             ))}
           </div>

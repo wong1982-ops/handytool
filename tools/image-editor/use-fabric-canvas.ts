@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ToolType } from './editor-toolbar'
 import type { Adjustments } from './adjustments-panel'
 import type { FilterPresetConfig } from './filter-presets'
+import type { HistoryEntry } from './history-strip'
 
 // ---------------------------------------------------------------------------
 // Layer type
@@ -42,6 +43,9 @@ export interface FabricCanvasAPI {
   redo: () => void
   canUndo: boolean
   canRedo: boolean
+  historyEntries: HistoryEntry[]
+  historyIndex: number
+  goToHistory: (index: number) => void
   deleteSelected: () => void
   selectAll: () => void
   rotateCW: () => void
@@ -104,8 +108,14 @@ export function useFabricCanvas(): FabricCanvasAPI {
   // Undo / redo stacks
   const historyRef = useRef<string[]>([])
   const redoStackRef = useRef<string[]>([])
+  const historyLabelsRef = useRef<string[]>([])
+  const redoLabelsRef = useRef<string[]>([])
   const isRestoringRef = useRef(false)
   const isUndoRedoInProgressRef = useRef(false)
+
+  // History entries exposed to UI (labels + index)
+  const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>([])
+  const [historyIndex, setHistoryIndex] = useState(-1)
 
   // Current tool / brush settings
   const activeToolRef = useRef<ToolType>('move')
@@ -144,17 +154,34 @@ export function useFabricCanvas(): FabricCanvasAPI {
   // History helpers
   // ------------------------------------------------------------------
 
-  const pushHistory = useCallback(() => {
+  const syncHistoryEntries = useCallback(() => {
+    const labels = historyLabelsRef.current
+    const redoLabels = redoLabelsRef.current
+    // Combine: history labels + redo labels (redo is stored reversed, so reverse back)
+    const allLabels = [...labels, ...[...redoLabels].reverse()]
+    const entries: HistoryEntry[] = allLabels.map((label, i) => ({ label, index: i }))
+    setHistoryEntries(entries)
+    setHistoryIndex(labels.length - 1)
+  }, [])
+
+  const pushHistory = useCallback((label: string = 'Edit') => {
     const canvas = fabricRef.current
     if (!canvas || isRestoringRef.current) return
     const json = JSON.stringify(canvas.toJSON(['__isBgImage', '__isCropRect', '__layerId', '__layerName']))
     const stack = historyRef.current
+    const labels = historyLabelsRef.current
     stack.push(json)
-    if (stack.length > MAX_HISTORY) stack.shift()
+    labels.push(label)
+    if (stack.length > MAX_HISTORY) {
+      stack.shift()
+      labels.shift()
+    }
     redoStackRef.current = []
+    redoLabelsRef.current = []
     setCanUndo(stack.length > 1)
     setCanRedo(false)
-  }, [])
+    syncHistoryEntries()
+  }, [syncHistoryEntries])
 
   const restoreFromJSON = useCallback(async (json: string) => {
     const canvas = fabricRef.current
@@ -237,9 +264,11 @@ export function useFabricCanvas(): FabricCanvasAPI {
         // Reset history
         historyRef.current = []
         redoStackRef.current = []
+        historyLabelsRef.current = []
+        redoLabelsRef.current = []
         setCanUndo(false)
         setCanRedo(false)
-        pushHistory()
+        pushHistory('Open')
       }
       imgEl.onerror = () => {
         console.error('[useFabricCanvas] Failed to load image from data URL')
@@ -284,8 +313,8 @@ export function useFabricCanvas(): FabricCanvasAPI {
       setIsReady(true)
 
       // Listen for object modifications to push history
-      canvas.on('object:modified', () => { pushHistory(); syncLayersFromCanvas() })
-      canvas.on('path:created', () => { pushHistory(); syncLayersFromCanvas() })
+      canvas.on('object:modified', () => { pushHistory('Transform'); syncLayersFromCanvas() })
+      canvas.on('path:created', () => { pushHistory('Draw'); syncLayersFromCanvas() })
 
       // Layer sync: assign __layerId to new objects, sync panel on changes
       canvas.on('object:added', (e: any) => {
@@ -546,7 +575,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
           canvas.setActiveObject(text)
           text.enterEditing()
           canvas.renderAll()
-          pushHistory()
+          pushHistory('Add Text')
 
           // One-shot: remove handler after first placement
           removeTextHandler()
@@ -655,6 +684,19 @@ export function useFabricCanvas(): FabricCanvasAPI {
     }
     if (adj.hueRotate !== 0) {
       const f = new filters.HueRotation({ rotation: adj.hueRotate / 180 })
+      adjustmentFilters.push(f)
+    }
+    if (adj.sharpen > 0) {
+      const intensity = adj.sharpen / 100
+      // Sharpening kernel: identity + (sharpen kernel - identity) * intensity
+      // Full sharpen kernel: [0, -1, 0, -1, 5, -1, 0, -1, 0]
+      // Identity kernel:     [0,  0, 0,  0, 1,  0, 0,  0, 0]
+      const matrix = [
+        0, -1 * intensity, 0,
+        -1 * intensity, 1 + 4 * intensity, -1 * intensity,
+        0, -1 * intensity, 0,
+      ]
+      const f = new filters.Convolute({ matrix })
       adjustmentFilters.push(f)
     }
 
@@ -860,7 +902,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
       canvas.add(img)
       canvas.setActiveObject(img)
       canvas.renderAll()
-      pushHistory()
+      pushHistory('Add Layer')
     }
     reader.readAsDataURL(file)
   }, [pushHistory])
@@ -875,7 +917,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
       canvas.discardActiveObject()
       canvas.renderAll()
       syncLayersFromCanvas()
-      pushHistory()
+      pushHistory('Delete Layer')
     }
   }, [syncLayersFromCanvas, pushHistory])
 
@@ -947,7 +989,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
       canvas.moveTo(obj, Math.max(0, canvasIndex))
       canvas.renderAll()
       syncLayersFromCanvas()
-      pushHistory()
+      pushHistory('Reorder Layers')
     }
   }, [syncLayersFromCanvas, pushHistory])
 
@@ -1030,43 +1072,101 @@ export function useFabricCanvas(): FabricCanvasAPI {
   const undo = useCallback(async () => {
     if (isUndoRedoInProgressRef.current) return
     const stack = historyRef.current
+    const labels = historyLabelsRef.current
     if (stack.length <= 1) return
 
     isUndoRedoInProgressRef.current = true
     const current = stack.pop()!
+    const currentLabel = labels.pop()!
     redoStackRef.current.push(current)
+    redoLabelsRef.current.push(currentLabel)
     const previous = stack[stack.length - 1]
 
     try {
       await restoreFromJSON(previous)
     } catch {
       // Restore the popped item back on failure
-      stack.push(redoStackRef.current.pop()!)
+      const restored = redoStackRef.current.pop()!
+      const restoredLabel = redoLabelsRef.current.pop()!
+      stack.push(restored)
+      labels.push(restoredLabel)
     }
     setCanUndo(stack.length > 1)
     setCanRedo(redoStackRef.current.length > 0)
+    syncHistoryEntries()
     isUndoRedoInProgressRef.current = false
-  }, [restoreFromJSON])
+  }, [restoreFromJSON, syncHistoryEntries])
 
   const redo = useCallback(async () => {
     if (isUndoRedoInProgressRef.current) return
     const redoStack = redoStackRef.current
+    const redoLabels = redoLabelsRef.current
     if (redoStack.length === 0) return
 
     isUndoRedoInProgressRef.current = true
     const next = redoStack.pop()!
+    const nextLabel = redoLabels.pop()!
     historyRef.current.push(next)
+    historyLabelsRef.current.push(nextLabel)
 
     try {
       await restoreFromJSON(next)
     } catch {
       // Restore on failure
       redoStack.push(historyRef.current.pop()!)
+      redoLabels.push(historyLabelsRef.current.pop()!)
     }
     setCanUndo(historyRef.current.length > 1)
     setCanRedo(redoStack.length > 0)
+    syncHistoryEntries()
     isUndoRedoInProgressRef.current = false
-  }, [restoreFromJSON])
+  }, [restoreFromJSON, syncHistoryEntries])
+
+  const goToHistory = useCallback(async (targetIndex: number) => {
+    if (isUndoRedoInProgressRef.current) return
+    const stack = historyRef.current
+    const labels = historyLabelsRef.current
+    const redoStack = redoStackRef.current
+    const redoLabels = redoLabelsRef.current
+
+    // Current position is stack.length - 1
+    const currentIdx = stack.length - 1
+    if (targetIndex === currentIdx || targetIndex < 0) return
+
+    // Total entries = stack + redoStack
+    const allSnapshots = [...stack, ...[...redoStack].reverse()]
+    const allLabels = [...labels, ...[...redoLabels].reverse()]
+    const totalLength = allSnapshots.length
+    if (targetIndex >= totalLength) return
+
+    isUndoRedoInProgressRef.current = true
+
+    // Rebuild stacks: [0..targetIndex] = history, [targetIndex+1..end] = redo (reversed)
+    const newHistory = allSnapshots.slice(0, targetIndex + 1)
+    const newHistoryLabels = allLabels.slice(0, targetIndex + 1)
+    const newRedo = allSnapshots.slice(targetIndex + 1).reverse()
+    const newRedoLabels = allLabels.slice(targetIndex + 1).reverse()
+
+    historyRef.current = newHistory
+    historyLabelsRef.current = newHistoryLabels
+    redoStackRef.current = newRedo
+    redoLabelsRef.current = newRedoLabels
+
+    try {
+      await restoreFromJSON(newHistory[newHistory.length - 1])
+    } catch {
+      // On failure, revert to original state
+      historyRef.current = stack
+      historyLabelsRef.current = labels
+      redoStackRef.current = redoStack
+      redoLabelsRef.current = redoLabels
+    }
+
+    setCanUndo(historyRef.current.length > 1)
+    setCanRedo(redoStackRef.current.length > 0)
+    syncHistoryEntries()
+    isUndoRedoInProgressRef.current = false
+  }, [restoreFromJSON, syncHistoryEntries])
 
   // ------------------------------------------------------------------
   // Selection / deletion
@@ -1082,7 +1182,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     })
     canvas.discardActiveObject()
     canvas.renderAll()
-    pushHistory()
+    pushHistory('Delete')
   }, [pushHistory])
 
   const selectAll = useCallback(() => {
@@ -1109,7 +1209,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     img.rotate((img.angle || 0) + 90)
     img.setCoords()
     canvas.renderAll()
-    pushHistory()
+    pushHistory('Rotate CW')
   }, [pushHistory])
 
   const rotateCCW = useCallback(() => {
@@ -1119,7 +1219,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     img.rotate((img.angle || 0) - 90)
     img.setCoords()
     canvas.renderAll()
-    pushHistory()
+    pushHistory('Rotate CCW')
   }, [pushHistory])
 
   const flipH = useCallback(() => {
@@ -1128,7 +1228,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     if (!img || !canvas) return
     img.set('flipX', !img.flipX)
     canvas.renderAll()
-    pushHistory()
+    pushHistory('Flip H')
   }, [pushHistory])
 
   const flipV = useCallback(() => {
@@ -1137,7 +1237,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     if (!img || !canvas) return
     img.set('flipY', !img.flipY)
     canvas.renderAll()
-    pushHistory()
+    pushHistory('Flip V')
   }, [pushHistory])
 
   // ------------------------------------------------------------------
@@ -1209,9 +1309,11 @@ export function useFabricCanvas(): FabricCanvasAPI {
     // Reset history
     historyRef.current = []
     redoStackRef.current = []
+    historyLabelsRef.current = []
+    redoLabelsRef.current = []
     setCanUndo(false)
     setCanRedo(false)
-    pushHistory()
+    pushHistory('Reset')
   }, [pushHistory])
 
   // ------------------------------------------------------------------
@@ -1289,6 +1391,9 @@ export function useFabricCanvas(): FabricCanvasAPI {
     redo,
     canUndo,
     canRedo,
+    historyEntries,
+    historyIndex,
+    goToHistory,
     deleteSelected,
     selectAll,
     rotateCW,

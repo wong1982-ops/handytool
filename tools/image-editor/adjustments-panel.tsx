@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import { FILTER_PRESETS, FILTER_CATEGORIES, type FilterCategory } from './filter-presets'
+import { NavigatorPanel } from './navigator-panel'
 
 export interface Adjustments {
   brightness: number
   contrast: number
   saturate: number
   hueRotate: number
+  sharpen: number  // 0-100, default 0
 }
 
 interface AdjustmentsPanelProps {
@@ -21,6 +23,7 @@ interface AdjustmentsPanelProps {
   zoom: number
   onZoomChange: (z: number) => void
   imageSize: { width: number; height: number } | null
+  canvasRef?: React.RefObject<HTMLCanvasElement | null>
 }
 
 export function AdjustmentsPanel({
@@ -34,6 +37,7 @@ export function AdjustmentsPanel({
   zoom,
   onZoomChange,
   imageSize,
+  canvasRef,
 }: AdjustmentsPanelProps) {
   const [activeCategory, setActiveCategory] = useState<FilterCategory | 'all'>('all')
 
@@ -47,6 +51,9 @@ export function AdjustmentsPanel({
 
   return (
     <div className="flex flex-col">
+      {/* Navigator minimap */}
+      <NavigatorPanel canvasRef={canvasRef ?? null} imageSize={imageSize} zoom={zoom} />
+
       {/* Adjustments */}
       <div className="p-4 border-b border-slate-700">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2">
@@ -60,6 +67,7 @@ export function AdjustmentsPanel({
           <SliderControl label="Contrast" value={adjustments.contrast} min={-100} max={100} onChange={(v) => updateAdj('contrast', v)} />
           <SliderControl label="Saturate" value={adjustments.saturate} min={-100} max={100} onChange={(v) => updateAdj('saturate', v)} />
           <SliderControl label="Hue Rotate" value={adjustments.hueRotate} min={0} max={360} suffix="°" onChange={(v) => updateAdj('hueRotate', v)} />
+          <SliderControl label="Sharpen" value={adjustments.sharpen} min={0} max={100} onChange={(v) => updateAdj('sharpen', v)} />
         </div>
       </div>
 

@@ -13,24 +13,60 @@ function getOutputType(filename: string): OutputType {
   return 'office'
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
 interface OutputPreviewProps {
   downloadUrl: string
   downloadFilename: string
+  inputSize?: number
+  outputSize?: number
 }
 
-export function OutputPreview({ downloadUrl, downloadFilename }: OutputPreviewProps) {
+export function OutputPreview({ downloadUrl, downloadFilename, inputSize, outputSize }: OutputPreviewProps) {
   const outputType = getOutputType(downloadFilename)
 
   if (outputType !== 'pdf' && outputType !== 'image') return null
+
+  // Size comparison logic
+  const showSizeComparison = inputSize != null && outputSize != null && inputSize > 0 && outputSize > 0
+  let sizeColor = 'text-yellow-500'
+  let reductionPercent = ''
+  if (showSizeComparison) {
+    const change = ((outputSize - inputSize) / inputSize) * 100
+    if (change < -10) {
+      sizeColor = 'text-green-500'
+      reductionPercent = `${change.toFixed(1)}%`
+    } else if (change > 10) {
+      sizeColor = 'text-red-500'
+      reductionPercent = `+${change.toFixed(1)}%`
+    } else {
+      sizeColor = 'text-yellow-500'
+      reductionPercent = `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`
+    }
+  }
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
       <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800">
         <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">Preview</h4>
       </div>
-      <div className="p-5">
+      <div className="p-5 space-y-4">
         {outputType === 'pdf' && <PdfPreview downloadUrl={downloadUrl} />}
         {outputType === 'image' && <ImagePreview downloadUrl={downloadUrl} filename={downloadFilename} />}
+
+        {/* File size comparison */}
+        {showSizeComparison && (
+          <div className="flex items-center justify-center gap-2 text-sm">
+            <span className="text-slate-400">{formatBytes(inputSize)}</span>
+            <span className="text-slate-500">&rarr;</span>
+            <span className={sizeColor}>{formatBytes(outputSize)}</span>
+            <span className={`text-xs ${sizeColor}`}>({reductionPercent})</span>
+          </div>
+        )}
       </div>
     </div>
   )

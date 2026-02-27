@@ -1,9 +1,12 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import type { TestConfig, TestScore } from './types'
 import { StatCards } from './stat-cards'
+import { ScoreChart } from './score-chart'
 import { ResultsTable } from './results-table'
+import { TestTips } from './test-tips'
+import { ShareResult } from './share-result'
 
 interface TestViewProps {
   config: TestConfig
@@ -20,6 +23,17 @@ export function TestView({
   onBack,
   onClearHistory,
 }: TestViewProps) {
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        onBack()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onBack])
+
   const history = scores?.history ?? []
   const attempts = scores?.attempts ?? 0
   const best = scores?.best
@@ -71,6 +85,9 @@ export function TestView({
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-2 max-w-xl mx-auto">
             {config.description}
           </p>
+          <p className="text-slate-400 dark:text-slate-500 text-xs mt-2">
+            Press <kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[10px] font-mono">Esc</kbd> to go back
+          </p>
         </div>
 
         {/* Game card area */}
@@ -84,6 +101,14 @@ export function TestView({
           unit={config.unit}
         />
 
+        {/* Score trend chart */}
+        <ScoreChart
+          history={history}
+          color={config.gameBgColor}
+          unit={config.unit}
+          lowerIsBetter={config.lowerIsBetter}
+        />
+
         {/* Results table */}
         {history.length > 0 && best !== undefined && (
           <ResultsTable
@@ -94,6 +119,21 @@ export function TestView({
             onClear={onClearHistory}
           />
         )}
+
+        {/* Share results */}
+        {best !== undefined && (
+          <div className="mt-6">
+            <ShareResult
+              testName={config.name}
+              score={best}
+              unit={config.unit}
+              color={config.gameBgColor}
+            />
+          </div>
+        )}
+
+        {/* Tips & strategies */}
+        <TestTips testId={config.id} />
       </main>
     </div>
   )

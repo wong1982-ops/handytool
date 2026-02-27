@@ -1,4 +1,6 @@
 import type { ColorPreset, ECardData, Template } from './types'
+import { BUSINESS_CARD_TEMPLATES } from './business-card-templates'
+import { NEW_ECARD_TEMPLATES } from './ecard-templates'
 
 export const COLOR_PRESETS: ColorPreset[] = [
   { name: 'Gold', background: '#101922', accent: '#D4AF37' },
@@ -23,9 +25,11 @@ export const TEMPLATES: Template[] = [
     description: 'Classic marble elegance with golden arcs and refined typography',
     category: 'classic-marble',
     categoryLabel: 'Classic Marble',
+    cardType: 'ecard',
     defaults: {
       template: 'executive',
       layout: 'centered',
+      cardType: 'ecard',
       heading: 'Your Name',
       subheading: 'Chief Executive Officer',
       body: 'Leading innovation with vision and purpose.',
@@ -46,6 +50,10 @@ export const TEMPLATES: Template[] = [
       logoUrl: '',
       logoX: 85,
       logoY: 80,
+      phone: '',
+      email: '',
+      website: '',
+      address: '',
     },
   },
   {
@@ -54,9 +62,11 @@ export const TEMPLATES: Template[] = [
     description: 'Corporate authority with deep navy and crisp pinstripe accents',
     category: 'corporate',
     categoryLabel: 'Corporate',
+    cardType: 'ecard',
     defaults: {
       template: 'midnight-pinstripe',
       layout: 'left',
+      cardType: 'ecard',
       heading: 'Your Name',
       subheading: 'Managing Director',
       body: 'Driving results through strategic leadership.',
@@ -77,6 +87,10 @@ export const TEMPLATES: Template[] = [
       logoUrl: '',
       logoX: 85,
       logoY: 80,
+      phone: '',
+      email: '',
+      website: '',
+      address: '',
     },
   },
   {
@@ -85,9 +99,11 @@ export const TEMPLATES: Template[] = [
     description: 'Modernist precision with light tones and technical grid overlay',
     category: 'modernist',
     categoryLabel: 'Modernist',
+    cardType: 'ecard',
     defaults: {
       template: 'tech-blueprint',
       layout: 'split',
+      cardType: 'ecard',
       heading: 'Your Name',
       subheading: 'Head of Engineering',
       body: 'Building the future, one line of code at a time.',
@@ -108,6 +124,10 @@ export const TEMPLATES: Template[] = [
       logoUrl: '',
       logoX: 85,
       logoY: 80,
+      phone: '',
+      email: '',
+      website: '',
+      address: '',
     },
   },
   {
@@ -116,9 +136,11 @@ export const TEMPLATES: Template[] = [
     description: 'Ethereal warmth with earthy gradients and organic copper tones',
     category: 'ethereal',
     categoryLabel: 'Ethereal',
+    cardType: 'ecard',
     defaults: {
       template: 'aura-signature',
       layout: 'right-banner',
+      cardType: 'ecard',
       heading: 'Your Name',
       subheading: 'Creative Director',
       body: 'Crafting experiences that resonate and inspire.',
@@ -139,6 +161,10 @@ export const TEMPLATES: Template[] = [
       logoUrl: '',
       logoX: 85,
       logoY: 80,
+      phone: '',
+      email: '',
+      website: '',
+      address: '',
     },
   },
   {
@@ -147,9 +173,11 @@ export const TEMPLATES: Template[] = [
     description: 'Noir sophistication with matte black and subtle silver accents',
     category: 'noir',
     categoryLabel: 'Noir',
+    cardType: 'ecard',
     defaults: {
       template: 'black-tie-matte',
       layout: 'minimal',
+      cardType: 'ecard',
       heading: 'Your Name',
       subheading: 'Principal Architect',
       body: 'Designing spaces that define generations.',
@@ -170,6 +198,10 @@ export const TEMPLATES: Template[] = [
       logoUrl: '',
       logoX: 85,
       logoY: 80,
+      phone: '',
+      email: '',
+      website: '',
+      address: '',
     },
   },
 ]
@@ -177,6 +209,7 @@ export const TEMPLATES: Template[] = [
 export const BLANK_DEFAULTS: ECardData = {
   template: 'blank',
   layout: 'centered',
+  cardType: 'ecard',
   heading: '',
   subheading: '',
   body: '',
@@ -197,4 +230,10 @@ export const BLANK_DEFAULTS: ECardData = {
   logoUrl: '',
   logoX: 85,
   logoY: 80,
+  phone: '',
+  email: '',
+  website: '',
+  address: '',
 }
+
+export const ALL_TEMPLATES: Template[] = [...TEMPLATES, ...NEW_ECARD_TEMPLATES, ...BUSINESS_CARD_TEMPLATES]
