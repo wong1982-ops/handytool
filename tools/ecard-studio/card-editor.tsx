@@ -38,6 +38,10 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
     else if (templateId === 'blank') setCardData({ ...BLANK_DEFAULTS })
   }, [setCardData])
 
+  const handleLoadCardData = useCallback((data: ECardData) => {
+    setCardData({ ...data })
+  }, [setCardData])
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
@@ -152,6 +156,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
       <TemplateStrip
         activeTemplate={cardData.template}
         onSelectTemplate={handleTemplateSelect}
+        onLoadCardData={handleLoadCardData}
       />
 
       {/* 2-Column Layout: Canvas + Edit Panel */}

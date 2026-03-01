@@ -4,37 +4,7 @@ import { useRef, useCallback, useState } from 'react'
 import type { CardLayout, ECardData, TextAlign } from '@/tools/ecard-studio/types'
 import { PATTERNS } from '@/tools/ecard-studio/patterns'
 import { COLOR_PRESETS, FONT_OPTIONS } from '@/tools/ecard-studio/templates'
-
-const SAVED_TEMPLATES_KEY = 'ecard-studio-saved-templates'
-
-interface SavedTemplate {
-  id: string
-  name: string
-  savedAt: number
-  data: ECardData
-}
-
-function getSavedTemplates(): SavedTemplate[] {
-  try {
-    const raw = localStorage.getItem(SAVED_TEMPLATES_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
-  }
-}
-
-function saveTemplate(name: string, data: ECardData): void {
-  const existing = getSavedTemplates()
-  const entry: SavedTemplate = {
-    id: `custom-${Date.now()}`,
-    name,
-    savedAt: Date.now(),
-    data: { ...data },
-  }
-  existing.unshift(entry)
-  // Keep max 20 saved templates
-  localStorage.setItem(SAVED_TEMPLATES_KEY, JSON.stringify(existing.slice(0, 20)))
-}
+import { saveTemplate } from '@/tools/ecard-studio/saved-templates'
 
 interface CustomizationPanelProps {
   cardData: ECardData
