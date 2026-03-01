@@ -57,6 +57,8 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-slate-950 overflow-hidden lg:max-h-[calc(100vh-4rem)]">
+      {/* Fullscreen lock: editor needs body overflow hidden + no footer */}
+      <style dangerouslySetInnerHTML={{ __html: 'html, body { height: 100dvh !important; min-height: 100dvh !important; overflow: hidden !important; } body > footer { display: none !important; }' }} />
       {/* Top Bar */}
       <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between flex-shrink-0">
         {/* Left: Breadcrumb */}
@@ -80,10 +82,10 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
           <button
             type="button"
             onClick={() => setShowMobilePanel(true)}
-            className="lg:hidden p-2 text-slate-400 hover:text-white transition-colors"
+            className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-slate-300 hover:text-white border border-slate-700 hover:border-slate-500 rounded-md transition-colors"
             aria-label="Open editor panel"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <circle cx="10" cy="10" r="2" stroke="currentColor" strokeWidth="2" />
               <path
                 d="M10 2V5M10 15V18M2 10H5M15 10H18M4.22 4.22L6.34 6.34M13.66 13.66L15.78 15.78M15.78 4.22L13.66 6.34M6.34 13.66L4.22 15.78"
@@ -92,12 +94,13 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
                 strokeLinecap="round"
               />
             </svg>
+            Edit
           </button>
           <button
             type="button"
             onClick={undo}
             disabled={!canUndo}
-            className="p-2 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="hidden sm:block p-2 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Undo"
             title="Undo (Ctrl+Z)"
           >
@@ -110,7 +113,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
             type="button"
             onClick={redo}
             disabled={!canRedo}
-            className="p-2 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="hidden sm:block p-2 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Redo"
             title="Redo (Ctrl+Shift+Z)"
           >
@@ -140,7 +143,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
                 strokeLinejoin="round"
               />
             </svg>
-            Download
+            <span className="hidden sm:inline">Download</span>
           </button>
         </div>
       </div>
@@ -152,7 +155,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
       />
 
       {/* 2-Column Layout: Canvas + Edit Panel */}
-      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
         {/* Left: Card Canvas */}
         <div className="flex-1 min-w-0 min-h-[60vh] lg:min-h-0">
           <CardCanvas
@@ -165,7 +168,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
         </div>
 
         {/* Right: Edit Panel — desktop */}
-        <div className="w-[320px] flex-shrink-0 border-l border-slate-800 overflow-y-auto hidden lg:block">
+        <div className="w-[320px] flex-shrink-0 border-l border-slate-800 overflow-y-auto hidden lg:block min-h-0">
           <CustomizationPanel
             cardData={cardData}
             onChange={handleCardChange}

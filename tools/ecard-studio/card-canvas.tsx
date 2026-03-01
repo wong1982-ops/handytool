@@ -142,18 +142,16 @@ export function CardCanvas({ cardData, cardRef, zoom, onZoomChange, onLogoMove }
 
       {/* Smart Recommendation Banner — bottom-center */}
       {showBanner && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 max-w-[90%]">
-          <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700 rounded-xl px-4 py-2 flex items-center gap-3">
-            <span className="shrink-0 text-xs font-semibold tracking-wide uppercase bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">
+        <div className="absolute bottom-3 left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-20 sm:max-w-[90%]">
+          <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700 rounded-xl px-3 py-2 sm:px-4 flex items-start sm:items-center gap-2 sm:gap-3">
+            <span className="shrink-0 text-[10px] sm:text-xs font-semibold tracking-wide uppercase bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">
               Smart Recommendation
             </span>
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-xs text-slate-400 shrink-0">Suggested for:</span>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Real Estate</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">Tech Startup</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Holiday Greeting</span>
-              </div>
+            <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
+              <span className="text-[10px] sm:text-xs text-slate-400 shrink-0">Suggested for:</span>
+              <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Real Estate</span>
+              <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">Tech Startup</span>
+              <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Holiday Greeting</span>
             </div>
             <button
               type="button"

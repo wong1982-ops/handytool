@@ -873,6 +873,33 @@ When adding any scrollable element (dropdown, textarea, code panel, list), visua
 - [ ] Dark mode: dark gray thumb on transparent track
 - [ ] Hover: thumb turns brand primary color
 
+## Nielsen's 10 Usability Heuristics (MANDATORY)
+
+All UI design decisions MUST consider these heuristics. When reviewing or building UI, check each applies:
+
+| # | Heuristic | Application |
+|---|-----------|------------|
+| H1 | **Visibility of System Status** | Show loading states, progress indicators, live counts, filter state summaries. Users should always know what's happening. |
+| H2 | **Match Between System & Real World** | Use natural language, familiar icons (emoji for categories), "Showing X of Y" instead of technical counts. |
+| H3 | **User Control & Freedom** | Clear/undo buttons, removable filter pills, close buttons on modals/drawers, "Clear all" actions. Never trap users. |
+| H4 | **Consistency & Standards** | Same chip styles everywhere, same tab patterns, same hover states. Follow platform conventions. |
+| H5 | **Error Prevention** | Disable actions that would yield 0 results, validate input before submit, confirm destructive actions. |
+| H6 | **Recognition over Recall** | Show active filters as visible pills, show tab counts, use clear labels not just icons. |
+| H7 | **Flexibility & Efficiency** | Support keyboard shortcuts, allow search + browse + filter to compose, power user paths alongside beginner paths. |
+| H8 | **Aesthetic & Minimalist Design** | No duplicate controls, strip non-essential elements, every pixel earns its place. |
+| H9 | **Help Users Recover from Errors** | Friendly empty states with clear recovery path, retry buttons, "no results" with filter clear suggestion. |
+| H10 | **Help & Documentation** | Placeholder text guides input, tooltips on icons, contextual help near complex features. |
+
+### Checklist for New Features
+
+When building any new UI feature, verify:
+- [ ] H1: Is system status always visible? (loading, counts, progress)
+- [ ] H3: Can the user undo/clear/escape every action?
+- [ ] H5: Are impossible/empty states prevented?
+- [ ] H6: Are active states clearly shown? (filters, selections, modes)
+- [ ] H8: Is every element necessary?
+- [ ] H9: Does the empty/error state guide the user to recovery?
+
 ## Component Patterns
 
 - Reusable UI → `components/ui/`

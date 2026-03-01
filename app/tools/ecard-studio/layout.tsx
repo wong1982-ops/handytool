@@ -54,7 +54,7 @@ const jsonLd = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: 'html, body { height: 100dvh !important; min-height: 100dvh !important; overflow: hidden !important; } body > footer { display: none !important; }' }} />
+      {/* Fullscreen styles are injected by CardEditor when in editor mode */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
