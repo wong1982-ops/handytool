@@ -6,7 +6,7 @@ import { useTestScores } from '@/tools/human-benchmark/use-test-scores'
 import { TestView } from '@/tools/human-benchmark/test-view'
 import type { ViewState, TestId, TestComponentProps } from '@/tools/human-benchmark/types'
 
-// Import all 8 test components
+// Import all 12 test components
 import { ReactionTime } from '@/tools/human-benchmark/tests/reaction-time'
 import { SequenceMemory } from '@/tools/human-benchmark/tests/sequence-memory'
 import { AimTrainer } from '@/tools/human-benchmark/tests/aim-trainer'
@@ -15,6 +15,10 @@ import { VerbalMemory } from '@/tools/human-benchmark/tests/verbal-memory'
 import { ChimpTest } from '@/tools/human-benchmark/tests/chimp-test'
 import { VisualMemory } from '@/tools/human-benchmark/tests/visual-memory'
 import { TypingTest } from '@/tools/human-benchmark/tests/typing-test'
+import { PitchIdentification } from '@/tools/human-benchmark/tests/pitch-identification'
+import { MentalRotation } from '@/tools/human-benchmark/tests/mental-rotation'
+import { SchulteGrid } from '@/tools/human-benchmark/tests/schulte-grid'
+import { RhythmTest } from '@/tools/human-benchmark/tests/rhythm-test'
 
 const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentProps>>> = {
   'reaction-time': ReactionTime,
@@ -25,6 +29,10 @@ const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentP
   'chimp-test': ChimpTest,
   'visual-memory': VisualMemory,
   'typing': TypingTest,
+  'pitch-identification': PitchIdentification,
+  'mental-rotation': MentalRotation,
+  'schulte-grid': SchulteGrid,
+  'rhythm-test': RhythmTest,
 }
 
 export default function HumanBenchmarkPage() {
