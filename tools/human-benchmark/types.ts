@@ -7,6 +7,10 @@ export type TestId =
   | 'chimp-test'
   | 'visual-memory'
   | 'typing'
+  | 'pitch-identification'
+  | 'mental-rotation'
+  | 'schulte-grid'
+  | 'rhythm-test'
 
 export type ViewState = 'dashboard' | TestId
 
