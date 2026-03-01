@@ -130,7 +130,7 @@ function LoadingSkeleton() {
       {/* Hero skeleton */}
       <div className="bg-white dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 text-center">
         <div className="h-4 w-48 bg-slate-200 dark:bg-slate-700 rounded mx-auto mb-4 animate-pulse" />
-        <div className="h-16 md:h-20 w-80 bg-slate-200 dark:bg-slate-700 rounded mx-auto mb-4 animate-pulse" />
+        <div className="h-16 md:h-20 w-full max-w-80 bg-slate-200 dark:bg-slate-700 rounded mx-auto mb-4 animate-pulse" />
         <div className="h-4 w-56 bg-slate-200 dark:bg-slate-700 rounded mx-auto animate-pulse" />
       </div>
 

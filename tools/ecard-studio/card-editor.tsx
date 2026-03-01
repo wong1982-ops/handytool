@@ -56,7 +56,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
   }, [cardData.template])
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 bg-slate-950 overflow-hidden">
+    <div className="flex flex-col flex-1 min-h-0 bg-slate-950 overflow-hidden lg:max-h-[calc(100vh-4rem)]">
       {/* Top Bar */}
       <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between flex-shrink-0">
         {/* Left: Breadcrumb */}
@@ -152,9 +152,9 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
       />
 
       {/* 2-Column Layout: Canvas + Edit Panel */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         {/* Left: Card Canvas */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 min-h-[60vh] lg:min-h-0">
           <CardCanvas
             cardData={cardData}
             cardRef={cardRef}

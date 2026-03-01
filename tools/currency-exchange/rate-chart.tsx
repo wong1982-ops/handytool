@@ -125,7 +125,7 @@ export function RateChart({ data, from, to, period, onPeriodChange, loading }: R
               role="tab"
               aria-selected={period === p}
               onClick={() => onPeriodChange(p)}
-              className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+              className={`px-4 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer ${
                 period === p
                   ? 'bg-white dark:bg-slate-700 text-[var(--tk-color-primary-500)] shadow-sm'
                   : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'

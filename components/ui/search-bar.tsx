@@ -66,7 +66,7 @@ export function SearchBar({
           onChange={(e) => handleChange(e.target.value)}
           aria-invalid={!!error}
           aria-describedby={error ? 'search-input-error' : undefined}
-          className={`w-full h-[54px] pl-12 pr-36 bg-white dark:bg-slate-900 border rounded-xl focus:ring-2 focus:border-transparent transition-all shadow-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 ${
+          className={`w-full h-[54px] pl-12 pr-28 sm:pr-36 bg-white dark:bg-slate-900 border rounded-xl focus:ring-2 focus:border-transparent transition-all shadow-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 ${
             error
               ? 'border-red-500 dark:border-red-400 focus:ring-red-500'
               : 'border-slate-200 dark:border-slate-800 focus:ring-[var(--tk-color-primary-500)]'
@@ -77,7 +77,7 @@ export function SearchBar({
           <button
             type="button"
             onClick={() => handleChange('')}
-            className="absolute right-[7.5rem] top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="absolute right-[5.5rem] sm:right-[7.5rem] top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             aria-label="Clear search"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -87,7 +87,7 @@ export function SearchBar({
         )}
         <button
           type="submit"
-          className="absolute right-2 top-2 bottom-2 px-6 bg-[var(--tk-color-primary-500)] text-white rounded-lg font-bold text-sm hover:opacity-90 transition-all cursor-pointer"
+          className="absolute right-2 top-2 bottom-2 px-4 sm:px-6 bg-[var(--tk-color-primary-500)] text-white rounded-lg font-bold text-sm hover:opacity-90 transition-all cursor-pointer"
         >
           {buttonLabel}
         </button>

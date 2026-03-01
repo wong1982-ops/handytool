@@ -169,7 +169,7 @@ export default function IpCheckPage() {
   }, [lastQuery, fetchIp])
 
   return (
-    <main className="max-w-5xl mx-auto px-6 py-8 md:py-5 flex-1">
+    <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-5 flex-1 overflow-x-hidden">
       <nav aria-label="Breadcrumb" className="mb-6 md:mb-4">
         <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
           <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
@@ -260,7 +260,7 @@ function LoadingSkeleton() {
     <div aria-busy="true" aria-label="Loading IP information">
       <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-2xl shadow-xl p-8 md:p-6 text-center">
         <div className="h-4 w-48 bg-slate-200 dark:bg-slate-700 rounded mx-auto mb-3 animate-pulse" />
-        <div className="h-14 md:h-14 w-80 bg-slate-200 dark:bg-slate-700 rounded mx-auto mb-4 animate-pulse" />
+        <div className="h-14 md:h-14 w-full max-w-80 bg-slate-200 dark:bg-slate-700 rounded mx-auto mb-4 animate-pulse" />
         <div className="flex justify-center gap-4 mb-4">
           <div className="h-8 w-40 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse" />
           <div className="h-8 w-32 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse" />

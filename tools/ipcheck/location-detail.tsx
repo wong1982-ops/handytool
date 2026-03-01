@@ -50,7 +50,7 @@ export function LocationDetail({ data }: LocationDetailProps) {
         <div className="p-6 md:p-5 md:col-span-1 border-r border-slate-200 dark:border-slate-800">
           <DetailList title="Detailed Location" items={items} />
         </div>
-        <div className="md:col-span-2 min-h-[300px] relative" role="img" aria-label="Map showing IP location">
+        <div className="md:col-span-2 min-h-[300px] relative overflow-hidden" role="img" aria-label="Map showing IP location">
           <LocationMap lat={data.lat} lng={data.lng} />
         </div>
       </div>

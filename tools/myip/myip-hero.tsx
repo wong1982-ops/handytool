@@ -23,7 +23,7 @@ export function MyIpHero({ ip, ipVersion = 'ipv4', isSecure }: MyIpHeroProps) {
         {ipVersion === 'ipv6' ? 'Your Public IPv6 Address' : 'Your Public IPv4 Address'}
       </h1>
       <div className="flex flex-wrap items-center justify-center gap-4">
-        <p className="text-slate-900 dark:text-white text-5xl md:text-7xl font-black tracking-tight">
+        <p className="text-slate-900 dark:text-white text-3xl sm:text-5xl md:text-7xl font-black tracking-tight break-all sm:break-normal">
           {ip}
         </p>
         <button

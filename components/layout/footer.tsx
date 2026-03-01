@@ -30,7 +30,7 @@ export function Footer({
             &copy; {new Date().getFullYear()} {brandName}
           </span>
         </div>
-        <div className="flex gap-8">
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 sm:gap-8">
           {links.map((link) => (
             <Link
               key={link.href + link.label}

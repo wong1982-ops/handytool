@@ -21,7 +21,7 @@ export function IpHeroCard({ ip, ipVersion = 'ipv4', ipv6, location, isSecure, o
       <p className="text-[var(--tk-color-primary-500)] text-sm font-bold uppercase tracking-widest mb-3 md:mb-2">
         {label}
       </p>
-      <h1 className="text-5xl md:text-5xl font-bold mb-4 md:mb-3 tracking-tight text-slate-900 dark:text-white">
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-3 tracking-tight text-slate-900 dark:text-white break-all sm:break-normal">
         {ip}
       </h1>
       {ipv6 && (
