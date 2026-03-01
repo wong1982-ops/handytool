@@ -1,16 +1,48 @@
 'use client'
 
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useState } from 'react'
 import type { CardLayout, ECardData, TextAlign } from '@/tools/ecard-studio/types'
 import { PATTERNS } from '@/tools/ecard-studio/patterns'
 import { COLOR_PRESETS, FONT_OPTIONS } from '@/tools/ecard-studio/templates'
 
+const SAVED_TEMPLATES_KEY = 'ecard-studio-saved-templates'
+
+interface SavedTemplate {
+  id: string
+  name: string
+  savedAt: number
+  data: ECardData
+}
+
+function getSavedTemplates(): SavedTemplate[] {
+  try {
+    const raw = localStorage.getItem(SAVED_TEMPLATES_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+function saveTemplate(name: string, data: ECardData): void {
+  const existing = getSavedTemplates()
+  const entry: SavedTemplate = {
+    id: `custom-${Date.now()}`,
+    name,
+    savedAt: Date.now(),
+    data: { ...data },
+  }
+  existing.unshift(entry)
+  // Keep max 20 saved templates
+  localStorage.setItem(SAVED_TEMPLATES_KEY, JSON.stringify(existing.slice(0, 20)))
+}
+
 interface CustomizationPanelProps {
   cardData: ECardData
   onChange: (updates: Partial<ECardData>) => void
+  onDownload?: () => void
 }
 
-export function CustomizationPanel({ cardData, onChange }: CustomizationPanelProps) {
+export function CustomizationPanel({ cardData, onChange, onDownload }: CustomizationPanelProps) {
   const bgColorRef = useRef<HTMLInputElement>(null)
   const accentColorRef = useRef<HTMLInputElement>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
@@ -698,28 +730,94 @@ export function CustomizationPanel({ cardData, onChange }: CustomizationPanelPro
         </div>
       </section>
 
-      {/* Save as Template */}
-      <button
-        type="button"
-        disabled
-        className="mt-auto flex items-center justify-center gap-2 w-full bg-slate-800 border border-slate-700 rounded-xl py-3 text-sm text-slate-500 cursor-not-allowed transition-colors"
-      >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
+      {/* Action Buttons */}
+      <ActionButtons cardData={cardData} onDownload={onDownload} />
+    </div>
+  )
+}
+
+/* ---------- Action Buttons ---------- */
+
+function ActionButtons({ cardData, onDownload }: { cardData: ECardData; onDownload?: () => void }) {
+  const [saveState, setSaveState] = useState<'idle' | 'naming' | 'saved'>('idle')
+  const [templateName, setTemplateName] = useState('')
+
+  const handleSave = () => {
+    const name = templateName.trim() || `My ${cardData.template} card`
+    saveTemplate(name, cardData)
+    setSaveState('saved')
+    setTemplateName('')
+    setTimeout(() => setSaveState('idle'), 2000)
+  }
+
+  return (
+    <div className="flex flex-col gap-2 mt-auto pt-4 border-t border-slate-800">
+      {/* Download */}
+      {onDownload && (
+        <button
+          type="button"
+          onClick={onDownload}
+          className="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-500 rounded-xl py-3 text-sm text-white font-medium transition-colors"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 18h16" />
+          </svg>
+          Download Card
+        </button>
+      )}
+
+      {/* Save as Template */}
+      {saveState === 'idle' && (
+        <button
+          type="button"
+          onClick={() => setSaveState('naming')}
+          className="flex items-center justify-center gap-2 w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 rounded-xl py-3 text-sm text-slate-300 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>
+          Save as Template
+        </button>
+      )}
+
+      {saveState === 'naming' && (
+        <div className="flex flex-col gap-2">
+          <input
+            type="text"
+            value={templateName}
+            onChange={(e) => setTemplateName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSave() }}
+            placeholder="Template name..."
+            autoFocus
+            className="w-full bg-slate-800 border border-slate-600 rounded-lg text-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-        </svg>
-        Save as Template
-        <span className="text-[10px] text-slate-600 ml-1">Coming soon</span>
-      </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleSave}
+              className="flex-1 py-2 text-sm bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => { setSaveState('idle'); setTemplateName('') }}
+              className="flex-1 py-2 text-sm bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg border border-slate-700 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {saveState === 'saved' && (
+        <div className="flex items-center justify-center gap-2 w-full bg-emerald-500/10 border border-emerald-500/30 rounded-xl py-3 text-sm text-emerald-400">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          Template Saved!
+        </div>
+      )}
     </div>
   )
 }

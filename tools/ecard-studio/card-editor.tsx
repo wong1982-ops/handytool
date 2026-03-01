@@ -173,6 +173,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
           <CustomizationPanel
             cardData={cardData}
             onChange={handleCardChange}
+            onDownload={handleDownload}
           />
         </div>
       </div>
@@ -212,6 +213,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
             <CustomizationPanel
               cardData={cardData}
               onChange={handleCardChange}
+              onDownload={handleDownload}
             />
           </div>
         </>
