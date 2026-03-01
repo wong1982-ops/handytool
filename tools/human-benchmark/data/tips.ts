@@ -49,4 +49,32 @@ export const TEST_TIPS: Record<string, string[]> = {
     'Practice regularly with different text to build muscle memory',
     'Keep your wrists relaxed and slightly elevated',
   ],
+  'pitch-identification': [
+    'Use headphones for clearer sound — speakers can distort subtle pitch differences',
+    'Hum along with the tone to better internalize the pitch before answering',
+    'Learn the reference pitch A4 (440Hz) — it helps anchor other notes',
+    'Listen for the "brightness" or "darkness" of a tone rather than trying to name it instantly',
+    'Practice with a piano or tuner app to train your ear between sessions',
+  ],
+  'mental-rotation': [
+    'Focus on one distinctive feature of the shape (a corner or notch) and trace where it moves',
+    'Mentally rotate the shape in small increments rather than trying to visualize the full rotation at once',
+    'Look for asymmetric features — they make it easier to distinguish rotations from mirrors',
+    'Use your finger to trace the outline if needed, especially on harder levels',
+    'Eliminate mirror images first — they are the most common distractors',
+  ],
+  'schulte-grid': [
+    'Soften your gaze to take in the whole grid at once rather than scanning cell by cell',
+    'Start by locating 1, but use peripheral vision to spot 2 and 3 nearby while tapping',
+    'Practice expanding your peripheral vision — it is the key skill for this test',
+    'Keep your eyes near the center of the grid and let numbers come to you',
+    'Avoid reading numbers sequentially left-to-right; let your eyes jump to the next target',
+  ],
+  'rhythm-test': [
+    'Tap along lightly during the listen phase to build muscle memory before recording',
+    'Focus on the spacing between beats, not the beats themselves',
+    'Use your whole body to feel the rhythm — nod or bob to internalize the tempo',
+    'Listen for the "groove" or pattern, not individual clicks',
+    'Stay relaxed — tension in your hand will throw off your timing',
+  ],
 }
