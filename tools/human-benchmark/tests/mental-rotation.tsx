@@ -67,26 +67,16 @@ function generateRound(level: number): {
   const correctAngle = pickRandom(angles)
   const correctPoints = rotatePoints(shape.points, correctAngle)
 
-  // Generate 3 distractors: mirror first, then rotate
+  // Generate 3 distractors: mirror first, then rotate at different angles
   const mirrored = mirrorPoints(shape.points)
-  const usedAngles = new Set<number>([correctAngle])
   const distractors: [number, number][][] = []
 
-  // Pick 3 unique angles for distractors
-  const availableAngles = angles.filter((a) => a !== correctAngle)
-  const shuffledAngles = shuffleArray(availableAngles)
-
+  // Build pool of distractor angles — allow reuse if not enough unique ones
+  const otherAngles = shuffleArray(angles.filter((a) => a !== correctAngle))
   for (let i = 0; i < 3; i++) {
-    let angle: number
-    if (i < shuffledAngles.length) {
-      angle = shuffledAngles[i]
-    } else {
-      // Fallback: use any angle not yet used
-      do {
-        angle = pickRandom(angles)
-      } while (usedAngles.has(angle))
-    }
-    usedAngles.add(angle)
+    // Cycle through available angles, reusing if needed (mirrored shapes
+    // with same angle still look different from the correct rotated shape)
+    const angle = otherAngles[i % otherAngles.length]
     distractors.push(rotatePoints(mirrored, angle))
   }
 
