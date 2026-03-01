@@ -440,8 +440,8 @@ const CardPreview = forwardRef<HTMLDivElement, CardPreviewProps>(
               className="z-[5] pointer-events-none"
               style={{
                 position: 'absolute',
-                width: 60,
-                height: 60,
+                width: 60 * ((data.logoScale || 100) / 100),
+                height: 60 * ((data.logoScale || 100) / 100),
                 objectFit: 'contain',
                 left: `${data.logoX}%`,
                 top: `${data.logoY}%`,

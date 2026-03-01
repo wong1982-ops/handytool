@@ -102,6 +102,8 @@ export interface ECardData {
   logoX: number
   /** Logo Y position as percentage (0–100) of the card height */
   logoY: number
+  /** Logo scale as percentage (25–200, default 100 = 60px base) */
+  logoScale: number
   /** Business card contact fields */
   phone: string
   email: string

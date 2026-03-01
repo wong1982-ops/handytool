@@ -164,6 +164,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
             zoom={zoom}
             onZoomChange={setZoom}
             onLogoMove={handleLogoMove}
+            onSelectTemplate={handleTemplateSelect}
           />
         </div>
 

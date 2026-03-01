@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import type { ECardData } from '@/tools/ecard-studio/types'
+import { useState, useMemo } from 'react'
+import type { ECardData, TemplateId } from '@/tools/ecard-studio/types'
+import { ALL_TEMPLATES } from '@/tools/ecard-studio/templates'
 import CardPreview from '@/tools/ecard-studio/card-preview'
 
 /* ------------------------------------------------------------------ */
@@ -60,9 +61,10 @@ export interface CardCanvasProps {
   zoom: number
   onZoomChange: (zoom: number) => void
   onLogoMove?: (logoX: number, logoY: number) => void
+  onSelectTemplate?: (templateId: TemplateId) => void
 }
 
-export function CardCanvas({ cardData, cardRef, zoom, onZoomChange, onLogoMove }: CardCanvasProps) {
+export function CardCanvas({ cardData, cardRef, zoom, onZoomChange, onLogoMove, onSelectTemplate }: CardCanvasProps) {
   const [showBanner, setShowBanner] = useState(true)
 
   const handleZoomOut = () => {
@@ -72,6 +74,19 @@ export function CardCanvas({ cardData, cardRef, zoom, onZoomChange, onLogoMove }
   const handleZoomIn = () => {
     onZoomChange(Math.min(200, zoom + 10))
   }
+
+  // Get contextual suggestions based on current template's category, fallback to same cardType
+  const suggestions = useMemo(() => {
+    const current = ALL_TEMPLATES.find((t) => t.id === cardData.template)
+    if (!current) return []
+    // Try same category first
+    const sameCategory = ALL_TEMPLATES.filter((t) => t.id !== current.id && t.category === current.category)
+    if (sameCategory.length >= 2) return sameCategory.slice(0, 3)
+    // Fallback: same card type
+    return ALL_TEMPLATES
+      .filter((t) => t.id !== current.id && t.cardType === current.cardType)
+      .slice(0, 3)
+  }, [cardData.template])
 
   return (
     <div className="relative h-full">
@@ -141,26 +156,40 @@ export function CardCanvas({ cardData, cardRef, zoom, onZoomChange, onLogoMove }
       </div>
 
       {/* Smart Recommendation Banner — bottom-center */}
-      {showBanner && (
+      {showBanner && suggestions.length > 0 && (
         <div className="absolute bottom-3 left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-20 sm:max-w-[90%]">
-          <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700 rounded-xl px-3 py-2 sm:px-4 flex items-start sm:items-center gap-2 sm:gap-3">
-            <span className="shrink-0 text-[10px] sm:text-xs font-semibold tracking-wide uppercase bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">
-              Smart Recommendation
-            </span>
-            <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
-              <span className="text-[10px] sm:text-xs text-slate-400 shrink-0">Suggested for:</span>
-              <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Real Estate</span>
-              <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">Tech Startup</span>
-              <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Holiday Greeting</span>
+          <div className="bg-slate-800/90 backdrop-blur-md border border-slate-700/80 rounded-xl px-3 py-2.5 sm:px-4 shadow-lg shadow-black/20">
+            <div className="flex items-center gap-2 mb-2">
+              <svg className="w-3.5 h-3.5 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M10 2a6 6 0 00-2 11.66V16a2 2 0 104 0v-2.34A6 6 0 0010 2zM8 17a1 1 0 001 1h2a1 1 0 001-1v-.08a6.06 6.06 0 01-4 0V17z" />
+              </svg>
+              <span className="text-[10px] sm:text-xs text-slate-400">Similar templates you might like</span>
+              <button
+                type="button"
+                onClick={() => setShowBanner(false)}
+                className="ml-auto text-slate-500 hover:text-white p-0.5 rounded-md hover:bg-slate-700 shrink-0 transition-colors"
+                aria-label="Dismiss recommendation"
+              >
+                <CloseIcon />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowBanner(false)}
-              className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-700 shrink-0"
-              aria-label="Dismiss recommendation"
-            >
-              <CloseIcon />
-            </button>
+            <div className="flex items-center gap-2">
+              {suggestions.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => onSelectTemplate?.(t.id)}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-700/60 hover:bg-slate-600/80 border border-slate-600/50 hover:border-slate-500 text-[10px] sm:text-xs text-slate-300 hover:text-white transition-all cursor-pointer"
+                >
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ backgroundColor: t.defaults.accentColor }}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate max-w-[100px] sm:max-w-[140px]">{t.name}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

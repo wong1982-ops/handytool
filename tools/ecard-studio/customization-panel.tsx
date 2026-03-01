@@ -665,6 +665,27 @@ export function CustomizationPanel({ cardData, onChange }: CustomizationPanelPro
             </button>
           )}
 
+          {/* Logo Size Slider */}
+          {cardData.logoUrl && (
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-slate-500 uppercase tracking-wider">
+                  Logo Size
+                </label>
+                <span className="text-xs text-slate-400 tabular-nums">{cardData.logoScale || 100}%</span>
+              </div>
+              <input
+                type="range"
+                min={25}
+                max={200}
+                step={5}
+                value={cardData.logoScale || 100}
+                onChange={(e) => onChange({ logoScale: Number(e.target.value) })}
+                className="w-full h-1.5 bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-500"
+              />
+            </div>
+          )}
+
           {/* Logo Position hint */}
           {cardData.logoUrl && (
             <p className="text-[11px] text-slate-500 flex items-center gap-1.5">
