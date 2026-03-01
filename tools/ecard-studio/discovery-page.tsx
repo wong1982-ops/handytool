@@ -127,7 +127,7 @@ export function DiscoveryPage() {
                   key={tab.key}
                   type="button"
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-all duration-200 cursor-pointer ${
                     activeTab === tab.key
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white'
@@ -153,7 +153,7 @@ export function DiscoveryPage() {
                   key={occ.tag}
                   type="button"
                   onClick={() => toggleOccasion(occ.tag)}
-                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border transition-all duration-200 ${
+                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border transition-all duration-200 cursor-pointer ${
                     isActive
                       ? 'bg-blue-600/15 border-blue-500 text-white ring-1 ring-blue-500/50'
                       : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white hover:border-slate-500'
@@ -249,7 +249,7 @@ export function DiscoveryPage() {
             <button
               type="button"
               onClick={clearAllFilters}
-              className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+              className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors cursor-pointer"
             >
               Clear all filters
             </button>
@@ -299,7 +299,7 @@ export function DiscoveryPage() {
                   <button
                     type="button"
                     onClick={() => handlePersonalize(template.id)}
-                    className="w-full py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+                    className="w-full py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors cursor-pointer"
                   >
                     Personalize
                   </button>

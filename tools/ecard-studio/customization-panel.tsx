@@ -259,7 +259,7 @@ export function CustomizationPanel({ cardData, onChange, onDownload }: Customiza
               aria-label={`${label} layout`}
               aria-pressed={cardData.layout === value}
               onClick={() => onChange({ layout: value })}
-              className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-[10px] transition-colors ${
+              className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-[10px] transition-colors cursor-pointer ${
                 cardData.layout === value
                   ? 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/50'
                   : 'bg-slate-800 text-slate-400 hover:text-white'
@@ -347,7 +347,7 @@ export function CustomizationPanel({ cardData, onChange, onDownload }: Customiza
               aria-label={label}
               aria-pressed={cardData.textAlign === value}
               onClick={() => onChange({ textAlign: value })}
-              className={`p-2 rounded-lg transition-colors ${
+              className={`p-2 rounded-lg transition-colors cursor-pointer ${
                 cardData.textAlign === value
                   ? 'bg-blue-500/20 text-blue-400'
                   : 'text-slate-400 hover:text-white'
@@ -365,7 +365,7 @@ export function CustomizationPanel({ cardData, onChange, onDownload }: Customiza
             aria-label="Toggle bold"
             aria-pressed={cardData.bold}
             onClick={() => onChange({ bold: !cardData.bold })}
-            className={`px-2.5 py-2 rounded-lg font-bold text-sm transition-colors ${
+            className={`px-2.5 py-2 rounded-lg font-bold text-sm transition-colors cursor-pointer ${
               cardData.bold
                 ? 'bg-blue-500/20 text-blue-400'
                 : 'text-slate-400 hover:text-white'
@@ -413,7 +413,7 @@ export function CustomizationPanel({ cardData, onChange, onDownload }: Customiza
                 onClick={() =>
                   onChange({ backgroundColor: preset.background, accentColor: preset.accent })
                 }
-                className={`w-10 h-10 rounded-full shrink-0 transition-all ${
+                className={`w-10 h-10 rounded-full shrink-0 transition-all cursor-pointer ${
                   isActive ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-900' : ''
                 }`}
                 style={{ backgroundColor: preset.accent }}
@@ -500,7 +500,7 @@ export function CustomizationPanel({ cardData, onChange, onDownload }: Customiza
                 aria-label={`${p.label} pattern`}
                 aria-pressed={cardData.backgroundPattern === p.id}
                 onClick={() => onChange({ backgroundPattern: p.id })}
-                className={`px-2 py-1.5 rounded-md text-[10px] transition-colors ${
+                className={`px-2 py-1.5 rounded-md text-[10px] transition-colors cursor-pointer ${
                   cardData.backgroundPattern === p.id
                     ? 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/50'
                     : 'bg-slate-800 text-slate-400 hover:text-white'
@@ -538,14 +538,14 @@ export function CustomizationPanel({ cardData, onChange, onDownload }: Customiza
               <button
                 type="button"
                 onClick={() => patternInputRef.current?.click()}
-                className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-xs text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
               >
                 Change
               </button>
               <button
                 type="button"
                 onClick={() => onChange({ customPatternUrl: '' })}
-                className="text-xs text-slate-500 hover:text-red-400 transition-colors"
+                className="text-xs text-slate-500 hover:text-red-400 transition-colors cursor-pointer"
               >
                 Remove
               </button>
@@ -554,7 +554,7 @@ export function CustomizationPanel({ cardData, onChange, onDownload }: Customiza
             <button
               type="button"
               onClick={() => patternInputRef.current?.click()}
-              className="flex items-center justify-center gap-2 w-full py-1.5 bg-slate-800 border border-dashed border-slate-600 rounded-lg text-[11px] text-slate-400 hover:text-white hover:border-slate-400 transition-colors"
+              className="flex items-center justify-center gap-2 w-full py-1.5 bg-slate-800 border border-dashed border-slate-600 rounded-lg text-[11px] text-slate-400 hover:text-white hover:border-slate-400 transition-colors cursor-pointer"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                 <path d="M7 3V11M3 7H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -642,14 +642,14 @@ export function CustomizationPanel({ cardData, onChange, onDownload }: Customiza
               <button
                 type="button"
                 onClick={() => logoInputRef.current?.click()}
-                className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-xs text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
               >
                 Change
               </button>
               <button
                 type="button"
                 onClick={() => onChange({ logoUrl: '' })}
-                className="text-xs text-slate-500 hover:text-red-400 transition-colors"
+                className="text-xs text-slate-500 hover:text-red-400 transition-colors cursor-pointer"
               >
                 Remove
               </button>
@@ -658,7 +658,7 @@ export function CustomizationPanel({ cardData, onChange, onDownload }: Customiza
             <button
               type="button"
               onClick={() => logoInputRef.current?.click()}
-              className="flex items-center justify-center gap-2 w-full py-2 bg-slate-800 border border-dashed border-slate-600 rounded-lg text-sm text-slate-400 hover:text-white hover:border-slate-400 transition-colors"
+              className="flex items-center justify-center gap-2 w-full py-2 bg-slate-800 border border-dashed border-slate-600 rounded-lg text-sm text-slate-400 hover:text-white hover:border-slate-400 transition-colors cursor-pointer"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

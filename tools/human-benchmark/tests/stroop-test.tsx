@@ -37,10 +37,14 @@ function generateRound(level: number): {
   const otherColors = colors.filter((c) => c.name !== inkColor.name)
   const wordColor = pickRandom(otherColors)
 
+  // Ensure the correct answer (inkColor) is always among the options
+  const otherOptions = shuffleArray(colors.filter((c) => c.name !== inkColor.name)).slice(0, 3)
+  const finalOptions = shuffleArray([inkColor, ...otherOptions])
+
   return {
     word: wordColor.name.toUpperCase(),
     inkColor,
-    options: shuffleArray(colors).slice(0, 4),
+    options: finalOptions,
   }
 }
 

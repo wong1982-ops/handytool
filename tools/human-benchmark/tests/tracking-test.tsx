@@ -254,7 +254,7 @@ export function TrackingTest({ onComplete, bestScore }: TestComponentProps) {
               {/* Target */}
               <div
                 className={`absolute rounded-full transition-colors duration-100 ${
-                  isOnTarget ? 'bg-green-400' : 'bg-white'
+                  isOnTarget ? 'bg-green-400 shadow-[0_0_16px_rgba(74,222,128,0.6)]' : 'bg-white shadow-[0_0_16px_rgba(239,68,68,0.5)]'
                 }`}
                 style={{
                   width: TARGET_RADIUS * 2,
@@ -266,10 +266,15 @@ export function TrackingTest({ onComplete, bestScore }: TestComponentProps) {
               >
                 {/* Crosshair */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-[2px] h-full bg-black/30" />
-                  <div className="absolute w-full h-[2px] bg-black/30" />
+                  <div className={`w-[2px] h-full ${isOnTarget ? 'bg-black/30' : 'bg-red-600/50'}`} />
+                  <div className={`absolute w-full h-[2px] ${isOnTarget ? 'bg-black/30' : 'bg-red-600/50'}`} />
                 </div>
               </div>
+
+              {/* Off-target border indicator */}
+              {!isOnTarget && mouseRef.current.x >= 0 && (
+                <div className="absolute inset-0 rounded-xl border-2 border-red-500/40 pointer-events-none animate-pulse" />
+              )}
             </div>
           </div>
         )}

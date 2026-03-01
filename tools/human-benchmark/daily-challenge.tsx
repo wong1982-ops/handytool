@@ -97,7 +97,7 @@ export default function DailyChallenge({ onStartChallenge }: DailyChallengeProps
           </div>
           <button
             onClick={() => onStartChallenge(todayTest.id)}
-            className="bg-white text-slate-900 font-semibold px-6 py-2.5 rounded-lg hover:bg-white/90 transition-colors text-sm"
+            className="bg-white text-slate-900 font-semibold px-6 py-2.5 rounded-lg hover:bg-white/90 transition-colors text-sm cursor-pointer"
           >
             Take Challenge
           </button>
