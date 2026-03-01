@@ -16,7 +16,7 @@ import { ChimpTest } from '@/tools/human-benchmark/tests/chimp-test'
 import { VisualMemory } from '@/tools/human-benchmark/tests/visual-memory'
 import { TypingTest } from '@/tools/human-benchmark/tests/typing-test'
 
-const TEST_COMPONENTS: Record<TestId, React.ComponentType<TestComponentProps>> = {
+const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentProps>>> = {
   'reaction-time': ReactionTime,
   'sequence-memory': SequenceMemory,
   'aim-trainer': AimTrainer,
@@ -48,11 +48,18 @@ export default function HumanBenchmarkPage() {
 
   return (
     <TestView config={config} scores={testScore} onBack={handleBack} onClearHistory={() => clearHistory(view)}>
-      <TestComponent
-        onComplete={(score) => handleComplete(view, score)}
-        onBack={handleBack}
-        bestScore={testScore?.best}
-      />
+      {TestComponent != null ? (
+        <TestComponent
+          onComplete={(score: number) => handleComplete(view, score)}
+          onBack={handleBack}
+          bestScore={testScore?.best}
+        />
+      ) : (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <p className="text-slate-400 text-lg font-medium mb-2">Coming Soon</p>
+          <p className="text-slate-600 text-sm">This test is under development.</p>
+        </div>
+      )}
     </TestView>
   )
 }
