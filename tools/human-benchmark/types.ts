@@ -11,6 +11,14 @@ export type TestId =
   | 'mental-rotation'
   | 'schulte-grid'
   | 'rhythm-test'
+  | 'interval-recognition'
+  | 'chord-identification'
+  | 'tone-memory'
+  | 'higher-or-lower'
+  | 'stroop-test'
+  | 'quick-math'
+  | 'word-scramble'
+  | 'tracking-test'
 
 export type ViewState = 'dashboard' | TestId
 

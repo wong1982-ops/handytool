@@ -30,3 +30,17 @@ export function getRandomPattern(difficulty: 'easy' | 'medium' | 'hard'): Rhythm
   const patterns = getPatternsByDifficulty(difficulty)
   return patterns[Math.floor(Math.random() * patterns.length)]
 }
+
+export function generateRandomPattern(level: number): number[] {
+  const beatCount = 4 + Math.floor(Math.min(level, 8) / 2)
+  const baseTempo = Math.max(250, 600 - level * 30)
+  const jitter = Math.min(0.4, 0.1 + level * 0.03)
+
+  const beats: number[] = [0]
+  for (let i = 1; i < beatCount; i++) {
+    const variation = 1 + (Math.random() * 2 - 1) * jitter
+    const gap = Math.max(150, baseTempo * variation)
+    beats.push(Math.round(beats[i - 1] + gap))
+  }
+  return beats
+}

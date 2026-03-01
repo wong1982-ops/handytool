@@ -325,7 +325,7 @@ export const TEST_CONFIGS: TestConfig[] = [
   },
   {
     id: 'rhythm-test',
-    name: 'Rhythm Test',
+    name: 'Rhythm',
     description:
       'Listen to a rhythm pattern, then tap it back as accurately as you can.',
     icon: React.createElement(
@@ -349,7 +349,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     iconBgLight: 'bg-violet-100',
     iconColorLight: 'text-violet-600',
     gameBgColor: '#8b5cf6',
-    unit: '%',
+    unit: 'level',
     lowerIsBetter: false,
   },
 ]
