@@ -2,14 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { GameCard } from '../game-card'
-import { getRandomPattern } from '../data/rhythms'
-import type { RhythmPattern } from '../data/rhythms'
+import { generateRandomPattern } from '../data/rhythms'
 import type { TestComponentProps } from '../types'
 
-type Phase = 'intro' | 'listen' | 'record' | 'result'
-
-const TOTAL_ROUNDS = 3
-const DIFFICULTIES: Array<'easy' | 'medium' | 'hard'> = ['easy', 'medium', 'hard']
+type Phase = 'intro' | 'listen' | 'record' | 'feedback' | 'gameover'
 
 function playClick(audioCtx: AudioContext) {
   const oscillator = audioCtx.createOscillator()
@@ -52,24 +48,27 @@ function scoreRound(originalBeats: number[], userTaps: number[]): number {
 
   const extraTaps = userTaps.length - matched.size
   const penalty = extraTaps * 0.5
-  const roundScore = ((sumBeatScores - penalty) / originalBeats.length) * 100
+  const rawScore = ((sumBeatScores - penalty) / originalBeats.length) * 100
 
-  return Math.max(0, Math.min(100, roundScore))
+  return Math.max(0, Math.min(100, rawScore))
 }
 
 export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
   const [phase, setPhase] = useState<Phase>('intro')
-  const [round, setRound] = useState(1)
-  const [pattern, setPattern] = useState<RhythmPattern | null>(null)
+  const [level, setLevel] = useState(1)
+  const [lives, setLives] = useState(3)
+  const [beats, setBeats] = useState<number[]>([])
   const [activeBeatIndex, setActiveBeatIndex] = useState(-1)
   const [isPulsing, setIsPulsing] = useState(false)
   const [userTaps, setUserTaps] = useState<number[]>([])
   const [tapCount, setTapCount] = useState(0)
-  const [roundScores, setRoundScores] = useState<number[]>([])
+  const [wasCorrect, setWasCorrect] = useState(false)
+  const [lastAccuracy, setLastAccuracy] = useState(0)
 
   const audioCtxRef = useRef<AudioContext | null>(null)
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([])
   const recordStartRef = useRef(0)
+  const feedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const getAudioContext = useCallback((): AudioContext => {
     if (!audioCtxRef.current) {
@@ -84,6 +83,10 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
   const clearAllTimeouts = useCallback(() => {
     timeoutsRef.current.forEach(clearTimeout)
     timeoutsRef.current = []
+    if (feedbackTimeoutRef.current) {
+      clearTimeout(feedbackTimeoutRef.current)
+      feedbackTimeoutRef.current = null
+    }
   }, [])
 
   const addTimeout = useCallback((fn: () => void, ms: number) => {
@@ -92,7 +95,6 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
     return id
   }, [])
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       clearAllTimeouts()
@@ -108,20 +110,18 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
     setTimeout(() => setIsPulsing(false), 100)
   }, [])
 
-  const startListening = useCallback((roundNum: number) => {
+  const startListening = useCallback((lvl: number) => {
     clearAllTimeouts()
-    const difficulty = DIFFICULTIES[roundNum - 1]
-    const pat = getRandomPattern(difficulty)
-    setPattern(pat)
+    const pattern = generateRandomPattern(lvl)
+    setBeats(pattern)
     setActiveBeatIndex(-1)
     setUserTaps([])
     setTapCount(0)
     setPhase('listen')
 
-    // 500ms delay before pattern starts
     addTimeout(() => {
       const ctx = getAudioContext()
-      pat.beats.forEach((beatTime, i) => {
+      pattern.forEach((beatTime, i) => {
         addTimeout(() => {
           playClick(ctx)
           triggerPulse()
@@ -129,8 +129,7 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
         }, beatTime)
       })
 
-      // After last beat + 1200ms, transition to record
-      const lastBeat = pat.beats[pat.beats.length - 1]
+      const lastBeat = pattern[pattern.length - 1]
       addTimeout(() => {
         setActiveBeatIndex(-1)
         setPhase('record')
@@ -145,28 +144,42 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
     playClick(ctx)
     triggerPulse()
     const timestamp = performance.now() - recordStartRef.current
-    setUserTaps(prev => [...prev, timestamp])
-    setTapCount(prev => prev + 1)
+    setUserTaps((prev) => [...prev, timestamp])
+    setTapCount((prev) => prev + 1)
   }, [phase, getAudioContext, triggerPulse])
 
   const handleSubmitRound = useCallback(() => {
-    if (!pattern) return
-    const score = scoreRound(pattern.beats, userTaps)
-    const newScores = [...roundScores, score]
-    setRoundScores(newScores)
+    if (beats.length === 0) return
+    const accuracy = scoreRound(beats, userTaps)
+    setLastAccuracy(Math.round(accuracy))
+    const passed = accuracy >= 60
 
-    if (newScores.length >= TOTAL_ROUNDS) {
-      const average = Math.round(newScores.reduce((a, b) => a + b, 0) / newScores.length)
-      setPhase('result')
-      onComplete(average)
+    setWasCorrect(passed)
+    setPhase('feedback')
+
+    if (passed) {
+      feedbackTimeoutRef.current = setTimeout(() => {
+        const nextLevel = level + 1
+        setLevel(nextLevel)
+        startListening(nextLevel)
+      }, 1000)
     } else {
-      const nextRound = round + 1
-      setRound(nextRound)
-      startListening(nextRound)
-    }
-  }, [pattern, userTaps, roundScores, round, onComplete, startListening])
+      const newLives = lives - 1
+      setLives(newLives)
 
-  // Keyboard support: spacebar to tap during record phase
+      if (newLives <= 0) {
+        feedbackTimeoutRef.current = setTimeout(() => {
+          setPhase('gameover')
+          onComplete(level)
+        }, 1000)
+      } else {
+        feedbackTimeoutRef.current = setTimeout(() => {
+          startListening(level)
+        }, 1000)
+      }
+    }
+  }, [beats, userTaps, level, lives, startListening, onComplete])
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === ' ' && phase === 'record') {
@@ -179,37 +192,38 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
   }, [phase, handleTap])
 
   const handleStart = useCallback(() => {
-    getAudioContext() // Initialize on user gesture
-    setRound(1)
-    setRoundScores([])
+    getAudioContext()
+    setLevel(1)
+    setLives(3)
     startListening(1)
   }, [getAudioContext, startListening])
 
   const handleTryAgain = useCallback(() => {
     clearAllTimeouts()
     setPhase('intro')
-    setRound(1)
-    setRoundScores([])
-    setPattern(null)
-    setActiveBeatIndex(-1)
-    setUserTaps([])
-    setTapCount(0)
   }, [clearAllTimeouts])
 
+  const heartsDisplay = '\u2665'.repeat(lives) + '\u2661'.repeat(3 - lives)
+
   const getBgColor = () => {
-    if (phase === 'result') return '#2563eb'
-    return '#8b5cf6'
+    switch (phase) {
+      case 'intro':
+      case 'listen':
+      case 'record':
+        return '#8b5cf6'
+      case 'feedback':
+        return wasCorrect ? '#16a34a' : '#dc2626'
+      case 'gameover':
+        return '#2563eb'
+    }
   }
 
   const getBadge = () => {
-    if (phase === 'listen') return `ROUND ${round}/${TOTAL_ROUNDS} — LISTEN`
-    if (phase === 'record') return `ROUND ${round}/${TOTAL_ROUNDS} — TAP`
-    return undefined
+    if (phase === 'intro' || phase === 'gameover') return undefined
+    if (phase === 'listen') return `LEVEL ${level}  ${heartsDisplay} — LISTEN`
+    if (phase === 'record') return `LEVEL ${level}  ${heartsDisplay} — TAP`
+    return `LEVEL ${level}  ${heartsDisplay}`
   }
-
-  const averageScore = roundScores.length > 0
-    ? Math.round(roundScores.reduce((a, b) => a + b, 0) / roundScores.length)
-    : 0
 
   return (
     <GameCard bgColor={getBgColor()} badge={getBadge()}>
@@ -222,18 +236,17 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
             aria-label="Start Rhythm Test"
           >
             <div className="text-6xl mb-6" aria-hidden="true">🥁</div>
-            <p className="text-2xl md:text-3xl font-bold mb-3">Rhythm Test</p>
+            <p className="text-2xl md:text-3xl font-bold mb-3">Rhythm</p>
             <p className="text-white/70 text-lg mb-2">Listen to the rhythm, then tap it back</p>
-            <p className="text-white/50 text-sm mb-4">🎧 Headphones recommended &bull; 3 rounds</p>
+            <p className="text-white/50 text-sm mb-4">🎧 Headphones recommended</p>
             {bestScore !== undefined && bestScore > 0 && (
-              <p className="text-white/50 text-sm">Your best: {bestScore}%</p>
+              <p className="text-white/50 text-sm">Your best: Level {bestScore}</p>
             )}
           </button>
         )}
 
-        {phase === 'listen' && pattern && (
+        {phase === 'listen' && (
           <div className="text-center text-white px-6">
-            {/* Visual pulse circle */}
             <div
               className={`w-32 h-32 rounded-full mx-auto mb-6 flex items-center justify-center transition-all duration-100 ${
                 isPulsing ? 'scale-110 bg-white/40' : 'bg-white/20'
@@ -243,9 +256,8 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
               <span className="text-4xl">🔊</span>
             </div>
             <p className="text-lg font-semibold mb-4">Listen carefully...</p>
-            {/* Beat indicator dots */}
-            <div className="flex justify-center gap-2" aria-label={`Pattern with ${pattern.beats.length} beats`}>
-              {pattern.beats.map((_, i) => (
+            <div className="flex justify-center gap-2" aria-label={`Pattern with ${beats.length} beats`}>
+              {beats.map((_, i) => (
                 <div
                   key={i}
                   className={`w-4 h-4 rounded-full transition-all duration-100 ${
@@ -258,11 +270,10 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
           </div>
         )}
 
-        {phase === 'record' && pattern && (
+        {phase === 'record' && (
           <div className="text-center text-white px-6">
-            {/* Beat indicator dots showing user progress */}
-            <div className="flex justify-center gap-2 mb-6" aria-label={`${tapCount} of ${pattern.beats.length} beats tapped`}>
-              {pattern.beats.map((_, i) => (
+            <div className="flex justify-center gap-2 mb-6" aria-label={`${tapCount} of ${beats.length} beats tapped`}>
+              {beats.map((_, i) => (
                 <div
                   key={i}
                   className={`w-4 h-4 rounded-full transition-all duration-100 ${
@@ -272,7 +283,6 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
                 />
               ))}
             </div>
-            {/* Tap button */}
             <button
               type="button"
               onClick={handleTap}
@@ -292,25 +302,31 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
               }}
               className="mt-2 px-6 py-3 bg-white/20 hover:bg-white/30 rounded-xl font-semibold min-h-[44px] text-white transition-colors"
             >
-              Done — Submit Round
+              Done
             </button>
           </div>
         )}
 
-        {phase === 'result' && (
+        {phase === 'feedback' && (
+          <div className="text-center text-white px-6">
+            <div className="text-4xl mb-4" aria-hidden="true">
+              {wasCorrect ? '✅' : '❌'}
+            </div>
+            <p className="text-2xl md:text-3xl font-bold mb-2">
+              {wasCorrect ? 'Nice rhythm!' : 'Off beat!'}
+            </p>
+            <p className="text-white/70 text-lg">Accuracy: {lastAccuracy}%</p>
+          </div>
+        )}
+
+        {phase === 'gameover' && (
           <div className="text-center text-white px-6">
             <div className="text-6xl mb-6" aria-hidden="true">🏆</div>
-            <p className="text-lg text-white/70 mb-2">Average Accuracy</p>
-            <p className="text-5xl md:text-6xl font-black mb-2">
-              {averageScore}<span className="text-2xl font-bold">%</span>
-            </p>
-            <div className="flex flex-wrap justify-center gap-2 mt-4 mb-6">
-              {roundScores.map((s, i) => (
-                <span key={i} className="bg-white/20 rounded-full px-3 py-1 text-sm font-medium">
-                  R{i + 1}: {Math.round(s)}%
-                </span>
-              ))}
-            </div>
+            <p className="text-lg text-white/70 mb-2">You reached</p>
+            <p className="text-5xl md:text-6xl font-black mb-2">Level {level}</p>
+            {bestScore !== undefined && bestScore > 0 && (
+              <p className="text-white/60 text-sm mb-6">Your best: Level {bestScore}</p>
+            )}
             <button
               type="button"
               onClick={(e) => {
