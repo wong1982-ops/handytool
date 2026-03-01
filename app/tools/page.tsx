@@ -41,7 +41,7 @@ async function getTrendingTools(): Promise<TrendingTool[]> {
     const { data } = await supabase.rpc('tool_popularity', { time_range_days: 7 })
     if (!data || data.length === 0) return []
 
-    return data.slice(0, 5).map((item: { tool_slug: string; page_views: number }, i: number) => {
+    return data.slice(0, 5).map((item: { tool_slug: string; view_count: number }, i: number) => {
       const slug = item.tool_slug
       const tool = tools.find((t) => t.href === `/tools/${slug}`)
       return {
@@ -51,7 +51,7 @@ async function getTrendingTools(): Promise<TrendingTool[]> {
         icon: tool?.icon,
         color: tool?.color || 'from-slate-500 to-slate-400',
         href: tool?.href || `/tools/${slug}`,
-        views: item.page_views ?? 0,
+        views: item.view_count ?? 0,
       }
     })
   } catch {
