@@ -6,7 +6,7 @@ import { useTestScores } from '@/tools/human-benchmark/use-test-scores'
 import { TestView } from '@/tools/human-benchmark/test-view'
 import type { ViewState, TestId, TestComponentProps } from '@/tools/human-benchmark/types'
 
-// Import all 12 test components
+// Import all 20 test components
 import { ReactionTime } from '@/tools/human-benchmark/tests/reaction-time'
 import { SequenceMemory } from '@/tools/human-benchmark/tests/sequence-memory'
 import { AimTrainer } from '@/tools/human-benchmark/tests/aim-trainer'
@@ -19,6 +19,14 @@ import { PitchIdentification } from '@/tools/human-benchmark/tests/pitch-identif
 import { MentalRotation } from '@/tools/human-benchmark/tests/mental-rotation'
 import { SchulteGrid } from '@/tools/human-benchmark/tests/schulte-grid'
 import { RhythmTest } from '@/tools/human-benchmark/tests/rhythm-test'
+import { IntervalRecognition } from '@/tools/human-benchmark/tests/interval-recognition'
+import { ChordIdentification } from '@/tools/human-benchmark/tests/chord-identification'
+import { ToneMemory } from '@/tools/human-benchmark/tests/tone-memory'
+import { HigherOrLower } from '@/tools/human-benchmark/tests/higher-or-lower'
+import { StroopTest } from '@/tools/human-benchmark/tests/stroop-test'
+import { QuickMath } from '@/tools/human-benchmark/tests/quick-math'
+import { WordScramble } from '@/tools/human-benchmark/tests/word-scramble'
+import { TrackingTest } from '@/tools/human-benchmark/tests/tracking-test'
 
 const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentProps>>> = {
   'reaction-time': ReactionTime,
@@ -33,6 +41,14 @@ const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentP
   'mental-rotation': MentalRotation,
   'schulte-grid': SchulteGrid,
   'rhythm-test': RhythmTest,
+  'interval-recognition': IntervalRecognition,
+  'chord-identification': ChordIdentification,
+  'tone-memory': ToneMemory,
+  'higher-or-lower': HigherOrLower,
+  'stroop-test': StroopTest,
+  'quick-math': QuickMath,
+  'word-scramble': WordScramble,
+  'tracking-test': TrackingTest,
 }
 
 export default function HumanBenchmarkPage() {
