@@ -20,9 +20,23 @@ function playClick(audioCtx: AudioContext) {
   oscillator.stop(audioCtx.currentTime + 0.05)
 }
 
-function scoreRound(originalBeats: number[], userTaps: number[]): number {
+interface BeatMatch {
+  beatTime: number
+  tapTime: number | null // null = missed
+  deviation: number // ms off, 0 = perfect
+  score: number // 0-1
+}
+
+interface ScoreResult {
+  accuracy: number
+  matches: BeatMatch[]
+  extraTaps: number[] // timestamps of unmatched user taps
+}
+
+function scoreRound(originalBeats: number[], userTaps: number[]): ScoreResult {
   const matched = new Set<number>()
   let sumBeatScores = 0
+  const matches: BeatMatch[] = []
 
   for (const beat of originalBeats) {
     let bestScore = 0
@@ -42,15 +56,29 @@ function scoreRound(originalBeats: number[], userTaps: number[]): number {
 
     if (bestIdx >= 0) {
       matched.add(bestIdx)
+      matches.push({
+        beatTime: beat,
+        tapTime: userTaps[bestIdx],
+        deviation: Math.abs(userTaps[bestIdx] - beat),
+        score: bestScore,
+      })
+    } else {
+      matches.push({ beatTime: beat, tapTime: null, deviation: 200, score: 0 })
     }
     sumBeatScores += bestScore
   }
 
-  const extraTaps = userTaps.length - matched.size
-  const penalty = extraTaps * 0.5
+  const extraTaps = userTaps
+    .filter((_, i) => !matched.has(i))
+    .map((t) => t)
+  const penalty = extraTaps.length * 0.5
   const rawScore = ((sumBeatScores - penalty) / originalBeats.length) * 100
 
-  return Math.max(0, Math.min(100, rawScore))
+  return {
+    accuracy: Math.max(0, Math.min(100, rawScore)),
+    matches,
+    extraTaps,
+  }
 }
 
 export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
@@ -64,6 +92,7 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
   const [tapCount, setTapCount] = useState(0)
   const [wasCorrect, setWasCorrect] = useState(false)
   const [lastAccuracy, setLastAccuracy] = useState(0)
+  const [lastResult, setLastResult] = useState<ScoreResult | null>(null)
 
   const audioCtxRef = useRef<AudioContext | null>(null)
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([])
@@ -150,19 +179,23 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
 
   const handleSubmitRound = useCallback(() => {
     if (beats.length === 0) return
-    const accuracy = scoreRound(beats, userTaps)
-    setLastAccuracy(Math.round(accuracy))
-    const passed = accuracy >= 60
+    const result = scoreRound(beats, userTaps)
+    setLastAccuracy(Math.round(result.accuracy))
+    setLastResult(result)
+    const passed = result.accuracy >= 60
 
     setWasCorrect(passed)
     setPhase('feedback')
+
+    // Longer feedback to show the timeline visualization
+    const feedbackDelay = 2500
 
     if (passed) {
       feedbackTimeoutRef.current = setTimeout(() => {
         const nextLevel = level + 1
         setLevel(nextLevel)
         startListening(nextLevel)
-      }, 1000)
+      }, feedbackDelay)
     } else {
       const newLives = lives - 1
       setLives(newLives)
@@ -171,11 +204,11 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
         feedbackTimeoutRef.current = setTimeout(() => {
           setPhase('gameover')
           onComplete(level)
-        }, 1000)
+        }, feedbackDelay)
       } else {
         feedbackTimeoutRef.current = setTimeout(() => {
           startListening(level)
-        }, 1000)
+        }, feedbackDelay)
       }
     }
   }, [beats, userTaps, level, lives, startListening, onComplete])
@@ -307,15 +340,118 @@ export function RhythmTest({ onComplete, bestScore }: TestComponentProps) {
           </div>
         )}
 
-        {phase === 'feedback' && (
-          <div className="text-center text-white px-6">
-            <div className="text-4xl mb-4" aria-hidden="true">
-              {wasCorrect ? '✅' : '❌'}
-            </div>
-            <p className="text-2xl md:text-3xl font-bold mb-2">
+        {phase === 'feedback' && lastResult && (
+          <div className="text-center text-white px-4 w-full">
+            <p className="text-xl md:text-2xl font-bold mb-1">
               {wasCorrect ? 'Nice rhythm!' : 'Off beat!'}
             </p>
-            <p className="text-white/70 text-lg">Accuracy: {lastAccuracy}%</p>
+            <p className="text-white/70 text-sm mb-4">Accuracy: {lastAccuracy}%</p>
+
+            {/* Timeline comparison */}
+            <div className="w-full max-w-[400px] mx-auto">
+              {(() => {
+                const allTimes = [
+                  ...lastResult.matches.map((m) => m.beatTime),
+                  ...lastResult.matches.filter((m) => m.tapTime !== null).map((m) => m.tapTime!),
+                  ...lastResult.extraTaps,
+                ]
+                const maxTime = Math.max(...allTimes, 1)
+
+                const getColor = (score: number) => {
+                  if (score >= 0.8) return 'bg-green-400'
+                  if (score >= 0.5) return 'bg-yellow-400'
+                  return 'bg-red-400'
+                }
+
+                const getLabel = (deviation: number) => {
+                  if (deviation < 30) return 'Perfect'
+                  if (deviation < 80) return 'Good'
+                  if (deviation < 150) return 'Late'
+                  return 'Missed'
+                }
+
+                return (
+                  <div className="flex flex-col gap-1">
+                    {/* Legend */}
+                    <div className="flex justify-between text-[10px] text-white/50 mb-1 px-1">
+                      <span>Expected</span>
+                      <span>Your taps</span>
+                    </div>
+
+                    {/* Beat-by-beat rows */}
+                    {lastResult.matches.map((m, i) => {
+                      const beatPos = (m.beatTime / maxTime) * 100
+                      const tapPos = m.tapTime !== null ? (m.tapTime / maxTime) * 100 : null
+                      const missed = m.tapTime === null
+
+                      return (
+                        <div key={i} className="relative h-8 bg-white/5 rounded-md overflow-hidden">
+                          {/* Expected beat marker */}
+                          <div
+                            className="absolute top-0 h-full w-[3px] bg-white/40"
+                            style={{ left: `${beatPos}%` }}
+                          />
+                          <div
+                            className="absolute top-0.5 w-3 h-3 rounded-full bg-white/60 -translate-x-1/2"
+                            style={{ left: `${beatPos}%` }}
+                          />
+
+                          {/* User tap marker */}
+                          {tapPos !== null && (
+                            <>
+                              <div
+                                className={`absolute bottom-0.5 w-3 h-3 rounded-full -translate-x-1/2 ${getColor(m.score)}`}
+                                style={{ left: `${tapPos}%` }}
+                              />
+                              {/* Connecting line */}
+                              <div
+                                className={`absolute top-1/2 h-[1px] ${getColor(m.score)} opacity-50`}
+                                style={{
+                                  left: `${Math.min(beatPos, tapPos)}%`,
+                                  width: `${Math.abs(beatPos - tapPos)}%`,
+                                }}
+                              />
+                            </>
+                          )}
+
+                          {/* Label */}
+                          <span className={`absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] font-medium ${
+                            missed ? 'text-red-400' : m.score >= 0.8 ? 'text-green-400' : m.score >= 0.5 ? 'text-yellow-400' : 'text-red-400'
+                          }`}>
+                            {missed ? 'Missed' : getLabel(m.deviation)}
+                          </span>
+                        </div>
+                      )
+                    })}
+
+                    {/* Extra taps row */}
+                    {lastResult.extraTaps.length > 0 && (
+                      <div className="relative h-6 bg-red-500/10 rounded-md overflow-hidden">
+                        {lastResult.extraTaps.map((t, i) => (
+                          <div
+                            key={i}
+                            className="absolute top-1 w-2.5 h-2.5 rounded-full bg-red-400/70 -translate-x-1/2"
+                            style={{ left: `${(t / maxTime) * 100}%` }}
+                          />
+                        ))}
+                        <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] text-red-400 font-medium">
+                          +{lastResult.extraTaps.length} extra
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Color key */}
+                    <div className="flex justify-center gap-3 mt-2 text-[9px] text-white/50">
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-white/60" />Expected</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-400" />Your tap</span>
+                      {lastResult.extraTaps.length > 0 && (
+                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400/70" />Extra</span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
           </div>
         )}
 
