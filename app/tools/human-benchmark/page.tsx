@@ -27,6 +27,9 @@ import { StroopTest } from '@/tools/human-benchmark/tests/stroop-test'
 import { QuickMath } from '@/tools/human-benchmark/tests/quick-math'
 import { WordScramble } from '@/tools/human-benchmark/tests/word-scramble'
 import { TrackingTest } from '@/tools/human-benchmark/tests/tracking-test'
+import { ColorSensitivity } from '@/tools/human-benchmark/tests/color-sensitivity'
+import { OneStroke } from '@/tools/human-benchmark/tests/one-stroke'
+import { Tangram } from '@/tools/human-benchmark/tests/tangram'
 
 const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentProps>>> = {
   'reaction-time': ReactionTime,
@@ -49,6 +52,9 @@ const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentP
   'quick-math': QuickMath,
   'word-scramble': WordScramble,
   'tracking-test': TrackingTest,
+  'color-sensitivity': ColorSensitivity,
+  'one-stroke': OneStroke,
+  'tangram': Tangram,
 }
 
 export default function HumanBenchmarkPage() {

@@ -19,6 +19,9 @@ export type TestId =
   | 'quick-math'
   | 'word-scramble'
   | 'tracking-test'
+  | 'color-sensitivity'
+  | 'one-stroke'
+  | 'tangram'
 
 export type ViewState = 'dashboard' | TestId
 
