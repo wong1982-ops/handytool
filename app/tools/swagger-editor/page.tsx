@@ -216,7 +216,7 @@ export default function SwaggerEditorPage() {
   const warningCount = errors.filter((e) => e.severity === 'warning').length
 
   return (
-    <div className="swagger-editor fixed inset-0 top-16 z-30 flex flex-col overflow-hidden bg-slate-50 dark:bg-slate-950">
+    <div className="swagger-editor flex flex-col overflow-hidden bg-slate-50 dark:bg-slate-950 h-[100dvh] md:fixed md:inset-0 md:top-16 md:z-30">
       {/* Toolbar section — pinned above scrolling workspace */}
       <div className="shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
         {/* Top Bar */}
