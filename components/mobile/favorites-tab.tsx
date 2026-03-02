@@ -15,8 +15,8 @@ export function FavoritesTab() {
     return (
       <div className="flex flex-col items-center justify-center px-8 py-20 text-center">
         <div className="text-5xl mb-4" aria-hidden="true">&#x2B50;</div>
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">No Favorites Yet</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">No Favorites Yet</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Star your most-used tools for quick access. Tap the star on any tool card.
         </p>
       </div>
@@ -25,19 +25,19 @@ export function FavoritesTab() {
 
   return (
     <div className="px-4 py-4">
-      <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Favorites</h2>
+      <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Favorites</h2>
       <div className="grid grid-cols-1 gap-2">
         {favoriteTools.map((tool) => {
           const slug = tool.href.replace('/tools/', '')
           return (
-            <div key={tool.href} className="flex items-center gap-3 p-3 rounded-xl bg-gray-100 dark:bg-white/5">
+            <div key={tool.href} className="flex items-center gap-3 p-3 rounded-xl bg-slate-100 dark:bg-white/5">
               <Link href={tool.href} className="flex items-center gap-3 flex-1 min-w-0">
                 <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${tool.color} flex items-center justify-center text-white shrink-0`}>
                   <div className="w-5 h-5 [&>svg]:w-5 [&>svg]:h-5">{tool.icon}</div>
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{tool.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{tool.description}</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{tool.name}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{tool.description}</p>
                 </div>
               </Link>
               <button

@@ -33,7 +33,7 @@ export function MobileShell({ children }: MobileShellProps) {
   if (!isMobile) return null
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-gray-50 dark:bg-gray-950">
+    <div className="fixed inset-0 z-[60] flex flex-col bg-slate-50 dark:bg-slate-950">
       <MobileHeader dark={dark} onToggleTheme={toggleTheme} />
 
       <TabSwipeContainer activeTab={activeTab} onTabChange={setActiveTab}>

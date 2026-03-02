@@ -58,7 +58,7 @@ export function MobileHeader({ brandName = 'Toolk1t', dark, onToggleTheme }: Mob
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex items-center justify-between px-4 h-12 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-b border-gray-200 dark:border-white/10">
+      <header className="sticky top-0 z-50 flex items-center justify-between px-4 h-12 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-b border-slate-200/50 dark:border-slate-800/50">
         <Link href="/" className="flex items-center shrink-0">
           <Image
             src="/logo.png"
@@ -73,7 +73,7 @@ export function MobileHeader({ brandName = 'Toolk1t', dark, onToggleTheme }: Mob
         <div className="flex items-center gap-2">
           <button
             onClick={openSearch}
-            className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
+            className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
             aria-label="Search tools"
             style={{ minHeight: '44px', minWidth: '44px' }}
           >
@@ -84,7 +84,7 @@ export function MobileHeader({ brandName = 'Toolk1t', dark, onToggleTheme }: Mob
 
           <button
             onClick={onToggleTheme}
-            className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
+            className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
             aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
             style={{ minHeight: '44px', minWidth: '44px' }}
           >
@@ -103,9 +103,9 @@ export function MobileHeader({ brandName = 'Toolk1t', dark, onToggleTheme }: Mob
 
       {/* Full-screen search overlay */}
       {searchOpen && (
-        <div className="fixed inset-0 z-[60] bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg flex flex-col">
-          <div className="flex items-center gap-2 px-4 h-14 border-b border-gray-200 dark:border-white/10">
-            <svg className="w-5 h-5 text-gray-500 dark:text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <div className="fixed inset-0 z-[60] bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg flex flex-col">
+          <div className="flex items-center gap-2 px-4 h-14 border-b border-slate-200/50 dark:border-slate-800/50">
+            <svg className="w-5 h-5 text-slate-500 dark:text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -114,7 +114,7 @@ export function MobileHeader({ brandName = 'Toolk1t', dark, onToggleTheme }: Mob
               value={query}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder="Search tools..."
-              className="flex-1 bg-transparent text-gray-900 dark:text-white text-base outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
+              className="flex-1 bg-transparent text-slate-900 dark:text-white text-base outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
               autoComplete="off"
             />
             <button
@@ -136,13 +136,13 @@ export function MobileHeader({ brandName = 'Toolk1t', dark, onToggleTheme }: Mob
                   <div className="w-5 h-5 [&>svg]:w-5 [&>svg]:h-5">{tool.icon}</div>
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{tool.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{tool.description}</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{tool.name}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{tool.description}</p>
                 </div>
               </button>
             ))}
             {suggestions.length === 0 && (
-              <p className="text-center text-gray-500 py-8">No tools found</p>
+              <p className="text-center text-slate-500 py-8">No tools found</p>
             )}
           </div>
         </div>

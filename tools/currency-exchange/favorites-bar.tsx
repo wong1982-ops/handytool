@@ -36,7 +36,7 @@ export function FavoritesBar({
         className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
           currentIsFav
             ? 'bg-amber-500/15 border-amber-500/30 text-amber-400 hover:bg-amber-500/25'
-            : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-slate-300'
+            : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-300'
         }`}
         aria-label={currentIsFav ? 'Remove from favorites' : 'Save as favorite'}
       >
@@ -46,7 +46,7 @@ export function FavoritesBar({
 
       {/* Divider */}
       {(hasFavorites || hasRecent) && (
-        <div className="shrink-0 w-px h-5 bg-slate-700" aria-hidden="true" />
+        <div className="shrink-0 w-px h-5 bg-slate-300 dark:bg-slate-700" aria-hidden="true" />
       )}
 
       {/* Favorite chips */}
@@ -63,7 +63,7 @@ export function FavoritesBar({
 
       {/* Divider between favorites and recent */}
       {hasFavorites && hasRecent && (
-        <div className="shrink-0 w-px h-5 bg-slate-700" aria-hidden="true" />
+        <div className="shrink-0 w-px h-5 bg-slate-300 dark:bg-slate-700" aria-hidden="true" />
       )}
 
       {/* Recent chips (exclude any that are already in favorites) */}
@@ -101,7 +101,7 @@ function PairChip({
       className={`shrink-0 flex items-center rounded-full text-xs font-medium transition-all border ${
         isActive
           ? 'bg-[var(--tk-color-primary-500)]/15 border-[var(--tk-color-primary-500)]/30 text-[var(--tk-color-primary-400)]'
-          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+          : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
       }`}
     >
       <button
@@ -111,7 +111,7 @@ function PairChip({
       >
         <span aria-hidden="true">{getFlag(pair.from)}</span>
         <span>{pair.from}</span>
-        <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="w-3 h-3 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>
         <span>{pair.to}</span>
