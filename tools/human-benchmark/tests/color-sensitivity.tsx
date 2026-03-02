@@ -48,7 +48,7 @@ function generateGrid(level: number): {
   return { gridSize, baseColor, oddColor, oddIndex }
 }
 
-export function ColorSensitivity({ onComplete, onBack, bestScore }: TestComponentProps) {
+export function ColorSensitivity({ onComplete, bestScore }: TestComponentProps) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [level, setLevel] = useState(1)
   const [lives, setLives] = useState(3)
@@ -201,7 +201,7 @@ export function ColorSensitivity({ onComplete, onBack, bestScore }: TestComponen
           </div>
         )}
 
-        {(phase === 'playing' || phase === 'feedback') && phase !== 'gameover' && (
+        {(phase === 'playing' || phase === 'feedback') && (
           <div className="text-center text-white px-6 w-full">
             {/* Timer display */}
             <p className="text-white/60 text-sm mb-4">{elapsed}s</p>
