@@ -32,6 +32,7 @@ import { OneStroke } from '@/tools/human-benchmark/tests/one-stroke'
 import { Tangram } from '@/tools/human-benchmark/tests/tangram'
 import { FiveRooms } from '@/tools/human-benchmark/tests/five-rooms'
 import { FourColour } from '@/tools/human-benchmark/tests/four-colour'
+import { Planarity } from '@/tools/human-benchmark/tests/planarity'
 
 const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentProps>>> = {
   'reaction-time': ReactionTime,
@@ -59,6 +60,7 @@ const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentP
   'tangram': Tangram,
   'five-rooms': FiveRooms,
   'four-colour': FourColour,
+  'planarity': Planarity,
 }
 
 export default function HumanBenchmarkPage() {
