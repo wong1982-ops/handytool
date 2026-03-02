@@ -162,7 +162,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
       {/* 2-Column Layout: Canvas + Edit Panel */}
       <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
         {/* Left: Card Canvas */}
-        <div className="flex-1 min-w-0 min-h-[60vh] lg:min-h-0">
+        <div className="flex-1 min-w-0 min-h-[40vh] lg:min-h-0">
           <CardCanvas
             cardData={cardData}
             cardRef={cardRef}

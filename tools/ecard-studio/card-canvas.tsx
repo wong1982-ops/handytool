@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import type { ECardData, TemplateId } from '@/tools/ecard-studio/types'
 import { ALL_TEMPLATES } from '@/tools/ecard-studio/templates'
 import CardPreview from '@/tools/ecard-studio/card-preview'
@@ -66,9 +66,42 @@ export interface CardCanvasProps {
 
 export function CardCanvas({ cardData, cardRef, zoom, onZoomChange, onLogoMove, onSelectTemplate }: CardCanvasProps) {
   const [showBanner, setShowBanner] = useState(true)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [autoFitted, setAutoFitted] = useState(false)
+
+  // Auto-fit card to container on mount and resize (mobile portrait fix)
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const fitToContainer = () => {
+      const rect = container.getBoundingClientRect()
+      const isBusinessCard = cardData.cardType === 'business-card'
+      const cardW = isBusinessCard ? 630 : 600
+      const cardH = isBusinessCard ? 360 : 400
+      // Add padding (24px each side)
+      const availW = rect.width - 48
+      const availH = rect.height - 48
+      if (availW < cardW || availH < cardH) {
+        const fitZoom = Math.floor(Math.min(availW / cardW, availH / cardH) * 100)
+        onZoomChange(Math.max(30, Math.min(100, fitZoom)))
+      }
+      setAutoFitted(true)
+    }
+
+    // Only auto-fit once on first render
+    if (!autoFitted) fitToContainer()
+
+    const observer = new ResizeObserver(() => {
+      // Re-fit only if zoom hasn't been manually changed from auto-fit value
+      if (!autoFitted) fitToContainer()
+    })
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [cardData.cardType, onZoomChange, autoFitted])
 
   const handleZoomOut = () => {
-    onZoomChange(Math.max(50, zoom - 10))
+    onZoomChange(Math.max(30, zoom - 10))
   }
 
   const handleZoomIn = () => {
@@ -89,7 +122,7 @@ export function CardCanvas({ cardData, cardRef, zoom, onZoomChange, onLogoMove, 
   }, [cardData.template])
 
   return (
-    <div className="relative h-full">
+    <div className="relative h-full" ref={containerRef}>
       {/* Card Preview Area — fills entire canvas */}
       <div className="absolute inset-0 flex items-center justify-center overflow-auto bg-slate-950/30">
         <div
