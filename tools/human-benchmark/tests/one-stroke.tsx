@@ -277,7 +277,6 @@ export function OneStroke({ onComplete, bestScore }: TestComponentProps) {
               {puzzle.nodes.map((node, i) => {
                 const isCurrent = currentNode === i
                 const isShaking = shakeNode === i
-                const isStart = path.length === 0
                 const isAdjacent = currentNode !== null && puzzle.edges.some(
                   ([a, b]) => (a === currentNode && b === i || b === currentNode && a === i) && !drawnEdges.has(edgeKey(a, b))
                 )

@@ -230,7 +230,7 @@ export function ColorSensitivity({ onComplete, bestScore }: TestComponentProps) 
                     role="gridcell"
                     aria-label={`Tile ${row + 1}-${col + 1}`}
                     onClick={() => handleTileClick(i)}
-                    className="cursor-pointer"
+                    className={phase === 'playing' ? 'cursor-pointer' : ''}
                     style={{ transition: 'fill 0.15s ease' }}
                   />
                 )
