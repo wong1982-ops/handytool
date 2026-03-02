@@ -217,19 +217,23 @@ export function Tangram({ onComplete, bestScore }: TestComponentProps) {
       // Get SVG coordinates
       const svg = svgRef.current
       if (!svg) return
-      const ctm = svg.getScreenCTM()
-      if (!ctm) return
-      const pt = svg.createSVGPoint()
-      pt.x = e.clientX
-      pt.y = e.clientY
-      const svgPt = pt.matrixTransform(ctm.inverse())
+      try {
+        const ctm = svg.getScreenCTM()
+        if (!ctm) return
+        const pt = svg.createSVGPoint()
+        pt.x = e.clientX
+        pt.y = e.clientY
+        const svgPt = pt.matrixTransform(ctm.inverse())
 
-      dragRef.current = {
-        pieceId,
-        startX: svgPt.x,
-        startY: svgPt.y,
-        offsetX: state.x,
-        offsetY: state.y,
+        dragRef.current = {
+          pieceId,
+          startX: svgPt.x,
+          startY: svgPt.y,
+          offsetX: state.x,
+          offsetY: state.y,
+        }
+      } catch {
+        return
       }
     },
     [phase, pieces],
@@ -241,29 +245,33 @@ export function Tangram({ onComplete, bestScore }: TestComponentProps) {
       const svg = svgRef.current
       if (!svg) return
 
-      const ctm = svg.getScreenCTM()
-      if (!ctm) return
-      const pt = svg.createSVGPoint()
-      pt.x = e.clientX
-      pt.y = e.clientY
-      const svgPt = pt.matrixTransform(ctm.inverse())
+      try {
+        const ctm = svg.getScreenCTM()
+        if (!ctm) return
+        const pt = svg.createSVGPoint()
+        pt.x = e.clientX
+        pt.y = e.clientY
+        const svgPt = pt.matrixTransform(ctm.inverse())
 
-      const dx = svgPt.x - dragRef.current.startX
-      const dy = svgPt.y - dragRef.current.startY
+        const dx = svgPt.x - dragRef.current.startX
+        const dy = svgPt.y - dragRef.current.startY
 
-      // Clamp piece position within SVG bounds (with some margin)
-      const rawX = dragRef.current.offsetX + dx
-      const rawY = dragRef.current.offsetY + dy
-      const clampedX = Math.max(-250, Math.min(250, rawX))
-      const clampedY = Math.max(-350, Math.min(350, rawY))
+        // Clamp piece position within SVG bounds (with some margin)
+        const rawX = dragRef.current.offsetX + dx
+        const rawY = dragRef.current.offsetY + dy
+        const clampedX = Math.max(-250, Math.min(250, rawX))
+        const clampedY = Math.max(-350, Math.min(350, rawY))
 
-      setPieces((prev) =>
-        prev.map((p) =>
-          p.id === dragRef.current!.pieceId
-            ? { ...p, x: clampedX, y: clampedY }
-            : p,
-        ),
-      )
+        setPieces((prev) =>
+          prev.map((p) =>
+            p.id === dragRef.current!.pieceId
+              ? { ...p, x: clampedX, y: clampedY }
+              : p,
+          ),
+        )
+      } catch {
+        return
+      }
     },
     [],
   )

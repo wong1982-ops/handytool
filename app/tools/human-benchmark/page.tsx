@@ -34,6 +34,7 @@ import { FiveRooms } from '@/tools/human-benchmark/tests/five-rooms'
 import { FourColour } from '@/tools/human-benchmark/tests/four-colour'
 import { Planarity } from '@/tools/human-benchmark/tests/planarity'
 import { ThreeUtilities } from '@/tools/human-benchmark/tests/three-utilities'
+import { TestErrorBoundary } from '@/tools/human-benchmark/error-boundary'
 
 const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentProps>>> = {
   'reaction-time': ReactionTime,
@@ -87,11 +88,13 @@ export default function HumanBenchmarkPage() {
   return (
     <TestView config={config} scores={testScore} onBack={handleBack} onClearHistory={() => clearHistory(view)}>
       {TestComponent != null ? (
-        <TestComponent
-          onComplete={(score: number) => handleComplete(view, score)}
-          onBack={handleBack}
-          bestScore={testScore?.best}
-        />
+        <TestErrorBoundary onBack={handleBack}>
+          <TestComponent
+            onComplete={(score: number) => handleComplete(view, score)}
+            onBack={handleBack}
+            bestScore={testScore?.best}
+          />
+        </TestErrorBoundary>
       ) : (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <p className="text-slate-400 text-lg font-medium mb-2">Coming Soon</p>

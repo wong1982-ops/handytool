@@ -199,19 +199,23 @@ export function Planarity({ onComplete, bestScore }: TestComponentProps) {
 
       const svg = svgRef.current
       if (!svg) return
-      const ctm = svg.getScreenCTM()
-      if (!ctm) return
-      const pt = svg.createSVGPoint()
-      pt.x = e.clientX
-      pt.y = e.clientY
-      const svgPt = pt.matrixTransform(ctm.inverse())
+      try {
+        const ctm = svg.getScreenCTM()
+        if (!ctm) return
+        const pt = svg.createSVGPoint()
+        pt.x = e.clientX
+        pt.y = e.clientY
+        const svgPt = pt.matrixTransform(ctm.inverse())
 
-      dragRef.current = {
-        nodeIdx,
-        startX: svgPt.x,
-        startY: svgPt.y,
-        origX: positions[nodeIdx][0],
-        origY: positions[nodeIdx][1],
+        dragRef.current = {
+          nodeIdx,
+          startX: svgPt.x,
+          startY: svgPt.y,
+          origX: positions[nodeIdx][0],
+          origY: positions[nodeIdx][1],
+        }
+      } catch {
+        return
       }
     },
     [phase, solved, positions],
@@ -222,25 +226,29 @@ export function Planarity({ onComplete, bestScore }: TestComponentProps) {
       if (!dragRef.current) return
       const svg = svgRef.current
       if (!svg) return
-      const ctm = svg.getScreenCTM()
-      if (!ctm) return
-      const pt = svg.createSVGPoint()
-      pt.x = e.clientX
-      pt.y = e.clientY
-      const svgPt = pt.matrixTransform(ctm.inverse())
+      try {
+        const ctm = svg.getScreenCTM()
+        if (!ctm) return
+        const pt = svg.createSVGPoint()
+        pt.x = e.clientX
+        pt.y = e.clientY
+        const svgPt = pt.matrixTransform(ctm.inverse())
 
-      const dx = svgPt.x - dragRef.current.startX
-      const dy = svgPt.y - dragRef.current.startY
+        const dx = svgPt.x - dragRef.current.startX
+        const dy = svgPt.y - dragRef.current.startY
 
-      // Clamp to viewBox
-      const nx = Math.max(10, Math.min(290, dragRef.current.origX + dx))
-      const ny = Math.max(10, Math.min(290, dragRef.current.origY + dy))
+        // Clamp to viewBox
+        const nx = Math.max(10, Math.min(290, dragRef.current.origX + dx))
+        const ny = Math.max(10, Math.min(290, dragRef.current.origY + dy))
 
-      setPositions((prev) => {
-        const next = [...prev] as [number, number][]
-        next[dragRef.current!.nodeIdx] = [nx, ny]
-        return next
-      })
+        setPositions((prev) => {
+          const next = [...prev] as [number, number][]
+          next[dragRef.current!.nodeIdx] = [nx, ny]
+          return next
+        })
+      } catch {
+        return
+      }
     },
     [],
   )
