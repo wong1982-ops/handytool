@@ -31,6 +31,7 @@ import { ColorSensitivity } from '@/tools/human-benchmark/tests/color-sensitivit
 import { OneStroke } from '@/tools/human-benchmark/tests/one-stroke'
 import { Tangram } from '@/tools/human-benchmark/tests/tangram'
 import { FiveRooms } from '@/tools/human-benchmark/tests/five-rooms'
+import { FourColour } from '@/tools/human-benchmark/tests/four-colour'
 
 const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentProps>>> = {
   'reaction-time': ReactionTime,
@@ -57,6 +58,7 @@ const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentP
   'one-stroke': OneStroke,
   'tangram': Tangram,
   'five-rooms': FiveRooms,
+  'four-colour': FourColour,
 }
 
 export default function HumanBenchmarkPage() {
