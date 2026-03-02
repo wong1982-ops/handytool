@@ -54,6 +54,7 @@ export interface FabricCanvasAPI {
   flipV: () => void
   exportPNG: () => void
   exportJPEG: (quality?: number) => void
+  exportWebP: (quality?: number) => void
   reset: () => void
   /** Enable/disable spacebar-pan mode (call from keydown/keyup) */
   setSpacebarPanning: (active: boolean) => void
@@ -582,18 +583,6 @@ export function useFabricCanvas(): FabricCanvasAPI {
         }
         textHandlerRef.current = handler
         canvas.on('mouse:down', handler)
-        break
-      }
-
-      case 'select': {
-        canvas.selection = true
-        canvas.defaultCursor = 'default'
-        allObjects.forEach((obj: any) => {
-          if (!obj.__isBgImage && !obj.__isCropRect) {
-            obj.selectable = true
-            obj.evented = true
-          }
-        })
         break
       }
 
@@ -1244,7 +1233,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
   // Export (resets zoom to 1x temporarily for full-resolution output)
   // ------------------------------------------------------------------
 
-  const exportCanvas = useCallback((format: 'png' | 'jpeg', quality?: number) => {
+  const exportCanvas = useCallback((format: 'png' | 'jpeg' | 'webp', quality?: number) => {
     const canvas = fabricRef.current
     const imgSize = imageSizeRef.current
     if (!canvas || !imgSize) return
@@ -1259,9 +1248,12 @@ export function useFabricCanvas(): FabricCanvasAPI {
     canvas.setDimensions({ width: imgSize.width, height: imgSize.height })
     canvas.renderAll()
 
+    // Fabric.js toDataURL only supports 'png' and 'jpeg' natively
+    // For WebP, we export as PNG then convert via canvas
+    const fabricFormat = format === 'webp' ? 'png' : format
     const dataURL = canvas.toDataURL({
-      format,
-      quality: format === 'jpeg' ? (quality ?? 0.92) : undefined,
+      format: fabricFormat,
+      quality: fabricFormat === 'jpeg' ? (quality ?? 0.92) : undefined,
       multiplier: 1,
     })
 
@@ -1270,15 +1262,36 @@ export function useFabricCanvas(): FabricCanvasAPI {
     canvas.setDimensions({ width: savedW, height: savedH })
     canvas.renderAll()
 
+    // For WebP, re-encode via an offscreen canvas
+    if (format === 'webp') {
+      const img = new Image()
+      img.onload = () => {
+        const offscreen = document.createElement('canvas')
+        offscreen.width = img.width
+        offscreen.height = img.height
+        const ctx = offscreen.getContext('2d')!
+        ctx.drawImage(img, 0, 0)
+        const webpURL = offscreen.toDataURL('image/webp', quality ?? 0.92)
+        const link = document.createElement('a')
+        link.download = 'edited-image.webp'
+        link.href = webpURL
+        link.click()
+      }
+      img.src = dataURL
+      return
+    }
+
     // Trigger download
     const link = document.createElement('a')
-    link.download = `edited-image.${format === 'jpeg' ? 'jpg' : 'png'}`
+    const ext = format === 'jpeg' ? 'jpg' : 'png'
+    link.download = `edited-image.${ext}`
     link.href = dataURL
     link.click()
   }, [])
 
   const exportPNG = useCallback(() => exportCanvas('png'), [exportCanvas])
   const exportJPEG = useCallback((quality?: number) => exportCanvas('jpeg', quality), [exportCanvas])
+  const exportWebP = useCallback((quality?: number) => exportCanvas('webp', quality), [exportCanvas])
 
   // ------------------------------------------------------------------
   // Reset
@@ -1402,6 +1415,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     flipV,
     exportPNG,
     exportJPEG,
+    exportWebP,
     reset,
     setSpacebarPanning,
     isPanning,

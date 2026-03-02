@@ -86,13 +86,6 @@ export function ExportActions({
 
   return (
     <div className="border-t border-white/10 bg-slate-950/60 px-4 py-4 flex flex-col gap-3">
-      {/* Optimization stats */}
-      {vectorResult && (
-        <div className="text-xs text-slate-400">
-          {vectorResult.pathCount} paths &middot; {formatFileSize(vectorResult.estimatedSize)}
-        </div>
-      )}
-
       {/* Status row */}
       <div className="flex items-center justify-between">
         <span className="font-mono text-[10px] text-slate-500 uppercase tracking-wide">
@@ -239,6 +232,7 @@ export function ExportActions({
             />
           </svg>
           PDF
+          <span className="text-[9px] text-slate-500" title="Exports as raster image embedded in PDF, not true vector paths">(raster)</span>
         </button>
 
         {/* PNG Export with resolution popover */}

@@ -1,4 +1,4 @@
-export type ToolType = 'move' | 'hand' | 'crop' | 'brush' | 'eraser' | 'text' | 'select'
+export type ToolType = 'move' | 'hand' | 'crop' | 'brush' | 'eraser' | 'text'
 
 interface EditorToolbarProps {
   activeTool: ToolType
@@ -6,6 +6,8 @@ interface EditorToolbarProps {
   fgColor: string
   bgColor: string
   onSwapColors: () => void
+  onFgColorChange: (color: string) => void
+  onBgColorChange: (color: string) => void
 }
 
 const TOOLS: { id: ToolType; label: string; icon: React.ReactNode }[] = [
@@ -63,18 +65,9 @@ const TOOLS: { id: ToolType; label: string; icon: React.ReactNode }[] = [
       </svg>
     ),
   },
-  {
-    id: 'select',
-    label: 'Selection Tool',
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 010 2H5a1 1 0 01-1-1zM4 13a1 1 0 011-1h4a1 1 0 010 2H5a1 1 0 01-1-1zM14 5a1 1 0 011-1h4a1 1 0 010 2h-4a1 1 0 01-1-1zM14 13a1 1 0 011-1h4a1 1 0 010 2h-4a1 1 0 01-1-1zM4 9a1 1 0 011-1h4a1 1 0 010 2H5a1 1 0 01-1-1zM14 9a1 1 0 011-1h4a1 1 0 010 2h-4a1 1 0 01-1-1z" />
-      </svg>
-    ),
-  },
 ]
 
-export function EditorToolbar({ activeTool, onToolChange, fgColor, bgColor, onSwapColors }: EditorToolbarProps) {
+export function EditorToolbar({ activeTool, onToolChange, fgColor, bgColor, onSwapColors, onFgColorChange, onBgColorChange }: EditorToolbarProps) {
   return (
     <aside className="w-14 border-r border-slate-700 dark:border-slate-700 bg-[#101622] flex flex-col items-center py-4 gap-3 shrink-0">
       {TOOLS.map((tool) => (
@@ -94,25 +87,50 @@ export function EditorToolbar({ activeTool, onToolChange, fgColor, bgColor, onSw
       ))}
 
       {/* Foreground / background colors */}
-      <button
-        type="button"
-        className="mt-auto relative w-11 h-11 cursor-pointer bg-transparent border-0 p-0"
-        onClick={onSwapColors}
-        title="Swap colors"
-        aria-label="Swap foreground and background colors"
-      >
-        <span
-          className="absolute top-0 left-0 w-6 h-6 rounded-sm border-2 border-slate-500 z-10 pointer-events-none"
-          style={{ backgroundColor: fgColor }}
-        />
-        <span
-          className="absolute bottom-0 right-0 w-6 h-6 rounded-sm border-2 border-slate-500 pointer-events-none"
-          style={{ backgroundColor: bgColor }}
-        />
-        <svg className="absolute top-[1px] right-[1px] w-3 h-3 text-slate-400 z-20 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-        </svg>
-      </button>
+      <div className="mt-auto flex flex-col items-center gap-1">
+        <div className="relative w-11 h-11">
+          {/* Foreground color */}
+          <label
+            className="absolute top-0 left-0 w-6 h-6 rounded-sm border-2 border-slate-500 z-10 cursor-pointer"
+            style={{ backgroundColor: fgColor }}
+            title="Foreground color"
+          >
+            <input
+              type="color"
+              value={fgColor}
+              onChange={(e) => onFgColorChange(e.target.value)}
+              className="sr-only"
+              aria-label="Foreground color"
+            />
+          </label>
+          {/* Background color */}
+          <label
+            className="absolute bottom-0 right-0 w-6 h-6 rounded-sm border-2 border-slate-500 cursor-pointer"
+            style={{ backgroundColor: bgColor }}
+            title="Background color"
+          >
+            <input
+              type="color"
+              value={bgColor}
+              onChange={(e) => onBgColorChange(e.target.value)}
+              className="sr-only"
+              aria-label="Background color"
+            />
+          </label>
+        </div>
+        {/* Swap button */}
+        <button
+          type="button"
+          className="p-1 text-slate-500 hover:text-white transition-colors cursor-pointer"
+          onClick={onSwapColors}
+          title="Swap colors"
+          aria-label="Swap foreground and background colors"
+        >
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+          </svg>
+        </button>
+      </div>
     </aside>
   )
 }

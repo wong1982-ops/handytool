@@ -55,12 +55,13 @@ export function AdjustmentsPanel({
       <NavigatorPanel canvasRef={canvasRef ?? null} imageSize={imageSize} zoom={zoom} />
 
       {/* Adjustments */}
-      <div className="p-4 border-b border-slate-700">
+      <div className={`p-4 border-b border-slate-700 ${!imageSize ? 'opacity-40 pointer-events-none' : ''}`}>
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
           </svg>
           Adjustments
+          {!imageSize && <span className="text-[9px] text-slate-600 font-normal normal-case tracking-normal ml-auto">Load image first</span>}
         </h3>
         <div className="space-y-4">
           <SliderControl label="Brightness" value={adjustments.brightness} min={-100} max={100} onChange={(v) => updateAdj('brightness', v)} />

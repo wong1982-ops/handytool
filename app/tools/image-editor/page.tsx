@@ -183,16 +183,16 @@ export default function ImageEditorPage() {
   }, [fabric.exportJPEG])
 
   const handleExportWithOptions = useCallback((options: ExportOptions) => {
-    // Simple export — download current canvas in the selected format
-    // Resize support will be added in use-fabric-canvas.ts later
     if (options.format === 'jpeg') {
       fabric.exportJPEG(options.quality)
+    } else if (options.format === 'webp') {
+      fabric.exportWebP(options.quality)
     } else {
       fabric.exportPNG()
     }
     setShowExport(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fabric.exportPNG, fabric.exportJPEG])
+  }, [fabric.exportPNG, fabric.exportJPEG, fabric.exportWebP])
 
   const handleReset = useCallback(() => {
     setAdjustments(DEFAULT_ADJUSTMENTS)
@@ -420,6 +420,8 @@ export default function ImageEditorPage() {
           fgColor={fgColor}
           bgColor={bgColor}
           onSwapColors={handleSwapColors}
+          onFgColorChange={setFgColor}
+          onBgColorChange={setBgColor}
         />
 
         {/* Center canvas */}

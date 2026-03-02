@@ -77,6 +77,29 @@ export function ComparisonSlider({ position, onChange, containerRef }: Compariso
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onKeyDown={(e) => {
+          const step = 2
+          switch (e.key) {
+            case 'ArrowLeft':
+            case 'ArrowDown':
+              e.preventDefault()
+              onChange(Math.max(0, position - step))
+              break
+            case 'ArrowRight':
+            case 'ArrowUp':
+              e.preventDefault()
+              onChange(Math.min(100, position + step))
+              break
+            case 'Home':
+              e.preventDefault()
+              onChange(0)
+              break
+            case 'End':
+              e.preventDefault()
+              onChange(100)
+              break
+          }
+        }}
         role="slider"
         aria-label="Comparison slider"
         aria-valuenow={Math.round(position)}

@@ -184,7 +184,19 @@ export default function SvgConverterPage() {
 
   // Zoom handlers
   const handleZoomChange = useCallback((z: number) => setZoom(z), [])
-  const handleFitScreen = useCallback(() => setZoom(100), [])
+  const handleFitScreen = useCallback(() => {
+    if (!processedImageMeta) {
+      setZoom(100)
+      return
+    }
+    const containerWidth = (typeof window !== 'undefined' ? window.innerWidth : 1200) - 300 // subtract sidebar width
+    const containerHeight = (typeof window !== 'undefined' ? window.innerHeight : 800) - 200 // subtract header/footer
+    const fitZoom = Math.min(
+      containerWidth / processedImageMeta.width,
+      containerHeight / processedImageMeta.height,
+    ) * 100
+    setZoom(Math.max(10, Math.min(400, Math.round(fitZoom))))
+  }, [processedImageMeta])
   const handleToggleGrid = useCallback(() => setShowGrid((g) => !g), [])
 
   // Keyboard shortcuts
@@ -299,20 +311,22 @@ export default function SvgConverterPage() {
           )}
 
           {/* Mobile settings toggle */}
-          <button
-            onClick={() => setShowMobileSettings(!showMobileSettings)}
-            className="lg:hidden p-2 hover:bg-slate-800 rounded transition-colors text-slate-400 cursor-pointer"
-            aria-label="Toggle settings panel"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-              />
-            </svg>
-          </button>
+          {editorPhase === 'vectorize' && (
+            <button
+              onClick={() => setShowMobileSettings(!showMobileSettings)}
+              className="lg:hidden p-2 hover:bg-slate-800 rounded transition-colors text-slate-400 cursor-pointer"
+              aria-label="Toggle settings panel"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                />
+              </svg>
+            </button>
+          )}
         </div>
       </header>
 
