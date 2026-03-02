@@ -33,6 +33,7 @@ import { Tangram } from '@/tools/human-benchmark/tests/tangram'
 import { FiveRooms } from '@/tools/human-benchmark/tests/five-rooms'
 import { FourColour } from '@/tools/human-benchmark/tests/four-colour'
 import { Planarity } from '@/tools/human-benchmark/tests/planarity'
+import { ThreeUtilities } from '@/tools/human-benchmark/tests/three-utilities'
 
 const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentProps>>> = {
   'reaction-time': ReactionTime,
@@ -61,6 +62,7 @@ const TEST_COMPONENTS: Partial<Record<TestId, React.ComponentType<TestComponentP
   'five-rooms': FiveRooms,
   'four-colour': FourColour,
   'planarity': Planarity,
+  'three-utilities': ThreeUtilities,
 }
 
 export default function HumanBenchmarkPage() {
