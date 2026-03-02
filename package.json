@@ -13,7 +13,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint"
   },
@@ -34,6 +34,7 @@
     "@lezer/highlight": "^1.2.3",
     "@neplex/vectorizer": "^0.0.5",
     "@replit/codemirror-indentation-markers": "^6.5.3",
+    "@serwist/next": "^9.5.6",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.95.3",
     "ajv": "^8.18.0",
@@ -81,6 +82,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "sass": "^1.97.3",
+    "serwist": "^9.5.6",
     "tailwindcss": "^4",
     "tsup": "^8",
     "typescript": "^5"

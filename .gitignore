@@ -4,3 +4,7 @@ node_modules/
 .claude/
 e2e/
 *.spec.ts
+
+# Serwist generated service worker
+public/sw.js
+public/sw.js.map
