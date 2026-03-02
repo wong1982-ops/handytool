@@ -28,7 +28,7 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
     setPullDistance(Math.min(info.offset.y * 0.5, 100))
   }
 
-  const handleDragEnd = (_: unknown, info: PanInfo) => {
+  const handleDragEnd = () => {
     if (pullDistance > THRESHOLD && !refreshing) {
       setRefreshing(true)
       router.refresh()
@@ -53,7 +53,7 @@ export function PullToRefresh({ children }: PullToRefreshProps) {
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
       dragListener={false}
-      onPointerDown={(e) => {
+      onPointerDown={() => {
         if (canPull()) {
           // Allow drag only when at top
         }

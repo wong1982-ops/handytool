@@ -4,7 +4,6 @@ import { type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, type PanInfo } from 'framer-motion'
 
-const EDGE_WIDTH = 20
 const COMMIT_THRESHOLD = 100
 const VELOCITY_THRESHOLD = 800
 
