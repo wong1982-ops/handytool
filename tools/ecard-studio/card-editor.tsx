@@ -22,6 +22,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
   const [zoom, setZoom] = useState(100)
   const [showPreview, setShowPreview] = useState(false)
   const [showMobilePanel, setShowMobilePanel] = useState(false)
+  const [showMobileTemplates, setShowMobileTemplates] = useState(false)
 
   const cardRef = useRef<HTMLDivElement>(null)
 
@@ -84,6 +85,24 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
+          {/* Mobile: Templates toggle */}
+          <button
+            type="button"
+            onClick={() => setShowMobileTemplates((v) => !v)}
+            className={`lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 text-sm border rounded-md transition-colors ${
+              showMobileTemplates
+                ? 'text-blue-400 border-blue-500/50 bg-blue-500/10'
+                : 'text-slate-300 hover:text-white border-slate-700 hover:border-slate-500'
+            }`}
+            aria-label="Toggle template gallery"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+              <rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+              <rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+              <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+          </button>
           {/* Mobile: Edit panel toggle */}
           <button
             type="button"
@@ -154,12 +173,20 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
         </div>
       </div>
 
-      {/* Template Strip */}
-      <TemplateStrip
-        activeTemplate={cardData.template}
-        onSelectTemplate={handleTemplateSelect}
-        onLoadCardData={handleLoadCardData}
-      />
+      {/* Template Strip — hidden on mobile, toggled via Templates button */}
+      <div className={`${showMobileTemplates ? 'block' : 'hidden'} lg:block`}>
+        <TemplateStrip
+          activeTemplate={cardData.template}
+          onSelectTemplate={(id) => {
+            handleTemplateSelect(id)
+            setShowMobileTemplates(false)
+          }}
+          onLoadCardData={(data) => {
+            handleLoadCardData(data)
+            setShowMobileTemplates(false)
+          }}
+        />
+      </div>
 
       {/* 2-Column Layout: Canvas + Edit Panel */}
       <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">

@@ -112,18 +112,16 @@ export default async function ToolsPage() {
         {tools.map((tool) => {
           const slug = tool.href.replace('/tools/', '')
           return (
-            <div key={tool.href} className="group flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
-              <Link href={tool.href} className="flex items-center gap-4 flex-1 min-w-0">
+            <Link key={tool.href} href={tool.href} className="group relative flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tool.color} shadow-md group-hover:scale-105 transition-transform flex items-center justify-center text-white shrink-0`}>
                   <div className="w-6 h-6 [&>svg]:w-6 [&>svg]:h-6">{tool.icon}</div>
                 </div>
-                <div className="min-w-0">
+                <div className="flex-1 min-w-0">
                   <p className="font-bold text-slate-900 dark:text-white">{tool.name}</p>
                   <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2" title={tool.description}>{tool.description}</p>
                 </div>
-              </Link>
-              <FavoriteButton slug={slug} name={tool.name} />
-            </div>
+                <FavoriteButton slug={slug} name={tool.name} />
+            </Link>
           )
         })}
       </div>

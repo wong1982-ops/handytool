@@ -257,9 +257,11 @@ export function DiscoveryPage() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {filteredTemplates.map((template) => (
-              <div
+              <button
                 key={template.id}
-                className="group bg-slate-900 rounded-xl border border-slate-800 overflow-hidden hover:border-slate-600 hover:shadow-lg hover:shadow-blue-500/5 hover:scale-[1.02] transition-all duration-200"
+                type="button"
+                onClick={() => handlePersonalize(template.id)}
+                className="group bg-slate-900 rounded-xl border border-slate-800 overflow-hidden hover:border-slate-600 hover:shadow-lg hover:shadow-blue-500/5 hover:scale-[1.02] transition-all duration-200 text-left cursor-pointer"
               >
                 {/* Preview Box with overlay badge */}
                 <div
@@ -296,15 +298,11 @@ export function DiscoveryPage() {
                 <div className="p-3 sm:p-4">
                   <h3 className="font-semibold text-xs sm:text-sm text-white truncate mb-1 sm:mb-2">{template.name}</h3>
                   <p className="text-[10px] sm:text-xs text-slate-500 mb-2 sm:mb-3 line-clamp-2">{template.description}</p>
-                  <button
-                    type="button"
-                    onClick={() => handlePersonalize(template.id)}
-                    className="w-full py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors cursor-pointer"
-                  >
+                  <span className="block w-full py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg bg-blue-600 group-hover:bg-blue-500 text-white transition-colors text-center">
                     Personalize
-                  </button>
+                  </span>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         )}

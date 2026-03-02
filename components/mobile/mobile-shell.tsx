@@ -12,9 +12,20 @@ interface MobileShellProps {
   children: React.ReactNode // the tools content (existing page)
 }
 
+const TAB_KEY = 'toolk1t-active-tab'
+
 export function MobileShell({ children }: MobileShellProps) {
   const isMobile = useMobileShell()
-  const [activeTab, setActiveTab] = useState<TabId>('tools')
+  const [activeTab, setActiveTab] = useState<TabId>(() => {
+    if (typeof window === 'undefined') return 'tools'
+    const saved = sessionStorage.getItem(TAB_KEY) as TabId | null
+    return saved === 'favorites' || saved === 'profile' ? saved : 'tools'
+  })
+
+  const handleTabChange = useCallback((tab: TabId) => {
+    setActiveTab(tab)
+    sessionStorage.setItem(TAB_KEY, tab)
+  }, [])
 
   const [dark, setDark] = useState(() => {
     if (typeof window === 'undefined') return true
@@ -36,18 +47,18 @@ export function MobileShell({ children }: MobileShellProps) {
     <div className="fixed inset-0 z-[60] flex flex-col bg-slate-50 dark:bg-slate-950">
       <MobileHeader dark={dark} onToggleTheme={toggleTheme} />
 
-      <TabSwipeContainer activeTab={activeTab} onTabChange={setActiveTab}>
+      <TabSwipeContainer activeTab={activeTab} onTabChange={handleTabChange}>
         {/* Tools tab — render the existing page content */}
         <div className="pb-16">{children}</div>
 
         {/* Favorites tab */}
-        <div className="pb-16"><FavoritesTab onNavigate={() => setActiveTab('tools')} /></div>
+        <div className="pb-16"><FavoritesTab onNavigate={() => handleTabChange('tools')} /></div>
 
         {/* Profile tab */}
         <div className="pb-16"><ProfileTab /></div>
       </TabSwipeContainer>
 
-      <BottomTabBar activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   )
 }
