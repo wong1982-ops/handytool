@@ -15,6 +15,11 @@ export function InstallPrompt() {
   const [show, setShow] = useState(false)
 
   useEffect(() => {
+    // Register service worker for PWA support
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {})
+    }
+
     if (window.matchMedia('(display-mode: standalone)').matches) return
 
     const dismissed = localStorage.getItem(DISMISS_KEY)
