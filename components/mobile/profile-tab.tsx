@@ -32,21 +32,21 @@ export function ProfileTab() {
 
   return (
     <div className="px-4 py-4 space-y-4">
-      <h2 className="text-lg font-bold text-white">Settings</h2>
+      <h2 className="text-lg font-bold text-gray-900 dark:text-white">Settings</h2>
 
       {/* User section */}
       {loading ? (
-        <div className="h-16 rounded-xl bg-white/5 animate-pulse" />
+        <div className="h-16 rounded-xl bg-gray-100 dark:bg-white/5 animate-pulse" />
       ) : user ? (
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5">
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-100 dark:bg-white/5">
           <div className="w-12 h-12 rounded-full bg-[#3D6AF2] flex items-center justify-center text-white font-bold text-lg">
             {(user.user_metadata?.full_name || user.email || '?')[0].toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white truncate">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
               {user.user_metadata?.full_name || 'User'}
             </p>
-            <p className="text-xs text-gray-400 truncate">{user.email}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
           </div>
           <button
             onClick={() => signOut()}
@@ -67,11 +67,11 @@ export function ProfileTab() {
       )}
 
       {/* Dark mode toggle */}
-      <div className="flex items-center justify-between p-4 rounded-xl bg-white/5">
-        <span className="text-sm text-white font-medium">Dark Mode</span>
+      <div className="flex items-center justify-between p-4 rounded-xl bg-gray-100 dark:bg-white/5">
+        <span className="text-sm text-gray-900 dark:text-white font-medium">Dark Mode</span>
         <button
           onClick={toggleTheme}
-          className={`relative w-12 h-7 rounded-full transition-colors cursor-pointer ${dark ? 'bg-[#3D6AF2]' : 'bg-gray-600'}`}
+          className={`relative w-12 h-7 rounded-full transition-colors cursor-pointer ${dark ? 'bg-[#3D6AF2]' : 'bg-gray-300'}`}
           role="switch"
           aria-checked={dark}
           aria-label="Toggle dark mode"
@@ -81,12 +81,12 @@ export function ProfileTab() {
       </div>
 
       {/* Links */}
-      <div className="rounded-xl bg-white/5 divide-y divide-white/5">
+      <div className="rounded-xl bg-gray-100 dark:bg-white/5 divide-y divide-gray-200 dark:divide-white/5">
         {LINKS.map((link) => (
           <Link
             key={link.href}
             href={link.href}
-            className="flex items-center justify-between px-4 py-3.5 text-sm text-gray-300 hover:text-white transition-colors"
+            className="flex items-center justify-between px-4 py-3.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             {link.label}
             <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

@@ -48,7 +48,7 @@ export function BottomSheet({ open, onClose, children, snapPoint = 'half' }: Bot
 
           {/* Sheet */}
           <motion.div
-            className="fixed bottom-0 left-0 right-0 z-[71] rounded-t-2xl bg-gray-900 border-t border-white/10"
+            className="fixed bottom-0 left-0 right-0 z-[71] rounded-t-2xl bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-white/10"
             style={{ maxHeight: SNAP_HEIGHTS[snapPoint] }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -61,7 +61,7 @@ export function BottomSheet({ open, onClose, children, snapPoint = 'half' }: Bot
           >
             {/* Drag handle */}
             <div className="flex justify-center py-3">
-              <div className="w-9 h-1 rounded-full bg-gray-600" />
+              <div className="w-9 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
             </div>
 
             {/* Content */}

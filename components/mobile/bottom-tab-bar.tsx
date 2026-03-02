@@ -65,7 +65,7 @@ export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
       className={`fixed bottom-0 left-0 right-0 z-50 transition-transform duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <div className="flex items-center justify-around h-14 bg-gray-900/90 backdrop-blur-lg border-t border-white/10">
+      <div className="flex items-center justify-around h-14 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-t border-gray-200 dark:border-white/10">
         {TABS.map((tab) => {
           const active = activeTab === tab.id
           return (
@@ -73,7 +73,7 @@ export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors cursor-pointer ${
-                active ? 'text-[#3D6AF2]' : 'text-gray-500'
+                active ? 'text-[#3D6AF2]' : 'text-gray-400 dark:text-gray-500'
               }`}
               aria-label={tab.label}
               aria-current={active ? 'page' : undefined}
