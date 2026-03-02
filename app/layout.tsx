@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ProfilePrompt } from "@/components/auth/profile-prompt";
+import { InstallPrompt } from "@/components/layout/install-prompt";
 import { PageTracker } from "@/lib/hooks/use-page-tracker";
 import "./globals.scss";
 
@@ -57,6 +58,7 @@ export default function RootLayout({
         {children}
         <Footer brandName="Toolk1t" />
         <ProfilePrompt />
+        <InstallPrompt />
         <PageTracker />
       </body>
     </html>
