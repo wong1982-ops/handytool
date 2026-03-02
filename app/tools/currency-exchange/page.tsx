@@ -8,6 +8,7 @@ import { CurrencyPairs, type CurrencyPair } from '@/tools/currency-exchange/curr
 import { ExternalLinks } from '@/tools/currency-exchange/external-links'
 import { PanelGrid } from '@/tools/currency-exchange/panel-grid'
 import { usePanelLayout, type PanelId } from '@/tools/currency-exchange/use-panel-layout'
+import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
 import { useIsDesktop } from '@/tools/currency-exchange/use-is-desktop'
 import { useFavorites } from '@/tools/currency-exchange/use-favorites'
 import { useOfflineRates } from '@/tools/currency-exchange/use-offline-rates'
@@ -454,16 +455,7 @@ export default function CurrencyExchangePage() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
-      {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="mb-6">
-        <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-          <li>
-            <a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li aria-current="page" className="text-slate-900 dark:text-white font-medium">Currency Exchange</li>
-        </ol>
-      </nav>
+      <ToolBreadcrumb toolName="Currency Exchange" toolSlug="currency-exchange" className="mb-6" />
 
       {/* Error banner */}
       {error && (

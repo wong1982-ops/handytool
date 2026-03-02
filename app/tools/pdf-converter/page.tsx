@@ -8,6 +8,7 @@ import { FileList, createStagedFile } from '@/tools/pdf-converter/file-list'
 import type { StagedFile, ProcessingState } from '@/tools/pdf-converter/file-list'
 import { ModeOptions } from '@/tools/pdf-converter/mode-options'
 import type { ImageToPdfOptions, PdfToImagesOutputOptions } from '@/tools/pdf-converter/mode-options'
+import { FavoriteButton } from '@/components/ui/favorite-button'
 import type { CompressionQuality } from '@/tools/pdf-converter/processors/compress-pdf'
 import type { ExtractionMode } from '@/tools/pdf-converter/processors/pdf-to-excel'
 import type { WatermarkOptions } from '@/tools/pdf-converter/processors/watermark'
@@ -427,12 +428,13 @@ export default function PdfConverterPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <nav aria-label="Breadcrumb">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2">
             <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
               <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
               <li aria-hidden="true">/</li>
               <li aria-current="page" className="text-slate-900 dark:text-white font-medium">PDF Converter</li>
             </ol>
+            <FavoriteButton slug="pdf-converter" name="PDF Converter" />
           </nav>
         </div>
       </div>

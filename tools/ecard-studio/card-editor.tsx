@@ -9,6 +9,7 @@ import { CardCanvas } from '@/tools/ecard-studio/card-canvas'
 import { CustomizationPanel } from '@/tools/ecard-studio/customization-panel'
 import { PreviewModal } from '@/tools/ecard-studio/preview-modal'
 import { exportCardAsPng } from '@/tools/ecard-studio/export'
+import { FavoriteButton } from '@/components/ui/favorite-button'
 
 function getInitialCardData(templateId: TemplateId): ECardData {
   if (templateId === 'blank') return { ...BLANK_DEFAULTS }
@@ -66,7 +67,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
       {/* Top Bar */}
       <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between flex-shrink-0">
         {/* Left: Breadcrumb */}
-        <nav aria-label="Breadcrumb">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2">
           <ol className="flex items-center gap-1.5 text-sm text-slate-400">
             <li>
               <a href="/tools" className="hover:text-white transition-colors">
@@ -78,6 +79,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
               ECard Studio
             </li>
           </ol>
+          <FavoriteButton slug="ecard-studio" name="ECard Studio" />
         </nav>
 
         {/* Right: Actions */}

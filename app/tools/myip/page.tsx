@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { MyIpHero } from '@/tools/myip/myip-hero'
 import { TechInfoPanel } from '@/tools/myip/tech-info-panel'
 import { LiveLocationPanel } from '@/tools/myip/live-location-panel'
+import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
 
 interface MyIpData {
   ip: string
@@ -69,14 +70,7 @@ export default function MyIpPage() {
   return (
     <main className="flex-1 flex flex-col items-center py-10 px-4">
       <div className="w-full max-w-[1024px] flex flex-col gap-8">
-        {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb">
-          <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-            <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
-            <li aria-hidden="true">/</li>
-            <li aria-current="page" className="text-slate-900 dark:text-white font-medium">My IP</li>
-          </ol>
-        </nav>
+        <ToolBreadcrumb toolName="My IP" toolSlug="myip" />
 
         {/* Error State */}
         {state === 'error' && error && (

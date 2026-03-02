@@ -5,6 +5,7 @@ import { TestCard } from './test-card'
 import { useTestScores } from './use-test-scores'
 import type { TestId } from './types'
 import DailyChallenge from './daily-challenge'
+import { FavoriteButton } from '@/components/ui/favorite-button'
 
 interface DashboardProps {
   onSelectTest: (testId: TestId) => void
@@ -46,9 +47,12 @@ export function Dashboard({ onSelectTest }: DashboardProps) {
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-                  Human Benchmark
-                </h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+                    Human Benchmark
+                  </h1>
+                  <FavoriteButton slug="human-benchmark" name="Human Benchmark" />
+                </div>
                 <p className="text-slate-500 dark:text-slate-400 mt-1">
                   Cognitive Testing Dashboard
                 </p>

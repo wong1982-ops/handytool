@@ -5,6 +5,7 @@ import { SearchBar } from '@/components/ui/search-bar'
 import { IpHeroCard } from '@/tools/ipcheck/ip-hero-card'
 import { IpInfoGrid } from '@/tools/ipcheck/ip-info-grid'
 import { LocationDetail } from '@/tools/ipcheck/location-detail'
+import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
 
 interface IpData {
   ip: string
@@ -170,13 +171,7 @@ export default function IpCheckPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-5 flex-1 overflow-x-hidden">
-      <nav aria-label="Breadcrumb" className="mb-6 md:mb-4">
-        <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-          <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
-          <li aria-hidden="true">/</li>
-          <li aria-current="page" className="text-slate-900 dark:text-white font-medium">IP Check</li>
-        </ol>
-      </nav>
+      <ToolBreadcrumb toolName="IP Check" toolSlug="ipcheck" />
 
       <div className="mb-8 md:mb-5">
         <div className="w-full flex items-start gap-2">
