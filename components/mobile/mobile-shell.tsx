@@ -41,7 +41,7 @@ export function MobileShell({ children }: MobileShellProps) {
         <div className="pb-16">{children}</div>
 
         {/* Favorites tab */}
-        <div className="pb-16"><FavoritesTab /></div>
+        <div className="pb-16"><FavoritesTab onNavigate={() => setActiveTab('tools')} /></div>
 
         {/* Profile tab */}
         <div className="pb-16"><ProfileTab /></div>

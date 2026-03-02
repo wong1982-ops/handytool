@@ -1,11 +1,16 @@
 'use client'
 
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { tools } from '@/lib/tools'
 import { useFavorites } from '@/lib/hooks/use-favorites'
 
-export function FavoritesTab() {
+interface FavoritesTabProps {
+  onNavigate?: () => void
+}
+
+export function FavoritesTab({ onNavigate }: FavoritesTabProps) {
   const { favorites, toggle } = useFavorites()
+  const router = useRouter()
   const favoriteTools = tools.filter((t) => {
     const slug = t.href.replace('/tools/', '')
     return favorites.includes(slug)
@@ -31,7 +36,12 @@ export function FavoritesTab() {
           const slug = tool.href.replace('/tools/', '')
           return (
             <div key={tool.href} className="flex items-center gap-3 p-3 rounded-xl bg-slate-100 dark:bg-white/5">
-              <Link href={tool.href} className="flex items-center gap-3 flex-1 min-w-0">
+              <button
+                onClick={() => {
+                  router.push(tool.href)
+                  onNavigate?.()
+                }}
+                className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer">
                 <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${tool.color} flex items-center justify-center text-white shrink-0`}>
                   <div className="w-5 h-5 [&>svg]:w-5 [&>svg]:h-5">{tool.icon}</div>
                 </div>
@@ -39,7 +49,7 @@ export function FavoritesTab() {
                   <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{tool.name}</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{tool.description}</p>
                 </div>
-              </Link>
+              </button>
               <button
                 onClick={() => toggle(slug)}
                 className="p-2 text-amber-400 cursor-pointer shrink-0"
