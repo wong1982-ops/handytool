@@ -217,10 +217,12 @@ export function Tangram({ onComplete, bestScore }: TestComponentProps) {
       // Get SVG coordinates
       const svg = svgRef.current
       if (!svg) return
+      const ctm = svg.getScreenCTM()
+      if (!ctm) return
       const pt = svg.createSVGPoint()
       pt.x = e.clientX
       pt.y = e.clientY
-      const svgPt = pt.matrixTransform(svg.getScreenCTM()?.inverse())
+      const svgPt = pt.matrixTransform(ctm.inverse())
 
       dragRef.current = {
         pieceId,
@@ -239,10 +241,12 @@ export function Tangram({ onComplete, bestScore }: TestComponentProps) {
       const svg = svgRef.current
       if (!svg) return
 
+      const ctm = svg.getScreenCTM()
+      if (!ctm) return
       const pt = svg.createSVGPoint()
       pt.x = e.clientX
       pt.y = e.clientY
-      const svgPt = pt.matrixTransform(svg.getScreenCTM()?.inverse())
+      const svgPt = pt.matrixTransform(ctm.inverse())
 
       const dx = svgPt.x - dragRef.current.startX
       const dy = svgPt.y - dragRef.current.startY
