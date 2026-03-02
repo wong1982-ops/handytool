@@ -9,6 +9,7 @@ import { ProblemsPanel } from '@/tools/swagger-editor/problems-panel'
 import { SwaggerUIPreview } from '@/tools/swagger-editor/swagger-ui-preview'
 import { useOpenApiValidator } from '@/tools/swagger-editor/use-openapi-validator'
 import { FavoriteButton } from '@/components/ui/favorite-button'
+import { BackButton } from '@/components/ui/back-button'
 import '@/tools/swagger-editor/split-pane.scss'
 
 const sampleYaml = `openapi: "3.0.1"
@@ -222,7 +223,8 @@ export default function SwaggerEditorPage() {
         {/* Top Bar */}
         <div className="px-4 md:px-6 py-2.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2">
-            <ol className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
+            <BackButton />
+            <ol className="hidden md:flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
               <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
               <li aria-hidden="true">/</li>
               <li aria-current="page" className="text-slate-900 dark:text-white font-medium">Swagger Editor</li>

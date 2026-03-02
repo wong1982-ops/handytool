@@ -9,6 +9,7 @@ import { LayersPanel } from '@/tools/image-editor/layers-panel'
 import { ExportDialog, type ExportOptions } from '@/tools/image-editor/export-dialog'
 import { HistoryStrip } from '@/tools/image-editor/history-strip'
 import { FavoriteButton } from '@/components/ui/favorite-button'
+import { BackButton } from '@/components/ui/back-button'
 
 const DEFAULT_ADJUSTMENTS: Adjustments = {
   brightness: 0,
@@ -211,8 +212,9 @@ export default function ImageEditorPage() {
       {/* Top bar */}
       <header className="h-12 border-b border-slate-700 flex items-center justify-between px-4 shrink-0 bg-[#101622]">
         <div className="flex items-center gap-4">
-          <nav aria-label="Breadcrumb" className="hidden sm:flex items-center gap-2">
-            <ol className="flex items-center gap-1.5 text-sm text-slate-400">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2">
+            <BackButton />
+            <ol className="hidden md:flex items-center gap-1.5 text-sm text-slate-400">
               <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
               <li aria-hidden="true">/</li>
               <li aria-current="page" className="text-white font-medium">Image Editor</li>

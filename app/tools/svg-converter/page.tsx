@@ -9,6 +9,7 @@ import { ExportActions } from '@/tools/svg-converter/export-actions'
 import { ZoomControls } from '@/tools/svg-converter/zoom-controls'
 import { StatusBar } from '@/tools/svg-converter/status-bar'
 import { FavoriteButton } from '@/components/ui/favorite-button'
+import { BackButton } from '@/components/ui/back-button'
 import { BatchPanel } from '@/tools/svg-converter/batch-panel'
 import { useSvgTracer } from '@/tools/svg-converter/use-svg-tracer'
 import { svgToEps } from '@/tools/svg-converter/exporters/svg-to-eps'
@@ -242,17 +243,12 @@ export default function SvgConverterPage() {
       {/* Top bar */}
       <header className="h-12 border-b border-slate-700 flex items-center justify-between px-4 shrink-0 bg-[#101622]">
         <div className="flex items-center gap-4">
-          <nav aria-label="Breadcrumb" className="hidden sm:flex items-center gap-2">
-            <ol className="flex items-center gap-1.5 text-sm text-slate-400">
-              <li>
-                <a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">
-                  Home
-                </a>
-              </li>
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2">
+            <BackButton />
+            <ol className="hidden md:flex items-center gap-1.5 text-sm text-slate-400">
+              <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
               <li aria-hidden="true">/</li>
-              <li aria-current="page" className="text-white font-medium">
-                SVG Converter
-              </li>
+              <li aria-current="page" className="text-white font-medium">SVG Converter</li>
             </ol>
             <FavoriteButton slug="svg-converter" name="SVG Converter" />
           </nav>

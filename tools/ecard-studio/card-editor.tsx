@@ -10,6 +10,7 @@ import { CustomizationPanel } from '@/tools/ecard-studio/customization-panel'
 import { PreviewModal } from '@/tools/ecard-studio/preview-modal'
 import { exportCardAsPng } from '@/tools/ecard-studio/export'
 import { FavoriteButton } from '@/components/ui/favorite-button'
+import { BackButton } from '@/components/ui/back-button'
 
 function getInitialCardData(templateId: TemplateId): ECardData {
   if (templateId === 'blank') return { ...BLANK_DEFAULTS }
@@ -67,18 +68,13 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
       <style dangerouslySetInnerHTML={{ __html: 'html, body { height: 100dvh !important; min-height: 100dvh !important; overflow: hidden !important; } body > footer { display: none !important; }' }} />
       {/* Top Bar */}
       <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between flex-shrink-0">
-        {/* Left: Breadcrumb */}
+        {/* Left: Back / Breadcrumb */}
         <nav aria-label="Breadcrumb" className="flex items-center gap-2">
-          <ol className="flex items-center gap-1.5 text-sm text-slate-400">
-            <li>
-              <a href="/tools" className="hover:text-white transition-colors">
-                Tools
-              </a>
-            </li>
+          <BackButton />
+          <ol className="hidden md:flex items-center gap-1.5 text-sm text-slate-400">
+            <li><a href="/tools" className="hover:text-white transition-colors">Tools</a></li>
             <li aria-hidden="true">/</li>
-            <li aria-current="page" className="text-white font-medium">
-              ECard Studio
-            </li>
+            <li aria-current="page" className="text-white font-medium">ECard Studio</li>
           </ol>
           <FavoriteButton slug="ecard-studio" name="ECard Studio" />
         </nav>
