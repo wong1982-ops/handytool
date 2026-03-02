@@ -1,27 +1,54 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useSyncExternalStore, useCallback } from 'react'
 
 const STORAGE_KEY = 'toolk1t-favorites'
 
-export function useFavorites() {
-  const [favorites, setFavorites] = useState<string[]>([])
+// Module-level store shared across all hook instances
+let listeners: Array<() => void> = []
+let cached: string[] | null = null
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) setFavorites(JSON.parse(stored))
-    } catch { /* ignore */ }
-  }, [])
+function read(): string[] {
+  if (cached) return cached
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    cached = stored ? JSON.parse(stored) : []
+  } catch {
+    cached = []
+  }
+  return cached!
+}
+
+function write(next: string[]) {
+  cached = next
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+  listeners.forEach((l) => l())
+}
+
+function subscribe(listener: () => void) {
+  listeners.push(listener)
+  return () => {
+    listeners = listeners.filter((l) => l !== listener)
+  }
+}
+
+function getSnapshot(): string[] {
+  return read()
+}
+
+function getServerSnapshot(): string[] {
+  return []
+}
+
+export function useFavorites() {
+  const favorites = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
   const toggle = useCallback((slug: string) => {
-    setFavorites((prev) => {
-      const next = prev.includes(slug)
-        ? prev.filter((s) => s !== slug)
-        : [...prev, slug]
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-      return next
-    })
+    const prev = read()
+    const next = prev.includes(slug)
+      ? prev.filter((s) => s !== slug)
+      : [...prev, slug]
+    write(next)
   }, [])
 
   const isFavorite = useCallback(
