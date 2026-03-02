@@ -1,6 +1,6 @@
 'use client'
 
-import { TEST_CONFIGS } from './constants'
+import { TEST_CONFIGS, CATEGORY_ORDER } from './constants'
 import { TestCard } from './test-card'
 import { useTestScores } from './use-test-scores'
 import type { TestId } from './types'
@@ -80,37 +80,28 @@ export function Dashboard({ onSelectTest }: DashboardProps) {
         {/* Daily challenge */}
         <DailyChallenge onStartChallenge={onSelectTest} />
 
-        {/* Section heading */}
-        <div className="flex items-center gap-2 mb-6">
-          <svg
-            className="w-5 h-5 text-[var(--tk-color-primary-500)]"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-            />
-          </svg>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            Cognitive Assessment Modules
-          </h2>
-        </div>
-
-        {/* Test card grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {TEST_CONFIGS.map((test) => (
-            <TestCard
-              key={test.id}
-              test={test}
-              score={scores[test.id]}
-              onClick={() => onSelectTest(test.id)}
-            />
-          ))}
-        </div>
+        {/* Grouped test sections */}
+        {CATEGORY_ORDER.map((category) => {
+          const tests = TEST_CONFIGS.filter((t) => t.category === category)
+          if (tests.length === 0) return null
+          return (
+            <div key={category} className="mb-8">
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">
+                {category}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                {tests.map((test) => (
+                  <TestCard
+                    key={test.id}
+                    test={test}
+                    score={scores[test.id]}
+                    onClick={() => onSelectTest(test.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

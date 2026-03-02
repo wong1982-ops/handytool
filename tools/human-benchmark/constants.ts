@@ -32,6 +32,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#dc2626',
     unit: 'ms',
     lowerIsBetter: true,
+    category: 'Reflexes & Speed',
   },
   {
     id: 'sequence-memory',
@@ -61,6 +62,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#7c3aed',
     unit: 'level',
     lowerIsBetter: false,
+    category: 'Memory',
   },
   {
     id: 'aim-trainer',
@@ -90,6 +92,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#16a34a',
     unit: 'ms',
     lowerIsBetter: true,
+    category: 'Reflexes & Speed',
   },
   {
     id: 'number-memory',
@@ -119,6 +122,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#2563eb',
     unit: 'digits',
     lowerIsBetter: false,
+    category: 'Memory',
   },
   {
     id: 'verbal-memory',
@@ -148,6 +152,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#d97706',
     unit: 'score',
     lowerIsBetter: false,
+    category: 'Memory',
   },
   {
     id: 'chimp-test',
@@ -177,6 +182,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#db2777',
     unit: 'level',
     lowerIsBetter: false,
+    category: 'Memory',
   },
   {
     id: 'visual-memory',
@@ -206,6 +212,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#0d9488',
     unit: 'level',
     lowerIsBetter: false,
+    category: 'Memory',
   },
   {
     id: 'typing',
@@ -235,6 +242,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#4f46e5',
     unit: 'WPM',
     lowerIsBetter: false,
+    category: 'Language & Logic',
   },
   {
     id: 'pitch-identification',
@@ -264,6 +272,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#f59e0b',
     unit: 'level',
     lowerIsBetter: false,
+    category: 'Audio & Music',
   },
   {
     id: 'mental-rotation',
@@ -293,6 +302,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#06b6d4',
     unit: 'level',
     lowerIsBetter: false,
+    category: 'Spatial & Visual',
   },
   {
     id: 'schulte-grid',
@@ -322,6 +332,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#f43f5e',
     unit: 's',
     lowerIsBetter: true,
+    category: 'Spatial & Visual',
   },
   {
     id: 'rhythm-test',
@@ -351,6 +362,7 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#8b5cf6',
     unit: 'level',
     lowerIsBetter: false,
+    category: 'Audio & Music',
   },
   {
     id: 'interval-recognition',
@@ -360,6 +372,7 @@ export const TEST_CONFIGS: TestConfig[] = [
       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5-9L16.5 3m0 0L12 7.5m4.5-4.5v13.5' })),
     iconBg: 'bg-teal-900/30', iconColor: 'text-teal-400', iconBgLight: 'bg-teal-100', iconColorLight: 'text-teal-600',
     gameBgColor: '#14b8a6', unit: 'level', lowerIsBetter: false,
+    category: 'Audio & Music',
   },
   {
     id: 'chord-identification',
@@ -369,6 +382,7 @@ export const TEST_CONFIGS: TestConfig[] = [
       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'm9 9 10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15.553Z' })),
     iconBg: 'bg-pink-900/30', iconColor: 'text-pink-400', iconBgLight: 'bg-pink-100', iconColorLight: 'text-pink-600',
     gameBgColor: '#ec4899', unit: 'level', lowerIsBetter: false,
+    category: 'Audio & Music',
   },
   {
     id: 'tone-memory',
@@ -378,6 +392,7 @@ export const TEST_CONFIGS: TestConfig[] = [
       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z' })),
     iconBg: 'bg-emerald-900/30', iconColor: 'text-emerald-400', iconBgLight: 'bg-emerald-100', iconColorLight: 'text-emerald-600',
     gameBgColor: '#10b981', unit: 'level', lowerIsBetter: false,
+    category: 'Memory',
   },
   {
     id: 'higher-or-lower',
@@ -387,6 +402,7 @@ export const TEST_CONFIGS: TestConfig[] = [
       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5-4.5L16.5 21m0 0L12 16.5m4.5 4.5V7.5' })),
     iconBg: 'bg-sky-900/30', iconColor: 'text-sky-400', iconBgLight: 'bg-sky-100', iconColorLight: 'text-sky-600',
     gameBgColor: '#0ea5e9', unit: 'level', lowerIsBetter: false,
+    category: 'Audio & Music',
   },
   {
     id: 'stroop-test',
@@ -397,6 +413,7 @@ export const TEST_CONFIGS: TestConfig[] = [
       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z' })),
     iconBg: 'bg-orange-900/30', iconColor: 'text-orange-400', iconBgLight: 'bg-orange-100', iconColorLight: 'text-orange-600',
     gameBgColor: '#f97316', unit: 'level', lowerIsBetter: false,
+    category: 'Language & Logic',
   },
   {
     id: 'quick-math',
@@ -406,6 +423,7 @@ export const TEST_CONFIGS: TestConfig[] = [
       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25v-.008Zm2.25-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H12.75v-.008Zm0 2.25h.008v.008H12.75v-.008Zm2.25-2.25h.008v.008H15v-.008Zm0 2.25h.008v.008H15v-.008ZM8.25 6h7.5v2.25h-7.5V6ZM6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75A2.25 2.25 0 0 0 15.75 1.5h-7.5A2.25 2.25 0 0 0 6 3.75Z' })),
     iconBg: 'bg-indigo-900/30', iconColor: 'text-indigo-400', iconBgLight: 'bg-indigo-100', iconColorLight: 'text-indigo-600',
     gameBgColor: '#6366f1', unit: 'level', lowerIsBetter: false,
+    category: 'Language & Logic',
   },
   {
     id: 'word-scramble',
@@ -415,6 +433,7 @@ export const TEST_CONFIGS: TestConfig[] = [
       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5' })),
     iconBg: 'bg-purple-900/30', iconColor: 'text-purple-400', iconBgLight: 'bg-purple-100', iconColorLight: 'text-purple-600',
     gameBgColor: '#a855f7', unit: 'level', lowerIsBetter: false,
+    category: 'Language & Logic',
   },
   {
     id: 'tracking-test',
@@ -424,6 +443,7 @@ export const TEST_CONFIGS: TestConfig[] = [
       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672Zm-7.518-.267A8.25 8.25 0 1 1 20.25 10.5M8.288 14.212A5.25 5.25 0 1 1 17.25 10.5' })),
     iconBg: 'bg-red-900/30', iconColor: 'text-red-400', iconBgLight: 'bg-red-100', iconColorLight: 'text-red-600',
     gameBgColor: '#ef4444', unit: 'level', lowerIsBetter: false,
+    category: 'Reflexes & Speed',
   },
   {
     id: 'color-sensitivity',
@@ -434,6 +454,7 @@ export const TEST_CONFIGS: TestConfig[] = [
       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z' })),
     iconBg: 'bg-pink-900/30', iconColor: 'text-pink-400', iconBgLight: 'bg-pink-100', iconColorLight: 'text-pink-600',
     gameBgColor: '#E8567F', unit: 'level', lowerIsBetter: false,
+    category: 'Spatial & Visual',
   },
   {
     id: 'one-stroke',
@@ -443,6 +464,7 @@ export const TEST_CONFIGS: TestConfig[] = [
       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125' })),
     iconBg: 'bg-green-900/30', iconColor: 'text-green-400', iconBgLight: 'bg-green-100', iconColorLight: 'text-green-600',
     gameBgColor: '#4CAF50', unit: 'level', lowerIsBetter: false,
+    category: 'Spatial & Visual',
   },
   {
     id: 'tangram',
@@ -453,5 +475,14 @@ export const TEST_CONFIGS: TestConfig[] = [
       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5' })),
     iconBg: 'bg-orange-900/30', iconColor: 'text-orange-400', iconBgLight: 'bg-orange-100', iconColorLight: 'text-orange-600',
     gameBgColor: '#FF9800', unit: 'level', lowerIsBetter: false,
+    category: 'Spatial & Visual',
   },
+]
+
+export const CATEGORY_ORDER = [
+  'Reflexes & Speed',
+  'Memory',
+  'Audio & Music',
+  'Language & Logic',
+  'Spatial & Visual',
 ]

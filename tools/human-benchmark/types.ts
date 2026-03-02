@@ -37,6 +37,7 @@ export interface TestConfig {
   gameBgColor: string
   unit: string
   lowerIsBetter: boolean
+  category?: string
 }
 
 export interface ScoreEntry {
