@@ -1,5 +1,5 @@
 import React from 'react'
-import type { TestConfig } from './types'
+import type { TestConfig, TestId } from './types'
 
 export const STORAGE_KEY = 'human-benchmark-scores'
 
@@ -477,6 +477,79 @@ export const TEST_CONFIGS: TestConfig[] = [
     gameBgColor: '#FF9800', unit: 'level', lowerIsBetter: false,
     category: 'Spatial & Visual',
   },
+  // ── Graph Theory ──────────────────────────────────
+  {
+    id: 'five-rooms' as TestId,
+    name: 'Five Rooms',
+    description: 'Draw a line that crosses every wall exactly once without retracing.',
+    icon: React.createElement(
+      'svg',
+      { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', strokeWidth: 1.5, stroke: 'currentColor', className: 'w-6 h-6' },
+      React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15' }),
+    ),
+    iconBg: 'bg-purple-900/30',
+    iconColor: 'text-purple-400',
+    iconBgLight: 'bg-purple-100',
+    iconColorLight: 'text-purple-600',
+    gameBgColor: '#8B5CF6',
+    unit: 'level',
+    lowerIsBetter: false,
+    category: 'Graph Theory',
+  },
+  {
+    id: 'four-colour' as TestId,
+    name: 'Four Colour',
+    description: 'Color every region of a map using at most 4 colors with no adjacent matches.',
+    icon: React.createElement(
+      'svg',
+      { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', strokeWidth: 1.5, stroke: 'currentColor', className: 'w-6 h-6' },
+      React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42' }),
+    ),
+    iconBg: 'bg-amber-900/30',
+    iconColor: 'text-amber-400',
+    iconBgLight: 'bg-amber-100',
+    iconColorLight: 'text-amber-600',
+    gameBgColor: '#F59E0B',
+    unit: 'level',
+    lowerIsBetter: false,
+    category: 'Graph Theory',
+  },
+  {
+    id: 'planarity' as TestId,
+    name: 'Planarity',
+    description: 'Untangle a messy graph by dragging nodes until no edges cross.',
+    icon: React.createElement(
+      'svg',
+      { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', strokeWidth: 1.5, stroke: 'currentColor', className: 'w-6 h-6' },
+      React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5' }),
+    ),
+    iconBg: 'bg-cyan-900/30',
+    iconColor: 'text-cyan-400',
+    iconBgLight: 'bg-cyan-100',
+    iconColorLight: 'text-cyan-600',
+    gameBgColor: '#06B6D4',
+    unit: 'level',
+    lowerIsBetter: false,
+    category: 'Graph Theory',
+  },
+  {
+    id: 'three-utilities' as TestId,
+    name: 'Three Utilities',
+    description: 'Connect houses to utilities with the fewest possible line crossings.',
+    icon: React.createElement(
+      'svg',
+      { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', strokeWidth: 1.5, stroke: 'currentColor', className: 'w-6 h-6' },
+      React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21' }),
+    ),
+    iconBg: 'bg-red-900/30',
+    iconColor: 'text-red-400',
+    iconBgLight: 'bg-red-100',
+    iconColorLight: 'text-red-600',
+    gameBgColor: '#EF4444',
+    unit: 'level',
+    lowerIsBetter: false,
+    category: 'Graph Theory',
+  },
 ]
 
 export const CATEGORY_ORDER = [
@@ -485,4 +558,5 @@ export const CATEGORY_ORDER = [
   'Audio & Music',
   'Language & Logic',
   'Spatial & Visual',
+  'Graph Theory',
 ]

@@ -22,6 +22,10 @@ export type TestId =
   | 'color-sensitivity'
   | 'one-stroke'
   | 'tangram'
+  | 'five-rooms'
+  | 'four-colour'
+  | 'planarity'
+  | 'three-utilities'
 
 export type ViewState = 'dashboard' | TestId
 
