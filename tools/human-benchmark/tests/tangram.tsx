@@ -251,10 +251,16 @@ export function Tangram({ onComplete, bestScore }: TestComponentProps) {
       const dx = svgPt.x - dragRef.current.startX
       const dy = svgPt.y - dragRef.current.startY
 
+      // Clamp piece position within SVG bounds (with some margin)
+      const rawX = dragRef.current.offsetX + dx
+      const rawY = dragRef.current.offsetY + dy
+      const clampedX = Math.max(-250, Math.min(250, rawX))
+      const clampedY = Math.max(-350, Math.min(350, rawY))
+
       setPieces((prev) =>
         prev.map((p) =>
           p.id === dragRef.current!.pieceId
-            ? { ...p, x: dragRef.current!.offsetX + dx, y: dragRef.current!.offsetY + dy }
+            ? { ...p, x: clampedX, y: clampedY }
             : p,
         ),
       )
@@ -267,8 +273,17 @@ export function Tangram({ onComplete, bestScore }: TestComponentProps) {
     const pieceId = dragRef.current.pieceId
     dragRef.current = null
 
-    // Check snap
-    setPieces((prev) => checkAndSnap(pieceId, prev))
+    // Check snap, then ensure piece is within visible bounds
+    setPieces((prev) => {
+      const snapped = checkAndSnap(pieceId, prev)
+      return snapped.map((p) => {
+        if (p.id !== pieceId || p.placed) return p
+        // Clamp final position within safe bounds
+        const clampedX = Math.max(-200, Math.min(200, p.x))
+        const clampedY = Math.max(-250, Math.min(300, p.y))
+        return { ...p, x: clampedX, y: clampedY }
+      })
+    })
   }, [checkAndSnap])
 
   const handleRotate = useCallback(() => {
