@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { tools } from '@/lib/tools'
 import { createClient } from '@/lib/supabase/server'
+import { FavoriteButton } from '@/components/ui/favorite-button'
 
 export const revalidate = 3600
 
@@ -108,21 +109,23 @@ export default async function ToolsPage() {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {tools.map((tool) => (
-          <Link
-            key={tool.href}
-            href={tool.href}
-            className="group flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all"
-          >
-            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tool.color} shadow-md group-hover:scale-105 transition-transform flex items-center justify-center text-white shrink-0`}>
-              <div className="w-6 h-6 [&>svg]:w-6 [&>svg]:h-6">{tool.icon}</div>
+        {tools.map((tool) => {
+          const slug = tool.href.replace('/tools/', '')
+          return (
+            <div key={tool.href} className="group flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
+              <Link href={tool.href} className="flex items-center gap-4 flex-1 min-w-0">
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tool.color} shadow-md group-hover:scale-105 transition-transform flex items-center justify-center text-white shrink-0`}>
+                  <div className="w-6 h-6 [&>svg]:w-6 [&>svg]:h-6">{tool.icon}</div>
+                </div>
+                <div className="min-w-0">
+                  <p className="font-bold text-slate-900 dark:text-white">{tool.name}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2" title={tool.description}>{tool.description}</p>
+                </div>
+              </Link>
+              <FavoriteButton slug={slug} name={tool.name} />
             </div>
-            <div className="min-w-0">
-              <p className="font-bold text-slate-900 dark:text-white">{tool.name}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2" title={tool.description}>{tool.description}</p>
-            </div>
-          </Link>
-        ))}
+          )
+        })}
       </div>
     </main>
   )

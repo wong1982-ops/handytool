@@ -57,8 +57,8 @@ export function InstallPrompt() {
   if (!show) return null
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md animate-in slide-in-from-bottom fade-in duration-300">
-      <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-gray-900/90 backdrop-blur-lg p-4 shadow-2xl">
+    <div className="fixed bottom-20 left-4 right-4 z-[70] mx-auto max-w-md animate-in slide-in-from-bottom fade-in duration-300">
+      <div className="flex items-center gap-3 rounded-xl border border-slate-700/50 bg-slate-900/95 backdrop-blur-lg p-4 shadow-2xl">
         <img src="/icon-192.png" alt="Toolk1t" className="h-10 w-10 rounded-lg" />
         <div className="flex-1 min-w-0">
           <p className="font-medium text-white text-sm">Install Toolk1t</p>
