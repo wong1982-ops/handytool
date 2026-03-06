@@ -71,17 +71,19 @@ async function handleCheckoutSessionCompleted(
       return
     }
 
-    // Retrieve Stripe subscription for period dates
+    // Retrieve Stripe subscription for period dates (v20: periods on items)
     const stripeSubscriptionId = session.subscription as string
     const subscription = await stripe.subscriptions.retrieve(
       stripeSubscriptionId,
+      { expand: ['items.data'] },
     )
 
+    const firstItem = subscription.items.data[0]
     const periodStart = new Date(
-      subscription.current_period_start * 1000,
+      firstItem.current_period_start * 1000,
     ).toISOString()
     const periodEnd = new Date(
-      subscription.current_period_end * 1000,
+      firstItem.current_period_end * 1000,
     ).toISOString()
 
     // Create the user_subscriptions row
@@ -107,9 +109,9 @@ async function handleCheckoutSessionCompleted(
       'grant_subscription_credits',
       {
         p_user_id: userId,
-        p_credits: tier.monthly_credits,
-        p_period_start: periodStart,
+        p_amount: tier.monthly_credits,
         p_period_end: periodEnd,
+        p_description: `Subscription credits granted`,
       },
     )
 
@@ -127,7 +129,8 @@ async function handleCheckoutSessionCompleted(
       'grant_purchased_credits',
       {
         p_user_id: userId,
-        p_credits: credits,
+        p_amount: credits,
+        p_description: `Purchased ${credits} credits`,
       },
     )
 
@@ -141,7 +144,8 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   const supabase = getAdminSupabase()
   const stripe = getStripe()
 
-  const stripeSubscriptionId = invoice.subscription as string | null
+  const stripeSubscriptionId =
+    (invoice.parent?.subscription_details?.subscription as string | null) ?? null
   if (!stripeSubscriptionId) return
 
   // Find our user_subscriptions record
@@ -172,16 +176,18 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
     return
   }
 
-  // Retrieve Stripe subscription for period dates
+  // Retrieve Stripe subscription for period dates (v20: periods on items)
   const subscription = await stripe.subscriptions.retrieve(
     stripeSubscriptionId,
+    { expand: ['items.data'] },
   )
 
+  const firstItem = subscription.items.data[0]
   const periodStart = new Date(
-    subscription.current_period_start * 1000,
+    firstItem.current_period_start * 1000,
   ).toISOString()
   const periodEnd = new Date(
-    subscription.current_period_end * 1000,
+    firstItem.current_period_end * 1000,
   ).toISOString()
 
   // Update user_subscriptions period
