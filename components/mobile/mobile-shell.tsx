@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useMobileShell } from '@/lib/hooks/use-mobile-shell'
+import { useAuth } from '@/lib/hooks/use-auth'
 import { MobileHeader } from '@/components/mobile/mobile-header'
 import { BottomTabBar, type TabId } from '@/components/mobile/bottom-tab-bar'
 import { TabSwipeContainer } from '@/components/mobile/tab-swipe-container'
@@ -16,6 +17,7 @@ const TAB_KEY = 'toolk1t-active-tab'
 
 export function MobileShell({ children }: MobileShellProps) {
   const isMobile = useMobileShell()
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<TabId>(() => {
     if (typeof window === 'undefined') return 'tools'
     const saved = sessionStorage.getItem(TAB_KEY) as TabId | null
@@ -58,7 +60,7 @@ export function MobileShell({ children }: MobileShellProps) {
         <div className="pb-16"><ProfileTab /></div>
       </TabSwipeContainer>
 
-      <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} />
+      <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} user={user} />
     </div>
   )
 }

@@ -1,12 +1,15 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
+import type { User } from '@supabase/supabase-js'
 
 export type TabId = 'tools' | 'favorites' | 'profile'
 
 interface BottomTabBarProps {
   activeTab: TabId
   onTabChange: (tab: TabId) => void
+  user?: User | null
 }
 
 const TABS: { id: TabId; label: string; icon: (active: boolean) => React.ReactNode }[] = [
@@ -42,7 +45,7 @@ const TABS: { id: TabId; label: string; icon: (active: boolean) => React.ReactNo
   },
 ]
 
-export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
+export function BottomTabBar({ activeTab, onTabChange, user }: BottomTabBarProps) {
   const [visible, setVisible] = useState(true)
   const lastScrollY = useRef(0)
 
@@ -60,6 +63,10 @@ export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  const avatarUrl = user?.user_metadata?.avatar_url || null
+  const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || null
+  const initial = (displayName || user?.email || '?')[0].toUpperCase()
+
   return (
     <nav
       className={`fixed bottom-0 left-0 right-0 z-50 transition-transform duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}
@@ -68,6 +75,8 @@ export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
       <div className="flex items-center justify-around h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200/50 dark:border-slate-800/50">
         {TABS.map((tab) => {
           const active = activeTab === tab.id
+          const isProfileWithUser = tab.id === 'profile' && user
+
           return (
             <button
               key={tab.id}
@@ -78,9 +87,29 @@ export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
               aria-label={tab.label}
               aria-current={active ? 'page' : undefined}
             >
-              {tab.icon(active)}
+              {isProfileWithUser ? (
+                <div className={`w-7 h-7 rounded-full overflow-hidden border-2 ${active ? 'border-[#3D6AF2]' : 'border-transparent'}`}>
+                  {avatarUrl ? (
+                    <Image
+                      src={avatarUrl}
+                      alt={displayName || 'User'}
+                      width={28}
+                      height={28}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="flex items-center justify-center w-full h-full bg-[#3D6AF2] text-white text-xs font-bold">
+                      {initial}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                tab.icon(active)
+              )}
               {active && (
-                <span className="text-[10px] font-semibold">{tab.label}</span>
+                <span className="text-[10px] font-semibold">
+                  {isProfileWithUser ? (displayName?.split(' ')[0] || tab.label) : tab.label}
+                </span>
               )}
             </button>
           )

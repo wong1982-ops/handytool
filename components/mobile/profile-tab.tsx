@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useState, useCallback, useRef } from 'react'
+import Image from 'next/image'
 import { signInWithOAuth } from '@/lib/supabase/auth'
 import { TermsSheetContent } from '@/components/mobile/sheets/terms-sheet-content'
 import { PrivacySheetContent } from '@/components/mobile/sheets/privacy-sheet-content'
@@ -219,8 +220,18 @@ export function ProfileTab() {
             <div className="h-16 rounded-xl bg-slate-100 dark:bg-white/5 animate-pulse" />
           ) : user ? (
             <div className="flex items-center gap-3 p-4 rounded-xl bg-slate-100 dark:bg-white/5">
-              <div className="w-12 h-12 rounded-full bg-[#3D6AF2] flex items-center justify-center text-white font-bold text-lg">
-                {(user.user_metadata?.full_name || user.email || '?')[0].toUpperCase()}
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-[#3D6AF2] flex items-center justify-center text-white font-bold text-lg shrink-0">
+                {user.user_metadata?.avatar_url ? (
+                  <Image
+                    src={user.user_metadata.avatar_url}
+                    alt={user.user_metadata?.full_name || 'User'}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  (user.user_metadata?.full_name || user.email || '?')[0].toUpperCase()
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
