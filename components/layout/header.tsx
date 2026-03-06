@@ -8,6 +8,7 @@ import { tools, type Tool } from '@/lib/tools'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { SignInModal } from '@/components/auth/sign-in-modal'
 import { UserMenu } from '@/components/auth/user-menu'
+import { CreditBadge } from '@/components/ui/credit-badge'
 
 interface HeaderProps {
   brandName?: string
@@ -291,6 +292,10 @@ export function Header({
           >
             Blog
           </Link>
+
+          <div className="hidden md:block">
+            <CreditBadge />
+          </div>
 
           <button
             onClick={toggleTheme}
