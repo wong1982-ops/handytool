@@ -1,7 +1,6 @@
 'use client'
 
 import { useAuth } from '@/lib/hooks/use-auth'
-import { useCredits } from '@/lib/hooks/use-credits'
 import { useState, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { signInWithOAuth } from '@/lib/supabase/auth'
@@ -17,7 +16,6 @@ const VELOCITY_THRESHOLD = 500
 
 export function ProfileTab() {
   const { user, loading, signOut } = useAuth()
-  const { balance: creditBalance, loading: creditsLoading } = useCredits()
   const [activeView, setActiveView] = useState<ViewId>('settings')
   const [swiping, setSwiping] = useState(false)
   const [swipeX, setSwipeX] = useState(0)
@@ -256,32 +254,6 @@ export function ProfileTab() {
               style={{ minHeight: '44px' }}
             >
               Sign In
-            </button>
-          )}
-
-          {/* Credit balance */}
-          {user && !creditsLoading && creditBalance && (
-            <button
-              onClick={() => {
-                if (typeof window !== 'undefined') window.location.href = '/billing'
-              }}
-              className="flex items-center justify-between w-full p-4 rounded-xl bg-slate-100 dark:bg-white/5 cursor-pointer"
-              style={{ minHeight: '44px' }}
-            >
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#3D6AF2]" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                  <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.736 6.979C9.208 6.193 9.696 6 10 6c.304 0 .792.193 1.264.979a1 1 0 001.715-1.029C12.279 4.784 11.232 4 10 4s-2.279.784-2.979 1.95c-.285.475-.507 1-.67 1.55H6a1 1 0 000 2h.013a9.358 9.358 0 000 1H6a1 1 0 100 2h.351c.163.55.385 1.075.67 1.55C7.721 15.216 8.768 16 10 16s2.279-.784 2.979-1.95a1 1 0 10-1.715-1.029c-.472.786-.96.979-1.264.979-.304 0-.792-.193-1.264-.979a5.389 5.389 0 01-.421-.821H10a1 1 0 100-2H8.014a7.35 7.35 0 010-1H10a1 1 0 100-2H8.315c.134-.29.283-.56.421-.821z" />
-                </svg>
-                <span className="text-sm text-slate-900 dark:text-white font-medium">Credits</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={`text-sm font-bold ${creditBalance.total > 50 ? 'text-emerald-500' : creditBalance.total > 10 ? 'text-amber-500' : 'text-red-500'}`}>
-                  {creditBalance.total.toLocaleString()}
-                </span>
-                <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
             </button>
           )}
 

@@ -7,6 +7,7 @@ import { MobileHeader } from '@/components/mobile/mobile-header'
 import { BottomTabBar, type TabId } from '@/components/mobile/bottom-tab-bar'
 import { TabSwipeContainer } from '@/components/mobile/tab-swipe-container'
 import { FavoritesTab } from '@/components/mobile/favorites-tab'
+import { BillingTab } from '@/components/mobile/billing-tab'
 import { ProfileTab } from '@/components/mobile/profile-tab'
 
 interface MobileShellProps {
@@ -21,7 +22,7 @@ export function MobileShell({ children }: MobileShellProps) {
   const [activeTab, setActiveTab] = useState<TabId>(() => {
     if (typeof window === 'undefined') return 'tools'
     const saved = sessionStorage.getItem(TAB_KEY) as TabId | null
-    return saved === 'favorites' || saved === 'profile' ? saved : 'tools'
+    return saved === 'favorites' || saved === 'billing' || saved === 'profile' ? saved : 'tools'
   })
 
   const handleTabChange = useCallback((tab: TabId) => {
@@ -55,6 +56,9 @@ export function MobileShell({ children }: MobileShellProps) {
 
         {/* Favorites tab */}
         <div className="pb-16"><FavoritesTab onNavigate={() => handleTabChange('tools')} /></div>
+
+        {/* Billing tab */}
+        <div className="pb-16"><BillingTab /></div>
 
         {/* Profile tab */}
         <div className="pb-16"><ProfileTab /></div>
