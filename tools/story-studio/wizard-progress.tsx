@@ -98,7 +98,7 @@ export function WizardProgress({ currentStep, onStepClick, bookStatus }: WizardP
           const isActive = step.key === currentStep
           const isCompleted = index < currentIndex
           const isClickable = index <= maxNavigable && index !== currentIndex
-          const isFuture = index > currentIndex
+
 
           return (
             <li
