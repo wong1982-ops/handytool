@@ -36,8 +36,10 @@ function getSnapshot(): string[] {
   return read()
 }
 
+const SERVER_SNAPSHOT: string[] = []
+
 function getServerSnapshot(): string[] {
-  return []
+  return SERVER_SNAPSHOT
 }
 
 export function useFavorites() {
