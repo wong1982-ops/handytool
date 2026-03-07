@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const pdfBytes = await generateBookPdf(parsed.data)
     const filename = `${parsed.data.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`
 
-    return new NextResponse(Buffer.from(pdfBytes), {
+    return new NextResponse(pdfBytes as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
