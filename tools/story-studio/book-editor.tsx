@@ -11,7 +11,7 @@ interface BookEditorProps {
   onReset: () => void
 }
 
-export function BookEditor({ book, onUpdateBook, onUpdatePage, onReset }: BookEditorProps) {
+export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, onReset }: BookEditorProps) {
   const [currentPage, setCurrentPage] = useState(0)
   const [mobileView, setMobileView] = useState<'reader' | 'edit'>('reader')
   const [showResetConfirm, setShowResetConfirm] = useState(false)
