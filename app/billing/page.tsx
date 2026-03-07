@@ -38,18 +38,18 @@ export default function BillingPage() {
   useEffect(() => {
     fetch('/api/v1/credits/tiers')
       .then((r) => r.ok ? r.json() : null)
-      .then((json) => { if (json?.data) setTiers(json.data) })
+      .then((json) => { if (json?.data?.tiers) setTiers(json.data.tiers) })
       .catch(() => {})
   }, [])
 
   // Fetch transactions
   const fetchTransactions = useCallback(async (page: number) => {
     try {
-      const res = await fetch(`/api/v1/credits/transactions?page=${page}&limit=${txPerPage}`)
+      const res = await fetch(`/api/v1/credits/history?page=${page}&limit=${txPerPage}`)
       if (!res.ok) return
       const json = await res.json()
-      setTransactions(json.data || [])
-      setTxTotal(json.meta?.total || 0)
+      setTransactions(json.data?.transactions || [])
+      setTxTotal(json.data?.pagination?.total || 0)
     } catch { /* ignore */ }
   }, [])
 
