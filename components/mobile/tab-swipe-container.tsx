@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useCallback, type ReactNode } from 'react'
+import { Children, useRef, useState, useCallback, type ReactNode } from 'react'
 import type { TabId } from '@/components/mobile/bottom-tab-bar'
 
 const TAB_ORDER: TabId[] = ['tools', 'favorites', 'billing', 'profile']
@@ -167,7 +167,7 @@ export function TabSwipeContainer({ activeTab, onTabChange, children }: TabSwipe
           willChange: 'transform',
         }}
       >
-        {children.map((child, i) => (
+        {Children.toArray(children).map((child, i) => (
           <div
             key={TAB_ORDER[i]}
             ref={setPanelRef(i)}
