@@ -1,10 +1,10 @@
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@/lib/supabase/server'
 import { apiSuccess, API_ERRORS } from '@/lib/api/response'
 import { regenerateStoryRequestSchema } from '@/lib/story/types'
 import { CREDIT_COSTS } from '@/lib/story/validation'
-import Anthropic from '@anthropic-ai/sdk'
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 export async function POST(request: Request) {
   const supabase = await createClient()
@@ -27,22 +27,21 @@ export async function POST(request: Request) {
 
   try {
     const { book, pageCount } = parsed.data
-    const styleDesc = book.style.customPrompt || book.style.preset
+    const styleDesc = book.concept.tags.style
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 8192,
-      system: `You are a professional children's book author. The user has an existing story that they've edited. Regenerate the story incorporating their changes while maintaining consistency. Keep the same characters and setting unless explicitly changed. Respond with the same JSON structure as the original. Art style: ${styleDesc}. Exactly ${pageCount} pages. Every imagePrompt must start with the art style and include full character physical descriptions. Do not include text/words in image prompts.`,
-      messages: [{
-        role: 'user',
-        content: `Here is the current story state. Please regenerate it with improvements while keeping the user's edits:\n\n${JSON.stringify(book, null, 2)}`,
-      }],
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      systemInstruction: `You are a professional children's book author. The user has an existing story that they've edited. Regenerate the story incorporating their changes while maintaining consistency. Keep the same characters and setting unless explicitly changed. Respond with the same JSON structure as the original. Art style: ${styleDesc}. Exactly ${pageCount} pages. Every imagePrompt must start with the art style and include full character physical descriptions. Do not include text/words in image prompts. Respond ONLY with the JSON object, no markdown code fences.`,
     })
 
-    const textBlock = response.content.find(b => b.type === 'text')
-    if (!textBlock || textBlock.type !== 'text') throw new Error('No response')
+    const result = await model.generateContent(
+      `Here is the current story state. Please regenerate it with improvements while keeping the user's edits:\n\n${JSON.stringify(book, null, 2)}`
+    )
 
-    let jsonText = textBlock.text.trim()
+    const text = result.response.text()
+    if (!text) throw new Error('No response')
+
+    let jsonText = text.trim()
     if (jsonText.startsWith('```')) {
       jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
     }

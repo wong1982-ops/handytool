@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { apiSuccess, API_ERRORS } from '@/lib/api/response'
-import { illustrateRequestSchema } from '@/lib/story/types'
+import { regenerateImageRequestSchema } from '@/lib/story/types'
 import { generateIllustration } from '@/lib/story/illustrate'
 import { CREDIT_COSTS } from '@/lib/story/validation'
 
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   let body: unknown
   try { body = await request.json() } catch { return API_ERRORS.VALIDATION({ message: 'Invalid JSON body' }) }
 
-  const parsed = illustrateRequestSchema.safeParse(body)
+  const parsed = regenerateImageRequestSchema.safeParse(body)
   if (!parsed.success) return API_ERRORS.VALIDATION(parsed.error.flatten().fieldErrors)
 
   const { error: deductError } = await supabase.rpc('deduct_credits', {

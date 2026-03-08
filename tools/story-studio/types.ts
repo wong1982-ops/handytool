@@ -1,12 +1,36 @@
 // tools/story-studio/types.ts
 
-export type Audience = 'toddler' | 'early-reader' | 'middle-grade' | 'young-adult' | 'all-ages'
-export type BookFormat = 'picture-book'
-export type BookStatus = 'draft' | 'story-approved' | 'illustrating' | 'complete'
-export type ImageStatus = 'pending' | 'generating' | 'done' | 'error'
-export type StylePreset = 'watercolor' | 'cartoon' | 'anime' | 'realistic' | 'paper-craft' | 'custom'
 export type CharacterRole = 'protagonist' | 'antagonist' | 'supporting'
-export type WizardStep = 'input' | 'story' | 'illustrations' | 'editor'
+export type BookStatus = 'generating' | 'complete'
+export type ImageStatus = 'pending' | 'generating' | 'done' | 'error'
+export type AppPhase = 'input' | 'concepts' | 'refine' | 'generating' | 'viewer'
+
+export interface ConceptSections {
+  premise: string
+  authorIntent: string
+  messageToAudience: string
+  narrativeArc: string
+  tone: string
+  visualStyle: string
+}
+
+export interface StoryConcept {
+  id: string
+  title: string
+  coverDescription: string
+  sections: ConceptSections
+  tags: {
+    style: string
+    audience: string
+    pageCount: number
+    tone: string
+  }
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
 
 export interface Dialogue {
   speaker: string
@@ -29,19 +53,14 @@ export interface Page {
   imagePrompt: string
   imageUrl?: string
   imageStatus: ImageStatus
-}
-
-export interface BookStyle {
-  preset: StylePreset
-  customPrompt?: string
+  audioUrl?: string
 }
 
 export interface StoryBook {
   id: string
+  slug: string
   title: string
-  audience: Audience
-  format: BookFormat
-  style: BookStyle
+  concept: StoryConcept
   theme: string
   setting: string
   characters: Character[]
@@ -51,37 +70,16 @@ export interface StoryBook {
   updatedAt: string
 }
 
-export interface StoryInput {
-  title?: string
-  plot: string
-  audience: Audience
-  format: BookFormat
-  pageCount: number
-  style: BookStyle
-}
-
-export const AUDIENCES: { value: Audience; label: string }[] = [
-  { value: 'toddler', label: 'Toddler (2-4)' },
-  { value: 'early-reader', label: 'Early Reader (5-7)' },
-  { value: 'middle-grade', label: 'Middle Grade (8-12)' },
-  { value: 'young-adult', label: 'Young Adult' },
-  { value: 'all-ages', label: 'All Ages' },
-]
-
-export const STYLE_PRESETS: { value: StylePreset; label: string; description: string }[] = [
-  { value: 'watercolor', label: 'Watercolor', description: 'Soft, flowing watercolor painting style' },
-  { value: 'cartoon', label: 'Cartoon', description: 'Bold lines, bright colors, playful' },
-  { value: 'anime', label: 'Anime', description: 'Japanese anime illustration style' },
-  { value: 'realistic', label: 'Realistic', description: 'Photorealistic digital art' },
-  { value: 'paper-craft', label: 'Paper Craft', description: 'Cut paper collage look' },
-  { value: 'custom', label: 'Custom', description: 'Describe your own style' },
-]
-
-export const PAGE_COUNTS = [8, 10, 12, 16] as const
+export type ProgressEvent =
+  | { type: 'status'; message: string }
+  | { type: 'story-ready'; data: StoryBook }
+  | { type: 'image-done'; page: number; url: string }
+  | { type: 'audio-done'; page: number; url: string }
+  | { type: 'complete'; data: StoryBook }
+  | { type: 'error'; message: string }
 
 export const CREDIT_COSTS = {
-  enrich: 20,
-  illustrate: 5,
+  generate: 50,
   regenerateStory: 10,
   regenerateImage: 5,
   exportPdf: 5,

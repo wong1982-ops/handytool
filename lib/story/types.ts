@@ -1,35 +1,60 @@
 import { z } from 'zod'
 
-export const audienceSchema = z.enum(['toddler', 'early-reader', 'middle-grade', 'young-adult', 'all-ages'])
-export const stylePresetSchema = z.enum(['watercolor', 'cartoon', 'anime', 'realistic', 'paper-craft', 'custom'])
+// --- Concept sections ---
 
-export const enrichRequestSchema = z.object({
-  plot: z.string().min(20, 'Plot must be at least 20 characters').max(2000),
-  title: z.string().max(200).optional(),
-  audience: audienceSchema,
-  pageCount: z.number().int().min(8).max(16),
-  style: z.object({
-    preset: stylePresetSchema,
-    customPrompt: z.string().max(500).optional(),
+export const conceptSectionsSchema = z.object({
+  premise: z.string(),
+  authorIntent: z.string(),
+  messageToAudience: z.string(),
+  narrativeArc: z.string(),
+  tone: z.string(),
+  visualStyle: z.string(),
+})
+
+// --- Concept generation ---
+
+export const conceptsRequestSchema = z.object({
+  plot: z.string().min(10, 'Plot must be at least 10 characters').max(2000),
+})
+
+export const storyConceptSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  coverDescription: z.string(),
+  sections: conceptSectionsSchema,
+  tags: z.object({
+    style: z.string(),
+    audience: z.string(),
+    pageCount: z.number().int().min(6).max(16),
+    tone: z.string(),
   }),
 })
 
-export const illustrateRequestSchema = z.object({
-  imagePrompt: z.string().min(10).max(2000),
-  style: z.object({
-    preset: stylePresetSchema,
-    customPrompt: z.string().max(500).optional(),
-  }),
-  characters: z.array(z.object({
-    name: z.string(),
-    description: z.string(),
-  })).optional(),
+// --- Full generation ---
+
+export const generateRequestSchema = z.object({
+  plot: z.string().min(10).max(2000),
+  concept: storyConceptSchema,
 })
+
+// --- Concept refinement ---
+
+export const chatMessageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string(),
+})
+
+export const refineRequestSchema = z.object({
+  concept: storyConceptSchema,
+  message: z.string().min(1).max(1000),
+  history: z.array(chatMessageSchema).max(6),
+})
+
+// --- Regeneration (kept from editor) ---
 
 export const regenerateStoryRequestSchema = z.object({
   book: z.object({
     title: z.string(),
-    audience: audienceSchema,
     theme: z.string(),
     setting: z.string(),
     characters: z.array(z.object({
@@ -48,13 +73,22 @@ export const regenerateStoryRequestSchema = z.object({
       })).optional(),
       mood: z.string(),
     })),
-    style: z.object({
-      preset: stylePresetSchema,
-      customPrompt: z.string().max(500).optional(),
-    }),
+    concept: storyConceptSchema,
   }),
-  pageCount: z.number().int().min(8).max(16),
+  pageCount: z.number().int().min(6).max(16),
 })
+
+// --- Regenerate single image (kept from editor) ---
+
+export const regenerateImageRequestSchema = z.object({
+  imagePrompt: z.string().min(10).max(2000),
+  characters: z.array(z.object({
+    name: z.string(),
+    description: z.string(),
+  })).optional(),
+})
+
+// --- PDF export ---
 
 export const exportPdfRequestSchema = z.object({
   title: z.string(),
@@ -69,7 +103,34 @@ export const exportPdfRequestSchema = z.object({
   })),
 })
 
-export type EnrichRequest = z.infer<typeof enrichRequestSchema>
-export type IllustrateRequest = z.infer<typeof illustrateRequestSchema>
+// --- Save / Share ---
+
+export const saveBookRequestSchema = z.object({
+  book: z.object({
+    id: z.string(),
+    slug: z.string(),
+    title: z.string(),
+    concept: storyConceptSchema,
+    theme: z.string(),
+    setting: z.string(),
+    characters: z.array(z.any()),
+    pages: z.array(z.any()),
+    status: z.string(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  }),
+})
+
+export const shareBookRequestSchema = z.object({
+  bookId: z.string().uuid(),
+  isPublic: z.boolean(),
+})
+
+export type ConceptsRequest = z.infer<typeof conceptsRequestSchema>
+export type StoryConcept = z.infer<typeof storyConceptSchema>
+export type GenerateRequest = z.infer<typeof generateRequestSchema>
+export type RefineRequest = z.infer<typeof refineRequestSchema>
+export type ChatMessage = z.infer<typeof chatMessageSchema>
 export type RegenerateStoryRequest = z.infer<typeof regenerateStoryRequestSchema>
+export type RegenerateImageRequest = z.infer<typeof regenerateImageRequestSchema>
 export type ExportPdfRequest = z.infer<typeof exportPdfRequestSchema>

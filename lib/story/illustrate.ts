@@ -1,12 +1,51 @@
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@/lib/supabase/server'
 
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+
+// Fallback providers (used if GEMINI_API_KEY is not set or Imagen fails)
 const FAL_API_KEY = process.env.FAL_API_KEY
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 
 interface IllustrateInput {
   imagePrompt: string
-  style: { preset: string; customPrompt?: string }
   characters?: { name: string; description: string }[]
+}
+
+function buildPrompt(input: IllustrateInput): string {
+  let prompt = input.imagePrompt
+  if (input.characters?.length) {
+    const charDescs = input.characters.map(c => `${c.name}: ${c.description}`).join('. ')
+    prompt += `\n\nCharacter descriptions for consistency: ${charDescs}`
+  }
+  prompt += '\n\nIMPORTANT: Do not include any text, words, letters, or writing in the image. Illustration only.'
+  return prompt
+}
+
+async function generateWithGeminiImagen(prompt: string): Promise<ArrayBuffer | string> {
+  const model = genAI.getGenerativeModel({
+    model: 'imagen-3.0-generate-002',
+  })
+
+  const result = await model.generateContent(prompt)
+  const response = result.response
+
+  // Imagen returns inline image data
+  const imagePart = response.candidates?.[0]?.content?.parts?.find(
+    (p: { inlineData?: { mimeType: string; data: string } }) => p.inlineData?.mimeType?.startsWith('image/')
+  )
+
+  if (!imagePart?.inlineData?.data) {
+    throw new Error('No image returned from Imagen')
+  }
+
+  // Convert base64 to ArrayBuffer
+  const binaryString = atob(imagePart.inlineData.data)
+  const bytes = new Uint8Array(binaryString.length)
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i)
+  }
+  return bytes.buffer
 }
 
 async function generateWithFal(prompt: string): Promise<ArrayBuffer> {
@@ -38,7 +77,7 @@ async function generateWithFal(prompt: string): Promise<ArrayBuffer> {
   return await imageResponse.arrayBuffer()
 }
 
-async function generateWithDalle(prompt: string): Promise<ArrayBuffer> {
+async function generateWithDalle(prompt: string): Promise<ArrayBuffer | string> {
   const response = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: {
@@ -64,23 +103,42 @@ async function generateWithDalle(prompt: string): Promise<ArrayBuffer> {
   const imageUrl = data.data?.[0]?.url
   if (!imageUrl) throw new Error('No image returned from DALL-E')
 
+  // In dev mode, return the URL directly (skip Supabase upload)
+  if (process.env.NODE_ENV === 'development') {
+    return imageUrl as string
+  }
+
   const imageResponse = await fetch(imageUrl)
   if (!imageResponse.ok) throw new Error('Failed to download generated image')
   return await imageResponse.arrayBuffer()
 }
 
 export async function generateIllustration(input: IllustrateInput): Promise<string> {
-  let prompt = input.imagePrompt
-  if (input.characters?.length) {
-    const charDescs = input.characters.map(c => `${c.name}: ${c.description}`).join('. ')
-    prompt += `\n\nCharacter descriptions for consistency: ${charDescs}`
+  const prompt = buildPrompt(input)
+
+  // Priority: Gemini Imagen → fal.ai → DALL-E
+  let result: ArrayBuffer | string
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      result = await generateWithGeminiImagen(prompt)
+    } catch (err) {
+      console.warn('Imagen generation failed, falling back:', err)
+      result = FAL_API_KEY
+        ? await generateWithFal(prompt)
+        : await generateWithDalle(prompt)
+    }
+  } else if (FAL_API_KEY) {
+    result = await generateWithFal(prompt)
+  } else {
+    result = await generateWithDalle(prompt)
   }
-  prompt += '\n\nIMPORTANT: Do not include any text, words, letters, or writing in the image. Illustration only.'
 
-  const imageBuffer = FAL_API_KEY
-    ? await generateWithFal(prompt)
-    : await generateWithDalle(prompt)
+  // In dev mode, DALL-E returns URL directly
+  if (typeof result === 'string') {
+    return result
+  }
 
+  const imageBuffer = result
   const supabase = await createClient()
   const filename = `illustrations/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`
 

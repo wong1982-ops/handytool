@@ -8,10 +8,11 @@ interface BookEditorProps {
   book: StoryBook
   onUpdateBook: (updates: Partial<StoryBook>) => void
   onUpdatePage: (sequence: number, updates: Partial<Page>) => void
-  onReset: () => void
+  onPreview: () => void
+  onStartOver: () => void
 }
 
-export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, onReset }: BookEditorProps) {
+export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, onPreview, onStartOver }: BookEditorProps) {
   const [currentPage, setCurrentPage] = useState(0)
   const [mobileView, setMobileView] = useState<'reader' | 'edit'>('reader')
   const [showResetConfirm, setShowResetConfirm] = useState(false)
@@ -45,7 +46,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
 
   const handleReset = () => {
     setShowResetConfirm(false)
-    onReset()
+    onStartOver()
   }
 
   const editPanel = (
@@ -101,7 +102,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
                 type="button"
                 onClick={handleAddDialogue}
                 className="text-xs font-medium text-[#3D6AF2] hover:text-[#3D6AF2]/80
-                  transition-colors min-h-[44px] px-2 flex items-center"
+                  transition-colors min-h-[44px] px-2 flex items-center cursor-pointer"
               >
                 + Add line
               </button>
@@ -131,7 +132,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
                         onClick={() => handleRemoveDialogue(i)}
                         className="flex items-center justify-center w-11 h-11 rounded-lg
                           text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20
-                          transition-colors"
+                          transition-colors cursor-pointer"
                         aria-label={`Remove dialogue line ${i + 1}`}
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -162,8 +163,17 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
         </>
       ) : null}
 
-      {/* New Story button */}
-      <div className="pt-4 mt-auto border-t border-gray-200 dark:border-gray-700">
+      {/* Action buttons */}
+      <div className="pt-4 mt-auto border-t border-gray-200 dark:border-gray-700 space-y-2">
+        <button
+          type="button"
+          onClick={onPreview}
+          className="w-full min-h-[44px] rounded-xl bg-[var(--tk-color-primary-500,#3D6AF2)] text-white text-sm font-medium
+            hover:opacity-90 transition-opacity cursor-pointer"
+        >
+          Preview Book
+        </button>
+
         {showResetConfirm ? (
           <div className="space-y-2">
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -174,7 +184,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
                 type="button"
                 onClick={handleReset}
                 className="flex-1 min-h-[44px] rounded-xl bg-red-500 text-white text-sm font-medium
-                  hover:bg-red-600 transition-colors"
+                  hover:bg-red-600 transition-colors cursor-pointer"
               >
                 Yes, start over
               </button>
@@ -183,7 +193,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
                 onClick={() => setShowResetConfirm(false)}
                 className="flex-1 min-h-[44px] rounded-xl border border-gray-300 dark:border-gray-600
                   text-gray-700 dark:text-gray-300 text-sm font-medium
-                  hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -194,10 +204,10 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
             type="button"
             onClick={() => setShowResetConfirm(true)}
             className="w-full min-h-[44px] rounded-xl border border-gray-300 dark:border-gray-600
-              text-gray-700 dark:text-gray-300 text-sm font-medium
-              hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              text-red-600 dark:text-red-400 text-sm font-medium
+              hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
           >
-            New Story
+            Start Over
           </button>
         )}
       </div>
@@ -217,7 +227,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
           <button
             type="button"
             onClick={() => setMobileView('reader')}
-            className={`min-h-[44px] px-3 text-sm font-medium transition-colors ${
+            className={`min-h-[44px] px-3 text-sm font-medium transition-colors cursor-pointer ${
               mobileView === 'reader'
                 ? 'bg-[#3D6AF2] text-white'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -228,7 +238,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
           <button
             type="button"
             onClick={() => setMobileView('edit')}
-            className={`min-h-[44px] px-3 text-sm font-medium transition-colors ${
+            className={`min-h-[44px] px-3 text-sm font-medium transition-colors cursor-pointer ${
               mobileView === 'edit'
                 ? 'bg-[#3D6AF2] text-white'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
