@@ -8,6 +8,12 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      db: {
+        schema: 'public',
+      },
+      global: {
+        fetch: (url, options) => fetch(url, { ...options, signal: AbortSignal.timeout(30000) }),
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll()

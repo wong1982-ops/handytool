@@ -23,25 +23,20 @@ async function getBook(slug: string) {
     currentUserId = process.env.DEV_USER_ID
   }
 
-  // Try via RPC to bypass RLS (supports dev mode without auth session)
-  if (currentUserId) {
-    const { data: userBooks } = await supabase.rpc('get_user_books', {
-      p_user_id: currentUserId,
-    })
-    const match = (userBooks || []).find((b: Record<string, unknown>) => b.slug === slug)
-    if (match) return match
+  // Single RPC: fetches by slug, returns if public OR owned by user (bypasses RLS)
+  const { data, error } = await supabase.rpc('get_book_by_slug', {
+    p_slug: slug,
+    p_user_id: currentUserId ?? null,
+  })
+
+  if (error) {
+    console.error('[book] get_book_by_slug failed:', error.message)
+    return null
   }
 
-  // Fallback: public books (works for shared links)
-  const { data, error } = await supabase
-    .from('books')
-    .select('id, slug, data, is_public, created_at')
-    .eq('slug', slug)
-    .eq('is_public', true)
-    .single()
-
-  if (error || !data) return null
-  return data
+  // RPC returns array (RETURNS TABLE), take first row
+  const book = Array.isArray(data) ? data[0] : data
+  return book ?? null
 }
 
 export async function generateMetadata({ params }: BookPageProps): Promise<Metadata> {
