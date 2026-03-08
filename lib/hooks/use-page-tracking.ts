@@ -67,20 +67,22 @@ export function usePageTracking() {
     function flushDuration() {
       if (!clientRowIdRef.current) return
       const duration = Math.round((Date.now() - startTime) / 1000)
-      // Use sendBeacon for reliability on page close
       const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/page_views?client_row_id=eq.${clientRowIdRef.current}`
       const body = JSON.stringify({ duration_seconds: duration })
-      const headers = {
-        'Content-Type': 'application/json',
-        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
-        'Prefer': 'return=minimal',
-      }
-      // Try sendBeacon first (works on tab close), fall back to fetch
-      const blob = new Blob([body], { type: 'application/json' })
-      if (!navigator.sendBeacon(url, blob)) {
-        fetch(url, { method: 'PATCH', headers, body, keepalive: true })
-      }
+      // Use fetch with keepalive (not sendBeacon) to avoid CORS credential conflict
+      // sendBeacon sends with credentials:include which conflicts with Supabase's wildcard CORS
+      fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
+          'Prefer': 'return=minimal',
+        },
+        body,
+        keepalive: true,
+        credentials: 'omit',
+      }).catch(() => {})
     }
 
     function handleVisibilityChange() {
