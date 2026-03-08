@@ -76,7 +76,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <button
@@ -175,7 +175,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
       <button
         onClick={() => onGenerate(concept)}
         disabled={loading || refining}
-        className="w-full py-3 rounded-xl bg-[var(--tk-color-primary-500,#3D6AF2)] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer disabled:cursor-default"
+        className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer disabled:cursor-default"
         style={{ minHeight: '44px' }}
       >
         {loading ? 'Generating Book...' : 'Generate Book'}

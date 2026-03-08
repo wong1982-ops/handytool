@@ -50,17 +50,16 @@ export function GenerationProgress({ events, totalPages }: GenerationProgressPro
           : 'Finishing up...'
 
   return (
-    <div className="max-w-md mx-auto text-center py-16">
+    <div className="max-w-md mx-auto text-center py-12 md:py-16">
       <div className="mb-8">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--tk-color-primary-500,#3D6AF2)]/10 flex items-center justify-center">
+        <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 flex items-center justify-center">
           {hasError ? (
-            <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <svg className="w-9 h-9 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
             </svg>
           ) : (
-            <svg className="w-8 h-8 text-[var(--tk-color-primary-500,#3D6AF2)] animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            <svg className="w-9 h-9 text-purple-500 animate-pulse" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
             </svg>
           )}
         </div>
@@ -75,9 +74,9 @@ export function GenerationProgress({ events, totalPages }: GenerationProgressPro
 
       {!hasError && (
         <>
-          <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 mb-3">
+          <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 mb-3 overflow-hidden">
             <div
-              className="bg-[var(--tk-color-primary-500,#3D6AF2)] h-2 rounded-full transition-all duration-500"
+              className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-2.5 rounded-full transition-all duration-500"
               style={{ width: `${Math.min(progress, 100)}%` }}
             />
           </div>

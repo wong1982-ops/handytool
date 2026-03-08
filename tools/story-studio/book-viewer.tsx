@@ -97,7 +97,6 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly }: BookViewerPr
       audioRef.current = audio
       audio.onended = onEnded
       audio.onerror = () => {
-        // Fallback to Speech API
         speakPageFallback(p.narrativeText, p.dialogue, onEnded)
       }
       audio.play().catch(() => {
@@ -157,61 +156,53 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly }: BookViewerPr
       ? 'animate-slide-right'
       : ''
 
+  // Render drop cap for narrative text
+  const renderNarrative = (text: string) => {
+    if (!text || text.length < 2) return <p className="text-base md:text-lg text-slate-800 dark:text-slate-200 leading-relaxed">{text}</p>
+    const firstChar = text[0]
+    const rest = text.slice(1)
+    return (
+      <p className="text-base md:text-lg text-slate-800 dark:text-slate-200 leading-relaxed">
+        <span className="float-left text-5xl md:text-6xl font-bold leading-[0.8] mr-2 mt-1 text-purple-600 dark:text-purple-400">{firstChar}</span>
+        {rest}
+      </p>
+    )
+  }
+
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+    <div>
+      {/* Top toolbar — readOnly hides edit actions, shows auto-play toggle style */}
+      {!readOnly && (
+        <div className="flex items-center justify-end gap-2 mb-4">
           <button
-            onClick={toggleTTS}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            onClick={onEdit}
+            className="px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             style={{ minHeight: '44px' }}
-            aria-label={isPlaying ? 'Stop reading' : 'Read aloud'}
           >
-            {isPlaying ? (
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            )}
-            {isPlaying ? 'Pause' : 'Read Aloud'}
+            Edit
+          </button>
+          <button
+            onClick={onStartOver}
+            className="px-3 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
+            style={{ minHeight: '44px' }}
+          >
+            Start Over
           </button>
         </div>
+      )}
 
-        {!readOnly && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onEdit}
-              className="px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-              style={{ minHeight: '44px' }}
-            >
-              Edit
-            </button>
-            <button
-              onClick={onStartOver}
-              className="px-3 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
-              style={{ minHeight: '44px' }}
-            >
-              Start Over
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Book */}
+      {/* Book container */}
       <div
-        className="relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden"
+        className="relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
         <div className={`transition-transform duration-300 ${slideClass}`}>
           {isCover ? (
+            /* Cover page */
             <div className="p-6 md:p-10 text-center">
               {book.pages[0]?.imageUrl && (
-                <div className="mb-6 rounded-xl overflow-hidden">
+                <div className="mb-6 rounded-xl overflow-hidden shadow-md">
                   <img
                     src={book.pages[0].imageUrl}
                     alt="Book cover"
@@ -219,7 +210,7 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly }: BookViewerPr
                   />
                 </div>
               )}
-              <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-purple-700 dark:text-purple-400 mb-2">
                 {book.title}
               </h2>
               <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -227,58 +218,126 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly }: BookViewerPr
               </p>
             </div>
           ) : page ? (
-            <div>
+            /* Content page — split layout on desktop */
+            <div className="flex flex-col md:flex-row">
               {page.imageUrl && (
-                <div className="w-full">
+                <div className="md:w-2/5 shrink-0">
                   <img
                     src={page.imageUrl}
                     alt={page.sceneDescription}
-                    className="w-full h-auto max-h-[400px] object-cover"
+                    className="w-full h-56 md:h-full object-cover"
                   />
                 </div>
               )}
-              <div className="p-5 md:p-8">
-                <p className="text-base md:text-lg text-slate-800 dark:text-slate-200 leading-relaxed">
-                  {page.narrativeText}
-                </p>
+              <div className={`flex-1 p-5 md:p-8 ${page.imageUrl ? '' : 'md:p-10'}`}>
+                {renderNarrative(page.narrativeText)}
                 {page.dialogue?.map((d, i) => (
                   <p key={i} className="mt-3 text-base md:text-lg text-slate-700 dark:text-slate-300 italic">
-                    &ldquo;{d.line}&rdquo; <span className="text-sm text-slate-500 not-italic">— {d.speaker}</span>
+                    &ldquo;{d.line}&rdquo; <span className="text-sm text-slate-500 not-italic">&mdash; {d.speaker}</span>
                   </p>
                 ))}
               </div>
             </div>
           ) : null}
         </div>
+      </div>
 
-        {/* Navigation arrows */}
-        {currentPage > 0 && (
+      {/* Page navigation bar */}
+      <div className="flex items-center justify-between mt-4">
+        <span className="text-sm text-slate-400 dark:text-slate-500">
+          {isCover ? 'Cover' : `Page ${currentPage} of ${totalPages}`}
+        </span>
+        <div className="flex items-center gap-2">
           <button
             onClick={goPrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/20 dark:bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/40 dark:hover:bg-white/20 transition-colors cursor-pointer"
+            disabled={currentPage === 0}
+            className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-default"
+            style={{ minHeight: '44px' }}
             aria-label="Previous page"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
+            Prev
           </button>
-        )}
-        {currentPage < totalPages && (
           <button
             onClick={goNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/20 dark:bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/40 dark:hover:bg-white/20 transition-colors cursor-pointer"
+            disabled={currentPage >= totalPages}
+            className="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-30 disabled:cursor-default"
+            style={{ minHeight: '44px' }}
             aria-label="Next page"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            Flip Page
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
             </svg>
           </button>
-        )}
+        </div>
       </div>
 
-      {/* Page indicator */}
-      <div className="text-center mt-3 text-sm text-slate-400 dark:text-slate-500">
-        {isCover ? 'Cover' : `${currentPage} / ${totalPages}`}
+      {/* Narration bar — sticky bottom, like the design */}
+      <div className="mt-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm px-4 py-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+            Narration
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => { if (currentPage > 1) { goTo(currentPage - 1, 'left') } }}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              aria-label="Previous track"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+              </svg>
+            </button>
+            <button
+              onClick={toggleTTS}
+              className="w-11 h-11 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md hover:opacity-90 transition-opacity cursor-pointer"
+              aria-label={isPlaying ? 'Pause narration' : 'Play narration'}
+            >
+              {isPlaying ? (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+            </button>
+            <button
+              onClick={() => { if (currentPage < totalPages) { goTo(currentPage + 1, 'right') } }}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              aria-label="Next track"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            Read Aloud
+          </span>
+          <button
+            onClick={toggleTTS}
+            className={`relative w-10 h-6 rounded-full transition-colors cursor-pointer ${
+              isPlaying
+                ? 'bg-purple-500'
+                : 'bg-slate-300 dark:bg-slate-700'
+            }`}
+            role="switch"
+            aria-checked={isPlaying}
+            aria-label="Toggle read aloud"
+          >
+            <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+              isPlaying ? 'translate-x-[18px]' : 'translate-x-0.5'
+            }`} />
+          </button>
+        </div>
       </div>
 
       {/* CSS for slide animations */}
