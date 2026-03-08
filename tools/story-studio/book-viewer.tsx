@@ -13,7 +13,9 @@ interface BookViewerProps {
 export function BookViewer({ book, onEdit, onStartOver, readOnly }: BookViewerProps) {
   const [currentPage, setCurrentPage] = useState(0) // 0 = cover
   const [direction, setDirection] = useState<'left' | 'right' | null>(null)
+  const [isSpeaking, setIsSpeaking] = useState(false)
   const touchStartX = useRef(0)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const totalPages = book.pages.length
   const isCover = currentPage === 0
@@ -58,6 +60,77 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly }: BookViewerPr
     }
   }
 
+  // --- TTS: speak current page text ---
+  const stopSpeaking = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current = null
+    }
+    window.speechSynthesis.cancel()
+    setIsSpeaking(false)
+  }, [])
+
+  const getPageText = useCallback((p: typeof page) => {
+    if (!p) return ''
+    let text = p.narrativeText
+    if (p.dialogue?.length) {
+      text += '. ' + p.dialogue.map(d => `${d.speaker} says: ${d.line}`).join('. ')
+    }
+    return text
+  }, [])
+
+  const speakCurrentPage = useCallback(() => {
+    if (isSpeaking) {
+      stopSpeaking()
+      return
+    }
+    if (!page) return
+
+    setIsSpeaking(true)
+
+    const onEnded = () => setIsSpeaking(false)
+
+    // Try stored audio first
+    if (page.audioUrl) {
+      const audio = new Audio(page.audioUrl)
+      audioRef.current = audio
+      audio.onended = onEnded
+      audio.onerror = () => {
+        // Fallback to Speech Synthesis
+        const utterance = new SpeechSynthesisUtterance(getPageText(page))
+        utterance.rate = 1.0
+        utterance.onend = onEnded
+        window.speechSynthesis.speak(utterance)
+      }
+      audio.play().catch(() => {
+        const utterance = new SpeechSynthesisUtterance(getPageText(page))
+        utterance.rate = 1.0
+        utterance.onend = onEnded
+        window.speechSynthesis.speak(utterance)
+      })
+    } else {
+      const utterance = new SpeechSynthesisUtterance(getPageText(page))
+      utterance.rate = 1.0
+      utterance.onend = onEnded
+      window.speechSynthesis.speak(utterance)
+    }
+  }, [isSpeaking, page, stopSpeaking, getPageText])
+
+  // Stop speech on page change or unmount
+  useEffect(() => {
+    stopSpeaking()
+  }, [currentPage, stopSpeaking])
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+      window.speechSynthesis.cancel()
+    }
+  }, [])
+
   const slideClass = direction === 'right'
     ? 'animate-slide-left'
     : direction === 'left'
@@ -99,7 +172,7 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly }: BookViewerPr
         </div>
       )}
 
-      {/* Book container — screen-height on desktop for hardcopy feel */}
+      {/* Book container */}
       <div
         className="relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden min-h-[60vh] md:min-h-[75vh]"
         onTouchStart={handleTouchStart}
@@ -107,7 +180,6 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly }: BookViewerPr
       >
         <div className={`transition-transform duration-300 h-full ${slideClass}`}>
           {isCover ? (
-            /* Cover page — full height centered */
             <div className="flex flex-col items-center justify-center min-h-[60vh] md:min-h-[75vh] p-6 md:p-10 text-center">
               {book.pages[0]?.imageUrl && (
                 <div className="mb-6 rounded-xl overflow-hidden shadow-md w-full max-w-md">
@@ -126,7 +198,6 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly }: BookViewerPr
               </p>
             </div>
           ) : page ? (
-            /* Content page — split layout, image fills half height */
             <div className="flex flex-col md:flex-row min-h-[60vh] md:min-h-[75vh]">
               <div className="md:w-1/2 shrink-0">
                 {page.imageUrl ? (
@@ -157,6 +228,30 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly }: BookViewerPr
             </div>
           ) : null}
         </div>
+
+        {/* TTS button — Google-style speaker icon, bottom-right of book */}
+        {!isCover && page && (
+          <button
+            onClick={speakCurrentPage}
+            className={`absolute bottom-4 right-4 w-11 h-11 rounded-full flex items-center justify-center shadow-lg transition-all cursor-pointer ${
+              isSpeaking
+                ? 'bg-purple-600 text-white'
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-purple-50 dark:hover:bg-slate-700'
+            }`}
+            aria-label={isSpeaking ? 'Stop reading' : 'Read this page'}
+            title={isSpeaking ? 'Stop reading' : 'Read this page'}
+          >
+            {isSpeaking ? (
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+              </svg>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Page navigation bar */}
