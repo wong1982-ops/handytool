@@ -53,9 +53,25 @@ export default function StoryStudioPage() {
 
   const isDev = process.env.NODE_ENV === 'development'
 
+  // After OAuth redirect: restore saved plot and auto-submit
+  useEffect(() => {
+    if (!user) return
+    try {
+      const pendingPlot = localStorage.getItem('toolk1t-story-pending-plot')
+      if (pendingPlot && phase === 'input') {
+        localStorage.removeItem('toolk1t-story-pending-plot')
+        fetchConcepts(pendingPlot)
+      }
+    } catch { /* ignore */ }
+  }, [user, phase, fetchConcepts])
+
   const handlePlotSubmit = useCallback(async (plotText: string) => {
     // In production, require sign-in before generating
     if (!isDev && !user) {
+      // Save plot to localStorage so it survives the OAuth redirect
+      try {
+        localStorage.setItem('toolk1t-story-pending-plot', plotText)
+      } catch { /* ignore */ }
       await signInWithOAuth('google')
       return
     }
