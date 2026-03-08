@@ -33,14 +33,24 @@ let vertexAuth: GoogleAuth | null = null
 function getVertexAuth(): GoogleAuth {
   if (vertexAuth) return vertexAuth
 
-  const keyJson = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
-  if (keyJson) {
+  const serviceKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+  const adcJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
+
+  if (serviceKey) {
+    // Service account key (JSON)
     vertexAuth = new GoogleAuth({
-      credentials: JSON.parse(keyJson),
+      credentials: JSON.parse(serviceKey),
+      scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+    })
+  } else if (adcJson) {
+    // User OAuth credentials (from gcloud auth application-default login)
+    // Works on Vercel where ADC file doesn't exist
+    vertexAuth = new GoogleAuth({
+      credentials: JSON.parse(adcJson),
       scopes: ['https://www.googleapis.com/auth/cloud-platform'],
     })
   } else {
-    // Fall back to Application Default Credentials
+    // Fall back to Application Default Credentials (local dev)
     vertexAuth = new GoogleAuth({
       scopes: ['https://www.googleapis.com/auth/cloud-platform'],
     })
