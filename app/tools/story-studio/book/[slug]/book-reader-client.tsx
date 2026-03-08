@@ -14,6 +14,8 @@ export function BookReaderClient({ bookData }: BookReaderClientProps) {
       id: (bookData.id as string) || '',
       slug: (bookData.slug as string) || '',
       title: (bookData.title as string) || 'Untitled',
+      authors: (bookData.authors as string[]) || ['AI'],
+      coverImageUrl: (bookData.coverImageUrl as string) || undefined,
       concept: bookData.concept as StoryBook['concept'],
       theme: (bookData.theme as string) || '',
       setting: (bookData.setting as string) || '',

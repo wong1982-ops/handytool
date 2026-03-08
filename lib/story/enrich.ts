@@ -3,41 +3,35 @@ import type { ConceptsRequest, StoryConcept, GenerateRequest, RefineRequest } fr
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
-export async function generateConcepts(input: ConceptsRequest): Promise<[StoryConcept, StoryConcept]> {
+export async function generateConcepts(input: ConceptsRequest): Promise<StoryConcept> {
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
-    systemInstruction: `You are a professional children's book creative director. Given a story plot idea, generate exactly 2 different story concepts that take the idea in distinct creative directions.
+    systemInstruction: `You are a professional children's book creative director. Given a story plot idea, generate a compelling story concept with rich detail.
 
-Each concept must be richly described with structured sections to help the author understand the vision.
-
-You MUST respond with valid JSON — an array of exactly 2 objects matching this structure:
-[
-  {
-    "id": "concept_1",
-    "title": "string — a compelling, memorable book title",
-    "coverDescription": "string — visual description of what the book cover would look like",
-    "sections": {
-      "premise": "string — 2-3 sentences answering: What is this story about? Set the scene and introduce the central conflict or journey.",
-      "authorIntent": "string — 1-2 sentences answering: What does the author want to provoke in the reader? What emotions or thoughts should this story stir?",
-      "messageToAudience": "string — 1-2 sentences answering: What should the reader take away? The moral, lesson, or feeling they carry after the last page.",
-      "narrativeArc": "string — 2-3 sentences answering: How does the story unfold? Sketch the beginning, turning point, and resolution without spoiling surprises.",
-      "tone": "string — 1-2 sentences answering: How is the story told? Describe the narrative voice, humor level, emotional texture.",
-      "visualStyle": "string — 1-2 sentences answering: What does the world look like? Describe the art direction, color palette, visual mood."
-    },
-    "tags": {
-      "style": "string — art style name (e.g., Watercolor, Cartoon, Anime, Paper Craft, Realistic, Storybook Illustration)",
-      "audience": "string — target age group (e.g., Ages 2-4, Ages 5-7, Ages 8-12)",
-      "pageCount": number — between 8 and 12,
-      "tone": "string — short emotional tone label (e.g., Adventurous & Heartwarming, Funny & Playful)"
-    }
+You MUST respond with valid JSON matching this structure:
+{
+  "id": "concept_1",
+  "title": "string — a compelling, memorable book title",
+  "coverDescription": "string — visual description of what the book cover would look like",
+  "sections": {
+    "premise": "string — 2-3 sentences answering: What is this story about? Set the scene and introduce the central conflict or journey.",
+    "authorIntent": "string — 1-2 sentences answering: What does the author want to provoke in the reader? What emotions or thoughts should this story stir?",
+    "messageToAudience": "string — 1-2 sentences answering: What should the reader take away? The moral, lesson, or feeling they carry after the last page.",
+    "narrativeArc": "string — 2-3 sentences answering: How does the story unfold? Sketch the beginning, turning point, and resolution without spoiling surprises.",
+    "tone": "string — 1-2 sentences answering: How is the story told? Describe the narrative voice, humor level, emotional texture.",
+    "visualStyle": "string — 1-2 sentences answering: What does the world look like? Describe the art direction, color palette, visual mood."
+  },
+  "tags": {
+    "style": "string — art style name (e.g., Watercolor, Cartoon, Anime, Paper Craft, Realistic, Storybook Illustration)",
+    "audience": "string — target age group (e.g., Ages 2-4, Ages 5-7, Ages 8-12)",
+    "pageCount": number — between 8 and 12,
+    "tone": "string — short emotional tone label (e.g., Adventurous & Heartwarming, Funny & Playful)"
   }
-]
+}
 
 Rules:
-- The 2 concepts MUST feel distinctly different in style, tone, and narrative approach
-- One could be lighthearted, the other more dramatic. One for younger, one for older. One whimsical, one grounded.
 - Sections should be vivid and specific — avoid generic descriptions
-- Respond ONLY with the JSON array, no markdown code fences`,
+- Respond ONLY with the JSON object, no markdown code fences`,
   })
 
   const result = await model.generateContent(`Story idea:\n${input.plot}`)
@@ -50,15 +44,17 @@ Rules:
     jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
   }
 
-  const parsed = JSON.parse(jsonText)
-  if (!Array.isArray(parsed) || parsed.length !== 2) {
-    throw new Error('Expected exactly 2 concepts')
-  }
-
-  return parsed as [StoryConcept, StoryConcept]
+  return JSON.parse(jsonText) as StoryConcept
 }
 
-export async function refineConcept(input: RefineRequest): Promise<{ concept: StoryConcept; reply: string }> {
+/**
+ * Stream-based refineConcept: yields text chunks as they arrive from Gemini,
+ * then parses the final accumulated JSON.
+ */
+export async function* refineConceptStream(input: RefineRequest): AsyncGenerator<
+  | { type: 'chunk'; text: string }
+  | { type: 'done'; data: { concept: StoryConcept; reply: string } }
+> {
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
     systemInstruction: `You are a children's book creative director helping an author refine their story concept. The author has selected a concept and wants to make changes.
@@ -86,17 +82,25 @@ ${JSON.stringify(input.concept, null, 2)}
 
 ${history ? `Previous conversation:\n${history}\n\n` : ''}Author's new request: ${input.message}`
 
-  const result = await model.generateContent(userMessage)
-  const text = result.response.text()
+  const result = await model.generateContentStream(userMessage)
 
-  if (!text) throw new Error('No response from Gemini')
+  let accumulated = ''
+  for await (const chunk of result.stream) {
+    const text = chunk.text()
+    if (text) {
+      accumulated += text
+      yield { type: 'chunk', text }
+    }
+  }
 
-  let jsonText = text.trim()
+  if (!accumulated) throw new Error('No response from Gemini')
+
+  let jsonText = accumulated.trim()
   if (jsonText.startsWith('```')) {
     jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
   }
 
-  return JSON.parse(jsonText)
+  yield { type: 'done', data: JSON.parse(jsonText) }
 }
 
 export async function generateStoryText(input: GenerateRequest) {

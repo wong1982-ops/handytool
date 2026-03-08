@@ -3,15 +3,25 @@ import { apiSuccess, API_ERRORS } from '@/lib/api/response'
 
 export async function GET() {
   const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-  if (authError || !user) return API_ERRORS.UNAUTHORIZED()
+  let authUserId: string | undefined
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    authUserId = user?.id
+  } catch {
+    // Auth failed — continue with dev fallback
+  }
 
-  const { data: books, error } = await supabase
-    .from('books')
-    .select('id, slug, data, is_public, created_at, updated_at')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
+  const effectiveUserId = authUserId
+    || (process.env.NODE_ENV === 'development' ? process.env.DEV_USER_ID : undefined)
+
+  // Not logged in — return empty list (bookshelf uses localStorage as fallback)
+  if (!effectiveUserId) return apiSuccess([])
+
+  // Use RPC to bypass RLS (needed in dev when no auth session)
+  const { data: books, error } = await supabase.rpc('get_user_books', {
+    p_user_id: effectiveUserId,
+  })
 
   if (error) {
     console.error('story/books: fetch failed', error)
@@ -19,7 +29,7 @@ export async function GET() {
   }
 
   // Return lightweight list (title, slug, cover, tags, dates)
-  const list = (books || []).map((b) => {
+  const list = (books || []).map((b: Record<string, unknown>) => {
     const bookData = b.data as Record<string, unknown>
     const concept = bookData.concept as Record<string, unknown> | undefined
     const tags = concept?.tags as Record<string, unknown> | undefined
@@ -29,7 +39,7 @@ export async function GET() {
       id: b.id,
       slug: b.slug,
       title: bookData.title || 'Untitled',
-      coverImageUrl: pages?.[0]?.imageUrl || null,
+      coverImageUrl: (bookData.coverImageUrl as string) || pages?.[0]?.imageUrl || null,
       audience: tags?.audience || '',
       style: tags?.style || '',
       pageCount: pages?.length || 0,

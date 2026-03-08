@@ -10,6 +10,29 @@ interface BookPageProps {
 
 async function getBook(slug: string) {
   const supabase = await createClient()
+
+  // Get current user (if any) to allow viewing own books
+  let currentUserId: string | undefined
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    currentUserId = user?.id
+  } catch { /* no auth session */ }
+
+  // Dev mode: use DEV_USER_ID
+  if (!currentUserId && process.env.NODE_ENV === 'development') {
+    currentUserId = process.env.DEV_USER_ID
+  }
+
+  // Try via RPC to bypass RLS (supports dev mode without auth session)
+  if (currentUserId) {
+    const { data: userBooks } = await supabase.rpc('get_user_books', {
+      p_user_id: currentUserId,
+    })
+    const match = (userBooks || []).find((b: Record<string, unknown>) => b.slug === slug)
+    if (match) return match
+  }
+
+  // Fallback: public books (works for shared links)
   const { data, error } = await supabase
     .from('books')
     .select('id, slug, data, is_public, created_at')
@@ -35,7 +58,7 @@ export async function generateMetadata({ params }: BookPageProps): Promise<Metad
   const pages = bookData.pages as { imageUrl?: string }[] | undefined
   const title = (bookData.title as string) || 'Untitled'
   const description = (sections?.premise as string) || 'An AI-generated story book'
-  const coverImage = pages?.[0]?.imageUrl || undefined
+  const coverImage = (bookData.coverImageUrl as string) || pages?.[0]?.imageUrl || undefined
 
   return {
     title: `${title} | Story Studio`,
@@ -64,53 +87,21 @@ export default async function BookPage({ params }: BookPageProps) {
   const bookData = book.data as Record<string, unknown>
   const concept = bookData.concept as Record<string, unknown> | undefined
   const sections = concept?.sections as Record<string, unknown> | undefined
-  const tags = concept?.tags as Record<string, unknown> | undefined
-  const pages = bookData.pages as { imageUrl?: string; narrativeText?: string; sceneDescription?: string; dialogue?: { speaker: string; line: string }[]; audioUrl?: string }[] | undefined
+  const pages = bookData.pages as { imageUrl?: string }[] | undefined
   const title = (bookData.title as string) || 'Untitled'
+  const authors = (bookData.authors as string[]) || []
   const premise = (sections?.premise as string) || ''
-  const coverImage = pages?.[0]?.imageUrl || null
+  const coverImage = (bookData.coverImageUrl as string) || pages?.[0]?.imageUrl || null
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10">
-        {/* Static preview (visible to crawlers & initial load) */}
-        <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-6">
-          {coverImage && (
-            <img
-              src={coverImage}
-              alt={title}
-              className="w-full h-auto max-h-[400px] object-cover"
-            />
-          )}
-          <div className="p-6 md:p-10 text-center">
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              {title}
-            </h1>
-            {tags && (
-              <div className="flex justify-center gap-2 mb-4">
-                {tags.audience ? (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300">
-                    {String(tags.audience)}
-                  </span>
-                ) : null}
-                {tags.style ? (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
-                    {String(tags.style)}
-                  </span>
-                ) : null}
-                {pages && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                    {pages.length} pages
-                  </span>
-                )}
-              </div>
-            )}
-            {premise && (
-              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
-                {premise}
-              </p>
-            )}
-          </div>
+        {/* SEO-only static preview (hidden visually, visible to crawlers) */}
+        <div className="sr-only">
+          <h1>{title}</h1>
+          {authors.length > 0 && <p>Written by {authors.join(' & ')}</p>}
+          {premise && <p>{premise}</p>}
+          {coverImage && <img src={coverImage} alt={title} />}
         </div>
 
         {/* Interactive reader (client component) */}

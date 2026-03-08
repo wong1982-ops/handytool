@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
@@ -22,6 +22,55 @@ export default function BookshelfPage() {
   const [books, setBooks] = useState<BookItem[]>([])
   const [loading, setLoading] = useState(true)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [pdfLoading, setPdfLoading] = useState<string | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
+
+  const handleDownloadPdf = async (book: BookItem) => {
+    if (pdfLoading) return
+    setPdfLoading(book.id)
+    try {
+      // Fetch full book data
+      const bookRes = await fetch(`/api/v1/story/books/${book.id}`)
+      if (!bookRes.ok) throw new Error('Failed to load book data')
+      const { data: fullBook } = await bookRes.json()
+      const bookData = fullBook.data as Record<string, unknown>
+      const pages = (bookData.pages as { sequence: number; narrativeText: string; dialogue: string; imageUrl?: string }[]) || []
+
+      abortRef.current = new AbortController()
+      const res = await fetch('/api/v1/story/export-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: bookData.title || book.title,
+          pages: pages
+            .filter((p) => p.imageUrl)
+            .map((p) => ({
+              sequence: p.sequence,
+              narrativeText: p.narrativeText,
+              dialogue: p.dialogue,
+              imageUrl: p.imageUrl,
+            })),
+        }),
+        signal: abortRef.current.signal,
+      })
+      if (!res.ok) throw new Error(`PDF export failed (${res.status})`)
+
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${book.title}.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      if (err instanceof Error && err.name !== 'AbortError') {
+        console.error('PDF download failed:', err)
+      }
+    } finally {
+      setPdfLoading(null)
+      abortRef.current = null
+    }
+  }
 
   const fetchBooks = useCallback(async () => {
     try {
@@ -98,7 +147,7 @@ export default function BookshelfPage() {
           </div>
           <Link
             href="/tools/story-studio"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors"
             style={{ minHeight: '44px' }}
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -112,8 +161,8 @@ export default function BookshelfPage() {
           <div className="text-center py-16 text-slate-400">Loading...</div>
         ) : books.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 flex items-center justify-center">
-              <svg className="w-9 h-9 text-purple-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-gradient-to-br from-amber-500/20 via-orange-500/20 to-yellow-500/20 flex items-center justify-center">
+              <svg className="w-9 h-9 text-amber-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
               </svg>
             </div>
@@ -121,7 +170,7 @@ export default function BookshelfPage() {
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Create your first AI-illustrated story book!</p>
             <Link
               href="/tools/story-studio"
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors"
               style={{ minHeight: '44px' }}
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -154,7 +203,7 @@ export default function BookshelfPage() {
                   )}
                   {/* Genre badge overlay */}
                   {book.style && (
-                    <span className="absolute top-2 right-2 text-[10px] font-bold uppercase tracking-wider bg-purple-600 text-white px-2 py-0.5 rounded">
+                    <span className="absolute top-2 right-2 text-[10px] font-bold uppercase tracking-wider bg-amber-500 text-white px-2 py-0.5 rounded">
                       {book.style}
                     </span>
                   )}
@@ -163,7 +212,7 @@ export default function BookshelfPage() {
                 {/* Info */}
                 <div className="p-3 flex-1 flex flex-col">
                   <Link href={`/tools/story-studio/book/${book.slug}`}>
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-0.5 hover:text-purple-600 dark:hover:text-purple-400 transition-colors line-clamp-2">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-0.5 hover:text-amber-600 dark:hover:text-amber-400 transition-colors line-clamp-2">
                       {book.title}
                     </h3>
                   </Link>
@@ -178,31 +227,56 @@ export default function BookshelfPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="px-3 pb-3 flex gap-1.5">
+                <div className="px-3 pb-3 flex flex-col gap-1.5">
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => handleShare(book)}
+                      className="flex-1 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                      style={{ minHeight: '36px' }}
+                    >
+                      {book.isPublic ? 'Unshare' : 'Share'}
+                    </button>
+                    {deleteConfirm === book.id ? (
+                      <button
+                        onClick={() => handleDelete(book.id)}
+                        className="flex-1 py-1.5 rounded-lg text-xs font-medium bg-red-500 text-white hover:bg-red-600 transition-colors cursor-pointer"
+                        style={{ minHeight: '36px' }}
+                      >
+                        Confirm
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setDeleteConfirm(book.id)}
+                        className="flex-1 py-1.5 rounded-lg text-xs font-medium border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
+                        style={{ minHeight: '36px' }}
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                   <button
-                    onClick={() => handleShare(book)}
-                    className="flex-1 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    onClick={() => handleDownloadPdf(book)}
+                    disabled={pdfLoading === book.id}
+                    className="w-full py-1.5 rounded-lg text-xs font-medium border border-[#3D6AF2]/30 text-[#3D6AF2] dark:text-blue-400 hover:bg-[#3D6AF2]/5 dark:hover:bg-blue-900/20 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
                     style={{ minHeight: '36px' }}
                   >
-                    {book.isPublic ? 'Unshare' : 'Share'}
+                    {pdfLoading === book.id ? (
+                      <>
+                        <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        PDF
+                      </>
+                    )}
                   </button>
-                  {deleteConfirm === book.id ? (
-                    <button
-                      onClick={() => handleDelete(book.id)}
-                      className="flex-1 py-1.5 rounded-lg text-xs font-medium bg-red-500 text-white hover:bg-red-600 transition-colors cursor-pointer"
-                      style={{ minHeight: '36px' }}
-                    >
-                      Confirm
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setDeleteConfirm(book.id)}
-                      className="flex-1 py-1.5 rounded-lg text-xs font-medium border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
-                      style={{ minHeight: '36px' }}
-                    >
-                      Delete
-                    </button>
-                  )}
                 </div>
               </div>
             ))}
@@ -210,10 +284,10 @@ export default function BookshelfPage() {
             {/* "Create New" card — dashed border like design */}
             <Link
               href="/tools/story-studio"
-              className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center gap-3 aspect-[3/5] hover:border-purple-400 dark:hover:border-purple-600 hover:bg-purple-50/50 dark:hover:bg-purple-900/10 transition-colors group"
+              className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center gap-3 aspect-[3/5] hover:border-amber-400 dark:hover:border-amber-600 hover:bg-amber-50/50 dark:hover:bg-amber-900/10 transition-colors group"
             >
-              <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-900/50 transition-colors">
-                <svg className="w-6 h-6 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center group-hover:bg-amber-200 dark:group-hover:bg-amber-900/50 transition-colors">
+                <svg className="w-6 h-6 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
               </div>

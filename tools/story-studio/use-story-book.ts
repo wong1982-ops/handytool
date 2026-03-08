@@ -6,7 +6,7 @@ import type { StoryBook, StoryConcept, AppPhase, ProgressEvent, Page } from './t
 
 const STORAGE_KEY = 'toolk1t-story-studio-v2'
 
-function loadFromStorage(): { book: StoryBook; concepts: [StoryConcept, StoryConcept]; plot: string } | null {
+function loadFromStorage(): { book: StoryBook; concepts: StoryConcept; plot: string } | null {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
     return stored ? JSON.parse(stored) : null
@@ -15,7 +15,7 @@ function loadFromStorage(): { book: StoryBook; concepts: [StoryConcept, StoryCon
   }
 }
 
-function saveToStorage(data: { book: StoryBook; concepts: [StoryConcept, StoryConcept]; plot: string } | null) {
+function saveToStorage(data: { book: StoryBook; concepts: StoryConcept; plot: string } | null) {
   try {
     if (data) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
@@ -30,13 +30,14 @@ function saveToStorage(data: { book: StoryBook; concepts: [StoryConcept, StoryCo
 export function useStoryBook() {
   const [phase, setPhase] = useState<AppPhase>('input')
   const [plot, setPlot] = useState<string | null>(null)
-  const [concepts, setConcepts] = useState<[StoryConcept, StoryConcept] | null>(null)
+  const [concepts, setConcepts] = useState<StoryConcept | null>(null)
   const [selectedConcept, setSelectedConcept] = useState<StoryConcept | null>(null)
   const [book, setBook] = useState<StoryBook | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
   const [progressEvents, setProgressEvents] = useState<ProgressEvent[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [creditsUsed, setCreditsUsed] = useState<number | null>(null)
   const abortRef = useRef<AbortController | null>(null)
 
   // Load from localStorage on mount
@@ -90,6 +91,7 @@ export function useStoryBook() {
     setProgressEvents([])
     setLoading(false)
     setError(null)
+    setCreditsUsed(null)
     saveToStorage(null)
   }, [])
 
@@ -115,8 +117,10 @@ export function useStoryBook() {
       }
 
       const { data } = await res.json()
-      setConcepts(data as [StoryConcept, StoryConcept])
-      setPhase('concepts')
+      const concept = data as StoryConcept
+      setConcepts(concept)
+      setSelectedConcept(concept)
+      setPhase('refine')
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return
       setError(err instanceof Error ? err.message : 'Failed to generate concepts')
@@ -196,6 +200,7 @@ export function useStoryBook() {
               })
             } else if (event.type === 'complete') {
               setBook(event.data)
+              if (event.creditsUsed) setCreditsUsed(event.creditsUsed)
               setPhase('viewer')
             } else if (event.type === 'error') {
               throw new Error(event.message)
@@ -231,6 +236,7 @@ export function useStoryBook() {
     loading,
     error,
     setError,
+    creditsUsed,
     fetchConcepts,
     selectConcept,
     startGeneration,

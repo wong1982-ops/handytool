@@ -1,6 +1,10 @@
-import { API_ERRORS, apiSuccess } from '@/lib/api/response'
+import { API_ERRORS } from '@/lib/api/response'
 import { refineRequestSchema } from '@/lib/story/types'
-import { refineConcept } from '@/lib/story/enrich'
+import { refineConceptStream } from '@/lib/story/enrich'
+
+function sseEvent(data: Record<string, unknown>): string {
+  return `data: ${JSON.stringify(data)}\n\n`
+}
 
 export async function POST(request: Request) {
   let body: unknown
@@ -15,12 +19,35 @@ export async function POST(request: Request) {
     return API_ERRORS.VALIDATION(parsed.error.flatten().fieldErrors)
   }
 
-  try {
-    const result = await refineConcept(parsed.data)
-    return apiSuccess(result)
-  } catch (err) {
-    const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
-    console.error('story/refine: AI call failed —', message)
-    return API_ERRORS.INTERNAL()
-  }
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = (data: Record<string, unknown>) => {
+        controller.enqueue(new TextEncoder().encode(sseEvent(data)))
+      }
+
+      try {
+        for await (const event of refineConceptStream(parsed.data)) {
+          if (event.type === 'chunk') {
+            send({ type: 'chunk', text: event.text })
+          } else if (event.type === 'done') {
+            send({ type: 'done', concept: event.data.concept, reply: event.data.reply })
+          }
+        }
+      } catch (err) {
+        const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+        console.error('story/refine: AI call failed —', message)
+        send({ type: 'error', message: 'Refinement failed. Please try again.' })
+      } finally {
+        controller.close()
+      }
+    },
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    },
+  })
 }

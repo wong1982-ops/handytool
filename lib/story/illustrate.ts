@@ -3,49 +3,123 @@ import { createClient } from '@/lib/supabase/server'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
-// Fallback providers (used if GEMINI_API_KEY is not set or Imagen fails)
+// Fallback providers (used if GEMINI_API_KEY is not set or Gemini fails)
 const FAL_API_KEY = process.env.FAL_API_KEY
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 
-interface IllustrateInput {
+export interface IllustrateInput {
   imagePrompt: string
   characters?: { name: string; description: string }[]
+  referenceImage?: Buffer  // character reference sheet
 }
 
+/**
+ * Build a structured prompt with characters leading for consistency.
+ */
 function buildPrompt(input: IllustrateInput): string {
-  let prompt = input.imagePrompt
+  let prompt = ''
+
+  // Characters first — stronger signal for model consistency
   if (input.characters?.length) {
-    const charDescs = input.characters.map(c => `${c.name}: ${c.description}`).join('. ')
-    prompt += `\n\nCharacter descriptions for consistency: ${charDescs}`
+    prompt += 'CHARACTERS (maintain exact appearances throughout):\n'
+    prompt += input.characters.map(c => `- ${c.name}: ${c.description}`).join('\n')
+    prompt += '\n\n'
   }
+
+  prompt += `SCENE: ${input.imagePrompt}`
   prompt += '\n\nIMPORTANT: Do not include any text, words, letters, or writing in the image. Illustration only.'
   return prompt
 }
 
-async function generateWithGeminiImagen(prompt: string): Promise<ArrayBuffer | string> {
-  const model = genAI.getGenerativeModel({
-    model: 'imagen-3.0-generate-002',
-  })
+/**
+ * Generate a character reference sheet showing all main characters side by side.
+ * Returns a Buffer for passing as reference to page illustrations, or null on failure.
+ */
+export async function generateCharacterReference(
+  characters: { name: string; description: string }[],
+  style: string,
+): Promise<Buffer | null> {
+  if (!characters.length || !process.env.GEMINI_API_KEY) return null
 
-  const result = await model.generateContent(prompt)
-  const response = result.response
+  try {
+    const charDescs = characters.map(c => `${c.name}: ${c.description}`).join('. ')
+    const prompt = `${style} style character reference sheet showing all main characters side by side, full body, clear distinct appearances, white background, no text. Characters: ${charDescs}`
 
-  // Imagen returns inline image data
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash-preview-image-generation',
+      generationConfig: {
+        // @ts-expect-error — responseModalities is valid for image generation models
+        responseModalities: ['IMAGE', 'TEXT'],
+      },
+    })
+
+    const result = await model.generateContent(prompt)
+    const response = result.response
+    const imagePart = response.candidates?.[0]?.content?.parts?.find(
+      (p: { inlineData?: { mimeType: string; data: string } }) => p.inlineData?.mimeType?.startsWith('image/')
+    )
+
+    if (!imagePart?.inlineData?.data) {
+      console.warn('Character reference: no image returned')
+      return null
+    }
+
+    return Buffer.from(imagePart.inlineData.data, 'base64')
+  } catch (err) {
+    console.warn('Character reference generation failed (proceeding without):', err)
+    return null
+  }
+}
+
+/** Extract image data from a Gemini response and return as ArrayBuffer */
+function extractImageFromGeminiResponse(response: { candidates?: { content?: { parts?: { inlineData?: { mimeType: string; data: string } }[] } }[] }): ArrayBuffer {
   const imagePart = response.candidates?.[0]?.content?.parts?.find(
     (p: { inlineData?: { mimeType: string; data: string } }) => p.inlineData?.mimeType?.startsWith('image/')
   )
 
   if (!imagePart?.inlineData?.data) {
-    throw new Error('No image returned from Imagen')
+    throw new Error('No image returned from Gemini')
   }
 
-  // Convert base64 to ArrayBuffer
   const binaryString = atob(imagePart.inlineData.data)
   const bytes = new Uint8Array(binaryString.length)
   for (let i = 0; i < binaryString.length; i++) {
     bytes[i] = binaryString.charCodeAt(i)
   }
   return bytes.buffer
+}
+
+/**
+ * Generate illustration using Gemini 2.0 Flash with optional reference image.
+ */
+async function generateWithGemini(
+  prompt: string,
+  referenceImage?: Buffer,
+): Promise<ArrayBuffer | string> {
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.0-flash-preview-image-generation',
+    generationConfig: {
+      // @ts-expect-error — responseModalities is valid for image generation models
+      responseModalities: ['IMAGE', 'TEXT'],
+    },
+  })
+
+  // Pass reference image alongside text prompt if available
+  if (referenceImage) {
+    const result = await model.generateContent({
+      contents: [{
+        role: 'user' as const,
+        parts: [
+          { inlineData: { mimeType: 'image/png', data: referenceImage.toString('base64') } },
+          { text: 'Use the character reference sheet above to maintain consistent character appearances. ' + prompt },
+        ],
+      }],
+    })
+    return extractImageFromGeminiResponse(result.response)
+  }
+
+  const result = await model.generateContent(prompt)
+  return extractImageFromGeminiResponse(result.response)
 }
 
 async function generateWithFal(prompt: string): Promise<ArrayBuffer> {
@@ -116,13 +190,14 @@ async function generateWithDalle(prompt: string): Promise<ArrayBuffer | string> 
 export async function generateIllustration(input: IllustrateInput): Promise<string> {
   const prompt = buildPrompt(input)
 
-  // Priority: Gemini Imagen → fal.ai → DALL-E
+  // Priority: Gemini 2.0 Flash (with reference image) → fal.ai → DALL-E
+  // Fallback providers don't receive the reference image (different APIs)
   let result: ArrayBuffer | string
   if (process.env.GEMINI_API_KEY) {
     try {
-      result = await generateWithGeminiImagen(prompt)
+      result = await generateWithGemini(prompt, input.referenceImage)
     } catch (err) {
-      console.warn('Imagen generation failed, falling back:', err)
+      console.warn('Gemini illustration failed, falling back:', err)
       result = FAL_API_KEY
         ? await generateWithFal(prompt)
         : await generateWithDalle(prompt)

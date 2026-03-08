@@ -3,7 +3,7 @@
 export type CharacterRole = 'protagonist' | 'antagonist' | 'supporting'
 export type BookStatus = 'generating' | 'complete'
 export type ImageStatus = 'pending' | 'generating' | 'done' | 'error'
-export type AppPhase = 'input' | 'concepts' | 'refine' | 'generating' | 'viewer'
+export type AppPhase = 'input' | 'refine' | 'generating' | 'viewer'
 
 export interface ConceptSections {
   premise: string
@@ -60,11 +60,14 @@ export interface StoryBook {
   id: string
   slug: string
   title: string
+  authors: string[]
+  coverImageUrl?: string
   concept: StoryConcept
   theme: string
   setting: string
   characters: Character[]
   pages: Page[]
+  voiceMap?: Record<string, string>
   status: BookStatus
   createdAt: string
   updatedAt: string
@@ -75,7 +78,7 @@ export type ProgressEvent =
   | { type: 'story-ready'; data: StoryBook }
   | { type: 'image-done'; page: number; url: string }
   | { type: 'audio-done'; page: number; url: string }
-  | { type: 'complete'; data: StoryBook }
+  | { type: 'complete'; data: StoryBook; creditsUsed?: number }
   | { type: 'error'; message: string }
 
 export const CREDIT_COSTS = {
