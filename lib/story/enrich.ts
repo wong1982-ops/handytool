@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import type { ConceptsRequest, StoryConcept, GenerateRequest, RefineRequest } from './types'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
@@ -8,30 +8,43 @@ export async function generateConcepts(input: ConceptsRequest): Promise<StoryCon
     model: 'gemini-2.5-flash',
     systemInstruction: `You are a professional children's book creative director. Given a story plot idea, generate a compelling story concept with rich detail.
 
-You MUST respond with valid JSON matching this structure:
-{
-  "id": "concept_1",
-  "title": "string — a compelling, memorable book title",
-  "coverDescription": "string — visual description of what the book cover would look like",
-  "sections": {
-    "premise": "string — 2-3 sentences answering: What is this story about? Set the scene and introduce the central conflict or journey.",
-    "authorIntent": "string — 1-2 sentences answering: What does the author want to provoke in the reader? What emotions or thoughts should this story stir?",
-    "messageToAudience": "string — 1-2 sentences answering: What should the reader take away? The moral, lesson, or feeling they carry after the last page.",
-    "narrativeArc": "string — 2-3 sentences answering: How does the story unfold? Sketch the beginning, turning point, and resolution without spoiling surprises.",
-    "tone": "string — 1-2 sentences answering: How is the story told? Describe the narrative voice, humor level, emotional texture.",
-    "visualStyle": "string — 1-2 sentences answering: What does the world look like? Describe the art direction, color palette, visual mood."
-  },
-  "tags": {
-    "style": "string — art style name (e.g., Watercolor, Cartoon, Anime, Paper Craft, Realistic, Storybook Illustration)",
-    "audience": "string — target age group (e.g., Ages 2-4, Ages 5-7, Ages 8-12)",
-    "pageCount": number — between 8 and 12,
-    "tone": "string — short emotional tone label (e.g., Adventurous & Heartwarming, Funny & Playful)"
-  }
-}
-
 Rules:
 - Sections should be vivid and specific — avoid generic descriptions
-- Respond ONLY with the JSON object, no markdown code fences`,
+- Keep each section concise (1-3 sentences max)`,
+    generationConfig: {
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: SchemaType.OBJECT,
+        properties: {
+          id: { type: SchemaType.STRING },
+          title: { type: SchemaType.STRING, description: 'A compelling, memorable book title' },
+          coverDescription: { type: SchemaType.STRING, description: 'Visual description of the book cover' },
+          sections: {
+            type: SchemaType.OBJECT,
+            properties: {
+              premise: { type: SchemaType.STRING, description: 'What is this story about? Set the scene and central conflict.' },
+              authorIntent: { type: SchemaType.STRING, description: 'What emotions or thoughts should this story stir?' },
+              messageToAudience: { type: SchemaType.STRING, description: 'What should the reader take away?' },
+              narrativeArc: { type: SchemaType.STRING, description: 'How does the story unfold? Beginning, turning point, resolution.' },
+              tone: { type: SchemaType.STRING, description: 'How is the story told? Voice, humor, emotional texture.' },
+              visualStyle: { type: SchemaType.STRING, description: 'Art direction, color palette, visual mood.' },
+            },
+            required: ['premise', 'authorIntent', 'messageToAudience', 'narrativeArc', 'tone', 'visualStyle'],
+          },
+          tags: {
+            type: SchemaType.OBJECT,
+            properties: {
+              style: { type: SchemaType.STRING, description: 'Art style (e.g., Watercolor, Cartoon, Anime)' },
+              audience: { type: SchemaType.STRING, description: 'Target age group (e.g., Ages 2-4, Ages 5-7)' },
+              pageCount: { type: SchemaType.NUMBER, description: 'Number of pages, between 8 and 12' },
+              tone: { type: SchemaType.STRING, description: 'Short emotional tone label' },
+            },
+            required: ['style', 'audience', 'pageCount', 'tone'],
+          },
+        },
+        required: ['id', 'title', 'coverDescription', 'sections', 'tags'],
+      },
+    },
   })
 
   const result = await model.generateContent(`Story idea:\n${input.plot}`)
@@ -39,12 +52,7 @@ Rules:
 
   if (!text) throw new Error('No response from Gemini')
 
-  let jsonText = text.trim()
-  if (jsonText.startsWith('```')) {
-    jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
-  }
-
-  return JSON.parse(jsonText) as StoryConcept
+  return JSON.parse(text) as StoryConcept
 }
 
 /**
@@ -125,7 +133,7 @@ You MUST respond with valid JSON matching this exact structure:
     {
       "name": "string",
       "role": "protagonist" | "antagonist" | "supporting",
-      "description": "string — detailed physical appearance (hair color, eye color, clothing, distinguishing features) and personality traits. Be very specific for illustration consistency.",
+      "description": "string — EXTREMELY detailed physical appearance for illustration consistency. Use hyper-specific modifiers (e.g., 'messy charcoal-grey hair' not 'grey hair', 'round tortoiseshell glasses' not 'glasses', 'oversized mustard-yellow raincoat with brass buttons' not 'yellow coat'). Include: exact hair color/style/length, eye color/shape, skin tone, body type/height, specific clothing items with colors and details, and any distinguishing features (freckles, scars, accessories). These descriptions will be copied verbatim into every illustration prompt.",
       "age": "string — approximate age"
     }
   ],
@@ -148,7 +156,7 @@ Rules:
 - First page is the opening scene, last page is the resolution
 - Each page should advance the story
 - Keep language age-appropriate for ${audience}
-- Every imagePrompt must start with "${style} style" and include full character physical descriptions
+- Every imagePrompt MUST start with "${style} style" and include the FULL physical description of every character present in the scene. Do NOT abbreviate or summarize — copy the complete character description into each imagePrompt. The AI image model does NOT remember characters between pages.
 - Do not include any text, words, or letters in image prompts
 - Respond ONLY with the JSON object, no markdown code fences`,
   })

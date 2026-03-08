@@ -157,53 +157,73 @@ export async function POST(request: Request) {
           description: c.description,
         }))
 
-        send({ type: 'status', message: 'Creating character references...' })
-        const referenceImage = await generateCharacterReference(characters, concept.tags.style)
+        send({ type: 'status', message: 'Creating character reference sheet for consistency...' })
+        let referenceImage = await generateCharacterReference(characters, concept.tags.style)
+
+        // Retry once if reference fails — it's important for consistency
+        if (!referenceImage) {
+          send({ type: 'status', message: 'Retrying character reference...' })
+          referenceImage = await generateCharacterReference(characters, concept.tags.style)
+        }
+
         if (referenceImage) {
           send({ type: 'status', message: `Character reference ready! Illustrating cover + ${totalPages} pages...` })
         } else {
-          send({ type: 'status', message: `Illustrating cover + ${totalPages} pages...` })
+          send({ type: 'status', message: `Illustrating cover + ${totalPages} pages (without reference)...` })
         }
 
-        // Generate cover + page illustrations with concurrency limit (3 at a time) and retry
-        const coverTask = async () => {
-          try {
-            const coverPrompt = `${concept.tags.style} style book cover illustration. ${concept.coverDescription}. Beautiful, cinematic, no text or words in the image.`
-            const coverUrl = await withRetry(() => generateIllustration({
-              imagePrompt: coverPrompt,
-              characters,
-              referenceImage: referenceImage ?? undefined,
-            }))
-            book.coverImageUrl = coverUrl
-            send({ type: 'status', message: 'Cover done! Illustrating pages...' })
-          } catch (err) {
-            console.error('Cover illustration failed:', err)
-          }
+        // Strategy 1: Lock the Seed — same seed for all pages in this book
+        const bookSeed = Math.floor(Math.random() * 2147483647)
+        console.log(`[story] Book seed: ${bookSeed}, reference: ${referenceImage ? 'yes' : 'no'}`)
+
+        // Generate cover first — its buffer becomes the first "previous page" for chaining
+        let previousPageBuffer: Buffer | null = null
+
+        try {
+          const coverPrompt = `${concept.tags.style} style book cover illustration. ${concept.coverDescription}. Beautiful, cinematic, no text or words in the image.`
+          send({ type: 'status', message: 'Illustrating cover...' })
+          const coverResult = await withRetry(() => generateIllustration({
+            imagePrompt: coverPrompt,
+            characters,
+            referenceImage: referenceImage ?? undefined,
+            seed: bookSeed,
+            style: concept.tags.style,
+          }))
+          book.coverImageUrl = coverResult.url
+          previousPageBuffer = coverResult.buffer
+          send({ type: 'status', message: 'Cover done! Illustrating pages...' })
+        } catch (err) {
+          console.error('Cover illustration failed:', err)
         }
 
         type ImageResult = { sequence: number; imageUrl: string | undefined; imageStatus: 'done' | 'error' }
 
-        const pageTasks = book.pages.map((page: { sequence: number; imagePrompt: string }, index: number) => {
-          return async (): Promise<ImageResult> => {
-            try {
-              const imageUrl = await withRetry(() => generateIllustration({
-                imagePrompt: page.imagePrompt,
-                characters,
-                referenceImage: referenceImage ?? undefined,
-              }))
-              send({ type: 'image-done', page: index + 1, url: imageUrl })
-              return { sequence: page.sequence, imageUrl, imageStatus: 'done' }
-            } catch (err) {
-              console.error(`Illustration failed for page ${index + 1}:`, err)
-              send({ type: 'image-done', page: index + 1, url: '' })
-              return { sequence: page.sequence, imageUrl: undefined, imageStatus: 'error' }
-            }
-          }
-        })
+        // Strategy 5: Sequential generation — chain each page's buffer as previousPageImage
+        // This ensures visual continuity: cover → page 1 → page 2 → ... → page N
+        const imageResults: ImageResult[] = []
 
-        // Run cover first, then pages with concurrency limit of 3
-        await coverTask()
-        const imageResults = await runWithConcurrency<ImageResult>(pageTasks, 3)
+        for (let index = 0; index < book.pages.length; index++) {
+          const page = book.pages[index] as { sequence: number; imagePrompt: string }
+          try {
+            send({ type: 'status', message: `Illustrating page ${index + 1} of ${totalPages}...` })
+            const result = await withRetry(() => generateIllustration({
+              imagePrompt: page.imagePrompt,
+              characters,
+              referenceImage: referenceImage ?? undefined,
+              previousPageImage: previousPageBuffer ?? undefined,
+              seed: bookSeed,
+              style: concept.tags.style,
+            }))
+            // Chain: this page's buffer becomes the next page's previousPageImage
+            if (result.buffer) previousPageBuffer = result.buffer
+            send({ type: 'image-done', page: index + 1, url: result.url })
+            imageResults.push({ sequence: page.sequence, imageUrl: result.url, imageStatus: 'done' })
+          } catch (err) {
+            console.error(`Illustration failed for page ${index + 1}:`, err)
+            send({ type: 'image-done', page: index + 1, url: '' })
+            imageResults.push({ sequence: page.sequence, imageUrl: undefined, imageStatus: 'error' })
+          }
+        }
 
         // Merge illustration results
         let pagesWithImages = book.pages.map((page: Record<string, unknown>) => {
