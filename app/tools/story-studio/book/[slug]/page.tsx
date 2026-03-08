@@ -72,7 +72,7 @@ export default async function BookPage({ params }: BookPageProps) {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10">
         {/* Static preview (visible to crawlers & initial load) */}
         <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-6">
           {coverImage && (

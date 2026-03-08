@@ -100,8 +100,10 @@ export default function StoryStudioPage() {
         </div>
       </div>
 
-      {/* Content area */}
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
+      {/* Content area — wider for viewer/editor, narrower for input phases */}
+      <div className={`mx-auto px-4 md:px-6 py-6 md:py-8 ${
+        phase === 'viewer' ? 'max-w-7xl' : 'max-w-4xl'
+      }`}>
         {error && (
           <div className="mb-6 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">
             {error}
