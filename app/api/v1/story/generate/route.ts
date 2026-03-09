@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUserId, apiError, API_ERRORS } from '@/lib/api/response'
 import { generateRequestSchema } from '@/lib/story/types'
-import { generateStoryText, generateSlug, type SeriesBookSummary } from '@/lib/story/enrich'
+import { generateStoryBible, generateStoryDraft, validateAndFix, generateSlug, type SeriesBookSummary } from '@/lib/story/enrich'
 import { generateIllustration, generateCharacterReference, type CharacterReference } from '@/lib/story/illustrate'
 import {
   assignVoices,
@@ -170,13 +170,22 @@ export async function POST(request: Request) {
       }
 
       try {
-        // Step 1: Generate story text
-        send({ type: 'status', message: 'Writing your story...' })
+        // Step 1: Build Story Bible (grounding document)
+        send({ type: 'status', message: 'Building story foundation...' })
+        const storyBible = await generateStoryBible({
+          plot,
+          concept,
+          seriesContext: seriesExistingBooks.length > 0 ? { existingBooks: seriesExistingBooks } : undefined,
+        })
 
-        const storyData = await generateStoryText(
-          { plot, concept },
-          seriesExistingBooks.length > 0 ? { existingBooks: seriesExistingBooks } : undefined,
-        )
+        // Step 2: Write story draft grounded against Story Bible
+        send({ type: 'status', message: 'Writing your story...' })
+        const rawDraft = await generateStoryDraft({ plot, concept }, storyBible)
+
+        // Step 3: Validate & auto-fix against Story Bible
+        send({ type: 'status', message: 'Reviewing for consistency...' })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const storyData = await validateAndFix(storyBible, rawDraft) as any
         const now = new Date().toISOString()
         const bookId = `story_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
         const slug = generateSlug(storyData.title || concept.title)

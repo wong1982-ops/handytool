@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUserId, apiSuccess, API_ERRORS } from '@/lib/api/response'
 
-const WELCOME_CREDITS = 50
+const WELCOME_CREDITS = 65
 
 export async function GET() {
   const userId = await getAuthUserId()

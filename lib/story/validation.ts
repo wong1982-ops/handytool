@@ -6,7 +6,7 @@ export class StoryValidationError extends Error {
 }
 
 export const CREDIT_COSTS = {
-  generate: 50,
+  generate: 65,
   regenerateStory: 10,
   regenerateImage: 5,
   exportPdf: 5,
