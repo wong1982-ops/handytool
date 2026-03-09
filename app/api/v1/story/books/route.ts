@@ -1,23 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
-import { apiSuccess, API_ERRORS } from '@/lib/api/response'
+import { getAuthUserId, apiSuccess, API_ERRORS } from '@/lib/api/response'
 
 export async function GET() {
-  const supabase = await createClient()
-
-  let authUserId: string | undefined
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    authUserId = user?.id
-  } catch {
-    // Auth failed — continue with dev fallback
-  }
-
-  const effectiveUserId = authUserId
-    || (process.env.NODE_ENV === 'development' ? process.env.DEV_USER_ID : undefined)
+  const effectiveUserId = await getAuthUserId()
 
   // Not logged in — return empty list (bookshelf uses localStorage as fallback)
   if (!effectiveUserId) return apiSuccess([])
 
+  const supabase = await createClient()
   // Use RPC to bypass RLS (needed in dev when no auth session)
   const { data: books, error } = await supabase.rpc('get_user_books', {
     p_user_id: effectiveUserId,

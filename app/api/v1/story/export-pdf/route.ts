@@ -1,24 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
-import { API_ERRORS } from '@/lib/api/response'
+import { getAuthUserId, API_ERRORS } from '@/lib/api/response'
 import { exportPdfRequestSchema } from '@/lib/story/types'
 import { generateBookPdf } from '@/lib/story/export-pdf'
 import { CREDIT_COSTS } from '@/lib/story/validation'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const supabase = await createClient()
-
-  let userId: string | undefined
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    userId = user?.id
-  } catch { /* no auth session */ }
-
-  if (!userId && process.env.NODE_ENV === 'development') {
-    userId = process.env.DEV_USER_ID
-  }
-
+  const userId = await getAuthUserId()
   if (!userId) return API_ERRORS.UNAUTHORIZED()
+
+  const supabase = await createClient()
 
   let body: unknown
   try { body = await request.json() } catch { return API_ERRORS.VALIDATION({ message: 'Invalid JSON body' }) }

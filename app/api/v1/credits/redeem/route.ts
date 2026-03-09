@@ -1,27 +1,17 @@
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
-import { createClient as createAuthClient } from '@/lib/supabase/server'
-import { createClient } from '@supabase/supabase-js'
-import { apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
+import { createClient } from '@/lib/supabase/server'
+import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 
 const bodySchema = z.object({
   code: z.string().min(1).max(50),
 })
 
-function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
-}
-
 export async function POST(request: NextRequest) {
-  const supabase = await createAuthClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  if (authError || !user) {
-    return API_ERRORS.UNAUTHORIZED()
-  }
+  const admin = await createClient()
 
   const body = await request.json().catch(() => null)
   const parsed = bodySchema.safeParse(body)
@@ -31,7 +21,6 @@ export async function POST(request: NextRequest) {
   }
 
   const { code } = parsed.data
-  const admin = getServiceClient()
 
   // Validate promo code exists and is active
   const { data: promo, error: promoError } = await admin
@@ -60,7 +49,7 @@ export async function POST(request: NextRequest) {
   const { data: existing } = await admin
     .from('credit_transactions')
     .select('id')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('type', 'promo_redemption')
     .contains('metadata', { promo_code: code })
     .limit(1)
@@ -71,7 +60,7 @@ export async function POST(request: NextRequest) {
 
   // Grant purchased credits
   const { error: grantError } = await admin.rpc('grant_purchased_credits', {
-    p_user_id: user.id,
+    p_user_id: userId,
     p_amount: promo.credit_amount,
     p_description: `Promo code: ${code}`,
   })
@@ -89,7 +78,7 @@ export async function POST(request: NextRequest) {
       type: 'promo_redemption',
       metadata: { promo_code: code },
     })
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('type', 'purchase')
     .eq('description', `Promo code: ${code}`)
     .order('created_at', { ascending: false })

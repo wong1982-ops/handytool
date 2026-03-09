@@ -1,23 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
-import { apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
-
-function getEffectiveUserId(userId?: string) {
-  return userId || (process.env.NODE_ENV === 'development' ? process.env.DEV_USER_ID : undefined)
-}
+import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createClient()
-
-  let authUserId: string | undefined
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    authUserId = user?.id
-  } catch { /* no auth session */ }
-
-  const effectiveUserId = getEffectiveUserId(authUserId)
+  const effectiveUserId = await getAuthUserId()
   if (!effectiveUserId) return API_ERRORS.UNAUTHORIZED()
 
+  const supabase = await createClient()
   // Use RPC to bypass RLS
   const { data: books } = await supabase.rpc('get_user_books', {
     p_user_id: effectiveUserId,
@@ -32,16 +21,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 // PATCH — update a page in a saved book
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createClient()
-
-  let authUserId: string | undefined
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    authUserId = user?.id
-  } catch { /* no auth session */ }
-
-  const effectiveUserId = getEffectiveUserId(authUserId)
+  const effectiveUserId = await getAuthUserId()
   if (!effectiveUserId) return API_ERRORS.UNAUTHORIZED()
+
+  const supabase = await createClient()
 
   let body: { pageSequence: number; narrativeText?: string; dialogue?: { speaker: string; line: string }[]; imagePrompt?: string; imageUrl?: string }
   try { body = await request.json() } catch { return API_ERRORS.VALIDATION({ message: 'Invalid JSON' }) }
@@ -87,13 +70,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const effectiveUserId = user?.id
-    || (process.env.NODE_ENV === 'development' ? process.env.DEV_USER_ID : undefined)
-
+  const effectiveUserId = await getAuthUserId()
   if (!effectiveUserId) return API_ERRORS.UNAUTHORIZED()
 
+  const supabase = await createClient()
   // Use RPC to bypass RLS (needed in dev when no auth session)
   const { error } = await supabase.rpc('delete_user_book', {
     p_user_id: effectiveUserId,

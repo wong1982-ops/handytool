@@ -1,28 +1,18 @@
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
-import { createClient as createAuthClient } from '@/lib/supabase/server'
-import { createClient } from '@supabase/supabase-js'
-import { apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
+import { createClient } from '@/lib/supabase/server'
+import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 
 const bodySchema = z.object({
   tool_id: z.string().min(1),
   input: z.record(z.unknown()),
 })
 
-function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
-}
-
 export async function POST(request: NextRequest) {
-  const supabase = await createAuthClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  if (authError || !user) {
-    return API_ERRORS.UNAUTHORIZED()
-  }
+  const admin = await createClient()
 
   const body = await request.json().catch(() => null)
   const parsed = bodySchema.safeParse(body)
@@ -32,7 +22,6 @@ export async function POST(request: NextRequest) {
   }
 
   const { tool_id, input } = parsed.data
-  const admin = getServiceClient()
 
   // Look up tool credit cost
   const { data: toolCost, error: costError } = await admin
@@ -49,7 +38,7 @@ export async function POST(request: NextRequest) {
 
   // Deduct credits
   const { data: deductResult, error: deductError } = await admin.rpc('deduct_credits', {
-    p_user_id: user.id,
+    p_user_id: userId,
     p_amount: cost,
     p_tool_id: tool_id,
     p_description: `Tool usage: ${tool_id}`,
@@ -77,7 +66,7 @@ export async function POST(request: NextRequest) {
     // Refund credits on AI failure
     if (transactionId) {
       const { error: refundError } = await admin.rpc('refund_credits', {
-        p_user_id: user.id,
+        p_user_id: userId,
         p_amount: cost,
         p_original_transaction_id: transactionId,
         p_description: 'AI call failed — credits refunded',

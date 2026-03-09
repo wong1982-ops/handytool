@@ -1,18 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
-import { apiSuccess, API_ERRORS } from '@/lib/api/response'
+import { getAuthUserId, apiSuccess, API_ERRORS } from '@/lib/api/response'
 
 export async function GET() {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
   const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    return API_ERRORS.UNAUTHORIZED()
-  }
-
   const { data, error } = await supabase
     .from('user_credits')
     .select('subscription_balance, purchased_balance, current_period_end')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .maybeSingle()
 
   if (error) {

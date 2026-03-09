@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { isLocalDev, LOCAL_DEV_USER_ID } from '@/lib/local-dev'
 
 /**
  * Get the authenticated user ID with dev-mode fallback.
+ * In local dev mode, returns the hardcoded local dev user.
  * In development, falls back to DEV_USER_ID env var.
  * Returns null if no auth available (caller should return UNAUTHORIZED).
  */
 export async function getAuthUserId(): Promise<string | null> {
+  if (isLocalDev) return LOCAL_DEV_USER_ID
+
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { getStripe } from '@/lib/stripe/client'
 import { CREDIT_PACKS } from '@/lib/stripe/config'
-import { apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
+import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 
 const bodySchema = z.discriminatedUnion('type', [
   z.object({
@@ -17,12 +17,17 @@ const bodySchema = z.discriminatedUnion('type', [
 ])
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  if (authError || !user) {
-    return API_ERRORS.UNAUTHORIZED()
-  }
+  const supabase = await createClient()
+
+  // Get user email for Stripe
+  let userEmail: string | undefined
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    userEmail = user?.email ?? undefined
+  } catch { /* use undefined */ }
 
   const body = await request.json().catch(() => null)
   const parsed = bodySchema.safeParse(body)
@@ -60,12 +65,12 @@ export async function POST(request: NextRequest) {
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
-      customer_email: user.email,
+      customer_email: userEmail,
       line_items: [{ price: tier.stripe_price_id, quantity: 1 }],
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
-        user_id: user.id,
+        user_id: userId,
         type: 'subscription',
         tier_id,
         credits: String(tier.monthly_credits),
@@ -85,7 +90,7 @@ export async function POST(request: NextRequest) {
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
-    customer_email: user.email,
+    customer_email: userEmail,
     line_items: [
       {
         price_data: {
@@ -99,7 +104,7 @@ export async function POST(request: NextRequest) {
     success_url: successUrl,
     cancel_url: cancelUrl,
     metadata: {
-      user_id: user.id,
+      user_id: userId,
       type: 'credit_pack',
       pack_id,
       credits: String(pack.credits),

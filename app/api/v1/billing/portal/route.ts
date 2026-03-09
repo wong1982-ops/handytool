@@ -1,21 +1,19 @@
 import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStripe } from '@/lib/stripe/client'
-import { apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
+import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  if (authError || !user) {
-    return API_ERRORS.UNAUTHORIZED()
-  }
+  const supabase = await createClient()
 
   // Find user's active subscription
   const { data: subscription, error: subError } = await supabase
     .from('user_subscriptions')
     .select('stripe_customer_id')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('status', 'active')
     .single()
 

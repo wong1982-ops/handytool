@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { apiSuccess, API_ERRORS } from '@/lib/api/response'
+import { getAuthUserId, apiSuccess, API_ERRORS } from '@/lib/api/response'
 
 const querySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -9,12 +9,10 @@ const querySchema = z.object({
 })
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  if (authError || !user) {
-    return API_ERRORS.UNAUTHORIZED()
-  }
+  const supabase = await createClient()
 
   const params = Object.fromEntries(request.nextUrl.searchParams)
   const parsed = querySchema.safeParse(params)
@@ -30,7 +28,7 @@ export async function GET(request: NextRequest) {
   const { data: transactions, error, count } = await supabase
     .from('credit_transactions')
     .select('*', { count: 'exact' })
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .range(from, to)
 

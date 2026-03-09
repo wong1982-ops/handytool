@@ -1,27 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
-import { apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
+import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 import { conceptsRequestSchema } from '@/lib/story/types'
 import { generateConcepts, type SeriesContext, type SeriesBookSummary } from '@/lib/story/enrich'
 import { CREDIT_COSTS } from '@/lib/story/validation'
 
 export async function POST(request: Request) {
   // Authenticate — concepts require login so we can check credit balance
-  let userId: string | undefined
-  try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      userId = user.id
-    } else if (process.env.NODE_ENV === 'development' && process.env.DEV_USER_ID) {
-      userId = process.env.DEV_USER_ID
-    }
-  } catch {
-    // Auth unavailable
-  }
-
-  if (!userId && process.env.NODE_ENV !== 'development') {
-    return API_ERRORS.UNAUTHORIZED()
-  }
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
 
   // Pre-check: user must have enough credits for a full generation
   // (concepts are free, but we prevent users from wasting time if they can't generate)

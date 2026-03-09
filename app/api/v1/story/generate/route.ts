@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { apiError, API_ERRORS } from '@/lib/api/response'
+import { getAuthUserId, apiError, API_ERRORS } from '@/lib/api/response'
 import { generateRequestSchema } from '@/lib/story/types'
 import { generateStoryText, generateSlug, type SeriesBookSummary } from '@/lib/story/enrich'
 import { generateIllustration, generateCharacterReference, type CharacterReference } from '@/lib/story/illustrate'
@@ -52,28 +52,11 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries = 2): Promise<T> {
 }
 
 export async function POST(request: Request) {
-  let userId: string | undefined
   let reservationId: string | undefined
 
   // Authenticate — generation requires login (for credit reservation)
-  try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (user) {
-      userId = user.id
-    } else if (process.env.NODE_ENV === 'development' && process.env.DEV_USER_ID) {
-      // Dev mode: use configured user ID so books are saved to the correct account
-      userId = process.env.DEV_USER_ID
-    }
-  } catch {
-    // Auth unavailable
-  }
-
-  // Require auth in production
-  if (!userId && process.env.NODE_ENV !== 'development') {
-    return API_ERRORS.UNAUTHORIZED()
-  }
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
 
   // Reserve credits atomically (prevents parallel requests from double-spending)
   if (userId && process.env.NODE_ENV !== 'development') {

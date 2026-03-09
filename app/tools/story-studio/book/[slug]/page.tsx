@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { isLocalDev, LOCAL_DEV_USER_ID } from '@/lib/local-dev'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BookReaderClient } from './book-reader-client'
@@ -14,14 +15,19 @@ async function getBook(slug: string) {
 
   // Get current user (if any) to allow viewing own books
   let currentUserId: string | undefined
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    currentUserId = user?.id
-  } catch { /* no auth session */ }
 
-  // Dev mode: use DEV_USER_ID
-  if (!currentUserId && process.env.NODE_ENV === 'development') {
-    currentUserId = process.env.DEV_USER_ID
+  if (isLocalDev) {
+    currentUserId = LOCAL_DEV_USER_ID
+  } else {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      currentUserId = user?.id
+    } catch { /* no auth session */ }
+
+    // Dev mode fallback: use DEV_USER_ID
+    if (!currentUserId && process.env.NODE_ENV === 'development') {
+      currentUserId = process.env.DEV_USER_ID
+    }
   }
 
   // Single RPC: fetches by slug, returns if public OR owned by user (bypasses RLS)

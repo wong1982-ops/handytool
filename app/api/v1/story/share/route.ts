@@ -1,22 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
-import { apiSuccess, API_ERRORS } from '@/lib/api/response'
+import { getAuthUserId, apiSuccess, API_ERRORS } from '@/lib/api/response'
 import { shareBookRequestSchema } from '@/lib/story/types'
 
 export async function POST(request: Request) {
-  const supabase = await createClient()
-
-  let effectiveUserId: string | undefined
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    effectiveUserId = user?.id
-  } catch { /* no auth session */ }
-
-  // Dev mode: use DEV_USER_ID
-  if (!effectiveUserId && process.env.NODE_ENV === 'development') {
-    effectiveUserId = process.env.DEV_USER_ID
-  }
-
+  const effectiveUserId = await getAuthUserId()
   if (!effectiveUserId) return API_ERRORS.UNAUTHORIZED()
+
+  const supabase = await createClient()
 
   const body = await request.json()
   const parsed = shareBookRequestSchema.safeParse(body)

@@ -1,18 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
-import { apiSuccess, API_ERRORS } from '@/lib/api/response'
+import { getAuthUserId, apiSuccess, API_ERRORS } from '@/lib/api/response'
 
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  const effectiveUserId = await getAuthUserId()
   const supabase = await createClient()
-
-  let authUserId: string | undefined
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    authUserId = user?.id
-  } catch { /* no auth session */ }
-
-  const effectiveUserId = authUserId
-    || (process.env.NODE_ENV === 'development' ? process.env.DEV_USER_ID : undefined)
 
   // Use the same RPC as the server component page
   const { data, error } = await supabase.rpc('get_book_by_slug', {
