@@ -295,7 +295,7 @@ export function Header({
             Blog
           </Link>
 
-          {/* Pricing drawer trigger (desktop) */}
+          {/* Pricing button (desktop) */}
           <button
             onClick={() => setPricingOpen(true)}
             className="hidden md:flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
@@ -464,7 +464,7 @@ export function Header({
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">Tips, guides & updates</p>
               </div>
             </Link>
-            {/* Pricing drawer trigger (mobile) */}
+            {/* Credits + Pricing (mobile) */}
             <button
               onClick={() => { setMobileMenuOpen(false); setPricingOpen(true) }}
               className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors w-full text-left cursor-pointer"
@@ -475,8 +475,8 @@ export function Header({
                 </svg>
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">Pricing</p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">Plans & subscriptions</p>
+                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">Credits & Pricing</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">Buy credits & manage plans</p>
               </div>
             </button>
             {/* Mobile tools grid */}

@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import type { StoryBook, StoryConcept, AppPhase, ProgressEvent, Page } from './types'
+import { clearPlotDraft } from './plot-input'
 
 const STORAGE_KEY = 'toolk1t-story-studio-v2'
 
@@ -94,6 +95,7 @@ export function useStoryBook() {
     setError(null)
     setCreditsUsed(null)
     saveToStorage(null)
+    clearPlotDraft()
   }, [])
 
   const [seriesId, setSeriesId] = useState<string | null>(null)
@@ -217,6 +219,7 @@ export function useStoryBook() {
               setBook(event.data)
               if (event.creditsUsed) setCreditsUsed(event.creditsUsed)
               setPhase('viewer')
+              clearPlotDraft()
             } else if (event.type === 'error') {
               throw new Error(event.message)
             }

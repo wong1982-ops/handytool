@@ -1,18 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useCredits } from '@/lib/hooks/use-credits'
 import { CREDIT_PACKS } from '@/lib/stripe/config'
 import { signInWithOAuth } from '@/lib/supabase/auth'
-
-interface Tier {
-  id: string
-  name: string
-  monthly_credits: number
-  price_cents: number
-  features: string[]
-}
 
 interface PricingDrawerProps {
   open: boolean
@@ -22,19 +15,11 @@ interface PricingDrawerProps {
 export function PricingDrawer({ open, onClose }: PricingDrawerProps) {
   const { user } = useAuth()
   const { balance, loading: creditsLoading } = useCredits()
-  const [tiers, setTiers] = useState<Tier[]>([])
   const [purchasing, setPurchasing] = useState<string | null>(null)
-  const [loadingPortal, setLoadingPortal] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const drawerRef = useRef<HTMLDivElement>(null)
 
-  // Fetch tiers when drawer opens
-  useEffect(() => {
-    if (!open) return
-    fetch('/api/v1/credits/tiers')
-      .then((r) => r.ok ? r.json() : null)
-      .then((json) => { if (json?.data?.tiers) setTiers(json.data.tiers) })
-      .catch(() => {})
-  }, [open])
+  useEffect(() => { setMounted(true) }, [])
 
   // Close on Escape
   useEffect(() => {
@@ -84,38 +69,27 @@ export function PricingDrawer({ open, onClose }: PricingDrawerProps) {
     }
   }, [])
 
-  const handleManageSubscription = useCallback(async () => {
-    setLoadingPortal(true)
-    try {
-      const res = await fetch('/api/v1/billing/portal', { method: 'POST' })
-      if (!res.ok) throw new Error('Portal failed')
-      const json = await res.json()
-      if (json.data?.url) {
-        window.location.href = json.data.url
-      }
-    } catch {
-      alert('Failed to open billing portal. Please try again.')
-    } finally {
-      setLoadingPortal(false)
-    }
-  }, [])
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
           open ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
+        style={{ zIndex: 9998 }}
         onClick={onClose}
       />
 
-      {/* Drawer panel */}
+      {/* Drawer panel — slides from left */}
       <div
         ref={drawerRef}
-        className={`fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto ${
-          open ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 left-0 h-full w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto ${
+          open ? 'translate-x-0' : '-translate-x-full'
         }`}
+        style={{ zIndex: 9999 }}
         role="dialog"
         aria-modal="true"
         aria-label="Pricing"
@@ -160,52 +134,6 @@ export function PricingDrawer({ open, onClose }: PricingDrawerProps) {
                 </p>
               </div>
             </div>
-          )}
-
-          {/* Subscription tiers */}
-          {tiers.length > 0 && (
-            <section>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 uppercase tracking-wider">
-                Subscription Plans
-              </h3>
-              <div className="space-y-3">
-                {tiers.map((tier) => (
-                  <div
-                    key={tier.id}
-                    className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">{tier.name}</h4>
-                      <p className="text-lg font-bold text-[#3D6AF2]">
-                        ${(tier.price_cents / 100).toFixed(2)}
-                        <span className="text-xs font-normal text-slate-500">/mo</span>
-                      </p>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-                      {tier.monthly_credits.toLocaleString()} credits/month
-                    </p>
-                    <ul className="space-y-1.5 mb-3">
-                      {tier.features.map((feat, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
-                          <svg className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          {feat}
-                        </li>
-                      ))}
-                    </ul>
-                    <button
-                      onClick={() => requireAuth(handleManageSubscription)}
-                      disabled={loadingPortal}
-                      className="w-full py-2 rounded-lg bg-[#3D6AF2] text-white font-semibold text-xs hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
-                      style={{ minHeight: '40px' }}
-                    >
-                      {loadingPortal ? 'Loading...' : user ? 'Manage Subscription' : 'Sign in to Subscribe'}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </section>
           )}
 
           {/* Credit packs */}
@@ -256,6 +184,7 @@ export function PricingDrawer({ open, onClose }: PricingDrawerProps) {
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body,
   )
 }

@@ -150,8 +150,15 @@ ${history ? `Previous conversation:\n${history}\n\n` : ''}Author's new request: 
   if (!accumulated) throw new Error('No response from Gemini')
 
   let jsonText = accumulated.trim()
+  // Strip markdown code fences if present (streaming doesn't use responseMimeType)
   if (jsonText.startsWith('```')) {
-    jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
+    jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/```[\s\S]*$/, '')
+  }
+  // Fallback: extract JSON between first { and last }
+  const firstBrace = jsonText.indexOf('{')
+  const lastBrace = jsonText.lastIndexOf('}')
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
+    jsonText = jsonText.slice(firstBrace, lastBrace + 1)
   }
 
   yield { type: 'done', data: JSON.parse(jsonText) }
@@ -170,33 +177,6 @@ Target audience: ${audience}
 Tone: ${tone}
 Visual style direction: ${concept.sections.visualStyle}
 
-You MUST respond with valid JSON matching this exact structure:
-{
-  "title": "${concept.title}",
-  "theme": "string — one-sentence theme",
-  "setting": "string — where/when the story takes place",
-  "characters": [
-    {
-      "name": "string",
-      "role": "protagonist" | "antagonist" | "supporting",
-      "description": "string — EXTREMELY detailed physical appearance for illustration consistency. Use hyper-specific modifiers (e.g., 'messy charcoal-grey hair' not 'grey hair', 'round tortoiseshell glasses' not 'glasses', 'oversized mustard-yellow raincoat with brass buttons' not 'yellow coat'). Include: exact hair color/style/length, eye color/shape, skin tone, body type/height, specific clothing items with colors and details, and any distinguishing features (freckles, scars, accessories). These descriptions will be copied verbatim into every illustration prompt.",
-      "age": "string — approximate age"
-    }
-  ],
-  "pages": [
-    {
-      "sequence": 1,
-      "sceneDescription": "string — detailed visual scene description for the illustrator",
-      "narrativeText": "string — the text that appears on this page of the book",
-      "dialogue": [
-        { "speaker": "character name", "line": "what they say" }
-      ],
-      "mood": "string — emotional tone",
-      "imagePrompt": "string — detailed image generation prompt starting with '${style} style'. Include full character appearances, scene, mood, lighting. No text in images."
-    }
-  ]
-}
-
 Rules:
 - Exactly ${pageCount} pages
 - First page is the opening scene, last page is the resolution
@@ -204,7 +184,57 @@ Rules:
 - Keep language age-appropriate for ${audience}
 - Every imagePrompt MUST start with "${style} style" and include the FULL physical description of every character present in the scene. Do NOT abbreviate or summarize — copy the complete character description into each imagePrompt. The AI image model does NOT remember characters between pages.
 - Do not include any text, words, or letters in image prompts
-- Respond ONLY with the JSON object, no markdown code fences`,
+- Character descriptions must be EXTREMELY detailed for illustration consistency. Use hyper-specific modifiers (e.g., 'messy charcoal-grey hair' not 'grey hair', 'round tortoiseshell glasses' not 'glasses', 'oversized mustard-yellow raincoat with brass buttons' not 'yellow coat'). Include: exact hair color/style/length, eye color/shape, skin tone, body type/height, specific clothing items with colors and details, and any distinguishing features.`,
+    generationConfig: {
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: SchemaType.OBJECT,
+        properties: {
+          title: { type: SchemaType.STRING },
+          theme: { type: SchemaType.STRING, description: 'One-sentence theme' },
+          setting: { type: SchemaType.STRING, description: 'Where/when the story takes place' },
+          characters: {
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                name: { type: SchemaType.STRING },
+                role: { type: SchemaType.STRING, description: 'protagonist, antagonist, or supporting' },
+                description: { type: SchemaType.STRING, description: 'Extremely detailed physical appearance for illustration consistency' },
+                age: { type: SchemaType.STRING },
+              },
+              required: ['name', 'role', 'description', 'age'],
+            },
+          },
+          pages: {
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                sequence: { type: SchemaType.NUMBER },
+                sceneDescription: { type: SchemaType.STRING, description: 'Detailed visual scene description for the illustrator' },
+                narrativeText: { type: SchemaType.STRING, description: 'The text that appears on this page of the book' },
+                dialogue: {
+                  type: SchemaType.ARRAY,
+                  items: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                      speaker: { type: SchemaType.STRING },
+                      line: { type: SchemaType.STRING },
+                    },
+                    required: ['speaker', 'line'],
+                  },
+                },
+                mood: { type: SchemaType.STRING, description: 'Emotional tone' },
+                imagePrompt: { type: SchemaType.STRING, description: `Detailed image generation prompt starting with '${style} style'. Include full character appearances, scene, mood, lighting. No text in images.` },
+              },
+              required: ['sequence', 'sceneDescription', 'narrativeText', 'mood', 'imagePrompt'],
+            },
+          },
+        },
+        required: ['title', 'theme', 'setting', 'characters', 'pages'],
+      },
+    },
   })
 
   let userMessage = `Story concept: ${concept.title}
@@ -229,12 +259,7 @@ Maintain continuity: characters should reference past adventures, show growth, a
 
   if (!text) throw new Error('No text response from Gemini')
 
-  let jsonText = text.trim()
-  if (jsonText.startsWith('```')) {
-    jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
-  }
-
-  return JSON.parse(jsonText)
+  return JSON.parse(text)
 }
 
 export function generateSlug(title: string): string {

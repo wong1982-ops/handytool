@@ -1,6 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+
+export const PLOT_DRAFT_KEY = 'toolk1t-story-plot-draft'
+
+export function clearPlotDraft() {
+  try { localStorage.removeItem(PLOT_DRAFT_KEY) } catch { /* ignore */ }
+}
 
 interface PlotInputProps {
   onSubmit: (plot: string) => void
@@ -9,7 +15,26 @@ interface PlotInputProps {
 }
 
 export function PlotInput({ onSubmit, loading, initialPlot }: PlotInputProps) {
-  const [plot, setPlot] = useState(initialPlot || '')
+  const [plot, setPlot] = useState(() => {
+    // Priority: initialPlot (from scan) > localStorage draft > empty
+    if (initialPlot) return initialPlot
+    try {
+      return localStorage.getItem(PLOT_DRAFT_KEY) || ''
+    } catch {
+      return ''
+    }
+  })
+
+  const updatePlot = useCallback((value: string) => {
+    setPlot(value)
+    try {
+      if (value) {
+        localStorage.setItem(PLOT_DRAFT_KEY, value)
+      } else {
+        localStorage.removeItem(PLOT_DRAFT_KEY)
+      }
+    } catch { /* ignore */ }
+  }, [])
   const [rephrasing, setRephrasing] = useState(false)
 
   const plotValid = plot.trim().length >= 10
@@ -32,7 +57,7 @@ export function PlotInput({ onSubmit, loading, initialPlot }: PlotInputProps) {
       if (res.ok) {
         const { data } = await res.json()
         if (data?.rephrasedPlot) {
-          setPlot(data.rephrasedPlot)
+          updatePlot(data.rephrasedPlot)
         }
       }
     } catch { /* silently fail */ }
@@ -54,7 +79,7 @@ export function PlotInput({ onSubmit, loading, initialPlot }: PlotInputProps) {
 
         <textarea
           value={plot}
-          onChange={(e) => setPlot(e.target.value)}
+          onChange={(e) => updatePlot(e.target.value)}
           placeholder="Example: A clockmaker in a city of clouds discovers a gear that can turn back time, but only for five minutes a day..."
           className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm resize-none h-36 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none placeholder:text-slate-400 transition-all"
           maxLength={2000}
