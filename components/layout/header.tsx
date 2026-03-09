@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/hooks/use-auth'
 import { SignInModal } from '@/components/auth/sign-in-modal'
 import { UserMenu } from '@/components/auth/user-menu'
 import { CreditBadge } from '@/components/ui/credit-badge'
+import { PricingDrawer } from '@/components/ui/pricing-drawer'
 
 interface HeaderProps {
   brandName?: string
@@ -27,6 +28,7 @@ export function Header({
   const [activeIndex, setActiveIndex] = useState(-1)
   const [scrolled, setScrolled] = useState(false)
   const [signInOpen, setSignInOpen] = useState(false)
+  const [pricingOpen, setPricingOpen] = useState(false)
 
   const { user, loading } = useAuth()
 
@@ -293,13 +295,13 @@ export function Header({
             Blog
           </Link>
 
-          {/* Pricing link (desktop) */}
-          <Link
-            href="/billing"
-            className="hidden md:flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors"
+          {/* Pricing drawer trigger (desktop) */}
+          <button
+            onClick={() => setPricingOpen(true)}
+            className="hidden md:flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
           >
             Pricing
-          </Link>
+          </button>
 
           <div className="hidden md:block">
             <CreditBadge />
@@ -462,11 +464,10 @@ export function Header({
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">Tips, guides & updates</p>
               </div>
             </Link>
-            {/* Pricing link (mobile) */}
-            <Link
-              href="/billing"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+            {/* Pricing drawer trigger (mobile) */}
+            <button
+              onClick={() => { setMobileMenuOpen(false); setPricingOpen(true) }}
+              className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors w-full text-left cursor-pointer"
             >
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shadow-sm flex items-center justify-center text-white shrink-0">
                 <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -477,7 +478,7 @@ export function Header({
                 <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">Pricing</p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">Plans & subscriptions</p>
               </div>
-            </Link>
+            </button>
             {/* Mobile tools grid */}
             <div className="grid grid-cols-2 gap-2 pt-1">
               {tools.map((tool) => (
@@ -517,6 +518,7 @@ export function Header({
         </div>
       )}
       <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} />
+      <PricingDrawer open={pricingOpen} onClose={() => setPricingOpen(false)} />
     </header>
   )
 }
