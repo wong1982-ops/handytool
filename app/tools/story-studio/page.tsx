@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { Suspense, useState, useCallback, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useStoryBook } from '@/tools/story-studio/use-story-book'
@@ -19,6 +19,14 @@ import Link from 'next/link'
 type SidebarView = 'create' | 'bookshelf'
 
 export default function StoryStudioPage() {
+  return (
+    <Suspense>
+      <StoryStudioContent />
+    </Suspense>
+  )
+}
+
+function StoryStudioContent() {
   const { user } = useAuth()
   const searchParams = useSearchParams()
   const urlSeriesId = searchParams.get('seriesId')
