@@ -31,6 +31,8 @@ export interface AudioSegment {
 // Voice pool & assignment
 // ---------------------------------------------------------------------------
 
+export { GEMINI_VOICES, GEMINI_VOICE_NAMES } from '@/lib/story/voices'
+
 const VOICE_POOL = {
   narrator: 'Enceladus',
   protagonist: 'Aoede',
@@ -40,17 +42,27 @@ const VOICE_POOL = {
 
 /**
  * Assign distinct Gemini voices to narrator + each character.
+ * If a character has a `voice` preference set (from series), use it directly.
  * Returns a VoiceMap: Record<string, string> mapping speaker key → voice name.
  */
-export function assignVoices(characters: Character[]): Record<string, string> {
+export function assignVoices(
+  characters: Character[],
+  voicePreferences?: Record<string, string>,
+): Record<string, string> {
   const map: Record<string, string> = {
-    narrator: VOICE_POOL.narrator,
+    narrator: voicePreferences?.['__narrator__'] || VOICE_POOL.narrator,
   }
 
   let supportingIdx = 0
 
   for (const char of characters) {
     if (map[char.name]) continue // skip duplicates
+
+    // Use voice preference if set (from series character)
+    if (voicePreferences?.[char.name]) {
+      map[char.name] = voicePreferences[char.name]
+      continue
+    }
 
     switch (char.role) {
       case 'protagonist':

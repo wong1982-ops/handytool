@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
-import { API_ERRORS } from '@/lib/api/response'
+import { apiError, API_ERRORS } from '@/lib/api/response'
 import { generateRequestSchema } from '@/lib/story/types'
-import { generateStoryText, generateSlug } from '@/lib/story/enrich'
-import { generateIllustration, generateCharacterReference } from '@/lib/story/illustrate'
+import { generateStoryText, generateSlug, type SeriesBookSummary } from '@/lib/story/enrich'
+import { generateIllustration, generateCharacterReference, type CharacterReference } from '@/lib/story/illustrate'
 import {
   assignVoices,
   segmentPageAudio,
@@ -53,8 +53,9 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries = 2): Promise<T> {
 
 export async function POST(request: Request) {
   let userId: string | undefined
+  let reservationId: string | undefined
 
-  // Try to authenticate — generation works without login, but DB save requires it
+  // Authenticate — generation requires login (for credit reservation)
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -65,21 +66,41 @@ export async function POST(request: Request) {
       // Dev mode: use configured user ID so books are saved to the correct account
       userId = process.env.DEV_USER_ID
     }
+  } catch {
+    // Auth unavailable
+  }
 
-    // Deduct credits (skip in dev to allow free generation)
-    if (userId && process.env.NODE_ENV !== 'development') {
-      const { error: deductError } = await supabase.rpc('deduct_credits', {
+  // Require auth in production
+  if (!userId && process.env.NODE_ENV !== 'development') {
+    return API_ERRORS.UNAUTHORIZED()
+  }
+
+  // Reserve credits atomically (prevents parallel requests from double-spending)
+  if (userId && process.env.NODE_ENV !== 'development') {
+    try {
+      const supabase = await createClient()
+      const { data, error: reserveError } = await supabase.rpc('reserve_credits', {
         p_user_id: userId,
         p_amount: CREDIT_COSTS.generate,
         p_description: 'Story Studio — full book generation',
       })
 
-      if (deductError) {
-        return API_ERRORS.FORBIDDEN()
+      if (reserveError) {
+        const isInsufficient = reserveError.message?.includes('insufficient_credits')
+        return isInsufficient
+          ? apiError('Insufficient credits', 'INSUFFICIENT_CREDITS', 402, {
+              required: CREDIT_COSTS.generate,
+              message: 'You do not have enough credits to generate a story book.',
+            })
+          : API_ERRORS.INTERNAL()
       }
+
+      // RPC returns array (RETURNS TABLE), take first row
+      const row = Array.isArray(data) ? data[0] : data
+      reservationId = row?.reservation_id
+    } catch {
+      return API_ERRORS.INTERNAL()
     }
-  } catch {
-    // Auth unavailable — proceed without user
   }
 
   let body: unknown
@@ -94,7 +115,70 @@ export async function POST(request: Request) {
     return API_ERRORS.VALIDATION(parsed.error.flatten().fieldErrors)
   }
 
-  const { plot, concept } = parsed.data
+  const { plot, concept, seriesId } = parsed.data
+
+  // If series: load approved character reference images, voice preferences, and existing book summaries
+  let seriesReferenceImages: { name: string; description: string; buffer: Buffer }[] = []
+  let seriesVoicePreferences: Record<string, string> = {}
+  let seriesExistingBooks: SeriesBookSummary[] = []
+  if (seriesId) {
+    try {
+      const supabase = await createClient()
+      const { data: seriesData } = await supabase.rpc('get_series_with_characters', {
+        p_series_id: seriesId,
+        p_user_id: userId ?? null,
+      })
+      const series = Array.isArray(seriesData) ? seriesData?.[0] : seriesData
+      if (series) {
+        const chars = (series.characters as { name: string; description: string; referenceImageUrl?: string; status: string; voice?: string | null }[]) || []
+
+        // Collect voice preferences
+        for (const c of chars) {
+          if (c.voice) seriesVoicePreferences[c.name] = c.voice
+        }
+
+        const approvedChars = chars.filter(c => c.status === 'approved' && c.referenceImageUrl)
+        for (const c of approvedChars) {
+          try {
+            const res = await fetch(c.referenceImageUrl!)
+            if (res.ok) {
+              const buf = Buffer.from(await res.arrayBuffer())
+              seriesReferenceImages.push({ name: c.name, description: c.description, buffer: buf })
+            }
+          } catch { /* skip failed downloads */ }
+        }
+      }
+
+      // Load existing books in the series for continuity context + voice consistency
+      const { data: existingBooks } = await supabase
+        .from('books')
+        .select('data')
+        .eq('series_id', seriesId)
+        .order('created_at', { ascending: true })
+
+      if (existingBooks?.length) {
+        for (const b of existingBooks) {
+          const bd = b.data as Record<string, unknown> | undefined
+          if (!bd) continue
+          const bookConcept = bd.concept as Record<string, unknown> | undefined
+          const sections = bookConcept?.sections as Record<string, unknown> | undefined
+          seriesExistingBooks.push({
+            title: (bd.title as string) || 'Untitled',
+            premise: (sections?.premise as string) || '',
+            theme: (bd.theme as string) || '',
+          })
+
+          // Carry forward narrator voice from first book for consistency
+          const bookVoiceMap = bd.voiceMap as Record<string, string> | undefined
+          if (bookVoiceMap?.narrator && !seriesVoicePreferences['__narrator__']) {
+            seriesVoicePreferences['__narrator__'] = bookVoiceMap.narrator
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[story] Failed to load series references:', err)
+    }
+  }
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -106,7 +190,10 @@ export async function POST(request: Request) {
         // Step 1: Generate story text
         send({ type: 'status', message: 'Writing your story...' })
 
-        const storyData = await generateStoryText({ plot, concept })
+        const storyData = await generateStoryText(
+          { plot, concept },
+          seriesExistingBooks.length > 0 ? { existingBooks: seriesExistingBooks } : undefined,
+        )
         const now = new Date().toISOString()
         const bookId = `story_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
         const slug = generateSlug(storyData.title || concept.title)
@@ -149,7 +236,7 @@ export async function POST(request: Request) {
 
         send({ type: 'story-ready', data: book })
 
-        // Step 2: Generate character reference sheet for visual consistency
+        // Step 2: Character reference for visual consistency
         const totalPages = book.pages.length
 
         const characters = book.characters.map((c: { name: string; description: string }) => ({
@@ -157,19 +244,30 @@ export async function POST(request: Request) {
           description: c.description,
         }))
 
-        send({ type: 'status', message: 'Creating character reference sheet for consistency...' })
-        let referenceImage = await generateCharacterReference(characters, concept.tags.style)
+        let referenceImage: Buffer | null = null
+        let characterReferences: CharacterReference[] = []
 
-        // Retry once if reference fails — it's important for consistency
-        if (!referenceImage) {
-          send({ type: 'status', message: 'Retrying character reference...' })
-          referenceImage = await generateCharacterReference(characters, concept.tags.style)
-        }
-
-        if (referenceImage) {
-          send({ type: 'status', message: `Character reference ready! Illustrating cover + ${totalPages} pages...` })
+        if (seriesReferenceImages.length > 0) {
+          // Series mode: use per-character portraits as individual subject references
+          characterReferences = seriesReferenceImages
+          const charNames = seriesReferenceImages.map(r => r.name).join(', ')
+          send({ type: 'status', message: `Using ${seriesReferenceImages.length} character portrait${seriesReferenceImages.length > 1 ? 's' : ''} (${charNames}) as consistency seeds. Illustrating cover + ${totalPages} pages...` })
         } else {
-          send({ type: 'status', message: `Illustrating cover + ${totalPages} pages (without reference)...` })
+          // Standalone mode: generate a new reference sheet
+          send({ type: 'status', message: 'Creating character reference sheet for consistency...' })
+          referenceImage = await generateCharacterReference(characters, concept.tags.style)
+
+          // Retry once if reference fails — it's important for consistency
+          if (!referenceImage) {
+            send({ type: 'status', message: 'Retrying character reference...' })
+            referenceImage = await generateCharacterReference(characters, concept.tags.style)
+          }
+
+          if (referenceImage) {
+            send({ type: 'status', message: `Character reference ready! Illustrating cover + ${totalPages} pages...` })
+          } else {
+            send({ type: 'status', message: `Illustrating cover + ${totalPages} pages (without reference)...` })
+          }
         }
 
         // Strategy 1: Lock the Seed — same seed for all pages in this book
@@ -186,6 +284,7 @@ export async function POST(request: Request) {
             imagePrompt: coverPrompt,
             characters,
             referenceImage: referenceImage ?? undefined,
+            characterReferences: characterReferences.length > 0 ? characterReferences : undefined,
             seed: bookSeed,
             style: concept.tags.style,
           }))
@@ -210,6 +309,7 @@ export async function POST(request: Request) {
               imagePrompt: page.imagePrompt,
               characters,
               referenceImage: referenceImage ?? undefined,
+              characterReferences: characterReferences.length > 0 ? characterReferences : undefined,
               previousPageImage: previousPageBuffer ?? undefined,
               seed: bookSeed,
               style: concept.tags.style,
@@ -239,7 +339,10 @@ export async function POST(request: Request) {
         send({ type: 'status', message: 'Recording narration with character voices...' })
 
         // Assign distinct voices to narrator + each character
-        const voiceMap = assignVoices(book.characters as { name: string; role: 'protagonist' | 'antagonist' | 'supporting'; description: string }[])
+        const voiceMap = assignVoices(
+          book.characters as { name: string; role: 'protagonist' | 'antagonist' | 'supporting'; description: string }[],
+          Object.keys(seriesVoicePreferences).length > 0 ? seriesVoicePreferences : undefined,
+        )
 
         type AudioResult = { sequence: number; audioUrl: string | undefined }
 
@@ -267,41 +370,49 @@ export async function POST(request: Request) {
 
         // Remaining pages forced to same provider for consistency
         const remainingPages = pagesWithImages.slice(1)
-        const audioTasks = remainingPages.map((page: { sequence: number; narrativeText: string; dialogue?: { speaker: string; line: string }[] }, index: number) => {
+        const audioTasks = remainingPages.map((pg: { sequence: number; narrativeText: string; dialogue?: { speaker: string; line: string }[] }, index: number) => {
           return async (): Promise<AudioResult> => {
-            try {
+            const pageNum = index + 2
+
+            const generateAudio = async (): Promise<AudioResult> => {
               // If locked to OpenAI, fall back to single-voice
               if (lockedProvider === 'openai') {
-                const narration = buildPageNarration(page.narrativeText, page.dialogue)
+                const narration = buildPageNarration(pg.narrativeText, pg.dialogue)
                 const result = await generatePageAudio({
                   text: narration,
                   bookId,
-                  pageNumber: index + 2,
+                  pageNumber: pageNum,
                   forceProvider: 'openai',
                 })
-                send({ type: 'audio-done', page: index + 2, url: result.audioUrl })
-                return { sequence: page.sequence, audioUrl: result.audioUrl }
+                return { sequence: pg.sequence, audioUrl: result.audioUrl }
               }
 
               // Gemini multi-voice
-              const segments = segmentPageAudio(page.narrativeText, page.dialogue, voiceMap)
+              const segments = segmentPageAudio(pg.narrativeText, pg.dialogue, voiceMap)
               const result = await generateMultiVoicePageAudio({
                 segments,
                 bookId,
-                pageNumber: index + 2,
+                pageNumber: pageNum,
                 forceProvider: lockedProvider,
               })
-              send({ type: 'audio-done', page: index + 2, url: result.audioUrl })
-              return { sequence: page.sequence, audioUrl: result.audioUrl }
+              return { sequence: pg.sequence, audioUrl: result.audioUrl }
+            }
+
+            // Retry TTS up to 2 times to reduce missing audio
+            try {
+              const result = await withRetry(generateAudio, 2)
+              send({ type: 'audio-done', page: pageNum, url: result.audioUrl })
+              return result
             } catch (err) {
-              console.error(`TTS failed for page ${index + 2}:`, err)
-              send({ type: 'audio-done', page: index + 2, url: '' })
-              return { sequence: page.sequence, audioUrl: undefined as string | undefined }
+              console.error(`TTS failed for page ${pageNum} after retries:`, err)
+              send({ type: 'audio-done', page: pageNum, url: '' })
+              return { sequence: pg.sequence, audioUrl: undefined as string | undefined }
             }
           }
         })
 
-        const remainingResults = await runWithConcurrency<AudioResult>(audioTasks, 3)
+        // Reduce concurrency to 2 to avoid TTS rate limits
+        const remainingResults = await runWithConcurrency<AudioResult>(audioTasks, 2)
 
         const audioResults: AudioResult[] = [
           { sequence: firstPage?.sequence ?? 1, audioUrl: page1AudioUrl },
@@ -336,6 +447,7 @@ export async function POST(request: Request) {
               p_slug: slug,
               p_data: finalBook,
               p_is_public: false,
+              p_series_id: seriesId ?? null,
             })
 
             // Revalidate static page
@@ -346,22 +458,34 @@ export async function POST(request: Request) {
           }
         }
 
+        // Confirm credit reservation (finalize the charge)
+        if (reservationId) {
+          try {
+            const supabase = await createClient()
+            await supabase.rpc('confirm_reserved_credits', {
+              p_reservation_id: reservationId,
+              p_description: 'Story Studio — full book generation',
+            })
+          } catch (err) {
+            console.error('Failed to confirm credit reservation:', err)
+          }
+        }
+
         send({ type: 'complete', data: finalBook, creditsUsed: CREDIT_COSTS.generate })
       } catch (err) {
         console.error('story/generate: failed', err)
         send({ type: 'error', message: err instanceof Error ? err.message : 'Generation failed' })
 
-        // Refund credits on failure
-        if (userId) {
+        // Release reserved credits on failure (credits return to available balance)
+        if (reservationId) {
           try {
             const supabase = await createClient()
-            await supabase.rpc('refund_credits', {
-              p_user_id: userId,
-              p_amount: CREDIT_COSTS.generate,
-              p_description: 'Story Studio — generation failed (refund)',
+            await supabase.rpc('release_reserved_credits', {
+              p_reservation_id: reservationId,
+              p_reason: 'Story Studio — generation failed',
             })
           } catch {
-            // Silently ignore refund failures
+            // Silently ignore release failures — cleanup job will handle expired reservations
           }
         }
       } finally {

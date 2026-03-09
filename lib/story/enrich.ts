@@ -1,9 +1,27 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
-import type { ConceptsRequest, StoryConcept, GenerateRequest, RefineRequest } from './types'
+import type { StoryConcept, GenerateRequest, RefineRequest } from './types'
+
+export interface SeriesBookSummary {
+  title: string
+  premise: string
+  theme: string
+}
+
+export interface SeriesContext {
+  setting: string
+  artStyle: string
+  characters: { name: string; description: string }[]
+  existingBooks?: SeriesBookSummary[]
+}
+
+interface ConceptsInput {
+  plot: string
+  seriesContext?: SeriesContext
+}
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
-export async function generateConcepts(input: ConceptsRequest): Promise<StoryConcept> {
+export async function generateConcepts(input: ConceptsInput): Promise<StoryConcept> {
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
     systemInstruction: `You are a professional children's book creative director. Given a story plot idea, generate a compelling story concept with rich detail.
@@ -47,12 +65,40 @@ Rules:
     },
   })
 
-  const result = await model.generateContent(`Story idea:\n${input.plot}`)
+  // Build prompt with optional series context
+  let prompt = `Story idea:\n${input.plot}`
+
+  if (input.seriesContext) {
+    const { setting, characters, artStyle } = input.seriesContext
+    prompt += `\n\nIMPORTANT — This story is part of a series with the following constraints:
+- Setting: ${setting}
+- Art style: ${artStyle} (you MUST use this exact style in tags.style)
+- The story MUST feature these characters with EXACTLY these physical descriptions:
+${characters.map((c: { name: string; description: string }) => `  * ${c.name}: ${c.description}`).join('\n')}
+
+The story concept MUST revolve around these characters in this setting. Do NOT invent new main characters.`
+
+    if (input.seriesContext.existingBooks?.length) {
+      prompt += `\n\nPrevious books in this series (for continuity — create a NEW story, do NOT repeat these plots):
+${input.seriesContext.existingBooks.map((b, i) => `  ${i + 1}. "${b.title}" — ${b.premise}${b.theme ? ` (Theme: ${b.theme})` : ''}`).join('\n')}
+
+Build on these stories: reference shared history, develop character relationships further, and explore new adventures. The new story should feel like a natural continuation of the series.`
+    }
+  }
+
+  const result = await model.generateContent(prompt)
   const text = result.response.text()
 
   if (!text) throw new Error('No response from Gemini')
 
-  return JSON.parse(text) as StoryConcept
+  const concept = JSON.parse(text) as StoryConcept
+
+  // If series context provided, force the art style
+  if (input.seriesContext) {
+    concept.tags.style = input.seriesContext.artStyle
+  }
+
+  return concept
 }
 
 /**
@@ -111,7 +157,7 @@ ${history ? `Previous conversation:\n${history}\n\n` : ''}Author's new request: 
   yield { type: 'done', data: JSON.parse(jsonText) }
 }
 
-export async function generateStoryText(input: GenerateRequest) {
+export async function generateStoryText(input: GenerateRequest, seriesContext?: { existingBooks?: SeriesBookSummary[] }) {
   const { plot, concept } = input
   const { style, audience, pageCount, tone } = concept.tags
 
@@ -161,7 +207,7 @@ Rules:
 - Respond ONLY with the JSON object, no markdown code fences`,
   })
 
-  const userMessage = `Story concept: ${concept.title}
+  let userMessage = `Story concept: ${concept.title}
 
 Author's intent: ${concept.sections.authorIntent}
 Premise: ${concept.sections.premise}
@@ -170,6 +216,13 @@ Tone: ${concept.sections.tone}
 Message to audience: ${concept.sections.messageToAudience}
 
 Original plot idea: ${plot}`
+
+  if (seriesContext?.existingBooks?.length) {
+    userMessage += `\n\nIMPORTANT — This story is part of a series. Previous books:
+${seriesContext.existingBooks.map((b, i) => `  ${i + 1}. "${b.title}" — ${b.premise}${b.theme ? ` (Theme: ${b.theme})` : ''}`).join('\n')}
+
+Maintain continuity: characters should reference past adventures, show growth, and build on established relationships. Do NOT retell previous stories — create a fresh adventure that feels like a natural sequel.`
+  }
 
   const result = await model.generateContent(userMessage)
   const text = result.response.text()

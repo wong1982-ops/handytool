@@ -37,6 +37,7 @@ export function useStoryBook() {
   const [progressEvents, setProgressEvents] = useState<ProgressEvent[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [errorCode, setErrorCode] = useState<string | null>(null)
   const [creditsUsed, setCreditsUsed] = useState<number | null>(null)
   const abortRef = useRef<AbortController | null>(null)
 
@@ -95,10 +96,15 @@ export function useStoryBook() {
     saveToStorage(null)
   }, [])
 
-  const fetchConcepts = useCallback(async (plotText: string) => {
+  const [seriesId, setSeriesId] = useState<string | null>(null)
+
+  const fetchConcepts = useCallback(async (plotText: string, seriesIdOverride?: string) => {
     setLoading(true)
     setError(null)
+    setErrorCode(null)
     setPlot(plotText)
+
+    const activeSeriesId = seriesIdOverride ?? seriesId
 
     try {
       const controller = new AbortController()
@@ -107,12 +113,16 @@ export function useStoryBook() {
       const res = await fetch('/api/v1/story/concepts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plot: plotText }),
+        body: JSON.stringify({ plot: plotText, ...(activeSeriesId ? { seriesId: activeSeriesId } : {}) }),
         signal: controller.signal,
       })
 
       if (!res.ok) {
         const err = await res.json().catch(() => null)
+        if (err?.code === 'INSUFFICIENT_CREDITS') {
+          setErrorCode('INSUFFICIENT_CREDITS')
+          throw new Error(err.details?.message || 'Insufficient credits to generate a story.')
+        }
         throw new Error(err?.error || `Failed: ${res.status}`)
       }
 
@@ -127,11 +137,12 @@ export function useStoryBook() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [seriesId])
 
   const startGeneration = useCallback(async (plotText: string, concept: StoryConcept) => {
     setLoading(true)
     setError(null)
+    setErrorCode(null)
     setPhase('generating')
     setProgressEvents([])
 
@@ -142,12 +153,16 @@ export function useStoryBook() {
       const res = await fetch('/api/v1/story/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plot: plotText, concept }),
+        body: JSON.stringify({ plot: plotText, concept, ...(seriesId ? { seriesId } : {}) }),
         signal: controller.signal,
       })
 
       if (!res.ok) {
         const err = await res.json().catch(() => null)
+        if (err?.code === 'INSUFFICIENT_CREDITS') {
+          setErrorCode('INSUFFICIENT_CREDITS')
+          throw new Error(err.details?.message || 'Insufficient credits to generate a story.')
+        }
         throw new Error(err?.error || `Failed: ${res.status}`)
       }
 
@@ -220,7 +235,7 @@ export function useStoryBook() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [seriesId])
 
   return {
     phase,
@@ -236,7 +251,11 @@ export function useStoryBook() {
     loading,
     error,
     setError,
+    errorCode,
+    setErrorCode,
     creditsUsed,
+    seriesId,
+    setSeriesId,
     fetchConcepts,
     selectConcept,
     startGeneration,

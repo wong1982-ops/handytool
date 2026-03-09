@@ -256,6 +256,111 @@ function mapApiError(code?: string, fallback?: string): string {
 }
 ```
 
+## Loading States — Skeleton Loading (MANDATORY)
+
+All loading states MUST use skeleton placeholders instead of text spinners ("Loading..."). Skeletons give users a preview of the incoming layout, reduce perceived wait time, and prevent layout shift.
+
+### Rules
+
+- **Never use plain text loading** — no "Loading...", "Please wait", or spinner-only states
+- **Match the target layout** — skeleton shape should mirror the real content (card grid → skeleton cards, list → skeleton rows)
+- **Use `animate-pulse`** — standard Tailwind animation for all skeleton elements
+- **Skeleton colors** — `bg-slate-200 dark:bg-slate-700` for content blocks, `bg-slate-100 dark:bg-slate-800` for containers
+- **Consistent border radius** — match the real component's radius (`rounded-2xl` for cards, `rounded-xl` for inputs, `rounded-full` for avatars)
+- **Show immediately** — never delay skeleton rendering; show it on the first render while data loads
+- **Timeout protection** — API fetches should include an `AbortController` timeout (8s recommended) so skeletons don't display indefinitely
+
+### Standard Patterns
+
+#### Card Grid Skeleton
+
+```tsx
+<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+  {Array.from({ length: 4 }).map((_, i) => (
+    <div key={i} className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-pulse">
+      <div className="w-full aspect-[3/4] bg-slate-200 dark:bg-slate-800" />
+      <div className="p-4 space-y-2">
+        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+      </div>
+    </div>
+  ))}
+</div>
+```
+
+#### Detail Page Skeleton
+
+```tsx
+<div className="animate-pulse space-y-6">
+  <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 md:p-6">
+    <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-1/3 mb-3" />
+    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3 mb-2" />
+    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+  </div>
+  <div className="space-y-4">
+    {Array.from({ length: 2 }).map((_, i) => (
+      <div key={i} className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 flex gap-4">
+        <div className="w-20 h-20 rounded-xl bg-slate-200 dark:bg-slate-700 shrink-0" />
+        <div className="flex-1 space-y-2">
+          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/3" />
+          <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-full" />
+          <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+```
+
+#### List/Table Skeleton
+
+```tsx
+<div className="animate-pulse space-y-3">
+  {Array.from({ length: 5 }).map((_, i) => (
+    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+      <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 shrink-0" />
+      <div className="flex-1 space-y-1.5">
+        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/5" />
+        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-3/5" />
+      </div>
+      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-16" />
+    </div>
+  ))}
+</div>
+```
+
+### Non-Blocking Data Loading
+
+When possible, show cached/local data immediately while fetching fresh data in the background:
+
+```tsx
+// Show local data first, merge API data when available
+const localData = loadFromCache()
+setData(localData)
+setLoading(localData.length === 0) // skeleton only if cache is empty
+
+const controller = new AbortController()
+const timeout = setTimeout(() => controller.abort(), 8000)
+try {
+  const res = await fetch('/api/endpoint', { signal: controller.signal })
+  clearTimeout(timeout)
+  if (res.ok) {
+    const fresh = await res.json()
+    setData(mergeData(localData, fresh))
+  }
+} catch { /* local data already shown */ }
+finally { setLoading(false) }
+```
+
+### Checklist
+
+- [ ] Loading state uses skeleton placeholders, not text/spinner
+- [ ] Skeleton layout matches the real content structure
+- [ ] All skeleton elements use `animate-pulse`
+- [ ] API fetches have `AbortController` timeout (max 8s)
+- [ ] Local/cached data shown immediately when available
+- [ ] `aria-busy="true"` set on the loading container
+
 ## Responsive Design
 
 ### Breakpoints

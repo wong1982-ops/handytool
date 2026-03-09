@@ -12,10 +12,17 @@ const VERTEX_REGION = process.env.GOOGLE_CLOUD_REGION || 'us-central1'
 const FAL_API_KEY = process.env.FAL_API_KEY
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 
+export interface CharacterReference {
+  name: string
+  description: string
+  buffer: Buffer
+}
+
 export interface IllustrateInput {
   imagePrompt: string
   characters?: { name: string; description: string }[]
-  referenceImage?: Buffer    // character reference sheet (Strategy 3)
+  referenceImage?: Buffer    // single character reference sheet (Strategy 3, standalone mode)
+  characterReferences?: CharacterReference[] // per-character portraits (Strategy 3, series mode)
   previousPageImage?: Buffer // previous page image for continuity (Strategy 5)
   seed?: number              // locked seed for consistency (Strategy 1)
   style?: string             // art style for style reference
@@ -106,17 +113,23 @@ function buildPrompt(input: IllustrateInput): string {
  * Strategy 6: Full character descriptions repeated every time (Prompt Repetition).
  * Strategy 7: Specific physical terms for visual consistency.
  */
-function buildImagen3Prompt(input: IllustrateInput, useSubjectRefs: boolean): string {
+function buildImagen3Prompt(input: IllustrateInput, subjectRefCount: number): string {
   let prompt = ''
 
   if (input.style) {
     prompt += `${input.style} style. `
   }
 
-  if (input.characters?.length && useSubjectRefs) {
-    // With subject references, use [1] notation to link to the reference
+  if (input.characters?.length && subjectRefCount > 0) {
+    // With subject references, use [N] notation to link each character to their portrait
     // Strategy 6: Still include full descriptions even with reference images
-    prompt += `Illustrate [1] in this scene: ${input.imagePrompt}. `
+    if (subjectRefCount === 1) {
+      prompt += `Illustrate [1] in this scene: ${input.imagePrompt}. `
+    } else {
+      // Multiple character references: [1], [2], etc.
+      const refTags = Array.from({ length: subjectRefCount }, (_, i) => `[${i + 1}]`).join(' and ')
+      prompt += `Illustrate ${refTags} in this scene: ${input.imagePrompt}. `
+    }
     prompt += `Exact character appearances: ${input.characters.map(c => `${c.name} — ${c.description}`).join('. ')}. `
   } else if (input.characters?.length) {
     // Strategy 6+7: Full specific descriptions repeated in every prompt
@@ -140,16 +153,80 @@ function buildImagen3Prompt(input: IllustrateInput, useSubjectRefs: boolean): st
 export async function generateCharacterReference(
   characters: { name: string; description: string }[],
   style: string,
+  styleReferenceImage?: Buffer,
 ): Promise<Buffer | null> {
-  // Try Imagen 3 first (higher quality), fall back to Gemini Flash
+  // Build prompt based on single character vs multiple
+  const isSingle = characters.length === 1
+  const charDescs = characters.map(c => `${c.name}: ${c.description}`).join('. ')
+
+  const buildRefPrompt = (suffix: string) => isSingle
+    ? `${style} style full body character portrait of ${characters[0].name}. ${characters[0].description}. Standing pose, clear details, clean background. ${suffix}`
+    : `${style} style character reference sheet showing all main characters side by side, full body, clear distinct appearances, white background. Characters: ${charDescs}. ${suffix}`
+
+  // Try Imagen 3 with style reference first (best consistency with existing portraits)
+  if (characters.length && VERTEX_PROJECT_ID && styleReferenceImage) {
+    try {
+      console.log(`[illustrate] Generating character ${isSingle ? 'portrait' : 'reference sheet'} via Imagen 3 with style reference...`)
+      const prompt = buildRefPrompt('No text, words, or letters in the image.')
+
+      const token = await getVertexAccessToken()
+      const url = `https://${VERTEX_REGION}-aiplatform.googleapis.com/v1/projects/${VERTEX_PROJECT_ID}/locations/${VERTEX_REGION}/publishers/google/models/imagen-3.0-capability-001:predict`
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          instances: [{
+            prompt,
+            referenceImages: [{
+              referenceType: 'REFERENCE_TYPE_STYLE',
+              referenceId: 1,
+              referenceImage: {
+                bytesBase64Encoded: styleReferenceImage.toString('base64'),
+              },
+              styleImageConfig: {
+                styleDescription: `Match this exact ${style} art style, color palette, line weight, shading technique, and visual mood`,
+              },
+            }],
+          }],
+          parameters: {
+            sampleCount: 1,
+            personGeneration: 'allow_all',
+            safetySetting: 'block_only_high',
+          },
+        }),
+      })
+
+      if (!response.ok) {
+        const err = await response.text()
+        throw new Error(`Imagen 3 capability error: ${response.status} ${err}`)
+      }
+
+      const data = await response.json()
+      const prediction = data.predictions?.[0]
+      if (!prediction?.bytesBase64Encoded) {
+        throw new Error('No image returned from Imagen 3 capability')
+      }
+
+      const buffer = Buffer.from(prediction.bytesBase64Encoded, 'base64')
+      console.log(`[illustrate] Character ${isSingle ? 'portrait' : 'reference'} via Imagen 3 + style ref (${(buffer.length / 1024).toFixed(0)} KB)`)
+      return buffer
+    } catch (err) {
+      console.warn('[illustrate] Imagen 3 capability with style ref failed, trying standard:', err)
+    }
+  }
+
+  // Try Imagen 3 standard (no style reference)
   if (characters.length && VERTEX_PROJECT_ID) {
     try {
-      console.log('[illustrate] Generating character reference sheet via Imagen 3...')
-      const charDescs = characters.map(c => `${c.name}: ${c.description}`).join('. ')
-      const prompt = `${style} style character reference sheet showing all main characters side by side, full body, clear distinct appearances, white background, labeled with names. Characters: ${charDescs}`
+      console.log(`[illustrate] Generating character ${isSingle ? 'portrait' : 'reference sheet'} via Imagen 3...`)
+      const prompt = buildRefPrompt('No text, words, or letters in the image.')
 
       const buffer = await generateWithImagen3Standard(prompt)
-      console.log(`[illustrate] Character reference via Imagen 3 (${(buffer.length / 1024).toFixed(0)} KB)`)
+      console.log(`[illustrate] Character ${isSingle ? 'portrait' : 'reference'} via Imagen 3 (${(buffer.length / 1024).toFixed(0)} KB)`)
       return buffer
     } catch (err) {
       console.warn('[illustrate] Imagen 3 character reference failed, trying Gemini Flash:', err)
@@ -162,12 +239,11 @@ export async function generateCharacterReference(
   }
 
   try {
-    const charDescs = characters.map(c => `${c.name}: ${c.description}`).join('. ')
-    const prompt = `${style} style character reference sheet showing all main characters side by side, full body, clear distinct appearances, white background, no text. Characters: ${charDescs}`
+    const prompt = buildRefPrompt('No text.')
 
     console.log('[illustrate] Generating character reference sheet via Gemini Flash...')
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-preview-image-generation',
+      model: 'gemini-2.0-flash-exp-image-generation',
       generationConfig: {
         // @ts-expect-error — responseModalities is valid for image generation models
         responseModalities: ['IMAGE', 'TEXT'],
@@ -253,33 +329,31 @@ async function generateWithImagen3Standard(
  */
 async function generateWithImagen3WithReference(
   prompt: string,
-  referenceImage: Buffer,
-  characters: { name: string; description: string }[],
+  characterRefs: CharacterReference[],
   previousPageImage?: Buffer,
 ): Promise<Buffer> {
   const token = await getVertexAccessToken()
   const url = `https://${VERTEX_REGION}-aiplatform.googleapis.com/v1/projects/${VERTEX_PROJECT_ID}/locations/${VERTEX_REGION}/publishers/google/models/imagen-3.0-capability-001:predict`
 
-  // Build reference images array
-  const referenceImages: Record<string, unknown>[] = [
-    {
-      referenceType: 'REFERENCE_TYPE_SUBJECT',
-      referenceId: 1,
-      referenceImage: {
-        bytesBase64Encoded: referenceImage.toString('base64'),
-      },
-      subjectImageConfig: {
-        subjectDescription: characters.map(c => `${c.name}: ${c.description}`).join('. '),
-        subjectType: 'SUBJECT_TYPE_PERSON',
-      },
+  // Build reference images array — one subject reference per character portrait
+  const referenceImages: Record<string, unknown>[] = characterRefs.map((ref, idx) => ({
+    referenceType: 'REFERENCE_TYPE_SUBJECT',
+    referenceId: idx + 1,
+    referenceImage: {
+      bytesBase64Encoded: ref.buffer.toString('base64'),
     },
-  ]
+    subjectImageConfig: {
+      subjectDescription: `${ref.name}: ${ref.description}`,
+      subjectType: 'SUBJECT_TYPE_PERSON',
+    },
+  }))
 
   // Add previous page as style reference for visual continuity (Strategy 5)
+  // Style reference ID comes after all subject references
   if (previousPageImage) {
     referenceImages.push({
       referenceType: 'REFERENCE_TYPE_STYLE',
-      referenceId: 2,
+      referenceId: characterRefs.length + 1,
       referenceImage: {
         bytesBase64Encoded: previousPageImage.toString('base64'),
       },
@@ -289,7 +363,7 @@ async function generateWithImagen3WithReference(
     })
   }
 
-  console.log(`[illustrate] Imagen 3 capability generation (subject ref${previousPageImage ? ' + style ref' : ''})`)
+  console.log(`[illustrate] Imagen 3 capability generation (${characterRefs.length} subject ref${characterRefs.length > 1 ? 's' : ''}${previousPageImage ? ' + style ref' : ''})`)
 
   const response = await fetch(url, {
     method: 'POST',
@@ -347,7 +421,7 @@ async function generateWithGemini(
   seed?: number,
 ): Promise<Buffer> {
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash-preview-image-generation',
+    model: 'gemini-2.0-flash-exp-image-generation',
     generationConfig: {
       // @ts-expect-error — responseModalities is valid for image generation models
       responseModalities: ['IMAGE', 'TEXT'],
@@ -498,14 +572,21 @@ async function uploadToStorage(buffer: Buffer): Promise<string> {
 export async function generateIllustration(input: IllustrateInput): Promise<IllustrateResult> {
   let buffer: Buffer | null = null
 
+  // Resolve character references: prefer per-character portraits (series mode),
+  // fall back to single reference image (standalone mode)
+  const charRefs: CharacterReference[] = input.characterReferences?.length
+    ? input.characterReferences
+    : input.referenceImage && input.characters?.length
+      ? [{ name: 'characters', description: input.characters.map(c => `${c.name}: ${c.description}`).join('. '), buffer: input.referenceImage }]
+      : []
+
   // --- Priority 1: Imagen 3 with subject/style reference (best consistency) ---
-  if (VERTEX_PROJECT_ID && input.referenceImage && input.characters?.length) {
+  if (VERTEX_PROJECT_ID && charRefs.length > 0) {
     try {
-      const prompt = buildImagen3Prompt(input, true)
+      const prompt = buildImagen3Prompt(input, charRefs.length)
       buffer = await generateWithImagen3WithReference(
         prompt,
-        input.referenceImage,
-        input.characters,
+        charRefs,
         input.previousPageImage,
       )
       const url = process.env.NODE_ENV === 'development'
@@ -520,7 +601,7 @@ export async function generateIllustration(input: IllustrateInput): Promise<Illu
   // --- Priority 2: Imagen 3 standard with seed (deterministic, no reference) ---
   if (VERTEX_PROJECT_ID) {
     try {
-      const prompt = buildImagen3Prompt(input, false)
+      const prompt = buildImagen3Prompt(input, 0)
       buffer = await generateWithImagen3Standard(prompt, input.seed)
       const url = process.env.NODE_ENV === 'development'
         ? `data:image/png;base64,${buffer.toString('base64')}`
@@ -531,11 +612,12 @@ export async function generateIllustration(input: IllustrateInput): Promise<Illu
     }
   }
 
-  // --- Priority 3: Gemini Flash (supports inline reference images) ---
+  // --- Priority 3: Gemini Flash (supports inline reference images, uses first ref only) ---
   if (process.env.GEMINI_API_KEY) {
     try {
       const prompt = buildPrompt(input)
-      buffer = await generateWithGemini(prompt, input.referenceImage, input.previousPageImage, input.seed)
+      const firstRef = charRefs.length > 0 ? charRefs[0].buffer : undefined
+      buffer = await generateWithGemini(prompt, firstRef, input.previousPageImage, input.seed)
       const url = process.env.NODE_ENV === 'development'
         ? `data:image/png;base64,${buffer.toString('base64')}`
         : await uploadToStorage(buffer)

@@ -293,6 +293,14 @@ export function Header({
             Blog
           </Link>
 
+          {/* Pricing link (desktop) */}
+          <Link
+            href="/billing"
+            className="hidden md:flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors"
+          >
+            Pricing
+          </Link>
+
           <div className="hidden md:block">
             <CreditBadge />
           </div>
@@ -452,6 +460,22 @@ export function Header({
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">Blog</p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">Tips, guides & updates</p>
+              </div>
+            </Link>
+            {/* Pricing link (mobile) */}
+            <Link
+              href="/billing"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shadow-sm flex items-center justify-center text-white shrink-0">
+                <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">Pricing</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">Plans & subscriptions</p>
               </div>
             </Link>
             {/* Mobile tools grid */}

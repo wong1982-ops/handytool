@@ -236,23 +236,13 @@ export default function BookshelfPage() {
                     >
                       {book.isPublic ? 'Unshare' : 'Share'}
                     </button>
-                    {deleteConfirm === book.id ? (
-                      <button
-                        onClick={() => handleDelete(book.id)}
-                        className="flex-1 py-1.5 rounded-lg text-xs font-medium bg-red-500 text-white hover:bg-red-600 transition-colors cursor-pointer"
-                        style={{ minHeight: '36px' }}
-                      >
-                        Confirm
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => setDeleteConfirm(book.id)}
-                        className="flex-1 py-1.5 rounded-lg text-xs font-medium border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
-                        style={{ minHeight: '36px' }}
-                      >
-                        Delete
-                      </button>
-                    )}
+                    <button
+                      onClick={() => setDeleteConfirm(book.id)}
+                      className="flex-1 py-1.5 rounded-lg text-xs font-medium border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
+                      style={{ minHeight: '36px' }}
+                    >
+                      Delete
+                    </button>
                   </div>
                   <button
                     onClick={() => handleDownloadPdf(book)}
@@ -296,6 +286,50 @@ export default function BookshelfPage() {
                 <p className="text-xs text-slate-400 dark:text-slate-500">Start a fresh tale</p>
               </div>
             </Link>
+          </div>
+        )}
+
+        {/* Delete confirmation dialog */}
+        {deleteConfirm && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+            onClick={() => setDeleteConfirm(null)}
+          >
+            <div
+              className="w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                  </svg>
+                </div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Delete Book</h3>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
+                Are you sure you want to delete <span className="font-semibold text-slate-900 dark:text-white">{books.find(b => b.id === deleteConfirm)?.title}</span>?
+              </p>
+              <p className="text-xs text-red-500 dark:text-red-400 mb-5">
+                This action is permanent and cannot be undone. All pages, illustrations, and audio will be lost.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  style={{ minHeight: '44px' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(deleteConfirm)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors cursor-pointer"
+                  style={{ minHeight: '44px' }}
+                >
+                  Delete Forever
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

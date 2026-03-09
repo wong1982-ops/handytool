@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useCredits } from '@/lib/hooks/use-credits'
 import { CREDIT_PACKS } from '@/lib/stripe/config'
-import Link from 'next/link'
+import { signInWithOAuth } from '@/lib/supabase/auth'
 
 interface Tier {
   id: string
@@ -23,8 +23,8 @@ interface Transaction {
 }
 
 export default function BillingPage() {
-  const { user, loading: authLoading } = useAuth()
-  const { balance, loading: creditsLoading, refetch } = useCredits()
+  const { user } = useAuth()
+  const { balance, loading: creditsLoading } = useCredits()
   const [tiers, setTiers] = useState<Tier[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [txPage, setTxPage] = useState(1)
@@ -113,29 +113,13 @@ export default function BillingPage() {
     expiry: 'text-red-500',
   }
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#3D6AF2] border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Sign in Required</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-center">
-          Please sign in to view your billing and credits.
-        </p>
-        <Link
-          href="/"
-          className="px-6 py-2.5 rounded-lg bg-[#3D6AF2] text-white font-semibold text-sm hover:opacity-90 transition-opacity"
-        >
-          Go Home
-        </Link>
-      </div>
-    )
+  // Helper: require sign-in before purchase actions
+  const requireAuth = async (action: () => Promise<void>) => {
+    if (!user) {
+      await signInWithOAuth('google')
+      return
+    }
+    await action()
   }
 
   return (
@@ -147,46 +131,50 @@ export default function BillingPage() {
             Billing & Credits
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
-            Manage your subscription, purchase credits, and view transaction history.
+            {user
+              ? 'Manage your subscription, purchase credits, and view transaction history.'
+              : 'View our plans and pricing. Sign in when you\'re ready to purchase.'}
           </p>
         </div>
 
-        {/* Credit balance overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <BalanceCard
-            label="Subscription Credits"
-            value={creditsLoading ? '...' : (balance?.subscription_balance ?? 0)}
-            icon={
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            }
-            subtitle={balance?.current_period_end ? `Resets ${new Date(balance.current_period_end).toLocaleDateString()}` : undefined}
-            color="text-blue-500"
-          />
-          <BalanceCard
-            label="Purchased Credits"
-            value={creditsLoading ? '...' : (balance?.purchased_balance ?? 0)}
-            icon={
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            }
-            subtitle="Never expires"
-            color="text-emerald-500"
-          />
-          <BalanceCard
-            label="Total Available"
-            value={creditsLoading ? '...' : (balance?.total ?? 0)}
-            icon={
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.736 6.979C9.208 6.193 9.696 6 10 6c.304 0 .792.193 1.264.979a1 1 0 001.715-1.029C12.279 4.784 11.232 4 10 4s-2.279.784-2.979 1.95c-.285.475-.507 1-.67 1.55H6a1 1 0 000 2h.013a9.358 9.358 0 000 1H6a1 1 0 100 2h.351c.163.55.385 1.075.67 1.55C7.721 15.216 8.768 16 10 16s2.279-.784 2.979-1.95a1 1 0 10-1.715-1.029c-.472.786-.96.979-1.264.979-.304 0-.792-.193-1.264-.979a5.389 5.389 0 01-.421-.821H10a1 1 0 100-2H8.014a7.35 7.35 0 010-1H10a1 1 0 100-2H8.315c.134-.29.283-.56.421-.821z" />
-              </svg>
-            }
-            color="text-[#3D6AF2]"
-            highlight
-          />
-        </div>
+        {/* Credit balance overview — only for signed-in users */}
+        {user && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <BalanceCard
+              label="Subscription Credits"
+              value={creditsLoading ? '...' : (balance?.subscription_balance ?? 0)}
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              }
+              subtitle={balance?.current_period_end ? `Resets ${new Date(balance.current_period_end).toLocaleDateString()}` : undefined}
+              color="text-blue-500"
+            />
+            <BalanceCard
+              label="Purchased Credits"
+              value={creditsLoading ? '...' : (balance?.purchased_balance ?? 0)}
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              }
+              subtitle="Never expires"
+              color="text-emerald-500"
+            />
+            <BalanceCard
+              label="Total Available"
+              value={creditsLoading ? '...' : (balance?.total ?? 0)}
+              icon={
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.736 6.979C9.208 6.193 9.696 6 10 6c.304 0 .792.193 1.264.979a1 1 0 001.715-1.029C12.279 4.784 11.232 4 10 4s-2.279.784-2.979 1.95c-.285.475-.507 1-.67 1.55H6a1 1 0 000 2h.013a9.358 9.358 0 000 1H6a1 1 0 100 2h.351c.163.55.385 1.075.67 1.55C7.721 15.216 8.768 16 10 16s2.279-.784 2.979-1.95a1 1 0 10-1.715-1.029c-.472.786-.96.979-1.264.979-.304 0-.792-.193-1.264-.979a5.389 5.389 0 01-.421-.821H10a1 1 0 100-2H8.014a7.35 7.35 0 010-1H10a1 1 0 100-2H8.315c.134-.29.283-.56.421-.821z" />
+                </svg>
+              }
+              color="text-[#3D6AF2]"
+              highlight
+            />
+          </div>
+        )}
 
         {/* Subscription tiers */}
         {tiers.length > 0 && (
@@ -219,11 +207,11 @@ export default function BillingPage() {
                     ))}
                   </ul>
                   <button
-                    onClick={handleManageSubscription}
+                    onClick={() => requireAuth(handleManageSubscription)}
                     disabled={loadingPortal}
                     className="mt-4 w-full py-2.5 rounded-lg bg-[#3D6AF2] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
                   >
-                    {loadingPortal ? 'Loading...' : 'Manage Subscription'}
+                    {loadingPortal ? 'Loading...' : user ? 'Manage Subscription' : 'Sign in to Subscribe'}
                   </button>
                 </div>
               ))}
@@ -255,19 +243,19 @@ export default function BillingPage() {
                   ${(pack.priceCents / pack.credits).toFixed(1)}/credit
                 </p>
                 <button
-                  onClick={() => handlePurchase(pack.id)}
+                  onClick={() => requireAuth(() => handlePurchase(pack.id))}
                   disabled={purchasing === pack.id}
                   className="mt-4 w-full py-2.5 rounded-lg border-2 border-[#3D6AF2] text-[#3D6AF2] font-semibold text-sm hover:bg-[#3D6AF2] hover:text-white transition-colors disabled:opacity-50 cursor-pointer"
                 >
-                  {purchasing === pack.id ? 'Redirecting...' : 'Buy Now'}
+                  {purchasing === pack.id ? 'Redirecting...' : user ? 'Buy Now' : 'Sign in to Buy'}
                 </button>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Transaction history */}
-        <section>
+        {/* Transaction history — signed-in users only */}
+        {user && <section>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
             Transaction History
           </h2>
@@ -356,7 +344,7 @@ export default function BillingPage() {
               </>
             )}
           </div>
-        </section>
+        </section>}
       </div>
     </div>
   )

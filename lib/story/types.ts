@@ -15,6 +15,7 @@ export const conceptSectionsSchema = z.object({
 
 export const conceptsRequestSchema = z.object({
   plot: z.string().min(10, 'Plot must be at least 10 characters').max(2000),
+  seriesId: z.string().uuid().optional(),
 })
 
 export const storyConceptSchema = z.object({
@@ -35,6 +36,7 @@ export const storyConceptSchema = z.object({
 export const generateRequestSchema = z.object({
   plot: z.string().min(10).max(2000),
   concept: storyConceptSchema,
+  seriesId: z.string().uuid().optional(),
 })
 
 // --- Concept refinement ---
