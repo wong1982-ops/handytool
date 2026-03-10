@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUserId, apiError, API_ERRORS } from '@/lib/api/response'
 import { generateRequestSchema } from '@/lib/story/types'
-import { generateStoryBible, generateStoryDraft, validateAndFix, generateSlug, type SeriesBookSummary } from '@/lib/story/enrich'
+import { generateStoryBible, generateStoryDraft, validateAndFix, generateSlug, rephrasePlot, type SeriesBookSummary } from '@/lib/story/enrich'
 import { generateIllustration, generateCharacterReference, type CharacterReference } from '@/lib/story/illustrate'
 import {
   assignVoices,
@@ -17,6 +17,18 @@ import { revalidatePath } from 'next/cache'
 function sseEvent(data: Record<string, unknown>): string {
   return `data: ${JSON.stringify(data)}\n\n`
 }
+
+/** Check if an error is a Gemini PROHIBITED_CONTENT block */
+function isContentBlocked(err: unknown): boolean {
+  if (err instanceof Error) {
+    return err.message.includes('PROHIBITED_CONTENT') ||
+           err.message.includes('Text not available') ||
+           err.message.includes('SAFETY') ||
+           err.message.includes('blocked')
+  }
+  return false
+}
+
 
 /** Run async tasks with limited concurrency */
 async function runWithConcurrency<T>(
@@ -172,15 +184,43 @@ export async function POST(request: Request) {
       try {
         // Step 1: Build Story Bible (grounding document)
         send({ type: 'status', message: 'Building story foundation...' })
-        const storyBible = await generateStoryBible({
-          plot,
-          concept,
-          seriesContext: seriesExistingBooks.length > 0 ? { existingBooks: seriesExistingBooks } : undefined,
-        })
+        let storyBible
+        try {
+          storyBible = await generateStoryBible({
+            plot,
+            concept,
+            seriesContext: seriesExistingBooks.length > 0 ? { existingBooks: seriesExistingBooks } : undefined,
+          })
+        } catch (bibleErr) {
+          if (isContentBlocked(bibleErr)) {
+            send({ type: 'status', message: 'Rephrasing your plot for safety compliance...' })
+            const safePlot = await rephrasePlot(plot)
+            send({ type: 'status', message: 'Retrying story foundation...' })
+            storyBible = await generateStoryBible({
+              plot: safePlot,
+              concept,
+              seriesContext: seriesExistingBooks.length > 0 ? { existingBooks: seriesExistingBooks } : undefined,
+            })
+          } else {
+            throw bibleErr
+          }
+        }
 
         // Step 2: Write story draft grounded against Story Bible
         send({ type: 'status', message: 'Writing your story...' })
-        const rawDraft = await generateStoryDraft({ plot, concept }, storyBible)
+        let rawDraft
+        try {
+          rawDraft = await generateStoryDraft({ plot, concept }, storyBible)
+        } catch (draftErr) {
+          if (isContentBlocked(draftErr)) {
+            send({ type: 'status', message: 'Rephrasing your plot for safety compliance...' })
+            const safePlot = await rephrasePlot(plot)
+            send({ type: 'status', message: 'Retrying story draft...' })
+            rawDraft = await generateStoryDraft({ plot: safePlot, concept }, storyBible)
+          } else {
+            throw draftErr
+          }
+        }
 
         // Step 3: Validate & auto-fix against Story Bible
         send({ type: 'status', message: 'Reviewing for consistency...' })
@@ -454,10 +494,26 @@ export async function POST(request: Request) {
         if (reservationId) {
           try {
             const supabase = await createClient()
-            await supabase.rpc('confirm_reserved_credits', {
+            const { data: confirmResult } = await supabase.rpc('confirm_reserved_credits', {
               p_reservation_id: reservationId,
-              p_description: 'Story Studio — full book generation',
+              p_description: `Story Studio — ${finalBook.title}`,
             })
+
+            // Enrich the transaction with book metadata for linking in transaction history
+            const row = Array.isArray(confirmResult) ? confirmResult[0] : confirmResult
+            const txnId = row?.transaction_id
+            if (txnId) {
+              await supabase
+                .from('credit_transactions')
+                .update({
+                  metadata: {
+                    reservation_id: reservationId,
+                    book_slug: slug,
+                    book_title: finalBook.title,
+                  },
+                })
+                .eq('id', txnId)
+            }
           } catch (err) {
             console.error('Failed to confirm credit reservation:', err)
           }

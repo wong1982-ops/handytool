@@ -73,6 +73,84 @@ async function getVertexAccessToken(): Promise<string> {
   return token
 }
 
+// ---------- Subject Type Detection ----------
+
+/**
+ * Common animal keywords for species-specific anatomy prompts.
+ * Maps keyword → { anatomy description, Imagen 3 subject type }.
+ */
+const ANIMAL_ANATOMY: Record<string, { anatomy: string; subjectType: string }> = {
+  dog:       { anatomy: '4 legs, 1 tail, 2 ears, 1 snout, 4 paws with paw pads', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  puppy:     { anatomy: '4 legs, 1 tail, 2 ears, 1 snout, 4 paws with paw pads', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  cat:       { anatomy: '4 legs, 1 tail, 2 ears, 4 paws with retractable claws, whiskers', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  kitten:    { anatomy: '4 legs, 1 tail, 2 ears, 4 paws with retractable claws, whiskers', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  rabbit:    { anatomy: '4 legs, 1 short fluffy tail, 2 long ears, 4 paws', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  bunny:     { anatomy: '4 legs, 1 short fluffy tail, 2 long ears, 4 paws', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  horse:     { anatomy: '4 legs with hooves, 1 long tail, 2 ears, 1 mane', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  pony:      { anatomy: '4 legs with hooves, 1 long tail, 2 ears, 1 mane', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  unicorn:   { anatomy: '4 legs with hooves, 1 long tail, 2 ears, 1 mane, 1 horn on forehead', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  bear:      { anatomy: '4 legs, 1 short tail, 2 rounded ears, 4 paws with claws', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  fox:       { anatomy: '4 legs, 1 bushy tail, 2 pointed ears, 4 paws, pointed snout', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  wolf:      { anatomy: '4 legs, 1 bushy tail, 2 pointed ears, 4 paws, elongated snout', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  bird:      { anatomy: '2 wings, 2 legs with talons, 1 beak, 1 tail fan, feathered body', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  owl:       { anatomy: '2 wings, 2 legs with talons, 1 beak, large round eyes, feathered body, can rotate head', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  eagle:     { anatomy: '2 large wings, 2 legs with talons, 1 hooked beak, 1 tail fan', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  penguin:   { anatomy: '2 flippers (not flying wings), 2 legs with webbed feet, 1 beak, upright posture', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  dragon:    { anatomy: '4 legs with claws, 2 wings, 1 long tail, 2 horns, scales covering body', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  frog:      { anatomy: '4 legs (2 long hind legs for jumping, 2 shorter front legs), no tail, wide mouth, bulging eyes', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  turtle:    { anatomy: '4 legs, 1 shell (dome top, flat bottom), 1 small tail, 1 head that can retract', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  fish:      { anatomy: 'fins (dorsal, pectoral, caudal/tail), scales, gills, no legs', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  elephant:  { anatomy: '4 thick legs, 1 trunk, 2 large ears, 1 thin tail, 2 tusks (if adult)', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  lion:      { anatomy: '4 legs, 1 tail with tuft, 2 ears, 4 paws with claws, mane (if male)', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  mouse:     { anatomy: '4 legs, 1 long thin tail, 2 large round ears, 4 tiny paws, whiskers', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  deer:      { anatomy: '4 legs with hooves, 1 short tail, 2 ears, antlers (if male/stag)', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  butterfly: { anatomy: '2 pairs of wings (4 wings total), 6 legs, 2 antennae, proboscis', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  spider:    { anatomy: '8 legs, no wings, multiple eyes (usually 8), spinnerets', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  snake:     { anatomy: 'no legs, no arms, long cylindrical body, forked tongue, scales', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+  monkey:    { anatomy: '2 arms, 2 legs, 1 long tail (prehensile), 5 fingers per hand, 5 toes per foot', subjectType: 'SUBJECT_TYPE_ANIMAL' },
+}
+
+/** Object/item keywords for Imagen 3 subject type detection */
+const OBJECT_KEYWORDS = [
+  'wand', 'sword', 'staff', 'crown', 'ring', 'amulet', 'book', 'lamp',
+  'mirror', 'key', 'chest', 'potion', 'crystal', 'orb', 'shield', 'gem',
+  'robot', 'machine', 'vehicle', 'ship', 'castle', 'house', 'toy',
+]
+
+/**
+ * Detect the Imagen 3 subject type and species-specific anatomy from a character description.
+ * Returns { subjectType, anatomyHint } for use in prompts and API calls.
+ */
+function detectSubjectInfo(description: string): { subjectType: string; anatomyHint: string } {
+  const lower = description.toLowerCase()
+
+  // Check animal keywords first (more specific)
+  for (const [keyword, info] of Object.entries(ANIMAL_ANATOMY)) {
+    if (lower.includes(keyword)) {
+      return {
+        subjectType: info.subjectType,
+        anatomyHint: `${keyword} anatomy: ${info.anatomy}`,
+      }
+    }
+  }
+
+  // Check object keywords
+  for (const kw of OBJECT_KEYWORDS) {
+    if (lower.includes(kw)) {
+      return {
+        subjectType: 'SUBJECT_TYPE_PRODUCT',
+        anatomyHint: '',
+      }
+    }
+  }
+
+  // Default to person (humans, humanoids, fairies, elves, etc.)
+  return {
+    subjectType: 'SUBJECT_TYPE_PERSON',
+    anatomyHint: 'human anatomy: exactly 2 arms, 2 legs, 5 fingers per hand, 5 toes per foot, normal proportioned neck',
+  }
+}
+
 // ---------- Prompt Building ----------
 
 /**
@@ -91,8 +169,12 @@ function buildPrompt(input: IllustrateInput): string {
   // Strategy 6: Full character descriptions repeated in EVERY prompt
   // Strategy 7: Descriptions should already contain specific terms from story generation
   if (input.characters?.length) {
-    prompt += 'CHARACTERS — you MUST reproduce these EXACT physical descriptions in the illustration. '
-    prompt += 'Do NOT deviate from any detail (hair color, clothing, accessories, body type, skin tone):\n'
+    prompt += 'CHARACTER CONSISTENCY RULES (MANDATORY):\n'
+    prompt += '- You MUST reproduce EVERY attribute listed below EXACTLY as specified.\n'
+    prompt += '- Do NOT change, omit, or reinterpret ANY detail: hair color/length/style, eye color/shape, skin tone, body type, outfit (every clothing item with exact colors), accessories, and distinguishing features.\n'
+    prompt += '- Each character MUST be visually distinguishable and match their description on EVERY page.\n'
+    prompt += '- If a character appeared on a previous page, they MUST look IDENTICAL here.\n\n'
+    prompt += 'CHARACTERS:\n'
     prompt += input.characters.map(c => `• ${c.name}: ${c.description}`).join('\n')
     prompt += '\n\n'
   }
@@ -100,6 +182,22 @@ function buildPrompt(input: IllustrateInput): string {
   if (input.style) {
     prompt += `ART STYLE: ${input.style}. `
   }
+
+  // Anatomical correctness rules — species-specific when possible
+  prompt += 'ANATOMY RULES (MANDATORY):\n'
+  if (input.characters?.length) {
+    const anatomyHints = input.characters
+      .map(c => {
+        const info = detectSubjectInfo(c.description)
+        return info.anatomyHint ? `- ${c.name}: ${info.anatomyHint}` : null
+      })
+      .filter(Boolean)
+    if (anatomyHints.length) {
+      prompt += anatomyHints.join('\n') + '\n'
+    }
+  }
+  prompt += '- No extra limbs, merged fingers, elongated/snake-like necks, or distorted body proportions.\n'
+  prompt += '- Hands must have natural proportions with correct finger count.\n\n'
 
   prompt += `SCENE: ${input.imagePrompt}`
   prompt += '\n\nIMPORTANT: Do not include any text, words, letters, or writing in the image. Illustration only.'
@@ -130,7 +228,7 @@ function buildImagen3Prompt(input: IllustrateInput, subjectRefCount: number): st
       const refTags = Array.from({ length: subjectRefCount }, (_, i) => `[${i + 1}]`).join(' and ')
       prompt += `Illustrate ${refTags} in this scene: ${input.imagePrompt}. `
     }
-    prompt += `Exact character appearances: ${input.characters.map(c => `${c.name} — ${c.description}`).join('. ')}. `
+    prompt += `CRITICAL — reproduce EVERY physical attribute exactly as described. Do NOT change hair, eyes, skin, outfit, or accessories: ${input.characters.map(c => `${c.name} — ${c.description}`).join('. ')}. `
   } else if (input.characters?.length) {
     // Strategy 6+7: Full specific descriptions repeated in every prompt
     prompt += input.characters.map(c => `${c.name}: ${c.description}`).join('. ') + '. '
@@ -139,6 +237,17 @@ function buildImagen3Prompt(input: IllustrateInput, subjectRefCount: number): st
     prompt += input.imagePrompt + '. '
   }
 
+  // Species-specific anatomy for Imagen 3 prompts
+  if (input.characters?.length) {
+    const hints = input.characters
+      .map(c => detectSubjectInfo(c.description).anatomyHint)
+      .filter(Boolean)
+    if (hints.length) {
+      prompt += `Anatomically correct: ${hints.join('. ')}. `
+    }
+  } else {
+    prompt += 'Anatomically correct: humans have exactly 2 arms, 2 legs, 5 fingers per hand, normal neck. Animals have species-accurate limb count. '
+  }
   prompt += 'No text, words, letters, or writing in the image. Children\'s book illustration.'
   return prompt
 }
@@ -159,9 +268,11 @@ export async function generateCharacterReference(
   const isSingle = characters.length === 1
   const charDescs = characters.map(c => `${c.name}: ${c.description}`).join('. ')
 
+  const anatomyRules = 'Anatomically correct: humans have exactly 2 arms, 2 legs, 5 fingers per hand, 5 toes per foot, normal proportioned neck. Animals have species-accurate limb count. No extra limbs, merged fingers, or distorted proportions.'
+
   const buildRefPrompt = (suffix: string) => isSingle
-    ? `${style} style full body character portrait of ${characters[0].name}. ${characters[0].description}. Standing pose, clear details, clean background. ${suffix}`
-    : `${style} style character reference sheet showing all main characters side by side, full body, clear distinct appearances, white background. Characters: ${charDescs}. ${suffix}`
+    ? `${style} style full body character portrait of ${characters[0].name}. ${characters[0].description}. Standing pose, clear details, clean background. ${anatomyRules} ${suffix}`
+    : `${style} style character reference sheet showing all main characters side by side, full body, clear distinct appearances, white background. Characters: ${charDescs}. ${anatomyRules} ${suffix}`
 
   // Try Imagen 3 with style reference first (best consistency with existing portraits)
   if (characters.length && VERTEX_PROJECT_ID && styleReferenceImage) {
@@ -300,7 +411,7 @@ async function generateWithImagen3Standard(
         addWatermark: false, // required for seed to work
         personGeneration: 'allow_all',
         safetySetting: 'block_only_high',
-        negativePrompt: 'text, words, letters, writing, watermark, signature, blurry, low quality',
+        negativePrompt: 'text, words, letters, writing, watermark, signature, blurry, low quality, inconsistent character appearance, different hairstyle, different clothing, different eye color, character redesign, wrong outfit color, extra arms, extra legs, extra fingers, six fingers, four arms, three arms, merged fingers, fused fingers, deformed hands, malformed hands, extra limbs, missing limbs, elongated neck, snake neck, distorted anatomy, extra ears, three eyes, deformed face, mutated body',
         ...(seed != null ? { seed } : {}),
       },
     }),
@@ -336,17 +447,21 @@ async function generateWithImagen3WithReference(
   const url = `https://${VERTEX_REGION}-aiplatform.googleapis.com/v1/projects/${VERTEX_PROJECT_ID}/locations/${VERTEX_REGION}/publishers/google/models/imagen-3.0-capability-001:predict`
 
   // Build reference images array — one subject reference per character portrait
-  const referenceImages: Record<string, unknown>[] = characterRefs.map((ref, idx) => ({
-    referenceType: 'REFERENCE_TYPE_SUBJECT',
-    referenceId: idx + 1,
-    referenceImage: {
-      bytesBase64Encoded: ref.buffer.toString('base64'),
-    },
-    subjectImageConfig: {
-      subjectDescription: `${ref.name}: ${ref.description}`,
-      subjectType: 'SUBJECT_TYPE_PERSON',
-    },
-  }))
+  // Detect correct subject type (person, animal, product) from character description
+  const referenceImages: Record<string, unknown>[] = characterRefs.map((ref, idx) => {
+    const { subjectType } = detectSubjectInfo(ref.description)
+    return {
+      referenceType: 'REFERENCE_TYPE_SUBJECT',
+      referenceId: idx + 1,
+      referenceImage: {
+        bytesBase64Encoded: ref.buffer.toString('base64'),
+      },
+      subjectImageConfig: {
+        subjectDescription: `${ref.name} — MUST match exactly: ${ref.description}`,
+        subjectType,
+      },
+    }
+  })
 
   // Add previous page as style reference for visual continuity (Strategy 5)
   // Style reference ID comes after all subject references
@@ -358,7 +473,7 @@ async function generateWithImagen3WithReference(
         bytesBase64Encoded: previousPageImage.toString('base64'),
       },
       styleImageConfig: {
-        styleDescription: 'Maintain the same art style, color palette, and visual mood as this previous page',
+        styleDescription: 'Maintain the same art style, color palette, visual mood, AND character appearances (identical hair, clothing, features) as this previous page',
       },
     })
   }
@@ -443,15 +558,22 @@ async function generateWithGemini(
     let instruction = ''
     if (referenceImage && previousPageImage) {
       instruction = 'IMAGE 1 is the character reference sheet. IMAGE 2 is the previous page illustration. '
-        + 'You MUST match each character\'s EXACT appearance — hair color/style, skin tone, clothing, accessories, body proportions — from the reference sheet. '
+        + 'CHARACTER CONSISTENCY IS THE #1 PRIORITY. You MUST match EVERY attribute from the reference sheet: '
+        + 'exact hair color, length, and style; exact eye color and shape; exact skin tone; exact clothing items with their specific colors; '
+        + 'exact accessories; exact body proportions and build. Do NOT change ANY of these attributes. '
         + 'Maintain the same art style, color palette, and lighting as the previous page for visual continuity. '
     } else if (referenceImage) {
       instruction = 'The image above is the character reference sheet. '
-        + 'You MUST match each character\'s EXACT appearance — hair color/style, skin tone, clothing, accessories, body proportions — from this reference. '
+        + 'CHARACTER CONSISTENCY IS THE #1 PRIORITY. You MUST match EVERY attribute from this reference: '
+        + 'exact hair color, length, and style; exact eye color and shape; exact skin tone; exact clothing items with their specific colors; '
+        + 'exact accessories; exact body proportions and build. Do NOT change ANY of these attributes. '
     } else if (previousPageImage) {
       instruction = 'The image above is the previous page illustration. '
-        + 'Maintain the same character appearances, art style, color palette, and visual mood for continuity. '
+        + 'CHARACTER CONSISTENCY IS THE #1 PRIORITY. Maintain IDENTICAL character appearances — same hair, eyes, skin, outfit, accessories. '
+        + 'Also maintain the same art style, color palette, and visual mood for continuity. '
     }
+
+    instruction += 'ANATOMY: Humans must have exactly 2 arms, 2 legs, 5 fingers per hand, normal neck. Animals must have species-correct limb count. No extra limbs or merged fingers. '
 
     parts.push({ text: instruction + prompt })
 

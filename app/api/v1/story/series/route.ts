@@ -31,24 +31,28 @@ export async function POST(request: Request) {
   const userId = await getAuthUserId()
   if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  // Check series limit
-  const { tier, limits } = await getUserEntitlements(userId)
+  // Check series limit (fail-open: allow creation if entitlements check times out)
   const supabase = await createClient()
+  try {
+    const { tier, limits } = await getUserEntitlements(userId)
 
-  const { count } = await supabase
-    .from('series')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
+    const { count } = await supabase
+      .from('series')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
 
-  if ((count ?? 0) >= limits.max_series) {
-    return apiError(
-      tier === 'free'
-        ? `Free users can create up to ${limits.max_series} series. Upgrade to Premium for more.`
-        : `You've reached your series limit (${limits.max_series}).`,
-      'SERIES_LIMIT_REACHED',
-      403,
-      { limit: limits.max_series, current: count ?? 0, tier },
-    )
+    if ((count ?? 0) >= limits.max_series) {
+      return apiError(
+        tier === 'free'
+          ? `Free users can create up to ${limits.max_series} series. Upgrade to Premium for more.`
+          : `You've reached your series limit (${limits.max_series}).`,
+        'SERIES_LIMIT_REACHED',
+        403,
+        { limit: limits.max_series, current: count ?? 0, tier },
+      )
+    }
+  } catch (err) {
+    console.warn('series create: entitlements check failed, allowing through:', err)
   }
 
   let body: unknown

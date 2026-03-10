@@ -12,9 +12,15 @@ interface BookViewerProps {
   readOnly?: boolean
   isOwner?: boolean
   onEditPage?: (sequence: number) => void
+  /** Called when the user navigates to a new page (0 = cover, 1+ = pages) */
+  onPageChange?: (currentPage: number) => void
+  /** Total page count (when pages are lazy-loaded, may differ from book.pages.length) */
+  totalPages?: number
+  /** Number of pages currently loaded (for lazy-load progress indicator) */
+  pagesLoaded?: number
 }
 
-export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEditPage }: BookViewerProps) {
+export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEditPage, onPageChange, totalPages: totalPagesProp, pagesLoaded }: BookViewerProps) {
   const isMobile = useMobileShell()
   const [currentPage, setCurrentPage] = useState(0) // 0 = cover
   const [direction, setDirection] = useState<'left' | 'right' | null>(null)
@@ -28,7 +34,7 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
   const noAudioTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pageRefs = useRef<(HTMLDivElement | null)[]>([])
 
-  const totalPages = book.pages.length
+  const totalPages = totalPagesProp ?? book.pages.length
   const isCover = currentPage === 0
   const page = isCover ? null : book.pages[currentPage - 1]
   const activePage = page || book.pages[0] || null
@@ -40,8 +46,9 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
     if (target < 0 || target > totalPages) return
     setDirection(dir)
     setCurrentPage(target)
+    onPageChange?.(target)
     setTimeout(() => setDirection(null), 300)
-  }, [totalPages])
+  }, [totalPages, onPageChange])
 
   const goNext = useCallback(() => goTo(currentPage + 1, 'right'), [currentPage, goTo])
   const goPrev = useCallback(() => goTo(currentPage - 1, 'left'), [currentPage, goTo])
@@ -171,12 +178,12 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
   // --- Rendering helpers ---
 
   const renderNarrative = (text: string) => {
-    if (!text || text.length < 2) return <p className="text-base md:text-lg lg:text-xl text-slate-800 dark:text-slate-200 leading-relaxed">{text}</p>
+    if (!text || text.length < 2) return <p className="text-base md:text-lg lg:text-xl text-slate-900 dark:text-slate-100 leading-[1.8] md:leading-[1.9]" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>{text}</p>
     const firstChar = text[0]
     const rest = text.slice(1)
     return (
-      <p className="text-base md:text-lg lg:text-xl text-slate-800 dark:text-slate-200 leading-relaxed">
-        <span className="float-left text-5xl md:text-6xl font-bold leading-[0.8] mr-2 mt-1 text-amber-600 dark:text-amber-400">{firstChar}</span>
+      <p className="text-base md:text-lg lg:text-xl text-slate-900 dark:text-slate-100 leading-[1.8] md:leading-[1.9]" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
+        <span className="float-left text-5xl md:text-6xl lg:text-7xl font-bold leading-[0.75] mr-3 mt-1.5 bg-gradient-to-br from-amber-500 to-amber-700 dark:from-amber-300 dark:to-amber-500 bg-clip-text text-transparent" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>{firstChar}</span>
         {rest}
       </p>
     )
@@ -184,9 +191,12 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
 
   const renderDialogue = (dialogue?: { speaker: string; line: string }[]) =>
     dialogue?.map((d, i) => (
-      <p key={i} className="mt-3 text-base md:text-lg lg:text-xl text-slate-700 dark:text-slate-300 italic">
-        &ldquo;{d.line}&rdquo; <span className="text-sm text-slate-500 not-italic">&mdash; {d.speaker}</span>
-      </p>
+      <div key={i} className="mt-4 pl-4 border-l-2 border-amber-400/50 dark:border-amber-500/40">
+        <p className="text-base md:text-lg lg:text-xl text-slate-800 dark:text-slate-200 italic leading-[1.7]" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
+          &ldquo;{d.line}&rdquo;
+        </p>
+        <p className="mt-1 text-xs md:text-sm font-semibold uppercase tracking-wider text-amber-700/70 dark:text-amber-400/70">&mdash; {d.speaker}</p>
+      </div>
     ))
 
   const renderCoverImage = () => {
@@ -219,25 +229,33 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
 
   const renderCoverText = () => (
     <div className="flex-1 p-6 md:p-10 lg:p-14 flex flex-col justify-center">
-      <h2 className="text-2xl md:text-4xl font-bold text-amber-600 dark:text-amber-400 mb-3 italic" style={{ fontFamily: 'Georgia, serif' }}>
+      {/* Decorative flourish */}
+      <div className="mb-4">
+        <svg className="w-10 h-3 text-amber-400/60 dark:text-amber-500/40" viewBox="0 0 40 12" fill="none">
+          <path d="M0 6 C6 0, 10 12, 16 6 C22 0, 26 12, 32 6 C36 2, 38 10, 40 6" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+      </div>
+      <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 dark:from-amber-300 dark:via-amber-400 dark:to-amber-500 bg-clip-text text-transparent mb-2 leading-tight" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
         {book.title}
       </h2>
       {book.authors && book.authors.length > 0 && (
-        <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 mb-4">
-          Written by {book.authors.join(' & ')}
+        <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 mb-5 italic tracking-wide" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
+          by {book.authors.join(' & ')}
         </p>
       )}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-5">
         {book.concept.tags.audience && (
-          <span className="text-xs px-2.5 py-1 rounded-full bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-medium">{book.concept.tags.audience}</span>
+          <span className="text-[11px] px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-200/60 dark:border-emerald-800/40">{book.concept.tags.audience}</span>
         )}
         {book.concept.tags.style && (
-          <span className="text-xs px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium">{book.concept.tags.style}</span>
+          <span className="text-[11px] px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200/60 dark:border-blue-800/40">{book.concept.tags.style}</span>
         )}
-        <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-medium">{totalPages} pages</span>
+        <span className="text-[11px] px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold">{totalPages} pages</span>
       </div>
       {book.concept.sections?.premise && (
-        <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-md">{book.concept.sections.premise}</p>
+        <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-md" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
+          {book.concept.sections.premise}
+        </p>
       )}
     </div>
   )
@@ -379,12 +397,13 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
           {book.pages.map((p, i) => (
             <div key={p.sequence}>
               {/* Page break divider */}
-              <div className="flex items-center gap-3 py-3">
-                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <div className="flex flex-col items-center gap-1.5 py-4">
+                <svg className="w-8 h-3 text-amber-400/40 dark:text-amber-500/30" viewBox="0 0 32 12" fill="none">
+                  <path d="M0 6 C5 0, 9 12, 16 6 C23 0, 27 12, 32 6" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-amber-600/50 dark:text-amber-400/40">
                   Page {i + 1} of {totalPages}
                 </span>
-                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
               </div>
 
               {/* Page card */}
@@ -393,7 +412,7 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
                 className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden scroll-mt-16"
               >
                 {renderPageImage(p)}
-                <div className="p-5">
+                <div className="p-5 md:p-6">
                   {renderNarrative(p.narrativeText)}
                   {renderDialogue(p.dialogue)}
                   {isOwner && onEditPage && (
@@ -466,7 +485,7 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
                     </svg>
                   </button>
                 </div>
-                <div className="flex-1 p-6 md:p-8 lg:p-10 flex flex-col justify-center">
+                <div className="flex-1 p-6 md:p-10 lg:p-14 flex flex-col justify-center overflow-y-auto">
                   {renderNarrative(page.narrativeText)}
                   {renderDialogue(page.dialogue)}
                   {isOwner && onEditPage && (
@@ -484,10 +503,13 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
                 </div>
               </div>
             ) : (
-              <div className="h-full flex items-center justify-center px-6 py-10 md:px-16 lg:px-24">
+              <div className="h-full flex items-center justify-center px-6 py-10 md:px-16 lg:px-24 bg-gradient-to-b from-amber-50/30 via-transparent to-amber-50/20 dark:from-amber-950/10 dark:via-transparent dark:to-amber-950/5">
                 <div className="max-w-2xl w-full">
-                  <div className="text-center mb-6">
-                    <span className="text-xs font-semibold uppercase tracking-widest text-slate-300 dark:text-slate-600">Page {page.sequence}</span>
+                  <div className="text-center mb-8">
+                    <svg className="w-8 h-3 mx-auto mb-3 text-amber-400/40 dark:text-amber-500/30" viewBox="0 0 32 12" fill="none">
+                      <path d="M0 6 C5 0, 9 12, 16 6 C23 0, 27 12, 32 6" stroke="currentColor" strokeWidth="1.5" />
+                    </svg>
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-600/50 dark:text-amber-400/40">Page {page.sequence}</span>
                   </div>
                   {renderNarrative(page.narrativeText)}
                   {renderDialogue(page.dialogue)}
@@ -503,9 +525,9 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
                       Edit Page
                     </button>
                   )}
-                  <div className="mt-8 flex justify-center">
-                    <svg className="w-8 h-4 text-slate-200 dark:text-slate-700" viewBox="0 0 32 16" fill="currentColor">
-                      <path d="M0 8 C8 0, 12 16, 16 8 C20 0, 24 16, 32 8" strokeWidth="1.5" stroke="currentColor" fill="none" />
+                  <div className="mt-10 flex justify-center">
+                    <svg className="w-10 h-4 text-amber-300/40 dark:text-amber-600/30" viewBox="0 0 40 12" fill="none">
+                      <path d="M0 6 C6 0, 10 12, 16 6 C22 0, 26 12, 32 6 C36 2, 38 10, 40 6" stroke="currentColor" strokeWidth="1.5" />
                     </svg>
                   </div>
                 </div>

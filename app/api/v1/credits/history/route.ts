@@ -37,8 +37,31 @@ export async function GET(request: NextRequest) {
     return API_ERRORS.INTERNAL()
   }
 
+  // Enrich usage transactions with book status (active vs deleted)
+  const enriched = transactions ?? []
+  const bookSlugs = enriched
+    .filter(tx => tx.metadata?.book_slug)
+    .map(tx => (tx.metadata as Record<string, unknown>).book_slug as string)
+
+  if (bookSlugs.length > 0) {
+    const { data: existingBooks } = await supabase
+      .from('books')
+      .select('slug')
+      .eq('user_id', userId)
+      .in('slug', bookSlugs)
+
+    const activeSlugs = new Set((existingBooks ?? []).map(b => b.slug))
+
+    for (const tx of enriched) {
+      const meta = tx.metadata as Record<string, unknown> | null
+      if (meta?.book_slug) {
+        meta.book_deleted = !activeSlugs.has(meta.book_slug as string)
+      }
+    }
+  }
+
   return apiSuccess({
-    transactions: transactions ?? [],
+    transactions: enriched,
     pagination: {
       page,
       limit,

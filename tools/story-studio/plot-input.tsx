@@ -107,6 +107,7 @@ export function PlotInput({ onSubmit, loading, initialPlot }: PlotInputProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
                 </svg>
                 Rephrase with AI
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">1 credit</span>
               </>
             )}
           </button>
@@ -116,7 +117,7 @@ export function PlotInput({ onSubmit, loading, initialPlot }: PlotInputProps) {
           <svg className="w-3.5 h-3.5 mt-0.5 shrink-0 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
           </svg>
-          AI-generated stories may contain inaccuracies. The more detail you provide — characters, setting, tone — the better the result.
+          AI-generated stories may contain inaccuracies. The more detail you provide — characters, setting, tone — the better the result. Content involving violence, sexual themes, or other prohibited material will be blocked.
         </p>
 
         <button

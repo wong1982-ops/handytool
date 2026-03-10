@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 import { conceptsRequestSchema } from '@/lib/story/types'
-import { generateConcepts, type SeriesContext, type SeriesBookSummary } from '@/lib/story/enrich'
+import { generateConcepts, rephrasePlot, sanitizePlotText, type SeriesContext, type SeriesBookSummary } from '@/lib/story/enrich'
 import { CREDIT_COSTS } from '@/lib/story/validation'
 
 export async function POST(request: Request) {
@@ -47,6 +47,9 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return API_ERRORS.VALIDATION(parsed.error.flatten().fieldErrors)
   }
+
+  // Sanitize raw plot text before any AI call
+  const safePlot = sanitizePlotText(parsed.data.plot)
 
   try {
     // Load series context if seriesId is provided
@@ -95,10 +98,30 @@ export async function POST(request: Request) {
       }
     }
 
-    const concepts = await generateConcepts({
-      plot: parsed.data.plot,
-      seriesContext,
-    })
+    let concepts
+    try {
+      concepts = await generateConcepts({
+        plot: safePlot,
+        seriesContext,
+      })
+    } catch (conceptErr) {
+      // Retry with rephrased plot if Gemini blocks for safety
+      if (conceptErr instanceof Error && (
+        conceptErr.message.includes('PROHIBITED_CONTENT') ||
+        conceptErr.message.includes('Text not available') ||
+        conceptErr.message.includes('SAFETY') ||
+        conceptErr.message.includes('blocked')
+      )) {
+        console.warn('story/concepts: content blocked, rephrasing plot and retrying...')
+        const rephrasedPlot = await rephrasePlot(safePlot)
+        concepts = await generateConcepts({
+          plot: rephrasedPlot,
+          seriesContext,
+        })
+      } else {
+        throw conceptErr
+      }
+    }
     return apiSuccess(concepts)
   } catch (err) {
     const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err)

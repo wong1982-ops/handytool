@@ -26,30 +26,46 @@ export function GenerationProgress({ events, totalPages }: GenerationProgressPro
   const storyReady = events.some(e => e.type === 'story-ready')
   const latestStatus = [...events].reverse().find(e => e.type === 'status')
   const hasError = events.some(e => e.type === 'error')
+  const latestMessage = latestStatus?.type === 'status' ? latestStatus.message ?? '' : ''
+
+  // Detect which stage we're in based on SSE status messages
+  const isWriting = !storyReady
+  const hasCharRef = latestMessage.includes('character reference') || latestMessage.includes('portrait') || latestMessage.includes('consistency seed')
+  const isCharRef = storyReady && imagesDone === 0 && (hasCharRef || (!latestMessage.includes('Illustrating') && !latestMessage.includes('narration')))
+  const isIllustrating = storyReady && imagesDone < (totalPages ?? 0) && (latestMessage.includes('Illustrating') || latestMessage.includes('Cover') || imagesDone > 0)
+  const isNarrating = storyReady && totalPages !== null && imagesDone >= totalPages && audiosDone < totalPages
+
+  // 5-stage pipeline: 0=Writing, 1=Reviewing, 2=Character Ref, 3=Illustrating, 4=Narrating
+  const stage = isWriting ? 0
+    : isCharRef ? 2
+    : isIllustrating ? 3
+    : isNarrating ? 4
+    : storyReady && !isIllustrating && !isNarrating && imagesDone === 0 ? 1
+    : 4
 
   const statusMessage = hasError
     ? 'Something went wrong...'
-    : latestStatus?.type === 'status'
-      ? latestStatus.message
-      : 'Starting...'
+    : latestMessage || 'Starting...'
 
-  // Progress: 0-33% story, 33-66% illustrations, 66-100% audio
+  // Progress: 0-15% writing, 15-25% reviewing, 25-35% char ref, 35-75% illustrations, 75-100% audio
   let progress = 0
   if (storyReady && totalPages) {
     const imageProgress = imagesDone / totalPages
     const audioProgress = audiosDone / totalPages
 
     if (audioProgress > 0) {
-      progress = 66 + audioProgress * 34
-    } else if (imageProgress > 0 || imagesDone > 0) {
-      progress = 33 + imageProgress * 33
+      progress = 75 + audioProgress * 25
+    } else if (imagesDone > 0) {
+      progress = 35 + imageProgress * 40
+    } else if (isCharRef) {
+      progress = 28
     } else {
-      progress = 33
+      progress = 20
     }
   } else if (storyReady) {
-    progress = 33
+    progress = 18
   } else {
-    progress = 15
+    progress = 10
   }
 
   // Pick a fun tip based on progress to rotate through them
@@ -58,16 +74,17 @@ export function GenerationProgress({ events, totalPages }: GenerationProgressPro
 
   const stageLabel = hasError
     ? 'Generation failed'
-    : !storyReady
+    : isWriting
       ? 'Writing story...'
-      : totalPages && imagesDone < totalPages
-        ? `Illustrating... ${imagesDone} / ${totalPages} pages`
-        : totalPages && audiosDone < totalPages
-          ? `Recording narration... ${audiosDone} / ${totalPages} pages`
-          : 'Finishing up...'
-
-  // Determine which stage icon to highlight
-  const stage = !storyReady ? 0 : (totalPages && imagesDone < totalPages) ? 1 : 2
+      : stage <= 1
+        ? 'Reviewing for consistency...'
+        : isCharRef
+          ? 'Creating character references...'
+          : isIllustrating
+            ? `Illustrating... ${imagesDone} / ${totalPages} pages`
+            : isNarrating
+              ? `Recording narration... ${audiosDone} / ${totalPages} pages`
+              : 'Finishing up...'
 
   return (
     <div className="max-w-lg mx-auto text-center py-10 md:py-14">
@@ -121,6 +138,16 @@ export function GenerationProgress({ events, totalPages }: GenerationProgressPro
                     <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                   </svg>
                 ) : stage === 1 ? (
+                  /* Magnifier — reviewing */
+                  <svg className="w-10 h-10 text-cyan-300 drop-shadow-lg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                  </svg>
+                ) : stage === 2 ? (
+                  /* People — character reference */
+                  <svg className="w-10 h-10 text-emerald-300 drop-shadow-lg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                  </svg>
+                ) : stage === 3 ? (
                   /* Paintbrush — illustrating */
                   <svg className="w-10 h-10 text-purple-300 drop-shadow-lg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
@@ -136,7 +163,7 @@ export function GenerationProgress({ events, totalPages }: GenerationProgressPro
           </div>
 
           {/* Status text */}
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
             Crafting Your Tale
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
@@ -150,30 +177,32 @@ export function GenerationProgress({ events, totalPages }: GenerationProgressPro
           </p>
 
           {/* Stage indicators */}
-          <div className="flex items-center justify-center gap-3 mb-6">
+          <div className="flex items-center justify-center gap-1.5 md:gap-2 mb-6 flex-wrap">
             {[
-              { label: 'Writing', icon: 'quill' },
-              { label: 'Illustrating', icon: 'paint' },
-              { label: 'Narrating', icon: 'mic' },
+              { label: 'Writing', idx: 0 },
+              { label: 'Reviewing', idx: 1 },
+              { label: 'Characters', idx: 2 },
+              { label: 'Illustrating', idx: 3 },
+              { label: 'Narrating', idx: 4 },
             ].map((s, i) => (
               <div key={s.label} className="flex items-center gap-1.5">
                 {i > 0 && (
-                  <div className={`w-8 h-0.5 rounded-full transition-colors duration-500 ${
-                    stage > i - 1 ? 'bg-indigo-400' : 'bg-slate-200 dark:bg-slate-700'
+                  <div className={`w-4 md:w-6 h-0.5 rounded-full transition-colors duration-500 ${
+                    stage > s.idx - 1 ? 'bg-indigo-400' : 'bg-slate-200 dark:bg-slate-700'
                   }`} />
                 )}
-                <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-500 ${
-                  stage === i
+                <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium transition-all duration-500 ${
+                  stage === s.idx
                     ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-300 dark:ring-indigo-700'
-                    : stage > i
+                    : stage > s.idx
                       ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
                 }`}>
-                  {stage > i ? (
+                  {stage > s.idx ? (
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
-                  ) : stage === i ? (
+                  ) : stage === s.idx ? (
                     <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
                   ) : null}
                   {s.label}

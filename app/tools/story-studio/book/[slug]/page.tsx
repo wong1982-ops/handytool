@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { isLocalDev, LOCAL_DEV_USER_ID } from '@/lib/local-dev'
+import { unstable_cache } from 'next/cache'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BookReaderClient } from './book-reader-client'
@@ -10,57 +11,137 @@ interface BookPageProps {
   params: Promise<{ slug: string }>
 }
 
-async function getBook(slug: string) {
+async function getCurrentUserId() {
+  if (isLocalDev) return LOCAL_DEV_USER_ID
+
+  const supabase = await createClient()
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user?.id) return user.id
+  } catch { /* no auth session */ }
+
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.DEV_USER_ID
+  }
+  return undefined
+}
+
+/**
+ * Fetch book shell (metadata without pages) — cached via ISR.
+ * Public books are served from edge cache instantly.
+ * Cache is keyed by slug and revalidated every hour.
+ */
+/**
+ * Try shell RPC (fast, no pages). Falls back to full get_book_by_slug if shell RPC doesn't exist.
+ */
+async function fetchBookShell(slug: string, userId: string | null) {
   const supabase = await createClient()
 
-  // Get current user (if any) to allow viewing own books
-  let currentUserId: string | undefined
+  // Try lightweight shell RPC first
+  const { data, error } = await supabase.rpc('get_book_shell_by_slug', {
+    p_slug: slug,
+    p_user_id: userId,
+  })
 
-  if (isLocalDev) {
-    currentUserId = LOCAL_DEV_USER_ID
-  } else {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      currentUserId = user?.id
-    } catch { /* no auth session */ }
-
-    // Dev mode fallback: use DEV_USER_ID
-    if (!currentUserId && process.env.NODE_ENV === 'development') {
-      currentUserId = process.env.DEV_USER_ID
-    }
+  if (!error && data) {
+    const book = Array.isArray(data) ? data[0] : data
+    if (book) return { ...book, _mode: 'shell' as const }
   }
 
-  // Single RPC: fetches by slug, returns if public OR owned by user (bypasses RLS)
-  const { data, error } = await supabase.rpc('get_book_by_slug', {
+  // Fallback: use original full RPC
+  console.warn('[book] get_book_shell_by_slug failed, using get_book_by_slug fallback', error?.message)
+  const { data: fullData, error: fullErr } = await supabase.rpc('get_book_by_slug', {
     p_slug: slug,
-    p_user_id: currentUserId ?? null,
+    p_user_id: userId,
+  })
+
+  if (fullErr) {
+    console.error('[book] get_book_by_slug failed:', fullErr.message)
+    return null
+  }
+
+  const book = Array.isArray(fullData) ? fullData[0] : fullData
+  if (!book) return null
+
+  // Extract page count and mark as full mode (pages already loaded)
+  const bookData = book.data as Record<string, unknown>
+  const pages = bookData?.pages as unknown[] | undefined
+  return { ...book, page_count: pages?.length ?? 0, _mode: 'full' as const }
+}
+
+/** Cached version for public books (no user context) */
+const getCachedBookShell = unstable_cache(
+  async (slug: string) => fetchBookShell(slug, null),
+  ['book-shell'],
+  { revalidate: 3600, tags: ['book-shell'] },
+)
+
+/** Fetch initial pages (first batch) for SSR */
+async function fetchInitialPages(bookId: string, userId: string | null) {
+  const supabase = await createClient()
+  const { data: pages, error } = await supabase.rpc('get_book_pages', {
+    p_book_id: bookId,
+    p_user_id: userId,
+    p_offset: 0,
+    p_limit: 4,
   })
 
   if (error) {
-    console.error('[book] get_book_by_slug failed:', error.message)
-    return { book: null, currentUserId, dbError: true }
+    console.warn('[book] get_book_pages failed, skipping lazy load:', error.message)
+    return null // null = RPC doesn't exist, use full data
   }
 
-  // RPC returns array (RETURNS TABLE), take first row
-  const book = Array.isArray(data) ? data[0] : data
-  return { book: book ?? null, currentUserId, dbError: false }
+  return (pages || []).map((row: { page_data: unknown }) => row.page_data)
+}
+
+async function getBook(slug: string) {
+  const currentUserId = await getCurrentUserId()
+
+  // Try cached shell first (works for public books)
+  let shell = await getCachedBookShell(slug)
+
+  // If no cached result, try with user auth (private book)
+  if (!shell && currentUserId) {
+    shell = await fetchBookShell(slug, currentUserId)
+  }
+
+  if (!shell) {
+    return { shell: null, initialPages: null, currentUserId, dbError: false }
+  }
+
+  // If full mode (fallback), pages are already in the data — no lazy load needed
+  if (shell._mode === 'full') {
+    return { shell, initialPages: null, currentUserId, dbError: false }
+  }
+
+  // Shell mode: fetch first batch of pages for lazy loading
+  const initialPages = await fetchInitialPages(shell.id as string, currentUserId ?? null)
+
+  return { shell, initialPages, currentUserId, dbError: false }
 }
 
 export async function generateMetadata({ params }: BookPageProps): Promise<Metadata> {
   const { slug } = await params
-  const { book } = await getBook(slug)
 
-  if (!book) {
+  // Use cached shell for metadata (fast, no pages needed)
+  let shell = await getCachedBookShell(slug)
+  if (!shell) {
+    const currentUserId = await getCurrentUserId()
+    if (currentUserId) {
+      shell = await fetchBookShell(slug, currentUserId)
+    }
+  }
+
+  if (!shell) {
     return { title: 'Story Studio' }
   }
 
-  const bookData = book.data as Record<string, unknown>
+  const bookData = shell.data as Record<string, unknown>
   const concept = bookData.concept as Record<string, unknown> | undefined
   const sections = concept?.sections as Record<string, unknown> | undefined
-  const pages = bookData.pages as { imageUrl?: string }[] | undefined
   const title = (bookData.title as string) || 'Untitled'
   const description = (sections?.premise as string) || 'An AI-generated story book'
-  const coverImage = (bookData.coverImageUrl as string) || pages?.[0]?.imageUrl || undefined
+  const coverImage = (bookData.coverImageUrl as string) || undefined
 
   return {
     title: `${title} | Story Studio`,
@@ -106,10 +187,10 @@ function BookPageShell({ children }: { children: React.ReactNode }) {
 
 export default async function BookPage({ params }: BookPageProps) {
   const { slug } = await params
-  const { book, currentUserId, dbError } = await getBook(slug)
+  const { shell, initialPages, currentUserId } = await getBook(slug)
 
-  // DB timed out — fall back to client-side loading from localStorage / API retry
-  if (!book && dbError) {
+  // No shell found — try full fallback (client-side loading)
+  if (!shell) {
     return (
       <BookPageShell>
         <BookReaderFallback slug={slug} />
@@ -117,40 +198,17 @@ export default async function BookPage({ params }: BookPageProps) {
     )
   }
 
-  // Genuinely not found (DB worked but no matching book)
-  if (!book) {
-    return (
-      <BookPageShell>
-        <div className="text-center py-20">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-            <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-            </svg>
-          </div>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Book Not Found</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">This story may have been removed or the link is incorrect.</p>
-          <Link
-            href="/tools/story-studio"
-            className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
-          >
-            Back to Story Studio
-          </Link>
-        </div>
-      </BookPageShell>
-    )
-  }
-
-  const bookData = book.data as Record<string, unknown>
+  const bookData = shell.data as Record<string, unknown>
   const concept = bookData.concept as Record<string, unknown> | undefined
   const sections = concept?.sections as Record<string, unknown> | undefined
-  const pages = bookData.pages as { imageUrl?: string }[] | undefined
   const title = (bookData.title as string) || 'Untitled'
   const authors = (bookData.authors as string[]) || []
   const premise = (sections?.premise as string) || ''
-  const coverImage = (bookData.coverImageUrl as string) || pages?.[0]?.imageUrl || null
+  const coverImage = (bookData.coverImageUrl as string) || null
 
-  const isOwner = !!(currentUserId && book.user_id === currentUserId)
-  const bookId = book.id as string
+  const isOwner = !!(currentUserId && shell.user_id === currentUserId)
+  const bookId = shell.id as string
+  const pageCount = (shell.page_count as number) || 0
 
   return (
     <BookPageShell>
@@ -162,8 +220,16 @@ export default async function BookPage({ params }: BookPageProps) {
         {coverImage && <img src={coverImage} alt={title} />}
       </div>
 
-      {/* Interactive reader (client component) */}
-      <BookReaderClient bookData={bookData} bookId={bookId} isOwner={isOwner} />
+      {/* Interactive reader (client component) — receives shell + initial pages */}
+      <BookReaderClient
+        bookData={bookData}
+        bookId={bookId}
+        isOwner={isOwner}
+        {...(initialPages !== null ? {
+          initialPages: initialPages as Record<string, unknown>[],
+          pageCount,
+        } : {})}
+      />
     </BookPageShell>
   )
 }

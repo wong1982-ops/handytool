@@ -1,23 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useCredits } from '@/lib/hooks/use-credits'
 import { CREDIT_PACKS } from '@/lib/stripe/config'
 import { signInWithOAuth } from '@/lib/supabase/auth'
 
-type ViewId = 'overview' | 'plans' | 'packs' | 'history'
-
-const SWIPE_THRESHOLD = 60
-const VELOCITY_THRESHOLD = 500
-
-interface Tier {
-  id: string
-  name: string
-  monthly_credits: number
-  price_cents: number
-  features: string[]
-}
+type ViewId = 'overview' | 'packs' | 'history'
 
 interface Transaction {
   id: string
@@ -25,6 +15,12 @@ interface Transaction {
   amount: number
   description: string
   created_at: string
+  metadata?: {
+    reservation_id?: string
+    book_slug?: string
+    book_title?: string
+    book_deleted?: boolean
+  }
 }
 
 const typeLabel: Record<string, string> = {
@@ -47,34 +43,13 @@ export function BillingTab() {
   const { user, loading: authLoading } = useAuth()
   const { balance, loading: creditsLoading } = useCredits()
   const [activeView, setActiveView] = useState<ViewId>('overview')
-  const [swiping, setSwiping] = useState(false)
-  const [swipeX, setSwipeX] = useState(0)
 
-  const [tiers, setTiers] = useState<Tier[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [txPage, setTxPage] = useState(1)
   const [txTotal, setTxTotal] = useState(0)
   const [purchasing, setPurchasing] = useState<string | null>(null)
-  const [loadingPortal, setLoadingPortal] = useState(false)
 
   const txPerPage = 10
-
-  const touchRef = useRef<{
-    startX: number
-    startY: number
-    startTime: number
-    locked: 'x' | 'y' | null
-  } | null>(null)
-
-  // Fetch tiers
-  useEffect(() => {
-    fetch('/api/v1/credits/tiers')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((json) => {
-        if (json?.data?.tiers) setTiers(json.data.tiers)
-      })
-      .catch(() => {})
-  }, [])
 
   // Fetch transactions
   const fetchTransactions = useCallback(async (page: number) => {
@@ -113,22 +88,6 @@ export function BillingTab() {
     }
   }
 
-  const handleManageSubscription = async () => {
-    setLoadingPortal(true)
-    try {
-      const res = await fetch('/api/v1/billing/portal', { method: 'POST' })
-      if (!res.ok) throw new Error('Portal failed')
-      const json = await res.json()
-      if (json.data?.url) {
-        window.location.href = json.data.url
-      }
-    } catch {
-      alert('Failed to open billing portal. Please try again.')
-    } finally {
-      setLoadingPortal(false)
-    }
-  }
-
   const navigateTo = useCallback((view: ViewId) => {
     setActiveView(view)
   }, [])
@@ -137,84 +96,10 @@ export function BillingTab() {
     setActiveView('overview')
   }, [])
 
-  // Swipe-to-go-back handlers
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      if (activeView === 'overview') return
-      const touch = e.touches[0]
-      touchRef.current = {
-        startX: touch.clientX,
-        startY: touch.clientY,
-        startTime: Date.now(),
-        locked: null,
-      }
-      setSwiping(false)
-      setSwipeX(0)
-    },
-    [activeView],
-  )
-
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (activeView === 'overview' || !touchRef.current) return
-      const touch = e.touches[0]
-      const dx = touch.clientX - touchRef.current.startX
-      const dy = touch.clientY - touchRef.current.startY
-
-      if (!touchRef.current.locked) {
-        if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-          touchRef.current.locked = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
-        } else {
-          return
-        }
-      }
-
-      if (touchRef.current.locked === 'y') return
-      e.stopPropagation()
-
-      if (dx > 0) {
-        setSwiping(true)
-        setSwipeX(dx)
-      }
-    },
-    [activeView],
-  )
-
-  const handleTouchEnd = useCallback(() => {
-    if (activeView === 'overview' || !touchRef.current) return
-
-    if (touchRef.current.locked === 'x') {
-      const elapsed = (Date.now() - touchRef.current.startTime) / 1000
-      const velocity = elapsed > 0 ? swipeX / elapsed : 0
-
-      if (swipeX > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
-        goBack()
-      }
-    }
-
-    touchRef.current = null
-    setSwiping(false)
-    setSwipeX(0)
-  }, [activeView, swipeX, goBack])
-
   const txTotalPages = Math.ceil(txTotal / txPerPage)
   const isDrillDown = activeView !== 'overview'
-  const swipeOffset = swiping
-    ? (swipeX / (typeof window !== 'undefined' ? window.innerWidth : 375)) * 100
-    : 0
-  const translateX = isDrillDown ? -100 + swipeOffset : 0
 
   const MENU_ITEMS: { label: string; view: ViewId; icon: React.ReactNode; desc: string }[] = [
-    {
-      label: 'Subscription Plans',
-      view: 'plans',
-      desc: tiers.length > 0 ? `${tiers.length} plans available` : 'View plans',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-      ),
-    },
     {
       label: 'Buy Credit Packs',
       view: 'packs',
@@ -239,52 +124,6 @@ export function BillingTab() {
 
   // Sub-view content
   const viewContent: Record<Exclude<ViewId, 'overview'>, React.ReactNode> = {
-    plans: (
-      <div className="space-y-5">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Subscription Plans</h2>
-          <p className="text-xs text-slate-500 mt-1">Choose a plan that fits your usage.</p>
-        </div>
-        {tiers.length === 0 ? (
-          <div className="p-6 text-center text-slate-400 text-sm">No plans available yet.</div>
-        ) : (
-          <div className="space-y-3">
-            {tiers.map((tier) => (
-              <div key={tier.id} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-bold text-slate-900 dark:text-white">{tier.name}</h3>
-                  <span className="text-lg font-bold text-[#3D6AF2]">
-                    ${(tier.price_cents / 100).toFixed(2)}
-                    <span className="text-xs font-normal text-slate-500">/mo</span>
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-                  {tier.monthly_credits.toLocaleString()} credits/month
-                </p>
-                <ul className="space-y-1.5 mb-3">
-                  {tier.features.map((feat, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
-                      <svg className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      {feat}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={handleManageSubscription}
-                  disabled={loadingPortal}
-                  className="w-full py-2.5 rounded-lg bg-[#3D6AF2] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
-                  style={{ minHeight: '44px' }}
-                >
-                  {loadingPortal ? 'Loading...' : 'Manage Subscription'}
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    ),
     packs: (
       <div className="space-y-5">
         <div>
@@ -330,9 +169,12 @@ export function BillingTab() {
                 {transactions.map((tx) => (
                   <div key={tx.id} className="px-4 py-3 flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                        {tx.description}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                          <MobileTransactionDescription tx={tx} />
+                        </p>
+                        <MobileTransactionBadge tx={tx} />
+                      </div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         <span className={typeColor[tx.type] || ''}>{typeLabel[tx.type] || tx.type}</span>{' '}
                         {new Date(tx.created_at).toLocaleDateString()}
@@ -383,7 +225,7 @@ export function BillingTab() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-              Sign in to manage your credits and subscriptions.
+              Sign in to manage your credits.
             </p>
             <div className="flex flex-col gap-3">
               <button
@@ -419,17 +261,12 @@ export function BillingTab() {
   }
 
   return (
-    <div
-      className="overflow-hidden h-full"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
+    <div className="overflow-hidden h-full">
       <div
         className="flex h-full"
         style={{
-          transform: `translateX(${translateX}%)`,
-          transition: swiping ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
+          transform: `translateX(${isDrillDown ? -100 : 0}%)`,
+          transition: 'transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
           willChange: 'transform',
         }}
       >
@@ -514,5 +351,45 @@ export function BillingTab() {
         </div>
       </div>
     </div>
+  )
+}
+
+function MobileTransactionDescription({ tx }: { tx: Transaction }) {
+  const bookSlug = tx.metadata?.book_slug
+  const bookTitle = tx.metadata?.book_title
+  const isDeleted = tx.metadata?.book_deleted
+
+  if (bookTitle && bookSlug && !isDeleted) {
+    return (
+      <Link
+        href={`/tools/story-studio/book/${bookSlug}`}
+        className="text-[#3D6AF2] hover:underline"
+      >
+        {tx.description}
+      </Link>
+    )
+  }
+
+  return <>{tx.description}</>
+}
+
+function MobileTransactionBadge({ tx }: { tx: Transaction }) {
+  const isDeleted = tx.metadata?.book_deleted
+  const hasBook = tx.metadata?.book_slug
+
+  if (!hasBook) return null
+
+  if (isDeleted) {
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-red-500/10 text-red-500 dark:bg-red-500/20 shrink-0">
+        Deleted
+      </span>
+    )
+  }
+
+  return (
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/20 shrink-0">
+      Active
+    </span>
   )
 }

@@ -98,7 +98,7 @@ export function PricingDrawer({ open, onClose }: PricingDrawerProps) {
         <div className="sticky top-0 z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 px-5 py-4 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">Pricing</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Plans & credit packs</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Buy credit packs</p>
           </div>
           <button
             onClick={onClose}

@@ -17,6 +17,7 @@ export default function SeriesListPage() {
   const [error, setError] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [deleteInput, setDeleteInput] = useState('')
+  const [rephrasing, setRephrasing] = useState<'description' | 'setting' | null>(null)
 
   if (needsAuth || (!authLoading && !user && process.env.NODE_ENV !== 'development')) {
     return (
@@ -42,6 +43,26 @@ export default function SeriesListPage() {
         </button>
       </div>
     )
+  }
+
+  const handleRephrase = async (field: 'description' | 'setting') => {
+    const text = form[field].trim()
+    if (!text || text.length < 5 || rephrasing) return
+    setRephrasing(field)
+    try {
+      const res = await fetch('/api/v1/story/rephrase-plot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plot: text }),
+      })
+      if (res.ok) {
+        const { data } = await res.json()
+        if (data?.rephrasedPlot) {
+          setForm(f => ({ ...f, [field]: data.rephrasedPlot }))
+        }
+      }
+    } catch { /* silently fail */ }
+    finally { setRephrasing(null) }
   }
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -238,11 +259,9 @@ export default function SeriesListPage() {
       {showCreate && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
-          onClick={() => setShowCreate(false)}
         >
           <div
             className="w-full max-w-lg rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-6"
-            onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Create New Series</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
@@ -277,27 +296,71 @@ export default function SeriesListPage() {
                 </label>
                 <textarea
                   required
-                  rows={2}
+                  rows={3}
                   value={form.description}
                   onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder="What is this series about?"
+                  placeholder="What is this series about? Describe the world, characters, and themes..."
                   className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none"
+                  disabled={rephrasing === 'description'}
                 />
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-[11px] text-slate-400">{form.description.length} characters</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRephrase('description')}
+                    disabled={form.description.trim().length < 5 || rephrasing !== null}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors disabled:opacity-40 disabled:cursor-default cursor-pointer"
+                  >
+                    {rephrasing === 'description' ? (
+                      <>
+                        <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+                        Rephrasing...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" /></svg>
+                        Rephrase with AI
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">1 credit</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Setting
                 </label>
-                <input
-                  type="text"
+                <textarea
                   required
+                  rows={2}
                   value={form.setting}
                   onChange={(e) => setForm(f => ({ ...f, setting: e.target.value }))}
-                  placeholder="e.g. Modern-day suburb, magical forest, space station"
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-                  style={{ minHeight: '44px' }}
+                  placeholder="e.g. A cozy modern-day suburb where magic hides in everyday objects..."
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none"
+                  disabled={rephrasing === 'setting'}
                 />
+                <div className="flex items-center justify-end mt-1">
+                  <button
+                    type="button"
+                    onClick={() => handleRephrase('setting')}
+                    disabled={form.setting.trim().length < 5 || rephrasing !== null}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors disabled:opacity-40 disabled:cursor-default cursor-pointer"
+                  >
+                    {rephrasing === 'setting' ? (
+                      <>
+                        <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+                        Rephrasing...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" /></svg>
+                        Rephrase with AI
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">1 credit</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div>

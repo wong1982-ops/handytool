@@ -1,9 +1,14 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
+import { createClient } from '@/lib/supabase/server'
+import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+const REPHRASE_CREDIT_COST = 1
 
 export async function POST(request: Request) {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
   let body: { plot: string }
   try {
     body = await request.json()
@@ -14,6 +19,24 @@ export async function POST(request: Request) {
   const plot = body.plot?.trim()
   if (!plot || plot.length < 10) {
     return apiError('Plot must be at least 10 characters', 'VALIDATION_ERROR', 400)
+  }
+
+  const supabase = await createClient()
+
+  // Deduct 1 credit
+  const { error: deductError } = await supabase.rpc('deduct_credits', {
+    p_user_id: userId,
+    p_amount: REPHRASE_CREDIT_COST,
+    p_tool_id: 'story-rephrase',
+    p_description: 'Story Studio — Rephrase plot with AI',
+  })
+
+  if (deductError) {
+    if (deductError.message?.includes('insufficient_credits')) {
+      return apiError('Insufficient credits', 'INSUFFICIENT_CREDITS', 402, { required: REPHRASE_CREDIT_COST })
+    }
+    console.error('rephrase-plot deduct error:', deductError)
+    return API_ERRORS.INTERNAL()
   }
 
   try {

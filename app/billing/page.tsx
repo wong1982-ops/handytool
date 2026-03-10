@@ -1,18 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useCredits } from '@/lib/hooks/use-credits'
 import { CREDIT_PACKS } from '@/lib/stripe/config'
 import { signInWithOAuth } from '@/lib/supabase/auth'
-
-interface Tier {
-  id: string
-  name: string
-  monthly_credits: number
-  price_cents: number
-  features: string[]
-}
 
 interface Transaction {
   id: string
@@ -20,27 +13,23 @@ interface Transaction {
   amount: number
   description: string
   created_at: string
+  metadata?: {
+    reservation_id?: string
+    book_slug?: string
+    book_title?: string
+    book_deleted?: boolean
+  }
 }
 
 export default function BillingPage() {
   const { user } = useAuth()
   const { balance, loading: creditsLoading } = useCredits()
-  const [tiers, setTiers] = useState<Tier[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [txPage, setTxPage] = useState(1)
   const [txTotal, setTxTotal] = useState(0)
   const [purchasing, setPurchasing] = useState<string | null>(null)
-  const [loadingPortal, setLoadingPortal] = useState(false)
 
   const txPerPage = 10
-
-  // Fetch tiers
-  useEffect(() => {
-    fetch('/api/v1/credits/tiers')
-      .then((r) => r.ok ? r.json() : null)
-      .then((json) => { if (json?.data?.tiers) setTiers(json.data.tiers) })
-      .catch(() => {})
-  }, [])
 
   // Fetch transactions
   const fetchTransactions = useCallback(async (page: number) => {
@@ -75,23 +64,6 @@ export default function BillingPage() {
       alert('Failed to start checkout. Please try again.')
     } finally {
       setPurchasing(null)
-    }
-  }
-
-  // Open Stripe customer portal
-  const handleManageSubscription = async () => {
-    setLoadingPortal(true)
-    try {
-      const res = await fetch('/api/v1/billing/portal', { method: 'POST' })
-      if (!res.ok) throw new Error('Portal failed')
-      const json = await res.json()
-      if (json.data?.url) {
-        window.location.href = json.data.url
-      }
-    } catch {
-      alert('Failed to open billing portal. Please try again.')
-    } finally {
-      setLoadingPortal(false)
     }
   }
 
@@ -132,8 +104,8 @@ export default function BillingPage() {
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
             {user
-              ? 'Manage your subscription, purchase credits, and view transaction history.'
-              : 'View our plans and pricing. Sign in when you\'re ready to purchase.'}
+              ? 'Purchase credits and view transaction history.'
+              : 'View our pricing. Sign in when you\'re ready to purchase.'}
           </p>
         </div>
 
@@ -174,49 +146,6 @@ export default function BillingPage() {
               highlight
             />
           </div>
-        )}
-
-        {/* Subscription tiers */}
-        {tiers.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-              Subscription Plans
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {tiers.map((tier) => (
-                <div
-                  key={tier.id}
-                  className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 flex flex-col"
-                >
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">{tier.name}</h3>
-                  <p className="text-2xl font-bold text-[#3D6AF2] mt-2">
-                    ${(tier.price_cents / 100).toFixed(2)}
-                    <span className="text-sm font-normal text-slate-500">/mo</span>
-                  </p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    {tier.monthly_credits.toLocaleString()} credits/month
-                  </p>
-                  <ul className="mt-4 space-y-2 flex-1">
-                    {tier.features.map((feat, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
-                        <svg className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        {feat}
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    onClick={() => requireAuth(handleManageSubscription)}
-                    disabled={loadingPortal}
-                    className="mt-4 w-full py-2.5 rounded-lg bg-[#3D6AF2] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
-                  >
-                    {loadingPortal ? 'Loading...' : user ? 'Manage Subscription' : 'Sign in to Subscribe'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
         )}
 
         {/* Credit packs */}
@@ -274,6 +203,7 @@ export default function BillingPage() {
                         <th className="px-4 py-3 font-semibold text-slate-500 dark:text-slate-400">Date</th>
                         <th className="px-4 py-3 font-semibold text-slate-500 dark:text-slate-400">Type</th>
                         <th className="px-4 py-3 font-semibold text-slate-500 dark:text-slate-400">Description</th>
+                        <th className="px-4 py-3 font-semibold text-slate-500 dark:text-slate-400">Status</th>
                         <th className="px-4 py-3 font-semibold text-slate-500 dark:text-slate-400 text-right">Credits</th>
                       </tr>
                     </thead>
@@ -287,7 +217,10 @@ export default function BillingPage() {
                             {typeLabel[tx.type] || tx.type}
                           </td>
                           <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
-                            {tx.description}
+                            <TransactionDescription tx={tx} />
+                          </td>
+                          <td className="px-4 py-3">
+                            <TransactionBadge tx={tx} />
                           </td>
                           <td className={`px-4 py-3 text-right font-semibold ${tx.amount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
                             {tx.amount >= 0 ? '+' : ''}{tx.amount}
@@ -303,9 +236,12 @@ export default function BillingPage() {
                   {transactions.map((tx) => (
                     <div key={tx.id} className="px-4 py-3 flex items-center justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                          {tx.description}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                            <TransactionDescription tx={tx} />
+                          </p>
+                          <TransactionBadge tx={tx} />
+                        </div>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                           <span className={typeColor[tx.type] || ''}>{typeLabel[tx.type] || tx.type}</span>
                           {' '}
@@ -347,6 +283,47 @@ export default function BillingPage() {
         </section>}
       </div>
     </div>
+  )
+}
+
+function TransactionDescription({ tx }: { tx: Transaction }) {
+  const bookSlug = tx.metadata?.book_slug
+  const bookTitle = tx.metadata?.book_title
+  const isDeleted = tx.metadata?.book_deleted
+
+  // If there's a linked book, show as link (if active) or plain text (if deleted)
+  if (bookTitle && bookSlug && !isDeleted) {
+    return (
+      <Link
+        href={`/tools/story-studio/book/${bookSlug}`}
+        className="text-[#3D6AF2] hover:underline"
+      >
+        {tx.description}
+      </Link>
+    )
+  }
+
+  return <>{tx.description}</>
+}
+
+function TransactionBadge({ tx }: { tx: Transaction }) {
+  const isDeleted = tx.metadata?.book_deleted
+  const hasBook = tx.metadata?.book_slug
+
+  if (!hasBook) return null
+
+  if (isDeleted) {
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-red-500/10 text-red-500 dark:bg-red-500/20">
+        Deleted
+      </span>
+    )
+  }
+
+  return (
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/20">
+      Active
+    </span>
   )
 }
 

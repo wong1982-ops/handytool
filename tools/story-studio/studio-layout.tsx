@@ -64,7 +64,7 @@ export function StudioLayout({ children, bookCount }: StudioLayoutProps) {
               <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-amber-400 rounded-full animate-pulse" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>
+              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
                 Story Studio
               </h1>
               <p className="text-purple-300/70 text-sm mt-0.5">
@@ -168,9 +168,6 @@ export function StudioLayout({ children, bookCount }: StudioLayoutProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
               </svg>
               Scan
-              <span className="ml-auto text-[9px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded-full">
-                Pro
-              </span>
             </Link>
           </nav>
         </aside>

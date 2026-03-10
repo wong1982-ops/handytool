@@ -29,25 +29,44 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
   const series = Array.isArray(data) ? data[0] : data
 
-  // Fetch books in series
-  const { data: books } = await supabase
-    .from('books')
-    .select('id, slug, data, is_public, created_at')
-    .eq('series_id', id)
-    .order('created_at', { ascending: false })
+  // Fetch books in series — try lightweight RPC first, fall back to direct query
+  let bookItems: { id: string; slug: string; title: string; coverImageUrl: string | null; pageCount: number; isPublic: boolean; createdAt: string }[] = []
 
-  const bookItems = (books || []).map((b: Record<string, unknown>) => {
-    const bookData = b.data as Record<string, unknown> | undefined
-    return {
-      id: b.id,
-      slug: b.slug,
-      title: (bookData?.title as string) || 'Untitled',
-      coverImageUrl: (bookData?.coverImageUrl as string) || null,
-      pageCount: (bookData?.pages as unknown[])?.length || 0,
-      isPublic: b.is_public,
-      createdAt: b.created_at,
-    }
+  const { data: books, error: booksErr } = await supabase.rpc('get_series_books_lightweight', {
+    p_series_id: id,
   })
+
+  if (!booksErr && books) {
+    bookItems = (books || []).map((b: Record<string, unknown>) => ({
+      id: b.id as string,
+      slug: b.slug as string,
+      title: (b.title as string) || 'Untitled',
+      coverImageUrl: (b.cover_image_url as string) || null,
+      pageCount: (b.page_count as number) || 0,
+      isPublic: b.is_public as boolean,
+      createdAt: b.created_at as string,
+    }))
+  } else {
+    // Fallback: direct query (RPC may not exist yet)
+    const { data: fallbackBooks } = await supabase
+      .from('books')
+      .select('id, slug, data, is_public, created_at')
+      .eq('series_id', id)
+      .order('created_at', { ascending: false })
+
+    bookItems = (fallbackBooks || []).map((b: Record<string, unknown>) => {
+      const bd = b.data as Record<string, unknown> | undefined
+      return {
+        id: b.id as string,
+        slug: b.slug as string,
+        title: (bd?.title as string) || 'Untitled',
+        coverImageUrl: (bd?.coverImageUrl as string) || null,
+        pageCount: Array.isArray(bd?.pages) ? (bd.pages as unknown[]).length : 0,
+        isPublic: b.is_public as boolean,
+        createdAt: b.created_at as string,
+      }
+    })
+  }
 
   return apiSuccess({
     id: series.id,

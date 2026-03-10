@@ -78,7 +78,7 @@ export function DiscoveryPage() {
       </section>
 
       {/* Unified Sticky Filter Bar */}
-      <section className="sticky top-0 z-10 bg-slate-950/95 backdrop-blur-sm border-b border-slate-800">
+      <section className="sticky top-0 z-20 bg-slate-950/95 backdrop-blur-sm border-b border-slate-800">
         <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-2.5">
           {/* Row 1: Search + Category Tabs */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">

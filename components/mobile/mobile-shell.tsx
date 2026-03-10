@@ -9,6 +9,7 @@ import { TabSwipeContainer } from '@/components/mobile/tab-swipe-container'
 import { FavoritesTab } from '@/components/mobile/favorites-tab'
 import { BillingTab } from '@/components/mobile/billing-tab'
 import { ProfileTab } from '@/components/mobile/profile-tab'
+import { ToolsTab } from '@/components/mobile/tools-tab'
 
 interface MobileShellProps {
   children: React.ReactNode // the tools content (existing page)
@@ -51,8 +52,8 @@ export function MobileShell({ children }: MobileShellProps) {
       <MobileHeader dark={dark} onToggleTheme={toggleTheme} />
 
       <TabSwipeContainer activeTab={activeTab} onTabChange={handleTabChange}>
-        {/* Tools tab — render the existing page content */}
-        <div className="pb-16">{children}</div>
+        {/* Tools tab — drill-down navigation with back button */}
+        <div className="pb-16"><ToolsTab>{children}</ToolsTab></div>
 
         {/* Favorites tab */}
         <div className="pb-16"><FavoritesTab onNavigate={() => handleTabChange('tools')} /></div>

@@ -668,6 +668,7 @@ When adding a new tool to toolk1t-client, EVERY item below must be addressed bef
 - [ ] Copy-to-clipboard uses same toast pattern as other tools
 - [ ] Export/download follows same Blob+anchor pattern
 - [ ] Toolbar/action bar layout matches existing tools (horizontal, grouped, icon+label)
+- [ ] **Credit costs always use badge styling** — never plain text. Use amber pill badge: `inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40`. Inside gradient buttons, use semi-transparent white badge: `bg-white/20 border border-white/30`.
 
 ### Graceful Error Handling (see Graceful Error Handling section)
 

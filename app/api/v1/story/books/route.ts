@@ -8,58 +8,62 @@ export async function GET() {
   if (!effectiveUserId) return apiSuccess([])
 
   const supabase = await createClient()
-  // Use RPC to bypass RLS (needed in dev when no auth session)
-  const { data: books, error } = await supabase.rpc('get_user_books', {
+
+  // Try lightweight bookshelf RPC first
+  const { data: books, error } = await supabase.rpc('get_user_bookshelf', {
     p_user_id: effectiveUserId,
   })
 
-  if (error) {
-    console.error('story/books: fetch failed', error)
+  if (!error && books) {
+    // Map DB column names to camelCase for client
+    const list = (books || []).map((b: Record<string, unknown>) => ({
+      id: b.id,
+      slug: b.slug,
+      title: b.title || 'Untitled',
+      authors: (b.authors as string[]) || ['AI'],
+      coverImageUrl: (b.cover_image_url as string) || null,
+      audience: b.audience || '',
+      style: b.style || '',
+      pageCount: b.page_count || 0,
+      isPublic: b.is_public,
+      createdAt: b.created_at,
+      seriesId: (b.series_id as string) || null,
+      seriesTitle: (b.series_title as string) || null,
+    }))
+
+    return apiSuccess(list)
+  }
+
+  // Fallback: direct query (RPC may not exist yet)
+  console.warn('story/books: get_user_bookshelf RPC failed, using fallback', error?.message)
+  const { data: fallbackBooks, error: fbErr } = await supabase
+    .from('books')
+    .select('id, slug, data, is_public, created_at, series_id')
+    .eq('user_id', effectiveUserId)
+    .order('created_at', { ascending: false })
+
+  if (fbErr) {
+    console.error('story/books: fallback fetch failed', fbErr)
     return API_ERRORS.INTERNAL()
   }
 
-  // Collect unique series IDs to fetch their titles
-  const seriesIds = [...new Set(
-    (books || [])
-      .map((b: Record<string, unknown>) => b.series_id as string | null)
-      .filter(Boolean) as string[]
-  )]
-
-  let seriesTitles: Record<string, string> = {}
-  if (seriesIds.length > 0) {
-    const { data: seriesData } = await supabase
-      .from('series')
-      .select('id, title')
-      .in('id', seriesIds)
-
-    if (seriesData) {
-      for (const s of seriesData) {
-        seriesTitles[s.id] = s.title
-      }
-    }
-  }
-
-  // Return lightweight list (title, slug, cover, tags, dates, series info)
-  const list = (books || []).map((b: Record<string, unknown>) => {
-    const bookData = b.data as Record<string, unknown>
-    const concept = bookData.concept as Record<string, unknown> | undefined
+  const list = (fallbackBooks || []).map((b: Record<string, unknown>) => {
+    const bd = b.data as Record<string, unknown> | undefined
+    const concept = bd?.concept as Record<string, unknown> | undefined
     const tags = concept?.tags as Record<string, unknown> | undefined
-    const pages = bookData.pages as { imageUrl?: string }[] | undefined
-    const bSeriesId = b.series_id as string | null
-
     return {
       id: b.id,
       slug: b.slug,
-      title: bookData.title || 'Untitled',
-      authors: (bookData.authors as string[]) || [],
-      coverImageUrl: (bookData.coverImageUrl as string) || pages?.[0]?.imageUrl || null,
-      audience: tags?.audience || '',
-      style: tags?.style || '',
-      pageCount: pages?.length || 0,
+      title: (bd?.title as string) || 'Untitled',
+      authors: (bd?.authors as string[]) || ['AI'],
+      coverImageUrl: (bd?.coverImageUrl as string) || null,
+      audience: (tags?.audience as string) || '',
+      style: (tags?.style as string) || '',
+      pageCount: Array.isArray(bd?.pages) ? (bd.pages as unknown[]).length : 0,
       isPublic: b.is_public,
       createdAt: b.created_at,
-      seriesId: bSeriesId || null,
-      seriesTitle: bSeriesId ? (seriesTitles[bSeriesId] || null) : null,
+      seriesId: (b.series_id as string) || null,
+      seriesTitle: null,
     }
   })
 

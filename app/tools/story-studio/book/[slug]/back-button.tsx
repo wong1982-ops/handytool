@@ -9,17 +9,22 @@ export function BackButton() {
 
   useEffect(() => {
     // Check if user navigated here from within the app
-    // history.length > 1 means there's a previous page in this tab
-    // document.referrer check ensures they came from the same origin
     const sameOrigin = document.referrer.startsWith(window.location.origin)
     setHasHistory(sameOrigin && window.history.length > 1)
   }, [])
 
-  if (!hasHistory) return null
+  const handleClick = () => {
+    if (hasHistory) {
+      router.back()
+    } else {
+      // No visit history — go to bookshelf as sensible default
+      router.push('/tools/story-studio')
+    }
+  }
 
   return (
     <button
-      onClick={() => router.back()}
+      onClick={handleClick}
       className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/60 transition-colors"
       style={{ minHeight: '40px' }}
     >

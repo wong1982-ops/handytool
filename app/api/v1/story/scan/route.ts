@@ -1,19 +1,15 @@
+import { createClient } from '@/lib/supabase/server'
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
-import { getUserEntitlements } from '@/lib/entitlements'
 import { extractStoryFromImages } from '@/lib/story/scan'
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/heic', 'image/webp']
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_SCAN_IMAGES = 10
+const SCAN_CREDIT_COST = 1
 
 export async function POST(request: Request) {
   const userId = await getAuthUserId()
   if (!userId) return API_ERRORS.UNAUTHORIZED()
-
-  // Check entitlements
-  const { tier, limits } = await getUserEntitlements(userId)
-  if (tier !== 'premium') {
-    return apiError('This is a premium feature. Upgrade to access Story Scanner.', 'PREMIUM_REQUIRED', 403)
-  }
 
   // Parse form data
   const contentType = request.headers.get('content-type')
@@ -29,13 +25,30 @@ export async function POST(request: Request) {
     return apiError('No images provided', 'VALIDATION_ERROR', 400)
   }
 
-  if (files.length > limits.scan_images) {
+  if (files.length > MAX_SCAN_IMAGES) {
     return apiError(
-      `Too many images. Your limit is ${limits.scan_images}.`,
+      `Too many images. Maximum is ${MAX_SCAN_IMAGES}.`,
       'IMAGE_LIMIT_EXCEEDED',
       400,
-      { limit: limits.scan_images, uploaded: files.length },
+      { limit: MAX_SCAN_IMAGES, uploaded: files.length },
     )
+  }
+
+  // Deduct credits
+  const supabase = await createClient()
+  const { error: deductError } = await supabase.rpc('deduct_credits', {
+    p_user_id: userId,
+    p_amount: SCAN_CREDIT_COST,
+    p_tool_id: 'story-scan',
+    p_description: `Story Studio — Scan ${files.length} page${files.length !== 1 ? 's' : ''}`,
+  })
+
+  if (deductError) {
+    if (deductError.message?.includes('insufficient_credits')) {
+      return apiError('Insufficient credits', 'INSUFFICIENT_CREDITS', 402, { required: SCAN_CREDIT_COST })
+    }
+    console.error('story/scan deduct error:', deductError)
+    return API_ERRORS.INTERNAL()
   }
 
   // Validate each file

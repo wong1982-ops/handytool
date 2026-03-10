@@ -16,7 +16,7 @@ export function BookReaderFallback({ slug }: FallbackProps) {
 
   useEffect(() => {
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 10000)
+    const timeout = setTimeout(() => controller.abort(), 30000)
 
     fetch(`/api/v1/story/books/by-slug/${slug}`, { signal: controller.signal })
       .then(async (res) => {

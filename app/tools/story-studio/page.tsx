@@ -12,7 +12,7 @@ import { GenerationProgress } from '@/tools/story-studio/generation-progress'
 import { BookViewer } from '@/tools/story-studio/book-viewer'
 import { BookEditor } from '@/tools/story-studio/book-editor'
 import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
-import type { StoryConcept } from '@/tools/story-studio/types'
+import type { StoryConcept, AppPhase } from '@/tools/story-studio/types'
 import { signInWithOAuth } from '@/lib/supabase/auth'
 import Link from 'next/link'
 
@@ -89,6 +89,15 @@ function StoryStudioContent() {
     }
     prevPhaseRef.current = phase
   }, [phase, book, creditsUsed, addBook, reset])
+
+  // Track the highest phase the user has reached (for wizard step navigation)
+  const [highestPhase, setHighestPhase] = useState<AppPhase>('input')
+  const phaseOrder: AppPhase[] = ['input', 'refine', 'generating', 'viewer']
+  useEffect(() => {
+    const currentIdx = phaseOrder.indexOf(phase)
+    const highestIdx = phaseOrder.indexOf(highestPhase)
+    if (currentIdx > highestIdx) setHighestPhase(phase)
+  }, [phase])
 
   const isDev = process.env.NODE_ENV === 'development'
 
@@ -172,7 +181,7 @@ function StoryStudioContent() {
               <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-amber-400 rounded-full animate-pulse" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>
+              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
                 Story Studio
               </h1>
               <p className="text-purple-300/70 text-sm mt-0.5">
@@ -268,9 +277,6 @@ function StoryStudioContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
               </svg>
               Scan
-              <span className="ml-auto text-[9px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded-full">
-                Pro
-              </span>
             </Link>
           </nav>
 
@@ -321,80 +327,105 @@ function StoryStudioContent() {
                 </div>
               ) : null}
 
-              {/* Series picker / active series banner */}
-              {phase === 'input' && (
-                <>
-                  {seriesId && seriesDetail ? (
-                    /* Active series banner with character previews */
-                    <div className="mb-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 overflow-hidden">
-                      <div className="p-4 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center flex-shrink-0">
-                            <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-                            </svg>
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300 truncate">
-                              Creating for: {seriesDetail.title}
-                            </p>
-                            <p className="text-xs text-indigo-600/80 dark:text-indigo-400/80">
-                              {seriesDetail.artStyle} &middot; {seriesDetail.setting}
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => { setSeriesId(null); window.history.replaceState(null, '', '/tools/story-studio') }}
-                          className="text-xs text-indigo-500 hover:text-indigo-700 dark:hover:text-indigo-300 cursor-pointer whitespace-nowrap shrink-0"
-                          style={{ minHeight: '32px' }}
-                        >
-                          Clear
-                        </button>
-                      </div>
-                      {/* Character portraits row */}
-                      {seriesDetail.characters.length > 0 && (
-                        <div className="px-4 pb-3 flex items-center gap-3 overflow-x-auto">
-                          {seriesDetail.characters.filter(c => c.status === 'approved').map((c) => (
-                            <div key={c.id} className="flex items-center gap-2 shrink-0">
-                              {c.referenceImageUrl ? (
-                                <img src={c.referenceImageUrl} alt={c.name} className="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-slate-800" />
-                              ) : (
-                                <div className="w-8 h-8 rounded-full bg-indigo-200 dark:bg-indigo-800 flex items-center justify-center border-2 border-white dark:border-slate-800">
-                                  <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-300">{c.name.charAt(0)}</span>
-                                </div>
-                              )}
-                              <span className="text-xs text-indigo-700 dark:text-indigo-300 font-medium">{c.name}</span>
-                              {c.voice && (
-                                <span className="text-[10px] text-indigo-500 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/40 px-1.5 py-0.5 rounded-full">{c.voice}</span>
-                              )}
-                            </div>
-                          ))}
-                          {seriesDetail.characters.filter(c => c.status !== 'approved').length > 0 && (
-                            <span className="text-[10px] text-indigo-400 dark:text-indigo-500 italic shrink-0">
-                              +{seriesDetail.characters.filter(c => c.status !== 'approved').length} draft
-                            </span>
+              {/* Wizard step indicator — clickable to jump between steps */}
+              {activeView === 'create' && (
+                <div className="mb-6">
+                  <div className="flex items-center gap-1">
+                    {([
+                      { id: 'input' as const, label: 'Write Plot', icon: (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                        </svg>
+                      )},
+                      { id: 'refine' as const, label: 'Refine', icon: (
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                        </svg>
+                      )},
+                      { id: 'generating' as const, label: 'Generate', icon: (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+                        </svg>
+                      )},
+                      { id: 'viewer' as const, label: 'Review', icon: (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                        </svg>
+                      )},
+                    ]).map((step, i, arr) => {
+                      const phaseOrder = ['input', 'refine', 'generating', 'viewer']
+                      const currentIndex = phaseOrder.indexOf(phase)
+                      const stepIndex = phaseOrder.indexOf(step.id)
+                      const highestIndex = phaseOrder.indexOf(highestPhase)
+                      const isActive = step.id === phase
+                      const isCompleted = stepIndex < currentIndex
+                      const isReachable = stepIndex <= highestIndex
+                      const isGenerating = phase === 'generating'
+                      const isClickable = (isReachable || step.id === 'input') && !isActive && !isGenerating
+
+                      return (
+                        <div key={step.id} className="flex items-center gap-1 flex-1">
+                          {i > 0 && (
+                            <div className={`flex-1 h-px transition-colors ${isCompleted || isActive ? 'bg-purple-400/50 dark:bg-purple-500/30' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                          )}
+                          <button
+                            onClick={() => {
+                              if (!isClickable || loading || isGenerating) return
+                              // Jump to any previously reached phase — preserve data
+                              if (step.id === 'input') {
+                                setPhase('input')
+                              } else if (step.id === 'refine' && selectedConcept) {
+                                setPhase('refine')
+                              } else if (step.id === 'viewer' && book) {
+                                setPhase('viewer')
+                              }
+                            }}
+                            disabled={!isClickable || loading}
+                            className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
+                              isActive
+                                ? 'bg-gradient-to-r from-purple-500/15 to-amber-500/10 dark:from-purple-500/20 dark:to-amber-500/10 text-purple-700 dark:text-purple-300 ring-1 ring-purple-300/50 dark:ring-purple-700/50'
+                                : isCompleted
+                                  ? 'text-purple-500 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer'
+                                  : 'text-slate-400 dark:text-slate-600'
+                            } ${isClickable && !isActive ? 'cursor-pointer' : ''}`}
+                          >
+                            {isCompleted ? (
+                              <div className="w-4 h-4 rounded-full bg-purple-500 dark:bg-purple-400 flex items-center justify-center">
+                                <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                              </div>
+                            ) : (
+                              <span className={isActive ? 'text-purple-600 dark:text-purple-400' : ''}>{step.icon}</span>
+                            )}
+                            <span className="hidden sm:inline">{step.label}</span>
+                          </button>
+                          {i < arr.length - 1 && (
+                            <div className={`flex-1 h-px transition-colors ${isCompleted ? 'bg-purple-400/50 dark:bg-purple-500/30' : 'bg-slate-200 dark:bg-slate-700'}`} />
                           )}
                         </div>
-                      )}
-                    </div>
-                  ) : seriesLoading ? (
-                    /* Loading skeleton for series picker */
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Series picker — flat select / deselect cards */}
+              {phase === 'input' && (
+                <>
+                  {seriesLoading ? (
                     <div className="mb-4 animate-pulse">
                       <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-48 mb-3" />
                       <div className="flex gap-3 overflow-hidden">
                         {Array.from({ length: 3 }).map((_, i) => (
-                          <div key={i} className="w-48 shrink-0 rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700" />
-                              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20" />
-                            </div>
-                            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-full" />
+                          <div key={i} className="w-56 shrink-0 rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+                            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-28 mb-2" />
+                            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-20" />
                           </div>
                         ))}
                       </div>
                     </div>
                   ) : allSeries.length > 0 ? (
-                    /* Series picker — clickable cards */
                     <div className="mb-4">
                       <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2.5">
                         Use a series <span className="text-slate-400 dark:text-slate-500 font-normal">(optional)</span>
@@ -402,14 +433,43 @@ function StoryStudioContent() {
                       <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
                         {allSeries.map((s) => {
                           const approvedChars = s.characters.filter(c => c.status === 'approved')
+                          const isSelected = seriesId === s.id
                           return (
                             <button
                               key={s.id}
-                              onClick={() => setSeriesId(s.id)}
-                              className="shrink-0 w-56 text-left rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 hover:border-indigo-400 dark:hover:border-indigo-600 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-colors cursor-pointer group"
+                              onClick={() => {
+                                if (isSelected) {
+                                  setSeriesId(null)
+                                  window.history.replaceState(null, '', '/tools/story-studio')
+                                } else {
+                                  setSeriesId(s.id)
+                                }
+                              }}
+                              className={`relative shrink-0 w-56 text-left rounded-xl border p-3 transition-all duration-150 cursor-pointer group ${
+                                isSelected
+                                  ? 'border-indigo-500 dark:border-indigo-400 bg-indigo-50/80 dark:bg-indigo-900/20'
+                                  : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-600'
+                              }`}
                               style={{ minHeight: '44px' }}
                             >
-                              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                              {/* Selected indicator — top-right checkmark */}
+                              <div className={`absolute top-2.5 right-2.5 w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-150 ${
+                                isSelected
+                                  ? 'bg-indigo-500 dark:bg-indigo-400 border-indigo-500 dark:border-indigo-400'
+                                  : 'border-slate-300 dark:border-slate-600 group-hover:border-slate-400 dark:group-hover:border-slate-500'
+                              }`}>
+                                {isSelected && (
+                                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                  </svg>
+                                )}
+                              </div>
+
+                              <p className={`text-sm font-semibold truncate pr-7 transition-colors ${
+                                isSelected
+                                  ? 'text-indigo-700 dark:text-indigo-300'
+                                  : 'text-slate-900 dark:text-white'
+                              }`}>
                                 {s.title}
                               </p>
                               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
@@ -451,7 +511,7 @@ function StoryStudioContent() {
                   concept={selectedConcept}
                   onConceptUpdate={handleConceptUpdate}
                   onGenerate={handleGenerate}
-                  onBack={() => { setPhase('input'); setSelectedConcept(null) }}
+                  onBack={() => { setPhase('input') }}
                   loading={loading}
                 />
               )}

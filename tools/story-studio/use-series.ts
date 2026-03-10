@@ -71,18 +71,30 @@ export function useSeriesList() {
   useEffect(() => { fetchSeries() }, [fetchSeries])
 
   const createSeries = useCallback(async (input: { title: string; description: string; setting: string; artStyle: string }) => {
-    const res = await fetch('/api/v1/story/series', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input),
-    })
-    if (!res.ok) {
-      const err = await res.json().catch(() => null)
-      throw new Error(err?.error || 'Failed to create series')
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 15000)
+    try {
+      const res = await fetch('/api/v1/story/series', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+        signal: controller.signal,
+      })
+      clearTimeout(timeout)
+      if (!res.ok) {
+        const err = await res.json().catch(() => null)
+        throw new Error(err?.error || 'Failed to create series')
+      }
+      const { data } = await res.json()
+      await fetchSeries()
+      return data.id as string
+    } catch (err) {
+      clearTimeout(timeout)
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw new Error('Request timed out. Please try again.')
+      }
+      throw err
     }
-    const { data } = await res.json()
-    await fetchSeries()
-    return data.id as string
   }, [fetchSeries])
 
   const deleteSeries = useCallback(async (id: string) => {
