@@ -1,14 +1,14 @@
 /**
  * Generate pre-recorded voice samples for all 30 Gemini TTS voices.
- * Uploads WAV files to Supabase Storage at: voice-samples/{voiceName}.wav
+ * Uploads WAV files to Cloudflare R2 at: voice-samples/{voiceName}.wav
  *
  * Usage: npx tsx scripts/generate-voice-samples.ts
  *
- * Requires: GEMINI_API_KEY, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local
+ * Requires: GEMINI_API_KEY, R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY in .env.local
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { createClient } from '@supabase/supabase-js'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { GEMINI_VOICES } from '../lib/story/voices'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
@@ -27,13 +27,20 @@ for (const line of envContent.split('\n')) {
 }
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY!
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID!
+const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID!
+const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY!
+const R2_BUCKET = process.env.R2_BUCKET || 'story-assets'
+const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL || 'https://pub-8feef024ac6a4d26b109ddfe22f033c1.r2.dev'
 
 const SAMPLE_TEXT = "How are you? I'm your new character. Nice to meet you!"
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const r2 = new S3Client({
+  region: 'auto',
+  endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: { accessKeyId: R2_ACCESS_KEY_ID, secretAccessKey: R2_SECRET_ACCESS_KEY },
+})
 
 function pcmToWav(pcmBase64: string): Buffer {
   const pcmData = Buffer.from(pcmBase64, 'base64')
@@ -106,14 +113,13 @@ async function main() {
     try {
       const wav = await generateSample(voice.name)
 
-      const { error } = await supabase.storage
-        .from('story-assets')
-        .upload(filename, new Uint8Array(wav), {
-          contentType: 'audio/wav',
-          upsert: true,
-        })
-
-      if (error) throw new Error(`Upload failed: ${error.message}`)
+      await r2.send(new PutObjectCommand({
+        Bucket: R2_BUCKET,
+        Key: filename,
+        Body: wav,
+        ContentType: 'audio/wav',
+        CacheControl: 'public, max-age=31536000, immutable',
+      }))
 
       console.log(`OK (${(wav.length / 1024).toFixed(0)} KB)`)
       success++
@@ -130,9 +136,7 @@ async function main() {
   console.log(`Done! ${success} succeeded, ${failed} failed.`)
 
   // Print the base URL for reference
-  const { data } = supabase.storage.from('story-assets').getPublicUrl('voice-samples/zephyr.wav')
-  const baseUrl = data.publicUrl.replace('zephyr.wav', '')
-  console.log(`Base URL: ${baseUrl}`)
+  console.log(`Base URL: ${R2_PUBLIC_URL}/voice-samples/`)
 }
 
 main().catch(console.error)

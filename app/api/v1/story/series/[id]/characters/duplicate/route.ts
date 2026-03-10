@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { apiSuccess, apiError, getAuthUserId, API_ERRORS } from '@/lib/api/response'
+import { uploadToR2 } from '@/lib/storage/r2'
 import { z } from 'zod'
 
 interface RouteParams { params: Promise<{ id: string }> }
@@ -65,25 +66,15 @@ export async function POST(request: Request, { params }: RouteParams) {
         const imgBuffer = Buffer.from(await imgRes.arrayBuffer())
         const storagePath = `series/${targetSeriesId}/characters/${newCharId}.png`
 
-        // Upload to target location
-        await supabase.storage
-          .from('story-assets')
-          .upload(storagePath, imgBuffer, {
-            contentType: 'image/png',
-            upsert: true,
-          })
-
-        // Get public URL
-        const { data: urlData } = supabase.storage
-          .from('story-assets')
-          .getPublicUrl(storagePath)
+        // Upload to R2
+        const publicUrl = await uploadToR2(storagePath, imgBuffer, 'image/png', { upsert: true })
 
         // Update the character's reference image URL and status
         await supabase.rpc('update_series_character', {
           p_user_id: userId,
           p_series_id: targetSeriesId,
           p_character_id: newCharId,
-          p_reference_image_url: `${urlData.publicUrl}?t=${Date.now()}`,
+          p_reference_image_url: `${publicUrl}?t=${Date.now()}`,
           p_status: sourceChar.status === 'approved' ? 'approved' : 'draft',
         })
       }

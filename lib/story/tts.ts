@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { createClient } from '@/lib/supabase/server'
+import { uploadToR2 } from '@/lib/storage/r2'
 import type { Character, Dialogue } from '@/tools/story-studio/types'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
@@ -346,26 +346,11 @@ export async function generatePageAudio(input: TtsInput): Promise<TtsResult> {
     return { audioUrl: `data:${contentType};base64,${base64}`, provider }
   }
 
-  // Upload to Supabase storage
-  const supabase = await createClient()
+  // Upload to R2
   const filename = `audio/${input.bookId}/page-${input.pageNumber}.${fileExtension}`
+  const audioUrl = await uploadToR2(filename, audioBuffer, contentType, { upsert: true })
 
-  const { error: uploadError } = await supabase.storage
-    .from('story-assets')
-    .upload(filename, audioBuffer, {
-      contentType,
-      upsert: true,
-    })
-
-  if (uploadError) {
-    throw new Error(`Audio upload failed: ${uploadError.message}`)
-  }
-
-  const { data: urlData } = supabase.storage
-    .from('story-assets')
-    .getPublicUrl(filename)
-
-  return { audioUrl: urlData.publicUrl, provider }
+  return { audioUrl, provider }
 }
 
 // ---------------------------------------------------------------------------
@@ -449,26 +434,11 @@ export async function generateMultiVoicePageAudio(
     }
   }
 
-  // Upload to Supabase storage
-  const supabase = await createClient()
+  // Upload to R2
   const filename = `audio/${bookId}/page-${pageNumber}.${fileExtension}`
+  const audioUrl = await uploadToR2(filename, stitchedBuffer, contentType, { upsert: true })
 
-  const { error: uploadError } = await supabase.storage
-    .from('story-assets')
-    .upload(filename, stitchedBuffer, {
-      contentType,
-      upsert: true,
-    })
-
-  if (uploadError) {
-    throw new Error(`Audio upload failed: ${uploadError.message}`)
-  }
-
-  const { data: urlData } = supabase.storage
-    .from('story-assets')
-    .getPublicUrl(filename)
-
-  return { audioUrl: urlData.publicUrl, provider: detectedProvider }
+  return { audioUrl, provider: detectedProvider }
 }
 
 // ---------------------------------------------------------------------------

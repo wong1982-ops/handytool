@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { apiSuccess, getAuthUserId, API_ERRORS } from '@/lib/api/response'
+import { deleteFromR2 } from '@/lib/storage/r2'
 import { z } from 'zod'
 import { GEMINI_VOICE_NAMES } from '@/lib/story/tts'
 
@@ -51,8 +52,8 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
   const supabase = await createClient()
 
-  // Remove reference image from storage
-  await supabase.storage.from('story-assets').remove([`series/${seriesId}/characters/${charId}.png`])
+  // Remove reference image from R2
+  await deleteFromR2(`series/${seriesId}/characters/${charId}.png`)
 
   const { data, error } = await supabase.rpc('delete_series_character', {
     p_user_id: userId,

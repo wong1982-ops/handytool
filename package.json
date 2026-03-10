@@ -25,6 +25,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
     "@apidevtools/swagger-parser": "^12.1.0",
+    "@aws-sdk/client-s3": "^3.1005.0",
     "@codemirror/commands": "^6.10.2",
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/lang-xml": "^6.1.0",

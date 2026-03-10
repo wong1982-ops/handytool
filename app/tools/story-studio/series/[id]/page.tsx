@@ -9,7 +9,7 @@ import { StudioLayout } from '@/tools/story-studio/studio-layout'
 import { GEMINI_VOICES, VOICE_GENDERS, VOICE_AGES, VOICE_STYLES, type VoiceGender, type VoiceAge, type VoiceStyle } from '@/lib/story/voices'
 import { ART_STYLES } from '@/lib/story/styles'
 
-const VOICE_SAMPLE_BASE_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/story-assets/voice-samples/`
+const VOICE_SAMPLE_BASE_URL = `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL || 'https://pub-8feef024ac6a4d26b109ddfe22f033c1.r2.dev'}/voice-samples/`
 
 const FILTER_LABELS = {
   gender: { female: 'Female', male: 'Male' },

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { apiSuccess, apiError, getAuthUserId, API_ERRORS } from '@/lib/api/response'
+import { uploadToR2 } from '@/lib/storage/r2'
 import { z } from 'zod'
 import { generateCharacterReference } from '@/lib/story/illustrate'
 
@@ -117,27 +118,12 @@ ${feedback}`,
       throw new Error('Failed to generate character portrait')
     }
 
-    // Upload to Supabase Storage
+    // Upload to R2
     const storagePath = `series/${seriesId}/characters/${characterId}.png`
-    const { error: uploadError } = await supabase.storage
-      .from('story-assets')
-      .upload(storagePath, new Uint8Array(referenceBuffer), {
-        contentType: 'image/png',
-        upsert: true,
-      })
-
-    if (uploadError) {
-      console.error('Portrait upload error:', uploadError)
-      throw new Error('Failed to upload portrait')
-    }
-
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from('story-assets')
-      .getPublicUrl(storagePath)
+    const publicUrl = await uploadToR2(storagePath, Buffer.from(referenceBuffer), 'image/png', { upsert: true })
 
     // Append cache-busting timestamp so browser doesn't serve stale cached portrait
-    const referenceImageUrl = `${urlData.publicUrl}?t=${Date.now()}`
+    const referenceImageUrl = `${publicUrl}?t=${Date.now()}`
 
     // Update character via RPC (bypasses RLS)
     const newRefinementCount = (char.refinement_count || 0) + 1

@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { GoogleAuth } from 'google-auth-library'
-import { createClient } from '@/lib/supabase/server'
+import { uploadToR2 } from '@/lib/storage/r2'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -661,20 +661,8 @@ async function generateWithDalle(prompt: string): Promise<{ buffer: Buffer | nul
 // ---------- Upload Helper ----------
 
 async function uploadToStorage(buffer: Buffer): Promise<string> {
-  const supabase = await createClient()
   const filename = `illustrations/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`
-  // Use Uint8Array to avoid SharedArrayBuffer type issues
-  const uint8 = new Uint8Array(buffer)
-  const { error } = await supabase.storage
-    .from('story-assets')
-    .upload(filename, uint8, {
-      contentType: 'image/png',
-      upsert: false,
-    })
-  if (error) throw new Error(`Storage upload failed: ${error.message}`)
-
-  const { data } = supabase.storage.from('story-assets').getPublicUrl(filename)
-  return data.publicUrl
+  return uploadToR2(filename, buffer, 'image/png')
 }
 
 // ---------- Main Entry Point ----------

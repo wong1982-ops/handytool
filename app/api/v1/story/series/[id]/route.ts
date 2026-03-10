@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { apiSuccess, getAuthUserId, API_ERRORS } from '@/lib/api/response'
+import { deleteManyFromR2 } from '@/lib/storage/r2'
 import { z } from 'zod'
 
 interface RouteParams { params: Promise<{ id: string }> }
@@ -129,7 +130,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
   if (chars?.length) {
     const paths = chars.map((c: { id: string }) => `series/${id}/characters/${c.id}.png`)
-    await supabase.storage.from('story-assets').remove(paths)
+    await deleteManyFromR2(paths)
   }
 
   // Delete via RPC (handles orphaning books + cascade)
