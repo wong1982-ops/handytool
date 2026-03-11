@@ -1,9 +1,10 @@
 'use client'
 
 import { useAuth } from '@/lib/hooks/use-auth'
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { signInWithOAuth } from '@/lib/supabase/auth'
+import { usePushNotifications } from '@/lib/hooks/use-push-notifications'
 import { TermsSheetContent } from '@/components/mobile/sheets/terms-sheet-content'
 import { PrivacySheetContent } from '@/components/mobile/sheets/privacy-sheet-content'
 import { ContactSheetContent } from '@/components/mobile/sheets/contact-sheet-content'
@@ -40,6 +41,63 @@ export function ProfileTab() {
       return next
     })
   }, [])
+
+  // Push notification state
+  const { state: pushState, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications()
+  const [pushToggling, setPushToggling] = useState(false)
+
+  // Notification preferences
+  const [emailNotif, setEmailNotif] = useState(true)
+  const [prefsLoaded, setPrefsLoaded] = useState(false)
+
+  useEffect(() => {
+    if (!user) return
+    fetch('/api/v1/notifications/prefs')
+      .then(r => r.json())
+      .then(({ prefs }) => {
+        if (prefs) {
+          setEmailNotif(prefs.email_on_book_complete)
+        }
+        setPrefsLoaded(true)
+      })
+      .catch(() => setPrefsLoaded(true))
+  }, [user])
+
+  const handlePushToggle = useCallback(async () => {
+    if (pushToggling) return
+    setPushToggling(true)
+    try {
+      if (pushState === 'subscribed') {
+        await pushUnsubscribe()
+        await fetch('/api/v1/notifications/prefs', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ push_on_book_complete: false }),
+        })
+      } else {
+        const ok = await pushSubscribe()
+        if (ok) {
+          await fetch('/api/v1/notifications/prefs', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ push_on_book_complete: true }),
+          })
+        }
+      }
+    } finally {
+      setPushToggling(false)
+    }
+  }, [pushState, pushToggling, pushSubscribe, pushUnsubscribe])
+
+  const handleEmailToggle = useCallback(async () => {
+    const next = !emailNotif
+    setEmailNotif(next)
+    await fetch('/api/v1/notifications/prefs', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email_on_book_complete: next }),
+    })
+  }, [emailNotif])
 
   const navigateTo = useCallback((view: ViewId) => {
     setActiveView(view)
@@ -270,6 +328,70 @@ export function ProfileTab() {
               <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-200 ${dark ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
           </div>
+
+          {/* Notification preferences */}
+          {user && prefsLoaded && (
+            <div className="space-y-0.5">
+              <h3 className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-1 mb-2">
+                Notifications
+              </h3>
+              <div className="rounded-xl bg-slate-100 dark:bg-white/5 divide-y divide-slate-200 dark:divide-white/5">
+                {/* Push notifications */}
+                {pushState !== 'unsupported' && (
+                  <div className="flex items-center justify-between px-4 py-3.5">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <svg className="w-5 h-5 text-slate-400 dark:text-slate-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                      </svg>
+                      <div className="min-w-0">
+                        <p className="text-sm text-slate-900 dark:text-white font-medium">Push Notifications</p>
+                        {pushState === 'denied' && (
+                          <p className="text-xs text-red-500">Blocked in browser settings</p>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={handlePushToggle}
+                      disabled={pushToggling || pushState === 'denied'}
+                      className={`relative w-12 h-7 rounded-full transition-colors cursor-pointer disabled:opacity-50 ${
+                        pushState === 'subscribed' ? 'bg-[#3D6AF2]' : 'bg-slate-300 dark:bg-slate-600'
+                      }`}
+                      role="switch"
+                      aria-checked={pushState === 'subscribed'}
+                      aria-label="Toggle push notifications"
+                    >
+                      <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-200 ${
+                        pushState === 'subscribed' ? 'translate-x-5' : 'translate-x-0'
+                      }`} />
+                    </button>
+                  </div>
+                )}
+
+                {/* Email notifications */}
+                <div className="flex items-center justify-between px-4 py-3.5">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <svg className="w-5 h-5 text-slate-400 dark:text-slate-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                    </svg>
+                    <p className="text-sm text-slate-900 dark:text-white font-medium">Email when book ready</p>
+                  </div>
+                  <button
+                    onClick={handleEmailToggle}
+                    className={`relative w-12 h-7 rounded-full transition-colors cursor-pointer ${
+                      emailNotif ? 'bg-[#3D6AF2]' : 'bg-slate-300 dark:bg-slate-600'
+                    }`}
+                    role="switch"
+                    aria-checked={emailNotif}
+                    aria-label="Toggle email notifications"
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-200 ${
+                      emailNotif ? 'translate-x-5' : 'translate-x-0'
+                    }`} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Links — drill-down navigation */}
           <div className="rounded-xl bg-slate-100 dark:bg-white/5 divide-y divide-slate-200 dark:divide-white/5">

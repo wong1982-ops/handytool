@@ -1,3 +1,8 @@
+/**
+ * @deprecated Use POST /api/v1/story/jobs instead.
+ * This SSE-based generation route is kept temporarily for rollback safety.
+ * The new queue-based flow provides checkpoint/resume and background generation.
+ */
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUserId, apiError, API_ERRORS } from '@/lib/api/response'
 import { generateRequestSchema } from '@/lib/story/types'

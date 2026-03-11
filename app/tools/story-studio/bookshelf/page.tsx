@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
+import { useJobProgress } from '@/tools/story-studio/use-job-progress'
+import { InProgressSection } from '@/tools/story-studio/job-card'
+import { PushPromptBanner } from '@/tools/story-studio/push-prompt'
 
 interface BookItem {
   id: string
@@ -24,6 +27,18 @@ export default function BookshelfPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [pdfLoading, setPdfLoading] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
+
+  // Background job progress tracking
+  const { jobs: activeJobs, completedJobId, clearCompletion, retryJob } = useJobProgress(user?.id)
+
+  // When a job completes, refresh the bookshelf to show the new book
+  useEffect(() => {
+    if (completedJobId) {
+      fetchBooks()
+      clearCompletion()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedJobId])
 
   const handleDownloadPdf = async (book: BookItem) => {
     if (pdfLoading) return
@@ -157,9 +172,15 @@ export default function BookshelfPage() {
           </Link>
         </div>
 
+        {/* Push notification prompt */}
+        <PushPromptBanner hasActiveJobs={activeJobs.length > 0} />
+
+        {/* In-progress jobs section */}
+        <InProgressSection jobs={activeJobs} onRetry={retryJob} />
+
         {loading ? (
           <div className="text-center py-16 text-slate-400">Loading...</div>
-        ) : books.length === 0 ? (
+        ) : books.length === 0 && activeJobs.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-gradient-to-br from-amber-500/20 via-orange-500/20 to-yellow-500/20 flex items-center justify-center">
               <svg className="w-9 h-9 text-amber-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">

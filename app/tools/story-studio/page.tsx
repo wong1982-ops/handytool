@@ -40,6 +40,7 @@ function StoryStudioContent() {
     loading, error, setError, errorCode, setErrorCode,
     creditsUsed,
     seriesId, setSeriesId,
+    activeJobId,
     fetchConcepts, startGeneration,
     updateBook, updatePage, reset,
   } = useStoryBook()
@@ -194,21 +195,8 @@ function StoryStudioContent() {
 
       {/* Main layout: sidebar + content */}
       <div className="max-w-7xl mx-auto flex">
-        {/* Mobile sidebar toggle */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="fixed bottom-4 left-4 z-30 md:hidden w-12 h-12 rounded-full bg-indigo-900 text-white shadow-lg flex items-center justify-center cursor-pointer"
-          aria-label="Toggle menu"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            {sidebarOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            )}
-          </svg>
-        </button>
-
+        {/* Mobile sidebar is now handled by the Story Studio layout (layout.tsx) */}
+        {/* Desktop-only inline sidebar overlay for legacy sidebar state */}
         {sidebarOpen && (
           <div className="fixed inset-0 bg-black/40 z-20 md:hidden" onClick={() => setSidebarOpen(false)} />
         )}
@@ -288,7 +276,41 @@ function StoryStudioContent() {
         }`}>
           {activeView === 'create' ? (
             <>
-              {error && errorCode === 'INSUFFICIENT_CREDITS' ? (
+              {error && errorCode === 'JOB_LIMIT_REACHED' ? (
+                <div className="mb-6 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-sm font-semibold text-indigo-800 dark:text-indigo-300 mb-1">Queue Full</h4>
+                      <p className="text-sm text-indigo-700 dark:text-indigo-400 mb-3">
+                        You already have 3 books being generated. Please wait for one to finish before starting a new one.
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <a
+                          href="/tools/story-studio/bookshelf"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors"
+                          style={{ minHeight: '40px' }}
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                          </svg>
+                          View Bookshelf
+                        </a>
+                        <button
+                          onClick={() => { setError(null); setErrorCode(null) }}
+                          className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                        >
+                          Dismiss
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : error && errorCode === 'INSUFFICIENT_CREDITS' ? (
                 <div className="mb-6 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
                   <div className="flex items-start gap-3">
                     <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -520,6 +542,7 @@ function StoryStudioContent() {
                 <GenerationProgress
                   events={progressEvents}
                   totalPages={book?.pages.length ?? null}
+                  activeJobId={activeJobId}
                 />
               )}
 

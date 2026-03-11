@@ -141,6 +141,14 @@ export function useStoryBook() {
     }
   }, [seriesId])
 
+  // Job ID for background generation tracking
+  const [activeJobId, setActiveJobId] = useState<string | null>(null)
+
+  /**
+   * Start background generation via the job queue.
+   * Submits to POST /api/v1/story/jobs and returns immediately.
+   * Progress is tracked via useJobProgress (Supabase Realtime).
+   */
   const startGeneration = useCallback(async (plotText: string, concept: StoryConcept) => {
     setLoading(true)
     setError(null)
@@ -149,14 +157,10 @@ export function useStoryBook() {
     setProgressEvents([])
 
     try {
-      const controller = new AbortController()
-      abortRef.current = controller
-
-      const res = await fetch('/api/v1/story/generate', {
+      const res = await fetch('/api/v1/story/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plot: plotText, concept, ...(seriesId ? { seriesId } : {}) }),
-        signal: controller.signal,
       })
 
       if (!res.ok) {
@@ -165,72 +169,21 @@ export function useStoryBook() {
           setErrorCode('INSUFFICIENT_CREDITS')
           throw new Error(err.details?.message || 'Insufficient credits to generate a story.')
         }
+        if (err?.code === 'JOB_LIMIT_REACHED') {
+          setErrorCode('JOB_LIMIT_REACHED')
+          throw new Error(err.error || 'You have 3 books generating. Wait for one to finish.')
+        }
         throw new Error(err?.error || `Failed: ${res.status}`)
       }
 
-      const reader = res.body?.getReader()
-      if (!reader) throw new Error('No response stream')
+      const { jobId } = await res.json()
+      setActiveJobId(jobId)
+      clearPlotDraft()
 
-      const decoder = new TextDecoder()
-      let buffer = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n\n')
-        buffer = lines.pop() || ''
-
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue
-          try {
-            const event = JSON.parse(line.slice(6)) as ProgressEvent
-
-            setProgressEvents(prev => [...prev, event])
-
-            if (event.type === 'story-ready') {
-              setBook(event.data)
-            } else if (event.type === 'image-done' && event.url) {
-              setBook(prev => {
-                if (!prev) return null
-                return {
-                  ...prev,
-                  pages: prev.pages.map(p =>
-                    p.sequence === event.page
-                      ? { ...p, imageUrl: event.url, imageStatus: 'done' as const }
-                      : p
-                  ),
-                }
-              })
-            } else if (event.type === 'audio-done' && event.url) {
-              setBook(prev => {
-                if (!prev) return null
-                return {
-                  ...prev,
-                  pages: prev.pages.map(p =>
-                    p.sequence === event.page
-                      ? { ...p, audioUrl: event.url }
-                      : p
-                  ),
-                }
-              })
-            } else if (event.type === 'complete') {
-              setBook(event.data)
-              if (event.creditsUsed) setCreditsUsed(event.creditsUsed)
-              setPhase('viewer')
-              clearPlotDraft()
-            } else if (event.type === 'error') {
-              throw new Error(event.message)
-            }
-          } catch (parseErr) {
-            // Skip unparseable SSE lines
-            if (parseErr instanceof Error && parseErr.message !== 'Unexpected end of JSON input') {
-              throw parseErr
-            }
-          }
-        }
-      }
+      // Generation is now running in the background.
+      // The UI should show "Your book is being generated" with progress
+      // tracked via useJobProgress.
+      setProgressEvents([{ type: 'status', message: 'Your book is being generated in the background. You can leave this page.' }])
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return
       setError(err instanceof Error ? err.message : 'Generation failed')
@@ -259,6 +212,8 @@ export function useStoryBook() {
     creditsUsed,
     seriesId,
     setSeriesId,
+    activeJobId,
+    setActiveJobId,
     fetchConcepts,
     selectConcept,
     startGeneration,

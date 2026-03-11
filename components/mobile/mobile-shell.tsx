@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { usePathname } from 'next/navigation'
 import { useMobileShell } from '@/lib/hooks/use-mobile-shell'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { MobileHeader } from '@/components/mobile/mobile-header'
@@ -11,6 +12,9 @@ import { BillingTab } from '@/components/mobile/billing-tab'
 import { ProfileTab } from '@/components/mobile/profile-tab'
 import { ToolsTab } from '@/components/mobile/tools-tab'
 
+/** Routes that opt out of MobileShell wrapping (custom full-screen layout) */
+const FULL_SCREEN_PATHS = ['/tools/story-studio']
+
 interface MobileShellProps {
   children: React.ReactNode // the tools content (existing page)
 }
@@ -19,7 +23,11 @@ const TAB_KEY = 'toolk1t-active-tab'
 
 export function MobileShell({ children }: MobileShellProps) {
   const isMobile = useMobileShell()
+  const pathname = usePathname()
   const { user } = useAuth()
+
+  // Story Studio uses its own custom full-screen layout — skip MobileShell
+  const isFullScreen = FULL_SCREEN_PATHS.some(p => pathname.startsWith(p))
   const [activeTab, setActiveTab] = useState<TabId>(() => {
     if (typeof window === 'undefined') return 'tools'
     const saved = sessionStorage.getItem(TAB_KEY) as TabId | null
@@ -46,6 +54,15 @@ export function MobileShell({ children }: MobileShellProps) {
   }, [])
 
   if (!isMobile) return null
+
+  // Full-screen routes (e.g. Story Studio) render children directly — no tabs, no bottom bar
+  if (isFullScreen) {
+    return (
+      <div className="fixed inset-0 z-[60] flex flex-col bg-slate-50 dark:bg-slate-950">
+        {children}
+      </div>
+    )
+  }
 
   return (
     <div className="fixed inset-0 z-[60] flex flex-col bg-slate-50 dark:bg-slate-950">

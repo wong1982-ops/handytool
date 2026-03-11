@@ -5,6 +5,8 @@ import type { ProgressEvent } from './types'
 interface GenerationProgressProps {
   events: ProgressEvent[]
   totalPages: number | null
+  /** If set, generation is running in background via job queue */
+  activeJobId?: string | null
 }
 
 const FUN_TIPS = [
@@ -20,7 +22,59 @@ const FUN_TIPS = [
   'Untangling a ball of narrative yarn...',
 ]
 
-export function GenerationProgress({ events, totalPages }: GenerationProgressProps) {
+export function GenerationProgress({ events, totalPages, activeJobId }: GenerationProgressProps) {
+  // Background job mode: show a simpler UI with link to bookshelf
+  if (activeJobId) {
+    return (
+      <div className="max-w-lg mx-auto text-center py-10 md:py-14">
+        <div className="relative w-28 h-28 mx-auto mb-8">
+          <div className="absolute inset-0 rounded-full animate-[orb-pulse_3s_ease-in-out_infinite]" style={{
+            background: 'conic-gradient(from 0deg, #818cf8, #a78bfa, #c084fc, #e879f9, #f472b6, #fb923c, #fbbf24, #a3e635, #34d399, #22d3ee, #818cf8)',
+            filter: 'blur(12px)',
+            opacity: 0.4,
+          }} />
+          <div className="absolute inset-3 rounded-full bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 shadow-2xl flex items-center justify-center">
+            <svg className="w-10 h-10 text-amber-300 drop-shadow-lg animate-[orb-float_2s_ease-in-out_infinite]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+            </svg>
+          </div>
+        </div>
+
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
+          Your Book is Being Created
+        </h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
+          Your story is being generated in the background. You can safely leave this page.
+        </p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mb-6">
+          Track progress and find your completed book on the bookshelf.
+        </p>
+
+        <a
+          href="/tools/story-studio/bookshelf"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors"
+          style={{ minHeight: '44px' }}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+          </svg>
+          Go to Bookshelf
+        </a>
+
+        <style jsx>{`
+          @keyframes orb-pulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.08) rotate(180deg); }
+          }
+          @keyframes orb-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+          }
+        `}</style>
+      </div>
+    )
+  }
+
   const imagesDone = events.filter(e => e.type === 'image-done').length
   const audiosDone = events.filter(e => e.type === 'audio-done').length
   const storyReady = events.some(e => e.type === 'story-ready')

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FILTER_PRESETS, FILTER_CATEGORIES, type FilterCategory } from './filter-presets'
+import { FILTER_PRESETS, FILTER_CATEGORIES, SAMPLE_IMAGE_URI, presetToCssFilter, type FilterCategory } from './filter-presets'
 import { NavigatorPanel } from './navigator-panel'
 
 export interface Adjustments {
@@ -99,33 +99,62 @@ export function AdjustmentsPanel({
         </div>
 
         {/* Filter thumbnails grid */}
-        <div className="grid grid-cols-3 gap-1.5">
-          {filteredPresets.map((preset) => (
-            <button
-              key={preset.id}
-              onClick={() => onFilterChange(preset.id === activeFilter ? 'natural' : preset.id)}
-              className={`rounded-lg text-center transition-all cursor-pointer p-1 ${
-                activeFilter === preset.id
-                  ? 'ring-2 ring-[var(--tk-color-primary-500)] bg-[var(--tk-color-primary-500)]/10'
-                  : 'hover:bg-slate-800'
-              }`}
-            >
-              <div className="w-full aspect-square rounded bg-slate-700 mb-1 overflow-hidden">
-                {filterThumbnails[preset.id] ? (
-                  <img
-                    src={filterThumbnails[preset.id]}
-                    alt={preset.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[8px] text-slate-500">
+        <div className="grid grid-cols-3 gap-2">
+          {filteredPresets.map((preset) => {
+            const isActive = activeFilter === preset.id
+            const hasThumbnail = !!filterThumbnails[preset.id]
+            const cssFilter = presetToCssFilter(preset)
+
+            return (
+              <button
+                key={preset.id}
+                onClick={() => onFilterChange(preset.id === activeFilter ? 'natural' : preset.id)}
+                className={`group relative rounded-xl overflow-hidden transition-all cursor-pointer ${
+                  isActive
+                    ? 'ring-2 ring-[var(--tk-color-primary-500)] ring-offset-1 ring-offset-[#1a2333] scale-[1.02]'
+                    : 'hover:ring-1 hover:ring-slate-600 hover:scale-[1.01]'
+                }`}
+              >
+                {/* Image preview */}
+                <div className="aspect-square relative overflow-hidden bg-slate-800">
+                  {hasThumbnail ? (
+                    <img
+                      src={filterThumbnails[preset.id]}
+                      alt={preset.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={SAMPLE_IMAGE_URI}
+                      alt={preset.name}
+                      className="w-full h-full object-cover"
+                      style={{ filter: cssFilter }}
+                    />
+                  )}
+
+                  {/* Active check badge */}
+                  {isActive && (
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[var(--tk-color-primary-500)] flex items-center justify-center">
+                      <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+
+                {/* Label overlay */}
+                <div className={`absolute inset-x-0 bottom-0 px-1.5 py-1 bg-gradient-to-t from-black/70 to-transparent ${
+                  isActive ? 'from-[var(--tk-color-primary-500)]/40' : ''
+                }`}>
+                  <span className={`text-[10px] font-semibold leading-tight block truncate ${
+                    isActive ? 'text-white' : 'text-white/90'
+                  }`}>
                     {preset.name}
-                  </div>
-                )}
-              </div>
-              <span className="text-[9px] text-slate-400 leading-tight block truncate">{preset.name}</span>
-            </button>
-          ))}
+                  </span>
+                </div>
+              </button>
+            )
+          })}
         </div>
 
         {/* Intensity slider — only shown when a filter is active */}

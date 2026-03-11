@@ -24,16 +24,6 @@ function getParentPath(pathname: string): string {
   return parent
 }
 
-/** Get a human-readable label for the back button */
-function getBackLabel(parentPath: string): string {
-  if (parentPath === '/' || parentPath === '/tools') return 'Tools'
-  // Take the last segment and format it: "story-studio" → "Story Studio"
-  const last = parentPath.split('/').pop() || 'Back'
-  return last
-    .split('-')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
-}
 
 export function ToolsTab({ children }: ToolsTabProps) {
   const pathname = usePathname()
@@ -135,9 +125,6 @@ export function ToolsTab({ children }: ToolsTabProps) {
     setSwipeX(0)
   }, [isRoot, swipeX, goBack])
 
-  const parentPath = getParentPath(pathname)
-  const backLabel = getBackLabel(parentPath)
-
   // Slide animation classes
   const getAnimationClass = () => {
     if (!slideDirection) return ''
@@ -168,31 +155,6 @@ export function ToolsTab({ children }: ToolsTabProps) {
         }}
         className={getAnimationClass()}
       >
-        {/* Sticky back button */}
-        <div className="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm px-2 py-2 border-b border-slate-200/50 dark:border-slate-800/50">
-          <button
-            onClick={goBack}
-            className="flex items-center gap-1 text-sm text-[#3D6AF2] font-medium cursor-pointer px-2 py-1"
-            style={{ minHeight: '44px' }}
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            {backLabel}
-          </button>
-        </div>
-
         {children}
       </div>
     </div>
