@@ -4,7 +4,7 @@ import { apiSuccess, apiError, getAuthUserId, API_ERRORS } from '@/lib/api/respo
 import { z } from 'zod'
 import { generateCharacterReference } from '@/lib/story/illustrate'
 import { uploadToR2 } from '@/lib/storage/r2'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { getAdminSupabase } from '@/lib/supabase/admin'
 
 const refineSchema = z.object({
   physicalDescription: z.string().min(10).max(2000),
@@ -41,18 +41,27 @@ export async function POST(
   }
 
   // Credit check: first generation costs 1 credit, refinements are free
-  const adminClient = createAdminClient()
+  const adminClient = getAdminSupabase() as any
+  let transactionId: string | null = null
   if (isFirstGeneration) {
-    const { data: balance } = await adminClient.rpc('get_user_credits', { p_user_id: userId })
-    if ((balance ?? 0) < 1) return apiError('Insufficient credits', 'INSUFFICIENT_CREDITS', 402)
+    const { data: creditRow } = await adminClient
+      .from('user_credits')
+      .select('subscription_balance, purchased_balance')
+      .eq('user_id', userId)
+      .single()
+    const balance = (creditRow?.subscription_balance ?? 0) + (creditRow?.purchased_balance ?? 0)
+    if (balance < 1) return apiError('Insufficient credits', 'INSUFFICIENT_CREDITS', 402)
 
-    // Reserve credit upfront
-    await adminClient.rpc('deduct_credits', {
+    // Deduct credit upfront — deduct_credits(p_user_id, p_amount, p_tool_id, p_description)
+    const { data: deductData, error: deductErr } = await adminClient.rpc('deduct_credits', {
       p_user_id: userId,
       p_amount: 1,
-      p_reason: 'character_refinement',
-      p_reference_id: characterId,
+      p_tool_id: 'story-studio',
+      p_description: `Character refinement — ${character.name}`,
     })
+    if (deductErr) return apiError('Failed to deduct credits', 'CREDIT_ERROR', 500)
+    const deductRow = Array.isArray(deductData) ? deductData[0] : deductData
+    transactionId = deductRow?.transaction_id ?? null
   }
 
   // Merge feedback into description if provided
@@ -106,24 +115,28 @@ Write an improved physical description that incorporates the feedback. Keep it u
   } catch {
     // Refund credit if generation fails
     if (isFirstGeneration) {
-      await adminClient.rpc('add_credits', {
-        p_user_id: userId,
-        p_amount: 1,
-        p_reason: 'character_refinement_refund',
-        p_reference_id: characterId,
-      })
+      if (transactionId) {
+        await adminClient.rpc('refund_credits', {
+          p_user_id: userId,
+          p_amount: 1,
+          p_original_transaction_id: transactionId,
+          p_description: 'Character refinement failed — credits refunded',
+        })
+      }
     }
     return apiError('Failed to generate portrait', 'GENERATION_ERROR', 500)
   }
   if (!imageBuffer) {
     // Refund credit if generation returns null
     if (isFirstGeneration) {
-      await adminClient.rpc('add_credits', {
-        p_user_id: userId,
-        p_amount: 1,
-        p_reason: 'character_refinement_refund',
-        p_reference_id: characterId,
-      })
+      if (transactionId) {
+        await adminClient.rpc('refund_credits', {
+          p_user_id: userId,
+          p_amount: 1,
+          p_original_transaction_id: transactionId,
+          p_description: 'Character refinement failed — credits refunded',
+        })
+      }
     }
     return apiError('Failed to generate portrait', 'GENERATION_ERROR', 500)
   }
