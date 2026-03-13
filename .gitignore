@@ -4,3 +4,4 @@ node_modules/
 .claude/
 e2e/
 *.spec.ts
+.worktrees/
