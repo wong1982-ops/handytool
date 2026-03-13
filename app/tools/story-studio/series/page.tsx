@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useSeriesList } from '@/tools/story-studio/use-series'
-import { StudioLayout } from '@/tools/story-studio/studio-layout'
 import { signInWithOAuth } from '@/lib/supabase/auth'
 import { ART_STYLES } from '@/lib/story/styles'
 
@@ -87,8 +86,8 @@ export default function SeriesListPage() {
   }
 
   return (
-    <StudioLayout>
-        <div className="mb-8 flex items-center justify-between">
+    <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10">
+      <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
               My Series
@@ -473,6 +472,6 @@ export default function SeriesListPage() {
           </div>
         </div>
       )}
-    </StudioLayout>
+    </div>
   )
 }
