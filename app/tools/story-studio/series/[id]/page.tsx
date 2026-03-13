@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useSeriesList, useSeriesDetail, type SeriesCharacter } from '@/tools/story-studio/use-series'
-import { StudioLayout } from '@/tools/story-studio/studio-layout'
+
 import { GEMINI_VOICES, VOICE_GENDERS, VOICE_AGES, VOICE_STYLES, type VoiceGender, type VoiceAge, type VoiceStyle } from '@/lib/story/voices'
 import { ART_STYLES } from '@/lib/story/styles'
 
@@ -604,8 +604,7 @@ export default function SeriesDetailPage() {
 
   if (loading) {
     return (
-      <StudioLayout>
-        <div className="animate-pulse space-y-6">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10 animate-pulse space-y-6">
           {/* Header skeleton */}
           <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 md:p-6">
             <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-1/3 mb-3" />
@@ -626,24 +625,21 @@ export default function SeriesDetailPage() {
               </div>
             ))}
           </div>
-        </div>
-      </StudioLayout>
+      </div>
     )
   }
 
   if (!detail) {
     return (
-      <StudioLayout>
-        <div className="flex flex-col items-center justify-center gap-4 py-20">
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white">Series Not Found</h1>
-          <Link
-            href="/tools/story-studio/series"
-            className="text-indigo-600 dark:text-indigo-400 text-sm hover:underline"
-          >
-            Back to My Series
-          </Link>
-        </div>
-      </StudioLayout>
+      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10 flex flex-col items-center justify-center gap-4 py-20">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Series Not Found</h1>
+        <Link
+          href="/tools/story-studio/series"
+          className="text-indigo-600 dark:text-indigo-400 text-sm hover:underline"
+        >
+          Back to My Series
+        </Link>
+      </div>
     )
   }
 
@@ -687,8 +683,8 @@ export default function SeriesDetailPage() {
   }
 
   return (
-    <StudioLayout>
-        {/* Back link */}
+    <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10">
+      {/* Back link */}
         <Link
           href="/tools/story-studio/series"
           className="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 mb-5 transition-colors"
@@ -1051,6 +1047,6 @@ export default function SeriesDetailPage() {
             </div>
           </div>
         )}
-    </StudioLayout>
+    </div>
   )
 }

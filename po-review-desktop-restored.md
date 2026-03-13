@@ -1,0 +1,173 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Toolk1t" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Toolk1t" [ref=e5]
+      - combobox [ref=e7]:
+        - generic [ref=e8]: Search tools
+        - button "Show all tools" [ref=e9] [cursor=pointer]:
+          - img [ref=e10]
+        - textbox "Search tools" [ref=e12]:
+          - /placeholder: Search tools...
+      - generic [ref=e13]:
+        - button "Tools" [ref=e15] [cursor=pointer]:
+          - text: Tools
+          - img [ref=e16]
+        - switch "Switch to light mode" [checked] [ref=e18] [cursor=pointer]:
+          - img [ref=e19]
+          - img [ref=e21]
+        - link "Sign In" [ref=e24] [cursor=pointer]:
+          - /url: /signin
+  - generic [ref=e25]:
+    - banner [ref=e26]:
+      - generic [ref=e27]:
+        - navigation "Breadcrumb" [ref=e28]:
+          - list [ref=e29]:
+            - listitem [ref=e30]:
+              - link "Home" [ref=e31] [cursor=pointer]:
+                - /url: /tools
+            - listitem [ref=e32]: /
+            - listitem [ref=e33]: Image Editor
+        - navigation [ref=e34]:
+          - button "File" [ref=e36] [cursor=pointer]
+          - button "Edit" [ref=e38] [cursor=pointer]
+          - button "Image" [ref=e40] [cursor=pointer]
+          - button "Filters" [ref=e42] [cursor=pointer]
+      - generic [ref=e43]:
+        - button "Undo" [disabled] [ref=e44]:
+          - img [ref=e45]
+        - button "Redo" [disabled] [ref=e47]:
+          - img [ref=e48]
+        - button "Reset adjustments" [ref=e51] [cursor=pointer]:
+          - img [ref=e52]
+        - button "Export" [ref=e487] [cursor=pointer]:
+          - img [ref=e55]
+          - generic [ref=e57]: Export
+    - main [ref=e58]:
+      - complementary [ref=e59]:
+        - button "Move Tool" [ref=e60] [cursor=pointer]:
+          - img [ref=e61]
+        - button "Hand Tool (Pan)" [ref=e63] [cursor=pointer]:
+          - img [ref=e64]
+        - button "Crop Tool" [ref=e66] [cursor=pointer]:
+          - img [ref=e67]
+        - button "Brush Tool" [ref=e69] [cursor=pointer]:
+          - img [ref=e70]
+        - button "Eraser Tool" [ref=e72] [cursor=pointer]:
+          - img [ref=e73]
+        - button "Text Tool" [ref=e75] [cursor=pointer]:
+          - img [ref=e76]
+        - button "Selection Tool" [ref=e78] [cursor=pointer]:
+          - img [ref=e79]
+        - button "Swap foreground and background colors" [active] [ref=e81] [cursor=pointer]:
+          - img
+      - generic [ref=e91]:
+        - generic [ref=e93]:
+          - generic [ref=e94]:
+            - heading "Adjustments" [level=3] [ref=e95]:
+              - img [ref=e96]
+              - text: Adjustments
+            - generic [ref=e98]:
+              - generic [ref=e99]:
+                - generic [ref=e100]:
+                  - generic [ref=e101]: Brightness
+                  - generic [ref=e102]: "0"
+                - slider "Brightness" [ref=e103] [cursor=pointer]: "0"
+              - generic [ref=e104]:
+                - generic [ref=e105]:
+                  - generic [ref=e106]: Contrast
+                  - generic [ref=e107]: "0"
+                - slider "Contrast" [ref=e108] [cursor=pointer]: "0"
+              - generic [ref=e109]:
+                - generic [ref=e110]:
+                  - generic [ref=e111]: Saturate
+                  - generic [ref=e112]: "0"
+                - slider "Saturate" [ref=e113] [cursor=pointer]: "0"
+              - generic [ref=e114]:
+                - generic [ref=e115]:
+                  - generic [ref=e116]: Hue Rotate
+                  - generic [ref=e117]: 0°
+                - slider "Hue Rotate" [ref=e118] [cursor=pointer]: "0"
+          - generic [ref=e119]:
+            - heading "Filter Gallery" [level=3] [ref=e120]:
+              - img [ref=e121]
+              - text: Filter Gallery
+            - generic [ref=e123]:
+              - button "All" [ref=e124] [cursor=pointer]
+              - button "Warm" [ref=e125] [cursor=pointer]
+              - button "Cool" [ref=e126] [cursor=pointer]
+              - button "Vintage" [ref=e127] [cursor=pointer]
+              - button "B&W" [ref=e128] [cursor=pointer]
+              - button "Dramatic" [ref=e129] [cursor=pointer]
+            - generic [ref=e130]:
+              - button "Inkwell Inkwell" [ref=e183] [cursor=pointer]:
+                - img "Inkwell" [ref=e274]
+                - generic [ref=e186]: Inkwell
+              - button "Moon Moon" [ref=e187] [cursor=pointer]:
+                - img "Moon" [ref=e275]
+                - generic [ref=e190]: Moon
+              - button "Reyes Reyes" [ref=e191] [cursor=pointer]:
+                - img "Reyes" [ref=e276]
+                - generic [ref=e194]: Reyes
+          - generic [ref=e211]:
+            - heading "Zoom" [level=3] [ref=e212]
+            - generic [ref=e213]:
+              - img [ref=e214]
+              - slider "Zoom level" [ref=e216] [cursor=pointer]: "100"
+              - generic [ref=e217]: 100%
+          - generic [ref=e281]:
+            - heading "Image Info" [level=3] [ref=e282]
+            - paragraph [ref=e283]: 512 × 512 px
+        - generic [ref=e219]:
+          - generic [ref=e220]:
+            - heading "Layers" [level=3] [ref=e221]
+            - generic [ref=e222]:
+              - button "Add image layer" [ref=e223] [cursor=pointer]:
+                - img [ref=e224]
+              - button "Delete selected layer" [disabled] [ref=e226]:
+                - img [ref=e227]
+          - generic [ref=e303]:
+            - generic [ref=e304]:
+              - generic [ref=e305]: Blend
+              - combobox "Blend mode" [ref=e306] [cursor=pointer]:
+                - option "Normal" [selected]
+                - option "Multiply"
+                - option "Screen"
+                - option "Overlay"
+                - option "Darken"
+                - option "Lighten"
+            - generic [ref=e307]:
+              - generic [ref=e308]: Opacity
+              - slider "Layer opacity" [ref=e309] [cursor=pointer]: "100"
+              - generic [ref=e310]: 100%
+          - generic [ref=e284] [cursor=pointer]:
+            - button "Hide Background" [ref=e312]:
+              - img [ref=e286]
+            - button "Unlock Background" [ref=e289]:
+              - img [ref=e290]
+            - generic [ref=e292]: Background
+            - generic [ref=e293]: image
+    - contentinfo [ref=e231]:
+      - generic [ref=e232]:
+        - generic [ref=e233]:
+          - img [ref=e294]
+          - text: 512 x 512 px
+        - generic [ref=e234]: "Zoom: 100%"
+        - generic [ref=e235]: "Tool: hand"
+      - generic [ref=e237]: Client-side editing
+  - contentinfo [ref=e238]:
+    - generic [ref=e239]:
+      - generic [ref=e240]:
+        - img [ref=e241]
+        - generic [ref=e243]: © 2026 Toolk1t
+      - generic [ref=e244]:
+        - link "Terms of Service" [ref=e245] [cursor=pointer]:
+          - /url: "#"
+        - link "Privacy Policy" [ref=e246] [cursor=pointer]:
+          - /url: "#"
+        - link "Contact Support" [ref=e247] [cursor=pointer]:
+          - /url: "#"
+  - button "Open Next.js Dev Tools" [ref=e253] [cursor=pointer]:
+    - img [ref=e254]
+  - alert [ref=e259]

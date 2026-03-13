@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 22, "column": 0}, "map": {"version":3,"sources":["file:///Users/mercury/WebstormProjects/handytool-workspace/app/page.tsx"],"sourcesContent":["import { redirect } from 'next/navigation'\n\nexport default function Home() {\n  redirect('/tools')\n}\n"],"names":[],"mappings":";;;;AAAA;AAAA;;AAEe,SAAS;IACtB,IAAA,8ZAAQ,EAAC;AACX"}}]
+}

@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[679674,["/_next/static/chunks/777f65ae185f0ec0.js","/_next/static/chunks/3d65c6b88f4d703c.js","/_next/static/chunks/8e19573363aca4a6.js","/_next/static/chunks/8e6c861d63bc35d2.js"],"ToolsLayoutClient"]
+3:I[374618,["/_next/static/chunks/819f7f83e23eb30c.js","/_next/static/chunks/2db077160c58f9cf.js"],"default"]
+4:I[909628,["/_next/static/chunks/819f7f83e23eb30c.js","/_next/static/chunks/2db077160c58f9cf.js"],"default"]
+0:{"buildId":"Rczko0icV-Ai8IFrWW1AC","rsc":["$","$1","c",{"children":[[["$","script","script-0",{"src":"/_next/static/chunks/8e6c861d63bc35d2.js","async":true}]],[["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"{\"@context\":\"https://schema.org\",\"@type\":\"CollectionPage\",\"name\":\"Free Online Tools\",\"description\":\"A collection of free online tools for developers and everyday use.\",\"url\":\"https://toolk1t.com/tools\",\"isPartOf\":{\"@type\":\"WebSite\",\"name\":\"Toolk1t\",\"url\":\"https://toolk1t.com\"}}"}}],["$","$L2",null,{"children":["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}]}]}]]]}],"loading":null,"isPartial":false}

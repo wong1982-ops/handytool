@@ -1,0 +1,3 @@
+:HL["/_next/static/chunks/0094f0fbf67f4dea.css","style"]
+:HL["/_next/static/chunks/22ebf6d2cf3fc394.css","style"]
+0:{"buildId":"Rczko0icV-Ai8IFrWW1AC","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"use-cases","paramType":null,"paramKey":"use-cases","hasRuntimePrefetch":false,"slots":{"children":{"name":"slug","paramType":"d","paramKey":"compress-pdf-for-email","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}

@@ -1,0 +1,89 @@
+[    2996ms] [ERROR] Loading the script 'https://web.cmp.usercentrics.eu/tcf/stub.js' violates the following Content Security Policy directive: "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com https://js.hcaptcha.com https://js.stripe.com https://frontend-assets.supabase.com https://ss.supabase.com https://ph.supabase.com https://vercel.live https://*.pusher.com https://maps.googleapis.com". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked. @ https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:145
+[    2996ms] [ERROR] Loading the script 'https://web.cmp.usercentrics.eu/ui/loader.js' violates the following Content Security Policy directive: "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com https://js.hcaptcha.com https://js.stripe.com https://frontend-assets.supabase.com https://ss.supabase.com https://ph.supabase.com https://vercel.live https://*.pusher.com https://maps.googleapis.com". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked. @ https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:145
+[    3264ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://api.supabase.com/platform/notifications?offset=0&limit=20&status=new%2Cseen:0
+[    3980ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://api.supabase.com/platform/projects/wgrcfnumbozvtmhcavnm:0
+[    4072ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://api.supabase.com/platform/notifications?offset=0&limit=20&status=new%2Cseen:0
+[    4097ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://api.supabase.com/platform/projects/wgrcfnumbozvtmhcavnm/billing/addons:0
+[    4357ms] [WARNING] [Warning] Please install/enable Redux devtools extension @ https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:14
+[   17706ms] [ERROR] Connecting to 'https://analytics.google.com/g/collect?a=adblocker_check' violates the following Content Security Policy directive: "default-src 'self' https://api.supabase.com http://localhost:8000 https://auth.supabase.io ws://localhost:8000 wss://localhost:8000 https://*.supabase.co https://*.storage.supabase.co wss://*.supabase.co https://*.hcaptcha.com https://cdn-global.configcat.com https://configcat.supabase.com https://*.stripe.com https://*.stripe.network https://www.cloudflare.com https://*.vercel-insights.com https://api.github.com https://raw.githubusercontent.com https://frontend-assets.supabase.com https://*.usercentrics.eu https://ss.supabase.com https://maps.googleapis.com https://ph.supabase.com https://cdnjs.cloudflare.com wss://*.pusher.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io". Note that 'connect-src' was not explicitly set, so 'default-src' is used as a fallback. The action has been blocked. @ https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:14
+[   17707ms] [ERROR] Fetch API cannot load https://analytics.google.com/g/collect?a=adblocker_check. Refused to connect because it violates the document's Content Security Policy. @ https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:14
+[   17729ms] [ERROR] Loading the script 'https://web.cmp.usercentrics.eu/tcf/stub.js' violates the following Content Security Policy directive: "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com https://js.hcaptcha.com https://js.stripe.com https://frontend-assets.supabase.com https://ss.supabase.com https://ph.supabase.com https://vercel.live https://*.pusher.com https://maps.googleapis.com". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked. @ https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:145
+[   17730ms] [ERROR] Loading the script 'https://web.cmp.usercentrics.eu/ui/loader.js' violates the following Content Security Policy directive: "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com https://js.hcaptcha.com https://js.stripe.com https://frontend-assets.supabase.com https://ss.supabase.com https://ph.supabase.com https://vercel.live https://*.pusher.com https://maps.googleapis.com". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked. @ https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:145
+[   19162ms] [WARNING] [Warning] Please install/enable Redux devtools extension @ https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:14
+[18495154ms] [ERROR] Failed to load resource: net::ERR_ADDRESS_UNREACHABLE @ https://supabase.com/dashboard/api/get-deployment-commit:0
+[18495155ms] [ERROR] TypeError: Failed to fetch
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:15:1799
+    at https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:1:643
+    at https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:772:819
+    at c (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:4:9000)
+    at a (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/46f4aabc6a912f94.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:55:14665)
+    at queryFn (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/46f4aabc6a912f94.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:55:14861)
+    at Object.a [as fn] (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:3779)
+    at y (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:33228)
+    at Object.start (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:33708)
+    at a.fetch (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:4905)
+    at #E (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:8869)
+    at l.fetch (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:8756)
+    at l.refetch (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:8570)
+    at a.onOnline (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:2575)
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/3ed5f54f77cb06ff.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:29707
+    at Array.forEach (<anonymous>)
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/3ed5f54f77cb06ff.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:29693
+    at Object.batch (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:31411)
+    at i.onOnline (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/3ed5f54f77cb06ff.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:29668)
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/3ed5f54f77cb06ff.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:31719 @ https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:14
+[18495156ms] [ERROR] Failed to load resource: net::ERR_ADDRESS_UNREACHABLE @ https://supabase.com/dashboard/api/incident-status:0
+[18495615ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ https://api.supabase.com/platform/stripe/invoices/overdue:0
+[18495659ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://api.supabase.com/platform/integrations/github/connections?organization_id=7891336:0
+[18495660ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://api.supabase.com/platform/projects-resource-warnings?slug=sejionhbidngnwqgyphm:0
+[18495662ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://api.supabase.com/platform/profile/permissions:0
+[18495662ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://api.supabase.com/platform/projects?limit=100&offset=0&sort=name_asc:0
+[18495664ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://api.supabase.com/platform/organizations/sejionhbidngnwqgyphm/entitlements:0
+[18495664ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://api.supabase.com/platform/profile:0
+[21186498ms] [ERROR] Failed to load resource: net::ERR_ADDRESS_UNREACHABLE @ https://supabase.com/dashboard/api/get-deployment-commit:0
+[21186533ms] [ERROR] TypeError: Failed to fetch
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:15:1799
+    at https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:1:643
+    at https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:772:819
+    at c (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:4:9000)
+    at a (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/46f4aabc6a912f94.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:55:14665)
+    at queryFn (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/46f4aabc6a912f94.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:55:14861)
+    at Object.a [as fn] (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:3779)
+    at y (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:33228)
+    at Object.start (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:33708)
+    at a.fetch (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:4905)
+    at #E (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:8869)
+    at l.fetch (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:8756)
+    at l.refetch (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:8570)
+    at a.onOnline (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:2575)
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/3ed5f54f77cb06ff.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:29707
+    at Array.forEach (<anonymous>)
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/3ed5f54f77cb06ff.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:29693
+    at Object.batch (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:31411)
+    at i.onOnline (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/3ed5f54f77cb06ff.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:29668)
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/3ed5f54f77cb06ff.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:31719 @ https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:14
+[21186534ms] [ERROR] Failed to load resource: net::ERR_ADDRESS_UNREACHABLE @ https://supabase.com/dashboard/api/incident-status:0
+[21187536ms] [ERROR] Failed to load resource: net::ERR_ADDRESS_UNREACHABLE @ https://supabase.com/dashboard/api/get-deployment-commit:0
+[21187537ms] [ERROR] TypeError: Failed to fetch
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:15:1799
+    at https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:1:643
+    at https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:772:819
+    at c (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:4:9000)
+    at a (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/46f4aabc6a912f94.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:55:14665)
+    at queryFn (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/46f4aabc6a912f94.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:55:14861)
+    at Object.a [as fn] (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:3779)
+    at y (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:33228)
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:33543 @ https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:14
+[21187537ms] [ERROR] Failed to load resource: net::ERR_ADDRESS_UNREACHABLE @ https://supabase.com/dashboard/api/incident-status:0
+[21189541ms] [ERROR] Failed to load resource: net::ERR_ADDRESS_UNREACHABLE @ https://supabase.com/dashboard/api/get-deployment-commit:0
+[21189541ms] [ERROR] TypeError: Failed to fetch
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:15:1799
+    at https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:1:643
+    at https://ss.supabase.com/4icgbaujh.js?60a389s=aWQ9R1RNLVdDVlJMTU43&page=2:772:819
+    at c (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:4:9000)
+    at a (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/46f4aabc6a912f94.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:55:14665)
+    at queryFn (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/46f4aabc6a912f94.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:55:14861)
+    at Object.a [as fn] (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/5483bc52ce10a873.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:3779)
+    at y (https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:33228)
+    at https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/83fd1454e733cc72.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:2:33543 @ https://frontend-assets.supabase.com/studio/3885265c0c7e/_next/static/chunks/bfa211da743f467d.js?dpl=dpl_7NaUF3bSMcME59AbgzSLVuWkcuWx:14
+[21189542ms] [ERROR] Failed to load resource: net::ERR_ADDRESS_UNREACHABLE @ https://supabase.com/dashboard/api/incident-status:0

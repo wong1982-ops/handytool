@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/use-auth'
-import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
 import { useJobProgress } from '@/tools/story-studio/use-job-progress'
 import { InProgressSection } from '@/tools/story-studio/job-card'
 import { PushPromptBanner } from '@/tools/story-studio/push-prompt'
@@ -147,11 +146,8 @@ export default function BookshelfPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10">
-        <ToolBreadcrumb toolName="Story Studio" toolSlug="story-studio" />
-
-        <div className="mt-4 mb-8 flex items-center justify-between">
+    <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10">
+      <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
               My Bookshelf
@@ -353,7 +349,6 @@ export default function BookshelfPage() {
             </div>
           </div>
         )}
-      </div>
     </div>
   )
 }

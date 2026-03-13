@@ -1,0 +1,109 @@
+'use client'
+
+import Link from 'next/link'
+import type { StoryItem } from '@/tools/story-studio/use-stories-list'
+
+interface StoryCardProps {
+  story: StoryItem
+  onEdit: (id: string) => void
+  onDelete: (id: string) => void
+  onToggleShare: (id: string, isPublic: boolean) => void
+}
+
+export function StoryCard({ story, onEdit, onDelete, onToggleShare }: StoryCardProps) {
+  const dateStr = new Date(story.createdAt).toLocaleDateString(undefined, {
+    month: 'short', day: 'numeric', year: 'numeric',
+  })
+
+  return (
+    <div className="group relative bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-md transition-shadow">
+      {/* Cover image */}
+      <Link href={`/tools/story-studio/book/${story.slug}`} className="block">
+        <div className="aspect-[3/4] bg-slate-100 dark:bg-slate-800 overflow-hidden">
+          {story.coverImageUrl ? (
+            <img
+              src={story.coverImageUrl}
+              alt={story.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <svg className="w-12 h-12 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+              </svg>
+            </div>
+          )}
+        </div>
+      </Link>
+
+      {/* Info */}
+      <div className="p-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <h3 className="font-medium text-sm text-slate-900 dark:text-white truncate">{story.title}</h3>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+              {story.pageCount} pages &middot; {dateStr}
+            </p>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${
+              story.status === 'complete'
+                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+            }`}>
+              {story.status === 'complete' ? 'Complete' : 'Draft'}
+            </span>
+          </div>
+        </div>
+
+        {story.seriesTitle && (
+          <p className="text-[11px] text-indigo-500 dark:text-indigo-400 mt-1 truncate">{story.seriesTitle}</p>
+        )}
+
+        {/* Quick actions */}
+        <div className="flex items-center gap-1 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <button
+            onClick={() => onEdit(story.id)}
+            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium
+              text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg
+              transition-colors cursor-pointer"
+            style={{ minHeight: '36px' }}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+            </svg>
+            Edit
+          </button>
+          <button
+            onClick={() => onToggleShare(story.id, !story.isPublic)}
+            className="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-indigo-500
+              rounded-lg transition-colors cursor-pointer"
+            aria-label={story.isPublic ? 'Make private' : 'Make public'}
+            title={story.isPublic ? 'Public — click to make private' : 'Private — click to share'}
+          >
+            {story.isPublic ? (
+              <svg className="w-3.5 h-3.5 text-indigo-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+              </svg>
+            )}
+          </button>
+          <button
+            onClick={() => onDelete(story.id)}
+            className="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-red-500
+              rounded-lg transition-colors cursor-pointer"
+            aria-label="Delete"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
