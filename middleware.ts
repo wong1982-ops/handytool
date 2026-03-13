@@ -48,6 +48,15 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    /*
+     * Match:
+     * - /api/* routes (for CORS headers)
+     * - Page routes (for Supabase session refresh)
+     * Exclude:
+     * - _next/* (static files, JS chunks, HMR websocket)
+     * - Static assets (images, fonts, manifest, service worker)
+     */
+    '/api/:path*',
+    '/((?!_next|favicon\\.ico|manifest|sw\\.js|icon|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?)$).*)',
   ],
 }

@@ -10,8 +10,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getAdminSupabase } from '@/lib/supabase/admin'
-import { verifyCronSecret, triggerNextStep, triggerTtsBatch, getNextStep, type PipelineStep } from './queue'
+import { createClient } from '@/lib/supabase/server'
+import { verifyCronSecret, triggerNextStep, triggerTtsBatch, getNextStep, IS_DEV, type PipelineStep } from './queue'
 
 /** Job row from the database. */
 export interface JobRow {
@@ -80,21 +80,19 @@ export function withJobStep(
 
     const { id: jobId } = await routeParams
 
-    // 2. Load job from DB (service role — bypasses RLS)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const supabase: any = getAdminSupabase()
-    const { data: job, error: fetchError } = await supabase
-      .from('book_jobs')
-      .select('*')
-      .eq('id', jobId)
-      .single()
+    // 2. Load job from DB via SECURITY DEFINER RPC (step routes have no user session)
+    const supabase = await createClient()
+    const { data: jobs, error: fetchError } = await supabase.rpc('get_job_by_id', {
+      p_job_id: jobId,
+    })
 
+    const job = Array.isArray(jobs) ? jobs[0] : jobs
     if (fetchError || !job) {
       console.error(`[job-step] Job ${jobId} not found:`, fetchError)
       return NextResponse.json({ error: 'Job not found' }, { status: 404 })
     }
 
-    const jobRow = job as JobRow
+    const jobRow = job as unknown as JobRow
 
     // Don't process completed jobs
     if (jobRow.status === 'completed') {
@@ -102,12 +100,9 @@ export function withJobStep(
       return NextResponse.json({ ok: true, skipped: true })
     }
 
-    // Mark job as running
+    // Mark job as running via RPC
     if (jobRow.status === 'scheduled') {
-      await supabase
-        .from('book_jobs')
-        .update({ status: 'running', updated_at: new Date().toISOString() })
-        .eq('id', jobId)
+      await supabase.rpc('set_job_running', { p_job_id: jobId })
     }
 
     // Parse query params
@@ -129,12 +124,15 @@ export function withJobStep(
       const currentPage = queryParams.page ? parseInt(queryParams.page, 10) : undefined
 
       // Determine the next step
+      const jobInput = jobRow.input as { skipIllustration?: boolean; skipAudio?: boolean }
       const nextStepInfo = result.nextStep
         ? { step: result.nextStep, params: result.nextParams }
         : getNextStep(stepName, {
             totalPages: result.setTotalPages ?? jobRow.total_pages,
             currentPage,
             completedTtsCount: result.triggerTtsBatch ? 0 : undefined,
+            skipIllustration: jobInput.skipIllustration,
+            skipAudio: jobInput.skipAudio,
           })
 
       const nextStepName = nextStepInfo === 'tts_batch'
@@ -145,6 +143,7 @@ export function withJobStep(
 
       const nextStatus = nextStepName === 'done' ? 'completed' : 'running'
 
+      // Write state via SECURITY DEFINER RPC
       const { error: updateError } = await supabase.rpc('update_job_step', {
         p_job_id: jobId,
         p_step: stepName,
@@ -160,17 +159,21 @@ export function withJobStep(
 
       // Update total_pages if set by the handler
       if (result.setTotalPages !== undefined) {
-        await supabase
-          .from('book_jobs')
-          .update({ total_pages: result.setTotalPages })
-          .eq('id', jobId)
+        await supabase.rpc('set_job_total_pages', {
+          p_job_id: jobId,
+          p_total_pages: result.setTotalPages,
+        })
       }
 
       // 5. Trigger next step
+      // In dev mode: await to serialize requests (Turbopack can only compile one route at a time).
+      // In production: fire-and-forget (returns void, non-blocking).
       if (nextStepInfo === 'tts_batch') {
-        triggerTtsBatch(jobId, result.setTotalPages ?? jobRow.total_pages)
+        const p = triggerTtsBatch(jobId, result.setTotalPages ?? jobRow.total_pages)
+        if (IS_DEV && p) await p
       } else if (nextStepInfo && nextStepName !== 'done') {
-        triggerNextStep(jobId, nextStepInfo.step, nextStepInfo.params)
+        const p = triggerNextStep(jobId, nextStepInfo.step, nextStepInfo.params)
+        if (IS_DEV && p) await p
       }
 
       return NextResponse.json({ ok: true, step: stepName, next: nextStepName })
@@ -192,7 +195,7 @@ export function withJobStep(
         // Release reserved credits on permanent failure
         if (jobRow.credits_reservation_id) {
           try {
-            await supabase.rpc('release_reserved_credits', {
+            await supabase.rpc('release_reserved_credits', {  // RPC — SECURITY DEFINER
               p_reservation_id: jobRow.credits_reservation_id,
               p_reason: `Story Studio — generation failed at ${stepName}: ${errorMessage}`,
             })
@@ -205,14 +208,10 @@ export function withJobStep(
       }
 
       // Increment retry count and let cron pick it up
-      await supabase
-        .from('book_jobs')
-        .update({
-          retry_count: newRetryCount,
-          error_message: errorMessage,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', jobId)
+      await supabase.rpc('increment_job_retry', {
+        p_job_id: jobId,
+        p_error: errorMessage,
+      })
 
       return NextResponse.json({ error: errorMessage, retryCount: newRetryCount }, { status: 500 })
     }

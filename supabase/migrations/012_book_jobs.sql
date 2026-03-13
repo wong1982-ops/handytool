@@ -239,3 +239,92 @@ BEGIN
   RETURN v_count;
 END;
 $$;
+
+-- =============================================================================
+-- 10. RPC: create_book_job — insert a new job row (SECURITY DEFINER bypasses RLS)
+--     Used by POST /api/v1/story/jobs to create jobs via the user session client.
+-- =============================================================================
+CREATE OR REPLACE FUNCTION public.create_book_job(
+  p_user_id UUID,
+  p_series_id UUID DEFAULT NULL,
+  p_total_pages INT DEFAULT 0,
+  p_input JSONB DEFAULT '{}'
+)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_job_id UUID;
+BEGIN
+  INSERT INTO public.book_jobs (user_id, series_id, status, current_step, total_pages, input, state)
+  VALUES (p_user_id, p_series_id, 'scheduled', 'story_bible', p_total_pages, p_input, '{}')
+  RETURNING id INTO v_job_id;
+
+  RETURN v_job_id;
+END;
+$$;
+
+-- =============================================================================
+-- 11. RPC: get_job_by_id — fetch a job row by ID (bypasses RLS for step routes)
+-- =============================================================================
+CREATE OR REPLACE FUNCTION public.get_job_by_id(p_job_id UUID)
+RETURNS SETOF public.book_jobs
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT * FROM public.book_jobs WHERE id = p_job_id;
+$$;
+
+-- =============================================================================
+-- 12. RPC: set_job_running — mark a scheduled job as running
+-- =============================================================================
+CREATE OR REPLACE FUNCTION public.set_job_running(p_job_id UUID)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  UPDATE public.book_jobs
+     SET status = 'running', updated_at = now()
+   WHERE id = p_job_id AND status = 'scheduled';
+END;
+$$;
+
+-- =============================================================================
+-- 13. RPC: set_job_total_pages — update total_pages on a job
+-- =============================================================================
+CREATE OR REPLACE FUNCTION public.set_job_total_pages(p_job_id UUID, p_total_pages INT)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  UPDATE public.book_jobs
+     SET total_pages = p_total_pages, updated_at = now()
+   WHERE id = p_job_id;
+END;
+$$;
+
+-- =============================================================================
+-- 14. RPC: increment_job_retry — bump retry count and record error
+-- =============================================================================
+CREATE OR REPLACE FUNCTION public.increment_job_retry(p_job_id UUID, p_error TEXT)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  UPDATE public.book_jobs
+     SET retry_count = retry_count + 1,
+         error_message = p_error,
+         updated_at = now()
+   WHERE id = p_job_id;
+END;
+$$;

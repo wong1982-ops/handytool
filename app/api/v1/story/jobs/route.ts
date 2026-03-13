@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getAuthUserId, apiError, API_ERRORS } from '@/lib/api/response'
 import { generateRequestSchema } from '@/lib/story/types'
 import { CREDIT_COSTS } from '@/lib/story/validation'
-import { triggerNextStep } from '@/lib/story/queue'
+import { triggerNextStep, IS_DEV } from '@/lib/story/queue'
 
 /**
  * POST /api/v1/story/jobs — Create a new background generation job.
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     return API_ERRORS.VALIDATION(parsed.error.flatten().fieldErrors)
   }
 
-  const { plot, concept, seriesId } = parsed.data
+  const { plot, concept, seriesId, skipIllustration, skipAudio, skipValidation } = parsed.data
   const supabase = await createClient()
 
   // Check concurrent job limit (max 3 active jobs)
@@ -65,23 +65,18 @@ export async function POST(request: NextRequest) {
     reservationId = row?.reservation_id
   }
 
-  // Create job row
-  const { data: job, error: insertError } = await supabase
-    .from('book_jobs')
-    .insert({
-      user_id: userId,
-      series_id: seriesId ?? null,
-      status: 'scheduled',
-      current_step: 'story_bible',
-      total_pages: concept.tags.pageCount,
-      input: { plot, concept, seriesId },
-      state: {},
-      credits_reservation_id: reservationId ?? null,
-    })
-    .select('id')
-    .single()
+  // Create job row via SECURITY DEFINER RPC (bypasses RLS)
+  const { data: job, error: insertError } = await supabase.rpc('create_book_job', {
+    p_user_id: userId,
+    p_series_id: seriesId ?? null,
+    p_total_pages: concept.tags.pageCount,
+    p_input: { plot, concept, seriesId, skipIllustration, skipAudio, skipValidation } as unknown as undefined,
+  })
 
-  if (insertError || !job) {
+  // RPC returns the job id as a single value
+  const jobId = typeof job === 'string' ? job : (job as { id: string } | null)?.id
+
+  if (insertError || !jobId) {
     console.error('[jobs] Failed to create job:', insertError)
     // Release credits if job creation fails
     if (reservationId) {
@@ -95,10 +90,12 @@ export async function POST(request: NextRequest) {
     return API_ERRORS.INTERNAL()
   }
 
-  // Fire-and-forget: trigger the first step
-  triggerNextStep(job.id, 'story_bible')
+  // Trigger the first step
+  // Dev: await to serialize (Turbopack single-writer). Prod: fire-and-forget.
+  const p = triggerNextStep(jobId, 'story_bible')
+  if (IS_DEV && p) await p
 
-  return NextResponse.json({ jobId: job.id }, { status: 201 })
+  return NextResponse.json({ jobId }, { status: 201 })
 }
 
 /**

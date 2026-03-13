@@ -97,16 +97,14 @@ export const POST = withJobStep('save', async (ctx) => {
       const confirmRow = Array.isArray(confirmResult) ? confirmResult[0] : confirmResult
       const txnId = confirmRow?.transaction_id
       if (txnId) {
-        await supabase
-          .from('credit_transactions')
-          .update({
-            metadata: {
-              reservation_id: job.credits_reservation_id,
-              book_slug: slug,
-              book_title: finalBook.title,
-            },
-          })
-          .eq('id', txnId)
+        await supabase.rpc('update_credit_transaction_metadata', {
+          p_txn_id: txnId,
+          p_metadata: {
+            reservation_id: job.credits_reservation_id,
+            book_slug: slug,
+            book_title: finalBook.title,
+          },
+        })
       }
     } catch (err) {
       console.error('[save] Failed to confirm credits:', err)

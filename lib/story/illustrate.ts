@@ -1,10 +1,13 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenAI } from '@google/genai'
 import { GoogleAuth } from 'google-auth-library'
 import { uploadToR2 } from '@/lib/storage/r2'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
+// Nano Banana (Gemini native image generation) — primary provider
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ''
+const genAI = new GoogleGenAI({ apiKey: GEMINI_API_KEY })
+const NANO_BANANA_MODEL = 'gemini-3.1-flash-image-preview'
 
-// Vertex AI config for Imagen 3
+// Vertex AI config for Imagen 3 (fallback)
 const VERTEX_PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT_ID
 const VERTEX_REGION = process.env.GOOGLE_CLOUD_REGION || 'us-central1'
 
@@ -257,13 +260,18 @@ function buildImagen3Prompt(input: IllustrateInput, subjectRefCount: number): st
 /**
  * Generate a character reference sheet showing all main characters side by side.
  * Strategy 3: Character Reference — generate a base reference image.
- * Uses Gemini Flash for image generation (supports multi-modal output).
+ * Priority: Nano Banana → Imagen 3 with style ref → Imagen 3 standard.
  */
 export async function generateCharacterReference(
   characters: { name: string; description: string }[],
   style: string,
   styleReferenceImage?: Buffer,
 ): Promise<Buffer | null> {
+  if (!characters.length) {
+    console.log('[illustrate] Skipping character reference: no characters')
+    return null
+  }
+
   // Build prompt based on single character vs multiple
   const isSingle = characters.length === 1
   const charDescs = characters.map(c => `${c.name}: ${c.description}`).join('. ')
@@ -274,8 +282,39 @@ export async function generateCharacterReference(
     ? `${style} style full body character portrait of ${characters[0].name}. ${characters[0].description}. Standing pose, clear details, clean background. ${anatomyRules} ${suffix}`
     : `${style} style character reference sheet showing all main characters side by side, full body, clear distinct appearances, white background. Characters: ${charDescs}. ${anatomyRules} ${suffix}`
 
-  // Try Imagen 3 with style reference first (best consistency with existing portraits)
-  if (characters.length && VERTEX_PROJECT_ID && styleReferenceImage) {
+  // --- Priority 1: Nano Banana (with optional style reference image) ---
+  if (GEMINI_API_KEY) {
+    try {
+      const prompt = buildRefPrompt('No text, words, or letters in the image.')
+      const contents: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] = []
+
+      // Pass style reference image inline if available
+      if (styleReferenceImage) {
+        contents.push({ inlineData: { mimeType: 'image/png', data: styleReferenceImage.toString('base64') } })
+        contents.push({ text: `Match this exact ${style} art style, color palette, line weight, shading technique, and visual mood. ${prompt}` })
+      } else {
+        contents.push({ text: prompt })
+      }
+
+      console.log(`[illustrate] Generating character ${isSingle ? 'portrait' : 'reference sheet'} via Nano Banana${styleReferenceImage ? ' + style ref' : ''}...`)
+      const response = await genAI.models.generateContent({
+        model: NANO_BANANA_MODEL,
+        contents,
+        config: {
+          responseModalities: ['TEXT', 'IMAGE'],
+        },
+      })
+
+      const buf = extractBufferFromNanoBananaResponse(response)
+      console.log(`[illustrate] Character ${isSingle ? 'portrait' : 'reference'} via Nano Banana (${(buf.length / 1024).toFixed(0)} KB)`)
+      return buf
+    } catch (err) {
+      console.warn('[illustrate] Nano Banana character reference failed, trying Imagen 3:', err)
+    }
+  }
+
+  // --- Priority 2: Imagen 3 with style reference ---
+  if (VERTEX_PROJECT_ID && styleReferenceImage) {
     try {
       console.log(`[illustrate] Generating character ${isSingle ? 'portrait' : 'reference sheet'} via Imagen 3 with style reference...`)
       const prompt = buildRefPrompt('No text, words, or letters in the image.')
@@ -330,8 +369,8 @@ export async function generateCharacterReference(
     }
   }
 
-  // Try Imagen 3 standard (no style reference)
-  if (characters.length && VERTEX_PROJECT_ID) {
+  // --- Priority 3: Imagen 3 standard ---
+  if (VERTEX_PROJECT_ID) {
     try {
       console.log(`[illustrate] Generating character ${isSingle ? 'portrait' : 'reference sheet'} via Imagen 3...`)
       const prompt = buildRefPrompt('No text, words, or letters in the image.')
@@ -340,45 +379,12 @@ export async function generateCharacterReference(
       console.log(`[illustrate] Character ${isSingle ? 'portrait' : 'reference'} via Imagen 3 (${(buffer.length / 1024).toFixed(0)} KB)`)
       return buffer
     } catch (err) {
-      console.warn('[illustrate] Imagen 3 character reference failed, trying Gemini Flash:', err)
+      console.warn('[illustrate] Imagen 3 character reference failed:', err)
     }
   }
 
-  if (!characters.length || !process.env.GEMINI_API_KEY) {
-    console.log('[illustrate] Skipping character reference: no characters or no API key')
-    return null
-  }
-
-  try {
-    const prompt = buildRefPrompt('No text.')
-
-    console.log('[illustrate] Generating character reference sheet via Gemini Flash...')
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp-image-generation',
-      generationConfig: {
-        // @ts-expect-error — responseModalities is valid for image generation models
-        responseModalities: ['IMAGE', 'TEXT'],
-      },
-    })
-
-    const result = await model.generateContent(prompt)
-    const response = result.response
-    const imagePart = response.candidates?.[0]?.content?.parts?.find(
-      (p: { inlineData?: { mimeType: string; data: string } }) => p.inlineData?.mimeType?.startsWith('image/')
-    )
-
-    if (!imagePart?.inlineData?.data) {
-      console.warn('[illustrate] Character reference: no image in response')
-      return null
-    }
-
-    const buf = Buffer.from(imagePart.inlineData.data, 'base64')
-    console.log(`[illustrate] Character reference via Gemini Flash (${(buf.length / 1024).toFixed(0)} KB)`)
-    return buf
-  } catch (err) {
-    console.error('[illustrate] Character reference generation failed:', err)
-    return null
-  }
+  console.log('[illustrate] No image generation provider available for character reference')
+  return null
 }
 
 // ---------- Imagen 3 via Vertex AI ----------
@@ -514,79 +520,103 @@ async function generateWithImagen3WithReference(
   return Buffer.from(prediction.bytesBase64Encoded, 'base64')
 }
 
-// ---------- Gemini Flash (fallback with reference support) ----------
+// ---------- Nano Banana (Gemini native image generation — primary) ----------
 
-/** Extract image base64 from a Gemini response */
-function extractBase64FromGeminiResponse(response: { candidates?: { content?: { parts?: { inlineData?: { mimeType: string; data: string } }[] } }[] }): string {
-  const imagePart = response.candidates?.[0]?.content?.parts?.find(
-    (p: { inlineData?: { mimeType: string; data: string } }) => p.inlineData?.mimeType?.startsWith('image/')
+/** Extract image buffer from a Nano Banana response */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function extractBufferFromNanoBananaResponse(response: any): Buffer {
+  const parts = response.candidates?.[0]?.content?.parts
+  if (!parts) throw new Error('No content in Nano Banana response')
+
+  const imagePart = parts.find(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (p: any) => p.inlineData?.mimeType?.startsWith('image/')
   )
 
   if (!imagePart?.inlineData?.data) {
-    throw new Error('No image returned from Gemini')
+    throw new Error('No image returned from Nano Banana')
   }
 
-  return imagePart.inlineData.data
+  return Buffer.from(imagePart.inlineData.data, 'base64')
 }
 
-async function generateWithGemini(
+/**
+ * Generate illustration with Nano Banana (Gemini 3.1 Flash Image).
+ * Supports up to 14 inline reference images for character consistency.
+ */
+async function generateWithNanoBanana(
   prompt: string,
   referenceImage?: Buffer,
+  characterRefs?: CharacterReference[],
   previousPageImage?: Buffer,
-  seed?: number,
 ): Promise<Buffer> {
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash-exp-image-generation',
-    generationConfig: {
-      // @ts-expect-error — responseModalities is valid for image generation models
-      responseModalities: ['IMAGE', 'TEXT'],
-      ...(seed != null ? { seed } : {}),
+  // Build contents array: reference images first, then text prompt
+  const contents: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] = []
+
+  // Add per-character reference portraits
+  if (characterRefs?.length) {
+    for (const ref of characterRefs) {
+      contents.push({ inlineData: { mimeType: 'image/png', data: ref.buffer.toString('base64') } })
+    }
+  } else if (referenceImage) {
+    // Single character reference sheet
+    contents.push({ inlineData: { mimeType: 'image/png', data: referenceImage.toString('base64') } })
+  }
+
+  // Add previous page image for visual continuity
+  if (previousPageImage) {
+    contents.push({ inlineData: { mimeType: 'image/png', data: previousPageImage.toString('base64') } })
+  }
+
+  const hasRefs = (characterRefs?.length ?? 0) > 0 || !!referenceImage
+  const hasPrev = !!previousPageImage
+
+  // Build instruction prefix based on what references we have
+  let instruction = ''
+  if (hasRefs && hasPrev) {
+    const refLabel = characterRefs?.length
+      ? `The first ${characterRefs.length} image(s) are character reference portraits`
+      : 'The first image is the character reference sheet'
+    instruction = `${refLabel}. The last image is the previous page illustration. `
+      + 'CHARACTER CONSISTENCY IS THE #1 PRIORITY. You MUST match EVERY attribute from the reference(s): '
+      + 'exact hair color, length, and style; exact eye color and shape; exact skin tone; exact clothing items with their specific colors; '
+      + 'exact accessories; exact body proportions and build. Do NOT change ANY of these attributes. '
+      + 'Maintain the same art style, color palette, and lighting as the previous page for visual continuity. '
+  } else if (hasRefs) {
+    const refLabel = characterRefs?.length
+      ? `The image(s) above are character reference portraits`
+      : 'The image above is the character reference sheet'
+    instruction = `${refLabel}. `
+      + 'CHARACTER CONSISTENCY IS THE #1 PRIORITY. You MUST match EVERY attribute from the reference(s): '
+      + 'exact hair color, length, and style; exact eye color and shape; exact skin tone; exact clothing items with their specific colors; '
+      + 'exact accessories; exact body proportions and build. Do NOT change ANY of these attributes. '
+  } else if (hasPrev) {
+    instruction = 'The image above is the previous page illustration. '
+      + 'CHARACTER CONSISTENCY IS THE #1 PRIORITY. Maintain IDENTICAL character appearances — same hair, eyes, skin, outfit, accessories. '
+      + 'Also maintain the same art style, color palette, and visual mood for continuity. '
+  }
+
+  if (instruction) {
+    instruction += 'ANATOMY: Humans must have exactly 2 arms, 2 legs, 5 fingers per hand, normal neck. Animals must have species-correct limb count. No extra limbs or merged fingers. '
+  }
+
+  contents.push({ text: instruction + prompt })
+
+  const refCount = (characterRefs?.length ?? 0) + (referenceImage ? 1 : 0) + (previousPageImage ? 1 : 0)
+  console.log(`[illustrate] Nano Banana (${NANO_BANANA_MODEL}) with ${refCount} reference image(s)`)
+
+  const response = await genAI.models.generateContent({
+    model: NANO_BANANA_MODEL,
+    contents,
+    config: {
+      responseModalities: ['TEXT', 'IMAGE'],
+      imageConfig: {
+        aspectRatio: '3:4', // portrait for book pages
+      },
     },
   })
 
-  const hasImages = referenceImage || previousPageImage
-  if (hasImages) {
-    const parts: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] = []
-
-    if (referenceImage) {
-      parts.push({ inlineData: { mimeType: 'image/png', data: referenceImage.toString('base64') } })
-    }
-    if (previousPageImage) {
-      parts.push({ inlineData: { mimeType: 'image/png', data: previousPageImage.toString('base64') } })
-    }
-
-    let instruction = ''
-    if (referenceImage && previousPageImage) {
-      instruction = 'IMAGE 1 is the character reference sheet. IMAGE 2 is the previous page illustration. '
-        + 'CHARACTER CONSISTENCY IS THE #1 PRIORITY. You MUST match EVERY attribute from the reference sheet: '
-        + 'exact hair color, length, and style; exact eye color and shape; exact skin tone; exact clothing items with their specific colors; '
-        + 'exact accessories; exact body proportions and build. Do NOT change ANY of these attributes. '
-        + 'Maintain the same art style, color palette, and lighting as the previous page for visual continuity. '
-    } else if (referenceImage) {
-      instruction = 'The image above is the character reference sheet. '
-        + 'CHARACTER CONSISTENCY IS THE #1 PRIORITY. You MUST match EVERY attribute from this reference: '
-        + 'exact hair color, length, and style; exact eye color and shape; exact skin tone; exact clothing items with their specific colors; '
-        + 'exact accessories; exact body proportions and build. Do NOT change ANY of these attributes. '
-    } else if (previousPageImage) {
-      instruction = 'The image above is the previous page illustration. '
-        + 'CHARACTER CONSISTENCY IS THE #1 PRIORITY. Maintain IDENTICAL character appearances — same hair, eyes, skin, outfit, accessories. '
-        + 'Also maintain the same art style, color palette, and visual mood for continuity. '
-    }
-
-    instruction += 'ANATOMY: Humans must have exactly 2 arms, 2 legs, 5 fingers per hand, normal neck. Animals must have species-correct limb count. No extra limbs or merged fingers. '
-
-    parts.push({ text: instruction + prompt })
-
-    console.log(`[illustrate] Gemini Flash with${referenceImage ? ' reference' : ''}${previousPageImage ? ' + prev page' : ''}${seed != null ? ` (seed=${seed})` : ''}`)
-    const result = await model.generateContent({ contents: [{ role: 'user' as const, parts }] })
-    const base64 = extractBase64FromGeminiResponse(result.response)
-    return Buffer.from(base64, 'base64')
-  }
-
-  console.log(`[illustrate] Gemini Flash without reference${seed != null ? ` (seed=${seed})` : ''}`)
-  const result = await model.generateContent(prompt)
-  const base64 = extractBase64FromGeminiResponse(result.response)
-  return Buffer.from(base64, 'base64')
+  return extractBufferFromNanoBananaResponse(response)
 }
 
 // ---------- Other Fallbacks ----------
@@ -647,11 +677,7 @@ async function generateWithDalle(prompt: string): Promise<{ buffer: Buffer | nul
   const imageUrl = data.data?.[0]?.url
   if (!imageUrl) throw new Error('No image returned from DALL-E')
 
-  // In dev mode, return the URL directly (skip Supabase upload)
-  if (process.env.NODE_ENV === 'development') {
-    return { buffer: null, url: imageUrl as string }
-  }
-
+  // Download image and return buffer (caller uploads to R2)
   const imageResponse = await fetch(imageUrl)
   if (!imageResponse.ok) throw new Error('Failed to download generated image')
   const ab = await imageResponse.arrayBuffer()
@@ -670,14 +696,14 @@ async function uploadToStorage(buffer: Buffer): Promise<string> {
 /**
  * Generate a single illustration. Returns URL + raw buffer for chaining.
  *
- * Provider priority: Imagen 3 with reference → Imagen 3 standard → Gemini Flash → fal.ai → DALL-E
+ * Provider priority: Nano Banana → Imagen 3 with reference → Imagen 3 standard → fal.ai → DALL-E
  *
- * All 5 consistency strategies:
- * 1. Lock the Seed — same seed across all pages (Imagen 3 standard)
+ * Consistency strategies:
+ * 1. Character Reference — reference images passed inline (Nano Banana supports up to 14)
  * 2. Consistent Base Prompt — character descriptions lead every prompt
- * 3. Character Reference — reference sheet passed as subject reference (Imagen 3 capability)
- * 4. Specific Details — detailed character descriptions from story generation
- * 5. Re-use Successful Images — previous page buffer passed as style reference
+ * 3. Specific Details — detailed character descriptions from story generation
+ * 4. Re-use Successful Images — previous page buffer for visual continuity
+ * 5. Lock the Seed — deterministic output (Imagen 3 standard fallback)
  */
 export async function generateIllustration(input: IllustrateInput): Promise<IllustrateResult> {
   let buffer: Buffer | null = null
@@ -690,7 +716,24 @@ export async function generateIllustration(input: IllustrateInput): Promise<Illu
       ? [{ name: 'characters', description: input.characters.map(c => `${c.name}: ${c.description}`).join('. '), buffer: input.referenceImage }]
       : []
 
-  // --- Priority 1: Imagen 3 with subject/style reference (best consistency) ---
+  // --- Priority 1: Nano Banana (supports all reference images inline) ---
+  if (GEMINI_API_KEY) {
+    try {
+      const prompt = buildPrompt(input)
+      buffer = await generateWithNanoBanana(
+        prompt,
+        input.referenceImage,
+        charRefs.length > 0 ? charRefs : undefined,
+        input.previousPageImage,
+      )
+      const url = await uploadToStorage(buffer)
+      return { url, buffer }
+    } catch (err) {
+      console.warn('[illustrate] Nano Banana failed, trying Imagen 3:', err)
+    }
+  }
+
+  // --- Priority 2: Imagen 3 with subject/style reference ---
   if (VERTEX_PROJECT_ID && charRefs.length > 0) {
     try {
       const prompt = buildImagen3Prompt(input, charRefs.length)
@@ -699,41 +742,22 @@ export async function generateIllustration(input: IllustrateInput): Promise<Illu
         charRefs,
         input.previousPageImage,
       )
-      const url = process.env.NODE_ENV === 'development'
-        ? `data:image/png;base64,${buffer.toString('base64')}`
-        : await uploadToStorage(buffer)
+      const url = await uploadToStorage(buffer)
       return { url, buffer }
     } catch (err) {
       console.warn('[illustrate] Imagen 3 capability failed, trying standard:', err)
     }
   }
 
-  // --- Priority 2: Imagen 3 standard with seed (deterministic, no reference) ---
+  // --- Priority 3: Imagen 3 standard with seed (deterministic, no reference) ---
   if (VERTEX_PROJECT_ID) {
     try {
       const prompt = buildImagen3Prompt(input, 0)
       buffer = await generateWithImagen3Standard(prompt, input.seed)
-      const url = process.env.NODE_ENV === 'development'
-        ? `data:image/png;base64,${buffer.toString('base64')}`
-        : await uploadToStorage(buffer)
+      const url = await uploadToStorage(buffer)
       return { url, buffer }
     } catch (err) {
-      console.warn('[illustrate] Imagen 3 standard failed, falling back to Gemini Flash:', err)
-    }
-  }
-
-  // --- Priority 3: Gemini Flash (supports inline reference images, uses first ref only) ---
-  if (process.env.GEMINI_API_KEY) {
-    try {
-      const prompt = buildPrompt(input)
-      const firstRef = charRefs.length > 0 ? charRefs[0].buffer : undefined
-      buffer = await generateWithGemini(prompt, firstRef, input.previousPageImage, input.seed)
-      const url = process.env.NODE_ENV === 'development'
-        ? `data:image/png;base64,${buffer.toString('base64')}`
-        : await uploadToStorage(buffer)
-      return { url, buffer }
-    } catch (err) {
-      console.warn('[illustrate] Gemini Flash failed, falling back:', err)
+      console.warn('[illustrate] Imagen 3 standard failed, falling back:', err)
     }
   }
 
@@ -741,9 +765,7 @@ export async function generateIllustration(input: IllustrateInput): Promise<Illu
   if (FAL_API_KEY) {
     const prompt = buildPrompt(input)
     buffer = await generateWithFal(prompt)
-    const url = process.env.NODE_ENV === 'development'
-      ? `data:image/png;base64,${buffer.toString('base64')}`
-      : await uploadToStorage(buffer)
+    const url = await uploadToStorage(buffer)
     return { url, buffer }
   }
 

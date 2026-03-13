@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAnonClient } from '@supabase/supabase-js'
 import { isLocalDev, LOCAL_DEV_USER_ID } from '@/lib/local-dev'
 import { unstable_cache } from 'next/cache'
 import type { Metadata } from 'next'
@@ -69,9 +70,42 @@ async function fetchBookShell(slug: string, userId: string | null) {
   return { ...book, page_count: pages?.length ?? 0, _mode: 'full' as const }
 }
 
-/** Cached version for public books (no user context) */
+/**
+ * Cached version for public books (no user context).
+ * Uses a standalone anon client (no cookies) so it's safe inside unstable_cache.
+ */
 const getCachedBookShell = unstable_cache(
-  async (slug: string) => fetchBookShell(slug, null),
+  async (slug: string) => {
+    const supabase = createAnonClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    )
+
+    const { data, error } = await supabase.rpc('get_book_shell_by_slug', {
+      p_slug: slug,
+      p_user_id: null,
+    })
+
+    if (!error && data) {
+      const book = Array.isArray(data) ? data[0] : data
+      if (book) return { ...book, _mode: 'shell' as const }
+    }
+
+    // Fallback
+    const { data: fullData, error: fullErr } = await supabase.rpc('get_book_by_slug', {
+      p_slug: slug,
+      p_user_id: null,
+    })
+
+    if (fullErr || !fullData) return null
+
+    const book = Array.isArray(fullData) ? fullData[0] : fullData
+    if (!book) return null
+
+    const bookData = book.data as Record<string, unknown>
+    const pages = bookData?.pages as unknown[] | undefined
+    return { ...book, page_count: pages?.length ?? 0, _mode: 'full' as const }
+  },
   ['book-shell'],
   { revalidate: 3600, tags: ['book-shell'] },
 )

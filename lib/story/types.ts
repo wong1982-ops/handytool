@@ -37,6 +37,9 @@ export const generateRequestSchema = z.object({
   plot: z.string().min(10).max(2000),
   concept: storyConceptSchema,
   seriesId: z.string().uuid().optional(),
+  skipIllustration: z.boolean().optional(),
+  skipAudio: z.boolean().optional(),
+  skipValidation: z.boolean().optional(),
 })
 
 // --- Concept refinement ---

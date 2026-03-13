@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSeriesList } from '@/tools/story-studio/use-series'
 
 interface StudioMobileSidebarProps {
   open: boolean
@@ -61,6 +62,8 @@ function getActiveItem(pathname: string): string {
 export function StudioMobileSidebar({ open, onClose }: StudioMobileSidebarProps) {
   const pathname = usePathname()
   const active = getActiveItem(pathname)
+  const { series } = useSeriesList()
+  const seriesCount = series.length
 
   // Close on Escape
   useEffect(() => {
@@ -120,6 +123,11 @@ export function StudioMobileSidebar({ open, onClose }: StudioMobileSidebarProps)
               >
                 <span className={isActive ? 'text-amber-400' : 'text-purple-400'}>{item.icon}</span>
                 {item.label}
+                {item.label === 'Series' && seriesCount > 0 && (
+                  <span className="ml-auto text-[11px] font-semibold bg-indigo-800/60 text-purple-200 px-1.5 py-0.5 rounded-full">
+                    {seriesCount}
+                  </span>
+                )}
               </Link>
             )
           })}

@@ -15,8 +15,8 @@ export function InstallPrompt() {
   const [show, setShow] = useState(false)
 
   useEffect(() => {
-    // Register service worker for PWA support
-    if ('serviceWorker' in navigator) {
+    // Register service worker for PWA support (skip in dev — adds overhead)
+    if ('serviceWorker' in navigator && process.env.NODE_ENV !== 'development') {
       navigator.serviceWorker.register('/sw.js').catch(() => {})
     }
 

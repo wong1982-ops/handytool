@@ -11,16 +11,17 @@ import { isLocalDev, LOCAL_DEV_USER_ID } from '@/lib/local-dev'
 export async function getAuthUserId(): Promise<string | null> {
   if (isLocalDev) return LOCAL_DEV_USER_ID
 
+  // In development with DEV_USER_ID, skip the slow Supabase auth round-trip
+  if (process.env.NODE_ENV === 'development' && process.env.DEV_USER_ID) {
+    return process.env.DEV_USER_ID
+  }
+
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (user) return user.id
   } catch {
     // Auth unavailable
-  }
-
-  if (process.env.NODE_ENV === 'development' && process.env.DEV_USER_ID) {
-    return process.env.DEV_USER_ID
   }
 
   return null

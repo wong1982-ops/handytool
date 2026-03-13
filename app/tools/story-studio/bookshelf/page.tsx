@@ -100,10 +100,11 @@ export default function BookshelfPage() {
     }
   }, [])
 
+  const isDev = process.env.NODE_ENV === 'development'
   useEffect(() => {
-    if (user) fetchBooks()
+    if (user || isDev) fetchBooks()
     else if (!authLoading) setLoading(false)
-  }, [user, authLoading, fetchBooks])
+  }, [user, isDev, authLoading, fetchBooks])
 
   const handleDelete = async (id: string) => {
     try {
@@ -136,7 +137,6 @@ export default function BookshelfPage() {
     }
   }
 
-  const isDev = process.env.NODE_ENV === 'development'
   if (!isDev && !authLoading && !user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4">

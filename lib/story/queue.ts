@@ -39,20 +39,20 @@ const STEP_ROUTES: Record<string, string> = {
   save: 'save',
 }
 
+export const IS_DEV = process.env.NODE_ENV === 'development'
+
 /**
- * Fire-and-forget trigger to the next step route.
- * Uses waitUntil-style: we don't await the response — the step route
- * will read job state from DB and proceed independently.
+ * Build the URL for a step route.
  */
-export function triggerNextStep(
+function buildStepUrl(
   jobId: string,
   step: PipelineStep,
   params?: Record<string, string>,
-): void {
+): string | null {
   const routeSegment = STEP_ROUTES[step]
   if (!routeSegment) {
     console.error(`[queue] Unknown step: ${step}`)
-    return
+    return null
   }
 
   const url = new URL(`/api/v1/story/jobs/${jobId}/${routeSegment}`, APP_URL)
@@ -61,27 +61,85 @@ export function triggerNextStep(
       url.searchParams.set(key, value)
     }
   }
+  return url.toString()
+}
 
-  console.log(`[queue] Triggering step: ${step} for job ${jobId}`)
+/**
+ * Fetch a step route.
+ * Returns a promise that resolves when the step HTTP call completes.
+ */
+function fetchStep(
+  url: string,
+  jobId: string,
+  step: PipelineStep,
+): Promise<void> {
+  // Illustration and TTS steps can take several minutes — extend the timeout
+  // to avoid undici HeadersTimeoutError killing the chain.
+  const timeoutMs = step === 'illustrate_page' || step === 'tts_page' || step === 'character_ref' || step === 'cover'
+    ? 5 * 60_000  // 5 minutes for image/audio generation
+    : 2 * 60_000  // 2 minutes for text steps
 
-  // Fire-and-forget — we intentionally don't await this
-  fetch(url.toString(), {
+  return fetch(url, {
     method: 'POST',
     headers: {
       'x-cron-secret': CRON_SECRET,
       'Content-Type': 'application/json',
     },
-  }).catch((err) => {
-    // Log but don't throw — the cron safety net will pick it up
-    console.error(`[queue] Failed to trigger ${step} for job ${jobId}:`, err)
+    signal: AbortSignal.timeout(timeoutMs),
   })
+    .then((res) => {
+      if (!res.ok) {
+        console.error(`[queue] Step ${step} for job ${jobId} returned ${res.status}`)
+      }
+    })
+    .catch((err) => {
+      console.error(`[queue] Failed to trigger ${step} for job ${jobId}:`, err)
+    })
 }
 
 /**
- * Trigger multiple TTS pages in parallel (batch fire-and-forget).
- * Called after the last illustration page completes.
+ * Trigger the next step route.
+ *
+ * - Production: fire-and-forget (non-blocking).
+ * - Development: returns a Promise so the caller (withJobStep) can await it,
+ *   serializing requests to avoid Turbopack concurrent compilation crashes.
  */
-export function triggerTtsBatch(jobId: string, totalPages: number): void {
+export function triggerNextStep(
+  jobId: string,
+  step: PipelineStep,
+  params?: Record<string, string>,
+): Promise<void> | void {
+  const url = buildStepUrl(jobId, step, params)
+  if (!url) return
+
+  console.log(`[queue] Triggering step: ${step} for job ${jobId}`)
+
+  if (IS_DEV) {
+    // Dev: return the promise so withJobStep can await it
+    return fetchStep(url, jobId, step)
+  }
+
+  // Production: fire-and-forget
+  fetchStep(url, jobId, step)
+}
+
+/**
+ * Trigger TTS pages.
+ *
+ * - Production: all pages fired in parallel (batch fire-and-forget).
+ * - Development: triggers page 1 only — each tts-page step chains to the next.
+ *   Returns a Promise so withJobStep can await it.
+ */
+export function triggerTtsBatch(
+  jobId: string,
+  totalPages: number,
+): Promise<void> | void {
+  if (IS_DEV) {
+    // Sequential: trigger page 1 only — each tts-page step will trigger the next
+    return triggerNextStep(jobId, 'tts_page', { page: '1' })
+  }
+
+  // Production: parallel fire-and-forget
   for (let page = 1; page <= totalPages; page++) {
     triggerNextStep(jobId, 'tts_page', { page: String(page) })
   }
@@ -114,6 +172,8 @@ export function getNextStep(
     totalPages: number
     currentPage?: number         // for illustrate_page / tts_page
     completedTtsCount?: number   // for tts_page: how many TTS are done (including this one)
+    skipIllustration?: boolean   // skip illustrate_page steps (keep character_ref + cover)
+    skipAudio?: boolean          // skip tts_page steps
   },
 ): { step: PipelineStep; params?: Record<string, string> } | 'tts_batch' | null {
   switch (currentStep) {
@@ -130,6 +190,10 @@ export function getNextStep(
       return { step: 'cover' }
 
     case 'cover':
+      if (context.skipIllustration) {
+        // Skip per-page illustrations → go to TTS or save
+        return context.skipAudio ? { step: 'save' } : 'tts_batch'
+      }
       // Start sequential illustration chain with page 1
       return { step: 'illustrate_page', params: { page: '1' } }
 
@@ -138,7 +202,8 @@ export function getNextStep(
       if (nextPage <= context.totalPages) {
         return { step: 'illustrate_page', params: { page: String(nextPage) } }
       }
-      // All pages illustrated → trigger TTS batch
+      // All pages illustrated → trigger TTS batch (or skip to save)
+      if (context.skipAudio) return { step: 'save' }
       return 'tts_batch'
     }
 

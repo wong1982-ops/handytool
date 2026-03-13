@@ -56,15 +56,13 @@ export const POST = withJobStep('tts_page', async (ctx) => {
         }
 
         // Carry forward narrator voice from first book
-        const { data: existingBooks } = await supabase
-          .from('books')
-          .select('data')
-          .eq('series_id', seriesId)
-          .order('created_at', { ascending: true })
-          .limit(1)
+        const { data: seriesBooks } = await supabase.rpc('get_series_books_data', {
+          p_series_id: seriesId,
+        })
 
-        if (existingBooks?.[0]) {
-          const bd = existingBooks[0].data as Record<string, unknown> | undefined
+        const firstBook = Array.isArray(seriesBooks) ? seriesBooks[0] : null
+        if (firstBook) {
+          const bd = firstBook.data as Record<string, unknown> | undefined
           const bookVoiceMap = bd?.voiceMap as Record<string, string> | undefined
           if (bookVoiceMap?.narrator && !seriesVoicePreferences['__narrator__']) {
             seriesVoicePreferences['__narrator__'] = bookVoiceMap.narrator
@@ -127,6 +125,11 @@ export const POST = withJobStep('tts_page', async (ctx) => {
   // Check if this is the last TTS page
   if (updatedAudio.length >= totalPages) {
     result.nextStep = 'save'
+  } else if (process.env.NODE_ENV === 'development') {
+    // Dev mode: TTS runs sequentially (not batched) to avoid Turbopack crashes.
+    // Chain to the next TTS page explicitly.
+    result.nextStep = 'tts_page'
+    result.nextParams = { page: String(pageNum + 1) }
   }
 
   return result

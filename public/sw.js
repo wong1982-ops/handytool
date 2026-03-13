@@ -1,7 +1,14 @@
-const CACHE_NAME = 'toolk1t-v1'
+const CACHE_NAME = 'toolk1t-v2'
 const OFFLINE_URL = '/offline'
 
+// In development, skip caching entirely
+const IS_DEV = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1'
+
 self.addEventListener('install', (event) => {
+  if (IS_DEV) {
+    self.skipWaiting()
+    return
+  }
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.add(OFFLINE_URL))
   )
@@ -18,6 +25,9 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
+  // In dev, don't intercept — let requests pass through directly
+  if (IS_DEV) return
+
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => caches.match(OFFLINE_URL))

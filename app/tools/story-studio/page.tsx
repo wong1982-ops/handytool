@@ -132,9 +132,9 @@ function StoryStudioContent() {
     setSelectedConcept(concept)
   }, [setSelectedConcept])
 
-  const handleGenerate = useCallback(async (concept: StoryConcept) => {
+  const handleGenerate = useCallback(async (concept: StoryConcept, options?: { skipIllustration?: boolean; skipAudio?: boolean; skipValidation?: boolean }) => {
     if (!plot) return
-    await startGeneration(plot, concept)
+    await startGeneration(plot, concept, options)
   }, [plot, startGeneration])
 
 

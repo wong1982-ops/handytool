@@ -1,6 +1,25 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { isLocalDev } from '@/lib/local-dev'
+
+/**
+ * Cached dev client — avoids creating a new cookie-based client per request.
+ * In dev mode with DEV_USER_ID, all RPCs are SECURITY DEFINER so we don't
+ * need user-session auth. Using a cached client eliminates the slow
+ * auth.getUser() round-trip that was causing 30s timeouts.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _devClient: any = null
+
+function getDevClient() {
+  if (_devClient) return _devClient
+  _devClient = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  )
+  return _devClient
+}
 
 export async function createClient() {
   // Local dev: use local Supabase URL + service role key (bypasses RLS)
@@ -17,6 +36,12 @@ export async function createClient() {
         setAll() {},
       },
     })
+  }
+
+  // Dev mode with DEV_USER_ID: use cached client (no cookie auth overhead).
+  // All RPCs are SECURITY DEFINER — they don't need a user session.
+  if (process.env.NODE_ENV === 'development' && process.env.DEV_USER_ID) {
+    return getDevClient()
   }
 
   const cookieStore = await cookies()

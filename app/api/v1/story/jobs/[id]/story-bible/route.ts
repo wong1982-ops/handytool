@@ -30,14 +30,12 @@ export const POST = withJobStep('story_bible', async (ctx) => {
   let seriesExistingBooks: SeriesBookSummary[] = []
   if (seriesId) {
     try {
-      const { data: existingBooks } = await supabase
-        .from('books')
-        .select('data')
-        .eq('series_id', seriesId)
-        .order('created_at', { ascending: true })
+      const { data: existingBooks } = await supabase.rpc('get_series_books_data', {
+        p_series_id: seriesId,
+      })
 
       if (existingBooks?.length) {
-        for (const b of existingBooks) {
+        for (const b of existingBooks as { data: unknown }[]) {
           const bd = b.data as Record<string, unknown> | undefined
           if (!bd) continue
           const bookConcept = bd.concept as Record<string, unknown> | undefined

@@ -29,7 +29,7 @@ const SECTION_LABELS: { key: keyof StoryConcept['sections']; label: string; icon
 interface RefinementChatProps {
   concept: StoryConcept
   onConceptUpdate: (concept: StoryConcept) => void
-  onGenerate: (concept: StoryConcept) => void
+  onGenerate: (concept: StoryConcept, options?: { skipIllustration?: boolean; skipAudio?: boolean; skipValidation?: boolean }) => void
   onBack: () => void
   loading: boolean
 }
@@ -38,6 +38,9 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
   const [history, setHistory] = useState<ChatMessage[]>([])
   const [refining, setRefining] = useState(false)
   const [streamingReply, setStreamingReply] = useState('')
+  const [skipValidation, setSkipValidation] = useState(false)
+  const [skipIllustration, setSkipIllustration] = useState(false)
+  const [skipAudio, setSkipAudio] = useState(false)
 
   const roundsUsed = history.filter(m => m.role === 'user').length
   const roundsLeft = MAX_ROUNDS - roundsUsed
@@ -270,51 +273,213 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
         </div>
       )}
 
-      {/* Cost estimate + Generate — enchanted CTA */}
-      <div className="relative rounded-2xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-purple-600/10 to-amber-500/10 dark:from-indigo-400/5 dark:via-purple-400/5 dark:to-amber-400/5" />
-        <div className="relative rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-indigo-200/50 dark:border-indigo-800/30 p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                </svg>
+      {/* Generation options + breakdown */}
+      {(() => {
+        const pages = concept.tags.pageCount
+        const isFullQuality = !skipValidation && !skipIllustration && !skipAudio
+        const anySkipped = skipValidation || skipIllustration || skipAudio
+        // Estimate total time in seconds
+        const estSeconds = 10 + 15 + (skipValidation ? 0 : 10) + 60 + 60
+          + (skipIllustration ? 0 : pages * 60) + (skipAudio ? 0 : pages * 15) + 1
+        const estLabel = estSeconds >= 120
+          ? `~${Math.round(estSeconds / 60)} min`
+          : `~${estSeconds}s`
+
+        return (
+          <div className="relative rounded-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-purple-600/10 to-amber-500/10 dark:from-indigo-400/5 dark:via-purple-400/5 dark:to-amber-400/5" />
+            <div className="relative rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-indigo-200/50 dark:border-indigo-800/30 p-5">
+              {/* Header with presets */}
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                  </svg>
+                </div>
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Generation</span>
+                <div className="flex gap-1.5 ml-auto">
+                  <button
+                    type="button"
+                    onClick={() => { setSkipValidation(false); setSkipIllustration(false); setSkipAudio(false) }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                      isFullQuality
+                        ? 'border-indigo-400 dark:border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'
+                    }`}
+                    style={{ minHeight: '36px' }}
+                  >
+                    All On
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSkipValidation(true); setSkipIllustration(true); setSkipAudio(true) }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                      skipValidation && skipIllustration && skipAudio
+                        ? 'border-amber-400 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 shadow-sm'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'
+                    }`}
+                    style={{ minHeight: '36px' }}
+                  >
+                    Text Only
+                  </button>
+                </div>
               </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Enchantment Cost</span>
+
+              {/* Interactive breakdown table */}
+              <div className="rounded-xl border border-slate-200/70 dark:border-slate-700/50 overflow-hidden mb-4">
+                <table className="w-full text-[11px]">
+                  <thead>
+                    <tr className="bg-slate-50 dark:bg-slate-800/50">
+                      <th className="text-left px-3 py-2 font-semibold text-slate-500 dark:text-slate-400">Step</th>
+                      <th className="text-center px-2 py-2 font-semibold text-slate-500 dark:text-slate-400 w-16">Time</th>
+                      <th className="text-center px-2 py-2 font-semibold text-slate-500 dark:text-slate-400 w-12">On</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {/* Fixed steps — always on */}
+                    {[
+                      { step: 'Story Bible', desc: 'Characters, setting, rules', time: '~10s' },
+                      { step: 'Story Draft', desc: 'Write all pages', time: '~15s' },
+                    ].map((row) => (
+                      <tr key={row.step}>
+                        <td className="px-3 py-1.5">
+                          <span className="font-medium text-slate-700 dark:text-slate-300">{row.step}</span>
+                          <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— {row.desc}</span>
+                        </td>
+                        <td className="text-center px-2 py-1.5 text-slate-400 dark:text-slate-500 font-mono">{row.time}</td>
+                        <td className="text-center px-2 py-1.5">
+                          <svg className="w-3.5 h-3.5 text-emerald-500 inline" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                        </td>
+                      </tr>
+                    ))}
+                    {/* Toggleable: Consistency Check */}
+                    <tr
+                      className={`cursor-pointer transition-colors ${skipValidation ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10'}`}
+                      onClick={() => setSkipValidation(v => !v)}
+                    >
+                      <td className="px-3 py-1.5">
+                        <span className={`font-medium ${skipValidation ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>Consistency Check</span>
+                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— Verify &amp; fix against rules</span>
+                      </td>
+                      <td className={`text-center px-2 py-1.5 font-mono ${skipValidation ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400 dark:text-slate-500'}`}>~10s</td>
+                      <td className="text-center px-2 py-1.5">
+                        <input type="checkbox" checked={!skipValidation} onChange={() => setSkipValidation(v => !v)} className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 accent-indigo-600 cursor-pointer" onClick={(e) => e.stopPropagation()} />
+                      </td>
+                    </tr>
+                    {/* Fixed steps — always on */}
+                    {[
+                      { step: 'Character Ref', desc: 'Visual reference sheet', time: '~60s' },
+                      { step: 'Cover Art', desc: 'Book cover illustration', time: '~60s' },
+                    ].map((row) => (
+                      <tr key={row.step}>
+                        <td className="px-3 py-1.5">
+                          <span className="font-medium text-slate-700 dark:text-slate-300">{row.step}</span>
+                          <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— {row.desc}</span>
+                        </td>
+                        <td className="text-center px-2 py-1.5 text-slate-400 dark:text-slate-500 font-mono">{row.time}</td>
+                        <td className="text-center px-2 py-1.5">
+                          <svg className="w-3.5 h-3.5 text-emerald-500 inline" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                        </td>
+                      </tr>
+                    ))}
+                    {/* Toggleable: Illustrations */}
+                    <tr
+                      className={`cursor-pointer transition-colors ${skipIllustration ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10'}`}
+                      onClick={() => setSkipIllustration(v => !v)}
+                    >
+                      <td className="px-3 py-1.5">
+                        <span className={`font-medium ${skipIllustration ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>{`Illustrations (x${pages})`}</span>
+                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— Per-page artwork</span>
+                      </td>
+                      <td className={`text-center px-2 py-1.5 font-mono ${skipIllustration ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400 dark:text-slate-500'}`}>{`~${pages} min`}</td>
+                      <td className="text-center px-2 py-1.5">
+                        <input type="checkbox" checked={!skipIllustration} onChange={() => setSkipIllustration(v => !v)} className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 accent-indigo-600 cursor-pointer" onClick={(e) => e.stopPropagation()} />
+                      </td>
+                    </tr>
+                    {/* Toggleable: Narration */}
+                    <tr
+                      className={`cursor-pointer transition-colors ${skipAudio ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10'}`}
+                      onClick={() => setSkipAudio(v => !v)}
+                    >
+                      <td className="px-3 py-1.5">
+                        <span className={`font-medium ${skipAudio ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>{`Narration (x${pages})`}</span>
+                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— Voice-over per page</span>
+                      </td>
+                      <td className={`text-center px-2 py-1.5 font-mono ${skipAudio ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400 dark:text-slate-500'}`}>{`~${Math.ceil(pages * 0.25)} min`}</td>
+                      <td className="text-center px-2 py-1.5">
+                        <input type="checkbox" checked={!skipAudio} onChange={() => setSkipAudio(v => !v)} className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 accent-indigo-600 cursor-pointer" onClick={(e) => e.stopPropagation()} />
+                      </td>
+                    </tr>
+                    {/* Save — always on */}
+                    <tr>
+                      <td className="px-3 py-1.5">
+                        <span className="font-medium text-slate-700 dark:text-slate-300">Save</span>
+                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— Finalize book</span>
+                      </td>
+                      <td className="text-center px-2 py-1.5 text-slate-400 dark:text-slate-500 font-mono">~1s</td>
+                      <td className="text-center px-2 py-1.5">
+                        <svg className="w-3.5 h-3.5 text-emerald-500 inline" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                      </td>
+                    </tr>
+                    {/* Total row */}
+                    <tr className="bg-slate-50/80 dark:bg-slate-800/30 font-semibold">
+                      <td className="px-3 py-2 text-slate-700 dark:text-slate-300">Estimated total</td>
+                      <td className="text-center px-2 py-2 text-indigo-600 dark:text-indigo-400 font-mono">{estLabel}</td>
+                      <td className="text-center px-2 py-2" />
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Context hint for skipped validation */}
+              {!skipValidation && (
+                <div className="rounded-xl bg-indigo-50/80 dark:bg-indigo-900/15 border border-indigo-200/40 dark:border-indigo-800/30 px-3 py-2.5 mb-4">
+                  <p className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 mb-1">Consistency check verifies:</p>
+                  <ul className="text-[10px] text-indigo-600/80 dark:text-indigo-400/70 space-y-0.5 pl-3">
+                    <li>Character descriptions match Story Bible on every page</li>
+                    <li>Timeline &amp; causality — no plot holes or contradictions</li>
+                    <li>Auto-fixes any issues found before illustration</li>
+                  </ul>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[11px] text-slate-400 dark:text-slate-500">Credits are refunded if generation fails</span>
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">{CREDIT_COSTS.generate} credits</span>
+              </div>
+
+              <button
+                onClick={() => onGenerate(concept, anySkipped ? {
+                  skipIllustration: skipIllustration || undefined,
+                  skipAudio: skipAudio || undefined,
+                  skipValidation: skipValidation || undefined,
+                } : undefined)}
+                disabled={loading || refining}
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-amber-600 hover:from-indigo-500 hover:via-purple-500 hover:to-amber-500 text-white font-bold text-sm transition-all shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 cursor-pointer disabled:opacity-50 disabled:cursor-default disabled:shadow-none"
+                style={{ minHeight: '44px' }}
+              >
+                {loading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.824 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    The magic is unfolding...
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-2">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                    </svg>
+                    Bring This Story to Life
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-white/20 border border-white/30">{estLabel}</span>
+                  </span>
+                )}
+              </button>
             </div>
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">{CREDIT_COSTS.generate} credits</span>
           </div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400 mb-4 pl-8 space-y-0.5">
-            <p>Includes: story writing + {concept.tags.pageCount} illustrations + {concept.tags.pageCount} narrations + cover</p>
-            <p>Credits are refunded if generation fails</p>
-          </div>
-          <button
-            onClick={() => onGenerate(concept)}
-            disabled={loading || refining}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-amber-600 hover:from-indigo-500 hover:via-purple-500 hover:to-amber-500 text-white font-bold text-sm transition-all shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 cursor-pointer disabled:opacity-50 disabled:cursor-default disabled:shadow-none"
-            style={{ minHeight: '44px' }}
-          >
-            {loading ? (
-              <span className="inline-flex items-center gap-2">
-                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.824 5.824 3 7.938l3-2.647z" />
-                </svg>
-                The magic is unfolding...
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-2">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
-                </svg>
-                Bring This Story to Life
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-white/20 border border-white/30">{CREDIT_COSTS.generate} credits</span>
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
+        )
+      })()}
     </div>
   )
 }
