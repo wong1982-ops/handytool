@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { StudioLayout } from '@/tools/story-studio/studio-layout'
 
 type Phase = 'upload' | 'processing' | 'review'
 
@@ -161,7 +160,7 @@ export default function ScanPage() {
   }, [])
 
   return (
-    <StudioLayout>
+    <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10">
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
@@ -376,6 +375,6 @@ export default function ScanPage() {
           </div>
         </div>
       )}
-    </StudioLayout>
+    </div>
   )
 }
