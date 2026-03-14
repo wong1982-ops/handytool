@@ -11,6 +11,7 @@ const createCharacterSchema = z.object({
   personality: z.string().max(2000).optional(),
   physicalDescription: z.string().max(2000).optional(),
   voice: z.string().max(100).optional(),
+  artStyle: z.string().max(100).optional(),
 })
 
 export async function GET() {
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
   const parsed = createCharacterSchema.safeParse(body)
   if (!parsed.success) return apiError(parsed.error.message, 'VALIDATION_ERROR', 400)
 
-  const { name, age, role, personality, physicalDescription, voice } = parsed.data
+  const { name, age, role, personality, physicalDescription, voice, artStyle } = parsed.data
 
   // Validate voice name if provided
   if (voice && !GEMINI_VOICES.some(v => v.name === voice)) {
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest) {
     p_physical_description: physicalDescription ?? null,
     p_voice: voice ?? null,
     p_reference_image_url: null,
+    p_art_style: artStyle ?? null,
   })
   if (dbError) return apiError(dbError.message, 'DB_ERROR', 500)
 

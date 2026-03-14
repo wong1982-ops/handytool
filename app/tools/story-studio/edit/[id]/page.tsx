@@ -16,7 +16,7 @@ interface PageData {
 export default function EditBookPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: bookId } = use(params)
   const router = useRouter()
-  const [bookData, setBookData] = useState<{ title: string; coverImageUrl?: string | null; pages: PageData[] } | null>(null)
+  const [bookData, setBookData] = useState<{ title: string; coverImageUrl?: string | null; artStyle?: string; pages: PageData[] } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -30,9 +30,12 @@ export default function EditBookPage({ params }: { params: Promise<{ id: string 
         if (cancelled) return
         const bookJsonb = (data.data as Record<string, unknown>) || {}
         const rawPages = (bookJsonb.pages as Record<string, unknown>[]) ?? []
+        const concept = bookJsonb.concept as Record<string, unknown> | undefined
+        const tags = concept?.tags as Record<string, unknown> | undefined
         setBookData({
           title: data.title || (bookJsonb.title as string) || 'Untitled',
           coverImageUrl: (bookJsonb.coverImageUrl as string) || null,
+          artStyle: (bookJsonb.style as string) || (tags?.style as string) || undefined,
           pages: rawPages.map((p: Record<string, unknown>) => ({
             sequence: p.sequence as number,
             sceneDescription: (p.sceneDescription as string) || '',
@@ -103,6 +106,7 @@ export default function EditBookPage({ params }: { params: Promise<{ id: string 
       bookId={bookId}
       title={bookData.title}
       coverImageUrl={bookData.coverImageUrl}
+      artStyle={bookData.artStyle}
       pages={bookData.pages}
       onSave={handleSave}
       onBack={handleBack}

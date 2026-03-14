@@ -104,14 +104,8 @@ export function useJobProgress(userId: string | null | undefined) {
   const [completedJobId, setCompletedJobId] = useState<string | null>(null)
   const channelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
 
-  // Fetch active jobs from REST
+  // Fetch active jobs from REST (API authenticates via cookies — no need to wait for client auth)
   const fetchJobs = useCallback(async () => {
-    if (!userId) {
-      setJobs([])
-      setLoading(false)
-      return
-    }
-
     try {
       const res = await fetch('/api/v1/story/jobs', {
         signal: AbortSignal.timeout(8000),
@@ -125,11 +119,13 @@ export function useJobProgress(userId: string | null | undefined) {
     } finally {
       setLoading(false)
     }
-  }, [userId])
+  }, [])
 
-  // Initial fetch
+  // Initial fetch + poll every 60s as fallback (Realtime may not work in dev)
   useEffect(() => {
     fetchJobs()
+    const interval = setInterval(fetchJobs, 60_000)
+    return () => clearInterval(interval)
   }, [fetchJobs])
 
   // Supabase Realtime subscription

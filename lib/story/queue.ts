@@ -184,16 +184,16 @@ export function getNextStep(
       return { step: 'validate' }
 
     case 'validate':
+      if (context.skipIllustration) {
+        // Skip all image generation — go straight to TTS or save
+        return context.skipAudio ? { step: 'save' } : 'tts_batch'
+      }
       return { step: 'character_ref' }
 
     case 'character_ref':
       return { step: 'cover' }
 
     case 'cover':
-      if (context.skipIllustration) {
-        // Skip per-page illustrations → go to TTS or save
-        return context.skipAudio ? { step: 'save' } : 'tts_batch'
-      }
       // Start sequential illustration chain with page 1
       return { step: 'illustrate_page', params: { page: '1' } }
 

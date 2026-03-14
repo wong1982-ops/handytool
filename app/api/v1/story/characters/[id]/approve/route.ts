@@ -11,24 +11,21 @@ export async function POST(
   const userId = await getAuthUserId()
   if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  // Fetch character (direct query)
-  const { data: character, error: fetchErr } = await supabase
-    .from('characters')
-    .select('id, status, reference_image_url')
-    .eq('id', characterId)
-    .eq('user_id', userId)
-    .single()
+  // Fetch character via RPC (SECURITY DEFINER — bypasses RLS)
+  const { data: character, error: fetchErr } = await supabase.rpc('get_character_detail', {
+    p_character_id: characterId,
+    p_user_id: userId,
+  })
   if (fetchErr || !character) return apiError('Character not found', 'NOT_FOUND', 404)
   if (!character.reference_image_url) return apiError('Character must have a portrait before approval', 'VALIDATION_ERROR', 400)
   if (character.status === 'approved') return apiError('Character is already approved', 'VALIDATION_ERROR', 400)
 
-  // Update status via direct update (RLS handles ownership)
-  const { error: updateErr } = await supabase
-    .from('characters')
-    .update({ status: 'approved' })
-    .eq('id', characterId)
-    .eq('user_id', userId)
-
+  // Update status via RPC (SECURITY DEFINER — bypasses RLS)
+  const { error: updateErr } = await supabase.rpc('update_character', {
+    p_user_id: userId,
+    p_character_id: characterId,
+    p_status: 'approved',
+  })
   if (updateErr) return apiError(updateErr.message, 'DB_ERROR', 500)
 
   return apiSuccess({ success: true })

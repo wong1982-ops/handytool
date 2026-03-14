@@ -340,13 +340,7 @@ export async function generatePageAudio(input: TtsInput): Promise<TtsResult> {
     }
   }
 
-  // In dev mode, return a data URL to skip Supabase upload
-  if (process.env.NODE_ENV === 'development') {
-    const base64 = audioBuffer.toString('base64')
-    return { audioUrl: `data:${contentType};base64,${base64}`, provider }
-  }
-
-  // Upload to R2
+  // Upload to R2 (always — base64 data URIs are too large for JSONB state in book_jobs)
   const filename = `audio/${input.bookId}/page-${input.pageNumber}.${fileExtension}`
   const audioUrl = await uploadToR2(filename, audioBuffer, contentType, { upsert: true })
 

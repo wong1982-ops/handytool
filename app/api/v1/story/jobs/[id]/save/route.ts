@@ -75,8 +75,9 @@ export const POST = withJobStep('save', async (ctx) => {
   }
 
   // Extract the book UUID from the RPC result
+  // insert_book returns UUID directly (not an object)
   const row = Array.isArray(insertedBook) ? insertedBook[0] : insertedBook
-  const savedBookId = row?.id || row?.book_id
+  const savedBookId = typeof row === 'string' ? row : (row?.id || row?.book_id)
 
   // Complete the job
   if (savedBookId) {

@@ -99,6 +99,8 @@ export function useStoryBook() {
   }, [])
 
   const [seriesId, setSeriesId] = useState<string | null>(null)
+  const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>([])
+  const [selectedArtStyle, setSelectedArtStyle] = useState<string | null>(null)
 
   const fetchConcepts = useCallback(async (plotText: string, seriesIdOverride?: string) => {
     setLoading(true)
@@ -115,7 +117,12 @@ export function useStoryBook() {
       const res = await fetch('/api/v1/story/concepts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plot: plotText, ...(activeSeriesId ? { seriesId: activeSeriesId } : {}) }),
+        body: JSON.stringify({
+          plot: plotText,
+          ...(activeSeriesId ? { seriesId: activeSeriesId } : {}),
+          ...(selectedCharacterIds.length > 0 ? { characterIds: selectedCharacterIds } : {}),
+          ...(selectedArtStyle ? { artStyle: selectedArtStyle } : {}),
+        }),
         signal: controller.signal,
       })
 
@@ -139,7 +146,7 @@ export function useStoryBook() {
     } finally {
       setLoading(false)
     }
-  }, [seriesId])
+  }, [seriesId, selectedCharacterIds, selectedArtStyle])
 
   // Job ID for background generation tracking
   const [activeJobId, setActiveJobId] = useState<string | null>(null)
@@ -164,6 +171,8 @@ export function useStoryBook() {
           plot: plotText,
           concept,
           ...(seriesId ? { seriesId } : {}),
+          ...(selectedCharacterIds.length > 0 ? { characterIds: selectedCharacterIds } : {}),
+          ...(selectedArtStyle ? { artStyle: selectedArtStyle } : {}),
           ...(options?.skipIllustration ? { skipIllustration: true } : {}),
           ...(options?.skipAudio ? { skipAudio: true } : {}),
           ...(options?.skipValidation ? { skipValidation: true } : {}),
@@ -198,7 +207,7 @@ export function useStoryBook() {
     } finally {
       setLoading(false)
     }
-  }, [seriesId])
+  }, [seriesId, selectedCharacterIds, selectedArtStyle])
 
   return {
     phase,
@@ -219,6 +228,10 @@ export function useStoryBook() {
     creditsUsed,
     seriesId,
     setSeriesId,
+    selectedCharacterIds,
+    setSelectedCharacterIds,
+    selectedArtStyle,
+    setSelectedArtStyle,
     activeJobId,
     setActiveJobId,
     fetchConcepts,

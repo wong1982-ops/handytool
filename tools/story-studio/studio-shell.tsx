@@ -12,7 +12,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Fantasy header */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-indigo-950 via-purple-900 to-indigo-950">
+      <div className="relative bg-gradient-to-r from-indigo-950 via-purple-900 to-indigo-950">
         {/* Starfield background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 opacity-40" style={{

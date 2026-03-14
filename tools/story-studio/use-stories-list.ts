@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useAuth } from '@/lib/hooks/use-auth'
 
 export interface StoryItem {
   id: string
@@ -22,7 +21,6 @@ export interface StoryItem {
 export type SortOption = 'newest' | 'oldest' | 'alphabetical' | 'updated'
 
 export function useStoriesList() {
-  const { user } = useAuth()
   const [stories, setStories] = useState<StoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -31,11 +29,13 @@ export function useStoriesList() {
   const [filterSeries, setFilterSeries] = useState<string | null>(null)
 
   const fetchStories = useCallback(async () => {
-    if (!user) { setLoading(false); return }
     try {
       setLoading(true)
       const res = await fetch('/api/v1/story/books')
-      if (!res.ok) throw new Error('Failed to load stories')
+      if (!res.ok) {
+        if (res.status === 401) { setLoading(false); return }
+        throw new Error('Failed to load stories')
+      }
       const { data } = await res.json()
       setStories(data ?? [])
     } catch (e) {
@@ -43,7 +43,7 @@ export function useStoriesList() {
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [])
 
   useEffect(() => { fetchStories() }, [fetchStories])
 

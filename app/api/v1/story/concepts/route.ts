@@ -91,9 +91,40 @@ export async function POST(request: Request) {
 
         seriesContext = {
           setting: series.setting,
-          artStyle: series.art_style,
+          artStyle: parsed.data.artStyle || series.art_style,
           characters: approvedChars.map(c => ({ name: c.name, description: c.description })),
           existingBooks: existingBooks.length > 0 ? existingBooks : undefined,
+        }
+      }
+    }
+
+    // Standalone mode: load selected characters + art style (no series required)
+    if (!seriesContext && (parsed.data.characterIds?.length || parsed.data.artStyle)) {
+      const supabase = await createClient()
+      let characters: { name: string; description: string }[] = []
+
+      if (parsed.data.characterIds?.length) {
+        // Load each character via RPC
+        const charResults = await Promise.all(
+          parsed.data.characterIds.map(cid =>
+            supabase.rpc('get_character_detail', { p_character_id: cid, p_user_id: userId })
+          )
+        )
+        characters = charResults
+          .map(r => r.data)
+          .filter(Boolean)
+          .map((c: any) => ({
+            name: c.name as string,
+            description: (c.physical_description || c.personality || '') as string,
+          }))
+          .filter(c => c.name)
+      }
+
+      if (characters.length > 0 || parsed.data.artStyle) {
+        seriesContext = {
+          setting: '',
+          artStyle: parsed.data.artStyle || "children's book illustration",
+          characters,
         }
       }
     }

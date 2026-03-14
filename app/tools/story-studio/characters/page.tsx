@@ -1,45 +1,37 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { useCharacterList } from '@/tools/story-studio/use-characters'
 import { CharacterList } from '@/tools/story-studio/characters/character-list'
 import { CharacterForm } from '@/tools/story-studio/characters/character-form'
-import { CharacterDetail } from '@/tools/story-studio/characters/character-detail'
 import { SeriesSection } from '@/tools/story-studio/characters/series-section'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { signInWithOAuth } from '@/lib/supabase/auth'
 import type { CreateCharacterInput } from '@/tools/story-studio/use-characters'
 
-type View = 'list' | 'create' | 'detail'
+type View = 'list' | 'create'
 
 export default function CharactersPage() {
+  const router = useRouter()
   const { user, loading: authLoading } = useAuth()
-  const { characters, loading, createCharacter, deleteCharacter, refresh } = useCharacterList()
+  const { characters, loading, createCharacter, deleteCharacter } = useCharacterList()
   const [view, setView] = useState<View>('list')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [formLoading, setFormLoading] = useState(false)
 
   const handleCreate = useCallback(async (data: CreateCharacterInput) => {
     setFormLoading(true)
     try {
       const id = await createCharacter(data)
-      setSelectedId(id)
-      setView('detail')
+      router.push(`/tools/story-studio/characters/${id}`)
     } finally {
       setFormLoading(false)
     }
-  }, [createCharacter])
+  }, [createCharacter, router])
 
   const handleSelect = useCallback((id: string) => {
-    setSelectedId(id)
-    setView('detail')
-  }, [])
-
-  const handleBack = useCallback(() => {
-    setSelectedId(null)
-    setView('list')
-    refresh()
-  }, [refresh])
+    router.push(`/tools/story-studio/characters/${id}`)
+  }, [router])
 
   // Auth gate
   if (!authLoading && !user) {
@@ -71,16 +63,6 @@ export default function CharactersPage() {
     )
   }
 
-  // Detail view
-  if (view === 'detail' && selectedId) {
-    return (
-      <CharacterDetail
-        characterId={selectedId}
-        onBack={handleBack}
-      />
-    )
-  }
-
   // List view (default)
   return (
     <div>
@@ -96,7 +78,7 @@ export default function CharactersPage() {
         characters={characters}
         onSelectCharacter={handleSelect}
         onCreateSeries={() => {
-          window.location.href = '/tools/story-studio/series'
+          router.push('/tools/story-studio/series')
         }}
       />
     </div>

@@ -8,12 +8,13 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3002',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3002',
     trace: 'on-first-retry',
   },
   webServer: {
     command: 'pnpm dev --port 3002',
-    url: 'http://localhost:3002',
+    url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3002',
     reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
   },
 })

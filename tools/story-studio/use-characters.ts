@@ -3,6 +3,32 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/lib/hooks/use-auth'
 
+export const ART_STYLES = [
+  { value: "children's book illustration", label: "Children's Book" },
+  { value: 'watercolor painting', label: 'Watercolor' },
+  { value: 'cartoon', label: 'Cartoon' },
+  { value: 'anime', label: 'Anime' },
+  { value: 'pixel art', label: 'Pixel Art' },
+  { value: 'oil painting', label: 'Oil Painting' },
+  { value: 'pencil sketch', label: 'Pencil Sketch' },
+  { value: 'comic book', label: 'Comic Book' },
+  { value: 'flat vector illustration', label: 'Flat Vector' },
+  { value: '3D render', label: '3D Render' },
+  { value: 'realistic digital art', label: 'Realistic' },
+  { value: 'pastel drawing', label: 'Pastel' },
+  { value: 'ink wash painting', label: 'Ink Wash' },
+  { value: 'storybook gouache', label: 'Gouache' },
+] as const
+
+export interface CharacterPortrait {
+  id: string
+  imageUrl: string
+  artStyle: string
+  isPrimary: boolean
+  refinementCount: number
+  createdAt: string
+}
+
 export interface CharacterItem {
   id: string
   name: string
@@ -12,6 +38,7 @@ export interface CharacterItem {
   physicalDescription: string | null
   referenceImageUrl: string | null
   voice: string | null
+  artStyle: string | null
   status: 'draft' | 'approved'
   refinementCount: number
   seriesIds: string[]
@@ -26,6 +53,7 @@ export interface CreateCharacterInput {
   personality?: string
   physicalDescription?: string
   voice?: string
+  artStyle?: string
 }
 
 export interface UpdateCharacterInput {
@@ -35,6 +63,7 @@ export interface UpdateCharacterInput {
   personality?: string
   physicalDescription?: string
   voice?: string | null
+  artStyle?: string
 }
 
 export function useCharacterList() {
@@ -59,6 +88,7 @@ export function useCharacterList() {
         physicalDescription: (c.physical_description as string) ?? null,
         referenceImageUrl: (c.reference_image_url as string) ?? null,
         voice: (c.voice as string) ?? null,
+        artStyle: (c.art_style as string) ?? null,
         status: (c.status as 'draft' | 'approved') ?? 'draft',
         refinementCount: (c.refinement_count as number) ?? 0,
         seriesIds: Array.isArray(c.series)
@@ -103,6 +133,7 @@ export function useCharacterList() {
 export function useCharacterDetail(characterId: string | null) {
   const { user } = useAuth()
   const [character, setCharacter] = useState<CharacterItem | null>(null)
+  const [portraits, setPortraits] = useState<CharacterPortrait[]>([])
   const [loading, setLoading] = useState(false)
   const [refining, setRefining] = useState(false)
 
@@ -110,12 +141,21 @@ export function useCharacterDetail(characterId: string | null) {
     if (!characterId || !user) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/v1/story/characters/${characterId}`)
-      if (!res.ok) throw new Error('Not found')
-      const { data } = await res.json()
-      setCharacter(data)
+      const [charRes, portraitsRes] = await Promise.all([
+        fetch(`/api/v1/story/characters/${characterId}`),
+        fetch(`/api/v1/story/characters/${characterId}/portraits`),
+      ])
+      if (!charRes.ok) throw new Error('Not found')
+      const { data: charData } = await charRes.json()
+      setCharacter(charData)
+
+      if (portraitsRes.ok) {
+        const { data: portraitsData } = await portraitsRes.json()
+        setPortraits(portraitsData ?? [])
+      }
     } catch {
       setCharacter(null)
+      setPortraits([])
     } finally {
       setLoading(false)
     }
@@ -134,30 +174,47 @@ export function useCharacterDetail(characterId: string | null) {
     await fetchCharacter()
   }, [characterId, fetchCharacter])
 
-  const refinePortrait = useCallback(async (physicalDescription: string, feedback?: string) => {
-    if (!characterId) return
+  // Generate a new portrait for a given art style, or refine an existing one
+  const generatePortrait = useCallback(async (artStyle: string, feedback?: string, portraitId?: string) => {
+    if (!characterId || !character?.physicalDescription) return
     setRefining(true)
     try {
       const res = await fetch(`/api/v1/story/characters/${characterId}/refine`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ physicalDescription, feedback }),
+        body: JSON.stringify({
+          physicalDescription: character.physicalDescription,
+          artStyle,
+          feedback,
+          portraitId,
+        }),
       })
       const json = await res.json()
       if (!res.ok) {
         throw new Error(json.code === 'INSUFFICIENT_CREDITS' ? 'Insufficient credits' : json.error)
       }
-      setCharacter(prev => prev ? {
-        ...prev,
-        physicalDescription: json.data.physicalDescription,
-        referenceImageUrl: json.data.referenceImageUrl,
-        refinementCount: json.data.refinementCount,
-      } : null)
+      // Update portraits from response
+      if (json.data.portraits) {
+        setPortraits(json.data.portraits)
+      }
+      // Refresh character to get updated reference_image_url
+      await fetchCharacter()
       return json.data
     } finally {
       setRefining(false)
     }
-  }, [characterId])
+  }, [characterId, character?.physicalDescription, fetchCharacter])
+
+  const setPrimaryPortrait = useCallback(async (portraitId: string) => {
+    if (!characterId) return
+    const res = await fetch(`/api/v1/story/characters/${characterId}/portraits/${portraitId}/primary`, {
+      method: 'POST',
+    })
+    if (!res.ok) throw new Error('Failed to set primary')
+    // Optimistic update
+    setPortraits(prev => prev.map(p => ({ ...p, isPrimary: p.id === portraitId })))
+    await fetchCharacter()
+  }, [characterId, fetchCharacter])
 
   const approveCharacter = useCallback(async () => {
     if (!characterId) return
@@ -187,8 +244,8 @@ export function useCharacterDetail(characterId: string | null) {
   }, [characterId, fetchCharacter])
 
   return {
-    character, loading, refining,
-    updateCharacter, refinePortrait, approveCharacter,
+    character, portraits, loading, refining,
+    updateCharacter, generatePortrait, setPrimaryPortrait, approveCharacter,
     linkToSeries, unlinkFromSeries, refresh: fetchCharacter,
   }
 }

@@ -6,9 +6,10 @@ import type { StoryConcept } from '@/lib/story/types'
 export const POST = withJobStep('illustrate_page', async (ctx) => {
   const { job, supabase } = ctx
   const pageNum = parseInt(ctx.params.page, 10)
-  const { concept, seriesId } = job.input as {
+  const { concept, seriesId, characterIds } = job.input as {
     concept: StoryConcept
     seriesId?: string
+    characterIds?: string[]
   }
 
   // Idempotent: check if this page is already illustrated
@@ -57,6 +58,25 @@ export const POST = withJobStep('illustrate_page', async (ctx) => {
       }
     } catch (err) {
       console.error(`[illustrate-page] Failed to reload series characters for page ${pageNum}:`, err)
+    }
+  } else if (job.state.characterRefMode === 'standalone' && characterIds?.length) {
+    // Standalone characters selected by user — load their primary portraits
+    for (const cid of characterIds) {
+      try {
+        const { data: charData } = await supabase.rpc('get_character_detail', {
+          p_character_id: cid,
+          p_user_id: job.user_id,
+        })
+        if (!charData) continue
+        const c = charData as { name: string; physical_description?: string; reference_image_url?: string }
+        if (c.reference_image_url) {
+          const res = await fetch(c.reference_image_url)
+          if (res.ok) {
+            const buf = Buffer.from(await res.arrayBuffer())
+            characterReferences.push({ name: c.name, description: c.physical_description || '', buffer: buf })
+          }
+        }
+      } catch { /* skip */ }
     }
   } else if (job.state.characterRefUrl) {
     try {

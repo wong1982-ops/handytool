@@ -5,9 +5,10 @@ import type { StoryConcept } from '@/lib/story/types'
 
 export const POST = withJobStep('character_ref', async (ctx) => {
   const { job, supabase } = ctx
-  const { concept, seriesId } = job.input as {
+  const { concept, seriesId, characterIds } = job.input as {
     concept: StoryConcept
     seriesId?: string
+    characterIds?: string[]
   }
 
   // Idempotent
@@ -21,8 +22,8 @@ export const POST = withJobStep('character_ref', async (ctx) => {
     description: c.description,
   }))
 
-  // Check for existing series character portraits
-  let seriesReferenceImages: { name: string; description: string; buffer: Buffer }[] = []
+  // Check for existing character portraits — from series OR standalone character IDs
+  let referenceImages: { name: string; description: string; buffer: Buffer }[] = []
 
   if (seriesId) {
     try {
@@ -39,7 +40,7 @@ export const POST = withJobStep('character_ref', async (ctx) => {
             const res = await fetch(c.referenceImageUrl!)
             if (res.ok) {
               const buf = Buffer.from(await res.arrayBuffer())
-              seriesReferenceImages.push({ name: c.name, description: c.description, buffer: buf })
+              referenceImages.push({ name: c.name, description: c.description, buffer: buf })
             }
           } catch { /* skip */ }
         }
@@ -47,15 +48,39 @@ export const POST = withJobStep('character_ref', async (ctx) => {
     } catch (err) {
       console.error('[character-ref] Failed to load series characters:', err)
     }
+  } else if (characterIds?.length) {
+    // Standalone mode with selected characters — load their primary portraits
+    for (const cid of characterIds) {
+      try {
+        const { data: charData } = await supabase.rpc('get_character_detail', {
+          p_character_id: cid,
+          p_user_id: job.user_id,
+        })
+        if (!charData) continue
+        const c = charData as { name: string; physical_description?: string; reference_image_url?: string }
+        if (c.reference_image_url) {
+          const res = await fetch(c.reference_image_url)
+          if (res.ok) {
+            const buf = Buffer.from(await res.arrayBuffer())
+            referenceImages.push({
+              name: c.name,
+              description: c.physical_description || '',
+              buffer: buf,
+            })
+          }
+        }
+      } catch { /* skip */ }
+    }
   }
 
-  if (seriesReferenceImages.length > 0) {
-    // Series mode: store character ref metadata (buffers re-fetched by illustrate step)
-    const charNames = seriesReferenceImages.map(r => r.name)
+  if (referenceImages.length > 0) {
+    // Has reference images: store character ref metadata (buffers re-fetched by illustrate step)
+    const charNames = referenceImages.map(r => r.name)
     return {
       statePatch: {
-        characterRefMode: 'series',
+        characterRefMode: seriesId ? 'series' : 'standalone',
         characterRefNames: charNames,
+        characterIds: characterIds || undefined,
       },
     }
   }

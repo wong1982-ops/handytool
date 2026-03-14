@@ -10,6 +10,7 @@ const illustrateSchema = z.object({
   refinement: z.string().min(1).max(2000).optional(),
   qualityMode: z.enum(['fast', 'quality']).default('quality'),
   characterIds: z.array(z.string().uuid()).optional(),
+  artStyle: z.string().min(1).max(200).optional(),
 }).refine(data => data.imagePrompt || data.refinement, {
   message: 'Either imagePrompt or refinement is required',
 })
@@ -29,7 +30,7 @@ export async function POST(
   const parsed = illustrateSchema.safeParse(body)
   if (!parsed.success) return apiError(parsed.error.message, 'VALIDATION_ERROR', 400)
 
-  const { pageId, imagePrompt: rawPrompt, refinement, qualityMode, characterIds } = parsed.data
+  const { pageId, imagePrompt: rawPrompt, refinement, qualityMode, characterIds, artStyle } = parsed.data
 
   // If refinement mode, fetch the stored prompt from existing illustration/cover
   let imagePrompt: string
@@ -77,7 +78,7 @@ export async function POST(
 
   try {
     const bookData = book.data as Record<string, unknown> | null
-    const style = (bookData?.style as string) || (bookData?.concept as any)?.tags?.style || "children's book illustration"
+    const style = artStyle || (bookData?.style as string) || (bookData?.concept as any)?.tags?.style || "children's book illustration"
 
     const characters: { name: string; description: string }[] = []
     let previousPageImage: Buffer | undefined

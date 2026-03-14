@@ -279,8 +279,9 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
         const isFullQuality = !skipValidation && !skipIllustration && !skipAudio
         const anySkipped = skipValidation || skipIllustration || skipAudio
         // Estimate total time in seconds
-        const estSeconds = 10 + 15 + (skipValidation ? 0 : 10) + 60 + 60
-          + (skipIllustration ? 0 : pages * 60) + (skipAudio ? 0 : pages * 15) + 1
+        const estSeconds = 10 + 15 + (skipValidation ? 0 : 10)
+          + (skipIllustration ? 0 : 60 + 60 + pages * 60) // char_ref + cover + illustrations
+          + (skipAudio ? 0 : pages * 15) + 1
         const estLabel = estSeconds >= 120
           ? `~${Math.round(estSeconds / 60)} min`
           : `~${estSeconds}s`
@@ -366,19 +367,23 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                         <input type="checkbox" checked={!skipValidation} onChange={() => setSkipValidation(v => !v)} className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 accent-indigo-600 cursor-pointer" onClick={(e) => e.stopPropagation()} />
                       </td>
                     </tr>
-                    {/* Fixed steps — always on */}
+                    {/* Character Ref & Cover Art — skipped when skipIllustration */}
                     {[
                       { step: 'Character Ref', desc: 'Visual reference sheet', time: '~60s' },
                       { step: 'Cover Art', desc: 'Book cover illustration', time: '~60s' },
                     ].map((row) => (
-                      <tr key={row.step}>
+                      <tr key={row.step} className={skipIllustration ? 'bg-slate-50/50 dark:bg-slate-800/20' : ''}>
                         <td className="px-3 py-1.5">
-                          <span className="font-medium text-slate-700 dark:text-slate-300">{row.step}</span>
+                          <span className={`font-medium ${skipIllustration ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>{row.step}</span>
                           <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— {row.desc}</span>
                         </td>
-                        <td className="text-center px-2 py-1.5 text-slate-400 dark:text-slate-500 font-mono">{row.time}</td>
+                        <td className={`text-center px-2 py-1.5 font-mono ${skipIllustration ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400 dark:text-slate-500'}`}>{row.time}</td>
                         <td className="text-center px-2 py-1.5">
-                          <svg className="w-3.5 h-3.5 text-emerald-500 inline" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                          {skipIllustration ? (
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500">skip</span>
+                          ) : (
+                            <svg className="w-3.5 h-3.5 text-emerald-500 inline" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                          )}
                         </td>
                       </tr>
                     ))}

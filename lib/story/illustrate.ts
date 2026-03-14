@@ -255,6 +255,51 @@ function buildImagen3Prompt(input: IllustrateInput, subjectRefCount: number): st
   return prompt
 }
 
+// ---------- Portrait Editing (Gemini — in-place refinement) ----------
+
+/**
+ * Edit an existing portrait based on user feedback.
+ * Passes the current image to Gemini and asks it to make targeted changes
+ * (e.g. "add a headband", "make hair curlier") while keeping everything else intact.
+ * Priority: Nano Banana → returns null (caller falls back to regeneration).
+ */
+export async function editPortrait(
+  currentImage: Buffer,
+  feedback: string,
+  characterName: string,
+  style: string,
+): Promise<Buffer | null> {
+  if (!GEMINI_API_KEY) return null
+
+  try {
+    console.log(`[illustrate] Editing portrait via Nano Banana: "${feedback.slice(0, 80)}"`)
+
+    const contents: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] = [
+      { inlineData: { mimeType: 'image/png', data: currentImage.toString('base64') } },
+      { text: `Edit this ${style} portrait of ${characterName}. `
+        + `Make ONLY these changes: ${feedback}. `
+        + `Keep EVERYTHING else exactly the same — same face, same pose, same background, same art style, same colors. `
+        + `Only modify what was specifically requested. `
+        + `No text, words, or letters in the image.` },
+    ]
+
+    const response = await genAI.models.generateContent({
+      model: NANO_BANANA_MODEL,
+      contents,
+      config: {
+        responseModalities: ['TEXT', 'IMAGE'],
+      },
+    })
+
+    const buf = extractBufferFromNanoBananaResponse(response)
+    console.log(`[illustrate] Portrait edited via Nano Banana (${(buf.length / 1024).toFixed(0)} KB)`)
+    return buf
+  } catch (err) {
+    console.warn('[illustrate] Portrait editing failed:', err)
+    return null
+  }
+}
+
 // ---------- Character Reference (Gemini Flash) ----------
 
 /**
@@ -279,7 +324,7 @@ export async function generateCharacterReference(
   const anatomyRules = 'Anatomically correct: humans have exactly 2 arms, 2 legs, 5 fingers per hand, 5 toes per foot, normal proportioned neck. Animals have species-accurate limb count. No extra limbs, merged fingers, or distorted proportions.'
 
   const buildRefPrompt = (suffix: string) => isSingle
-    ? `${style} style full body character portrait of ${characters[0].name}. ${characters[0].description}. Standing pose, clear details, clean background. ${anatomyRules} ${suffix}`
+    ? `${style} style full body character portrait of EXACTLY ONE character: ${characters[0].name}. ${characters[0].description}. Single figure only, standing pose, clear details, clean background. Do NOT add any other people, figures, or characters — only ${characters[0].name} should appear. ${anatomyRules} ${suffix}`
     : `${style} style character reference sheet showing all main characters side by side, full body, clear distinct appearances, white background. Characters: ${charDescs}. ${anatomyRules} ${suffix}`
 
   // --- Priority 1: Nano Banana (with optional style reference image) ---
@@ -288,10 +333,13 @@ export async function generateCharacterReference(
       const prompt = buildRefPrompt('No text, words, or letters in the image.')
       const contents: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] = []
 
-      // Pass style reference image inline if available
+      // Pass identity reference — only for face and body proportions, nothing else
       if (styleReferenceImage) {
         contents.push({ inlineData: { mimeType: 'image/png', data: styleReferenceImage.toString('base64') } })
-        contents.push({ text: `Match this exact ${style} art style, color palette, line weight, shading technique, and visual mood. ${prompt}` })
+        contents.push({ text: `The image above is ONLY a face and body reference. Match ONLY: face shape, facial features, hair color/style, eye color, skin tone, and height/body proportions. `
+          + `IGNORE everything else from the reference — ignore clothing, accessories, background, color palette, art style, and rendering technique. `
+          + `You MUST render in pure ${style} style with its own characteristic textures, line work, and colors. `
+          + prompt })
       } else {
         contents.push({ text: prompt })
       }
@@ -322,6 +370,8 @@ export async function generateCharacterReference(
       const token = await getVertexAccessToken()
       const url = `https://${VERTEX_REGION}-aiplatform.googleapis.com/v1/projects/${VERTEX_PROJECT_ID}/locations/${VERTEX_REGION}/publishers/google/models/imagen-3.0-capability-001:predict`
 
+      // Use as SUBJECT reference (character identity), not STYLE reference
+      const { subjectType } = detectSubjectInfo(characters[0]?.description ?? '')
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -332,13 +382,14 @@ export async function generateCharacterReference(
           instances: [{
             prompt,
             referenceImages: [{
-              referenceType: 'REFERENCE_TYPE_STYLE',
+              referenceType: 'REFERENCE_TYPE_SUBJECT',
               referenceId: 1,
               referenceImage: {
                 bytesBase64Encoded: styleReferenceImage.toString('base64'),
               },
-              styleImageConfig: {
-                styleDescription: `Match this exact ${style} art style, color palette, line weight, shading technique, and visual mood`,
+              subjectImageConfig: {
+                subjectDescription: `${characters[0]?.name ?? 'Character'} — match face shape, facial features, hair, eye color, skin tone, and body proportions only. Render in ${style} style.`,
+                subjectType,
               },
             }],
           }],

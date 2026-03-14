@@ -1,8 +1,41 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { VoicePicker } from '@/tools/story-studio/characters/voice-picker'
 import type { CreateCharacterInput, UpdateCharacterInput } from '@/tools/story-studio/use-characters'
+
+function HintIcon({ hint }: { hint: string }) {
+  const [open, setOpen] = useState(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
+
+  return (
+    <span
+      className="relative inline-flex ml-1"
+      onMouseEnter={() => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setOpen(true) }}
+      onMouseLeave={() => { timeoutRef.current = setTimeout(() => setOpen(false), 150) }}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="w-4 h-4 inline-flex items-center justify-center rounded-full
+          bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400
+          hover:bg-indigo-100 dark:hover:bg-indigo-900/40 hover:text-indigo-600 dark:hover:text-indigo-400
+          transition-colors cursor-pointer text-[10px] font-bold leading-none"
+        aria-label="Hint"
+      >
+        ?
+      </button>
+      {open && (
+        <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 z-20
+          w-52 px-3 py-2 rounded-lg text-xs text-slate-700 dark:text-slate-200
+          bg-white dark:bg-slate-800 shadow-lg border border-slate-200 dark:border-slate-700
+          pointer-events-none">
+          {hint}
+        </span>
+      )}
+    </span>
+  )
+}
 
 interface CharacterFormProps {
   initial?: {
@@ -49,7 +82,10 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
 
       {/* Name */}
       <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Name *</label>
+        <label className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          Name *
+          <HintIcon hint="The character's name as it will appear in the story and dialogue." />
+        </label>
         <input
           type="text"
           value={name}
@@ -66,7 +102,10 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
       {/* Age + Role (inline) */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Age</label>
+          <label className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            Age
+            <HintIcon hint="Can be a number or description like '8 years old', 'teenager', or 'elderly'. Helps the AI write age-appropriate dialogue." />
+          </label>
           <input
             type="text"
             value={age}
@@ -79,7 +118,10 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Role</label>
+          <label className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            Role
+            <HintIcon hint="Protagonist: the main character. Antagonist: the opposing force. Supporting: side characters like friends or mentors." />
+          </label>
           <select
             value={role}
             onChange={e => setRole(e.target.value)}
@@ -97,7 +139,10 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
 
       {/* Personality */}
       <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Personality</label>
+        <label className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          Personality
+          <HintIcon hint="Traits, quirks, and temperament. This shapes how the AI writes dialogue and actions for this character." />
+        </label>
         <textarea
           value={personality}
           onChange={e => setPersonality(e.target.value)}
@@ -112,7 +157,10 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
 
       {/* Physical Description */}
       <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Physical Description</label>
+        <label className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          Physical Description
+          <HintIcon hint="How the character looks — hair, eyes, clothing, etc. Used to generate a consistent portrait and keep illustrations accurate." />
+        </label>
         <textarea
           value={physicalDescription}
           onChange={e => setPhysicalDescription(e.target.value)}
@@ -128,7 +176,10 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
       {/* Voice */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Voice</label>
+          <label className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-300">
+            Voice
+            <HintIcon hint="The voice used for this character's dialogue in narration. Leave blank to auto-assign based on the character's traits." />
+          </label>
           <button
             type="button"
             onClick={() => setShowVoicePicker(!showVoicePicker)}

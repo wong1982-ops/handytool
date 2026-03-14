@@ -158,3 +158,20 @@ body {
     background-color: var(--tk-color-primary-400, #6b8ff6);
   }
 }
+
+/* Image prompt viewer responsive font size: mobile 20px, tablet 1.25vw, desktop 18px */
+.ipv-responsive-text {
+  font-size: 20px;
+
+  @media (min-width: 768px) {
+    font-size: 1.25vw;
+  }
+
+  @media (min-width: 1440px) {
+    font-size: 18px;
+  }
+
+  input, textarea, span, p, label, button {
+    font-size: inherit;
+  }
+}

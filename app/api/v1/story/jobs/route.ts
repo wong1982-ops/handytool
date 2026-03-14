@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     return API_ERRORS.VALIDATION(parsed.error.flatten().fieldErrors)
   }
 
-  const { plot, concept, seriesId, skipIllustration, skipAudio, skipValidation } = parsed.data
+  const { plot, concept, seriesId, characterIds, artStyle, skipIllustration, skipAudio, skipValidation } = parsed.data
   const supabase = await createClient()
 
   // Check concurrent job limit (max 3 active jobs)
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     p_user_id: userId,
     p_series_id: seriesId ?? null,
     p_total_pages: concept.tags.pageCount,
-    p_input: { plot, concept, seriesId, skipIllustration, skipAudio, skipValidation } as unknown as undefined,
+    p_input: { plot, concept, seriesId, characterIds, artStyle, skipIllustration, skipAudio, skipValidation } as unknown as undefined,
   })
 
   // RPC returns the job id as a single value

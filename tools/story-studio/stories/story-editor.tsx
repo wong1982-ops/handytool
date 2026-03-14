@@ -7,6 +7,7 @@ import { ImagePromptViewer } from '@/tools/story-studio/stories/image-prompt-vie
 import { IllustrationReviewFlow } from '@/tools/story-studio/add-ons/illustration-review-flow'
 import { NarrationFlow } from '@/tools/story-studio/add-ons/narration-flow'
 import { ImageLightbox } from '@/tools/story-studio/image-lightbox'
+import { ART_STYLES } from '@/tools/story-studio/use-characters'
 
 interface PageData {
   sequence: number
@@ -32,6 +33,7 @@ interface StoryEditorProps {
   bookId: string
   title: string
   coverImageUrl?: string | null
+  artStyle?: string
   pages: PageData[]
   onSave: (pages: PageData[]) => Promise<void>
   onBack: () => void
@@ -243,12 +245,13 @@ function GenerateBar({ type, media, generating, error, hasPrompt, onGenerate, on
 }
 
 /* ── Cover editor ───────────────────────────────────── */
-function CoverEditor({ title, coverUrl, generating, error, onGenerate }: {
+function CoverEditor({ title, coverUrl, generating, error, artStyle: initialStyle, onGenerate }: {
   title: string
   coverUrl: string | null
   generating: boolean
   error: string | null
-  onGenerate: (opts: { prompt?: string; refinement?: string; characterIds?: string[] }) => void
+  artStyle?: string
+  onGenerate: (opts: { prompt?: string; refinement?: string; characterIds?: string[]; artStyle?: string }) => void
 }) {
   const [coverPrompt, setCoverPrompt] = useState(
     `Book cover for "${title}". A captivating, eye-catching illustration that captures the story's essence.`
@@ -257,6 +260,7 @@ function CoverEditor({ title, coverUrl, generating, error, onGenerate }: {
   const [zoomImage, setZoomImage] = useState<{ src: string; alt: string } | null>(null)
   const [characters, setCharacters] = useState<{ id: string; name: string }[]>([])
   const [selectedCharIds, setSelectedCharIds] = useState<string[]>([])
+  const [selectedStyle, setSelectedStyle] = useState(initialStyle || "children's book illustration")
 
   // Fetch approved characters
   useEffect(() => {
@@ -286,6 +290,7 @@ function CoverEditor({ title, coverUrl, generating, error, onGenerate }: {
     onGenerate({
       prompt: coverPrompt,
       characterIds: selectedCharIds.length > 0 ? selectedCharIds : undefined,
+      artStyle: selectedStyle,
     })
   }
 
@@ -294,6 +299,7 @@ function CoverEditor({ title, coverUrl, generating, error, onGenerate }: {
     onGenerate({
       refinement: refineText.trim(),
       characterIds: selectedCharIds.length > 0 ? selectedCharIds : undefined,
+      artStyle: selectedStyle,
     })
     setRefineText('')
   }
@@ -339,7 +345,7 @@ function CoverEditor({ title, coverUrl, generating, error, onGenerate }: {
       {/* Character picker */}
       {characters.length > 0 && (
         <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 p-4 space-y-2">
-          <label className="font-medium text-sm text-slate-700 dark:text-slate-300">Characters on Cover</label>
+          <label className="font-medium text-slate-700 dark:text-slate-300">Characters on Cover</label>
           <div className="flex flex-wrap gap-2">
             {characters.map(c => (
               <label
@@ -364,11 +370,28 @@ function CoverEditor({ title, coverUrl, generating, error, onGenerate }: {
         </div>
       )}
 
+      {/* Art style dropdown */}
+      <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 p-4 space-y-2">
+        <label className="font-medium text-slate-700 dark:text-slate-300">Art Style</label>
+        <select
+          value={selectedStyle}
+          onChange={e => setSelectedStyle(e.target.value)}
+          className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
+            bg-white dark:bg-slate-800 text-sm
+            focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+          style={{ minHeight: '44px' }}
+        >
+          {ART_STYLES.map(s => (
+            <option key={s.value} value={s.value}>{s.label}</option>
+          ))}
+        </select>
+      </div>
+
       {/* Cover prompt + generate/refine */}
       <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 p-4 space-y-3">
         {!coverUrl && (
           <>
-            <label className="font-medium text-sm text-slate-700 dark:text-slate-300">Cover Prompt</label>
+            <label className="font-medium text-slate-700 dark:text-slate-300">Cover Prompt</label>
             <textarea
               value={coverPrompt}
               onChange={e => setCoverPrompt(e.target.value)}
@@ -646,7 +669,7 @@ function FullPagePreview({ media, pageNumber, totalPages, narrativeText, dialogu
    Main Editor
    ═══════════════════════════════════════════════════════ */
 
-export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, pages: initialPages, onSave, onBack }: StoryEditorProps) {
+export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, artStyle: initialArtStyle, pages: initialPages, onSave, onBack }: StoryEditorProps) {
   const [pages, setPages] = useState<PageData[]>(initialPages)
   const [activePage, setActivePage] = useState(1)
   const [coverUrl, setCoverUrl] = useState<string | null>(initialCoverUrl ?? null)
@@ -920,7 +943,7 @@ export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, pag
   }, [bookId, activePage, ensurePageId, refreshMedia])
 
   // Generate cover illustration (supports full prompt or refinement-only)
-  const generateCover = useCallback(async (opts: { prompt?: string; refinement?: string; characterIds?: string[] }) => {
+  const generateCover = useCallback(async (opts: { prompt?: string; refinement?: string; characterIds?: string[]; artStyle?: string }) => {
     setGeneratingCover(true)
     setCoverError(null)
     try {
@@ -931,6 +954,7 @@ export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, pag
         body.imagePrompt = opts.prompt
       }
       if (opts.characterIds?.length) body.characterIds = opts.characterIds
+      if (opts.artStyle) body.artStyle = opts.artStyle
 
       const res = await fetch(`/api/v1/story/books/${bookId}/illustrate`, {
         method: 'POST',
@@ -1054,6 +1078,7 @@ export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, pag
           coverUrl={coverUrl}
           generating={generatingCover}
           error={coverError}
+          artStyle={initialArtStyle}
           onGenerate={generateCover}
         />
       ) : (
