@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { getAdminSupabase } from '@/lib/supabase/admin'
 import { apiSuccess, apiError, getAuthUserId, API_ERRORS } from '@/lib/api/response'
 import { z } from 'zod'
 import {
@@ -31,27 +30,24 @@ export async function POST(
 
   const { pageId, narratorVoice, voiceMap: voiceOverrides } = parsed.data
 
-  // Verify book ownership
-  const { data: book } = await supabase
-    .from('books')
-    .select('id, series_id')
-    .eq('id', bookId)
-    .eq('user_id', userId)
-    .single()
-  if (!book) return apiError('Book not found', 'NOT_FOUND', 404)
+  // Verify book ownership via SECURITY DEFINER RPC
+  const { data: books, error: bookErr } = await supabase.rpc('get_book_by_id', {
+    p_user_id: userId,
+    p_book_id: bookId,
+  })
+  if (bookErr || !(books || [])[0]) return apiError('Book not found', 'NOT_FOUND', 404)
 
-  // Fetch page content
-  const { data: page } = await supabase
-    .from('book_pages')
-    .select('id, sequence, narrative_text, dialogue')
-    .eq('id', pageId)
-    .eq('book_id', bookId)
-    .single()
-  if (!page) return apiError('Page not found', 'NOT_FOUND', 404)
+  // Fetch page content via SECURITY DEFINER RPC
+  const { data: pageRows, error: pageErr } = await supabase.rpc('get_book_page_by_id', {
+    p_user_id: userId,
+    p_book_id: bookId,
+    p_page_id: pageId,
+  })
+  const page = (pageRows || [])[0]
+  if (pageErr || !page) return apiError('Page not found', 'NOT_FOUND', 404)
 
   // Reserve credits
-  const adminClient = getAdminSupabase() as any
-  const { data: reserveData, error: reserveErr } = await adminClient.rpc('reserve_credits', {
+  const { data: reserveData, error: reserveErr } = await supabase.rpc('reserve_credits', {
     p_user_id: userId,
     p_amount: CREDIT_COST,
     p_description: `Story Studio — narration page ${page.sequence}`,
@@ -62,18 +58,23 @@ export async function POST(
   }
 
   try {
+    // Parse dialogue (may come as string from RPC or as object from direct query)
+    const rawDialogue = page.dialogue
+    const dialogue: { speaker: string; line: string }[] =
+      typeof rawDialogue === 'string' ? JSON.parse(rawDialogue || '[]') :
+      Array.isArray(rawDialogue) ? rawDialogue : []
+
     // Build voice map
-    const dialogueSpeakers = (page.dialogue as { speaker: string; line: string }[] ?? [])
-      .map(d => d.speaker)
-      .filter((v, i, a) => a.indexOf(v) === i)
+    const dialogueSpeakers = dialogue
+      .map((d: { speaker: string }) => d.speaker)
+      .filter((v: string, i: number, a: string[]) => a.indexOf(v) === i)
 
     let characterVoices: Record<string, string> = {}
     if (dialogueSpeakers.length > 0) {
-      const { data: chars } = await supabase
-        .from('characters')
-        .select('name, voice')
-        .eq('user_id', userId)
-        .in('name', dialogueSpeakers)
+      const { data: chars } = await supabase.rpc('get_characters_by_names', {
+        p_user_id: userId,
+        p_names: dialogueSpeakers,
+      })
       for (const c of chars ?? []) {
         if (c.voice) characterVoices[c.name] = c.voice
       }
@@ -87,12 +88,12 @@ export async function POST(
 
     const segments = segmentPageAudio(
       page.narrative_text || '',
-      page.dialogue as { speaker: string; line: string }[] | undefined,
+      dialogue.length > 0 ? dialogue : undefined,
       finalVoiceMap,
     )
 
     if (segments.length === 0) {
-      await adminClient.rpc('release_reserved_credits', {
+      await supabase.rpc('release_reserved_credits', {
         p_reservation_id: reservation.reservation_id,
         p_reason: 'No audio segments to generate',
       })
@@ -107,29 +108,17 @@ export async function POST(
 
     if (!result?.audioUrl) throw new Error('TTS returned no audio')
 
-    // Store result
-    const { data: existing } = await supabase
-      .from('page_audio')
-      .select('id')
-      .eq('book_page_id', pageId)
-      .single()
-
-    const audioData = {
-      book_page_id: pageId,
-      audio_url: result.audioUrl,
-      status: 'done' as const,
-      voice_map: finalVoiceMap,
-      duration_seconds: null,
-    }
-
-    if (existing) {
-      await supabase.from('page_audio').update(audioData).eq('id', existing.id)
-    } else {
-      await supabase.from('page_audio').insert(audioData)
-    }
+    // Store result via SECURITY DEFINER RPC
+    await supabase.rpc('upsert_page_audio', {
+      p_book_page_id: pageId,
+      p_audio_url: result.audioUrl,
+      p_status: 'done',
+      p_voice_map: finalVoiceMap,
+      p_duration_seconds: null,
+    })
 
     // Confirm credits
-    await adminClient.rpc('confirm_reserved_credits', {
+    await supabase.rpc('confirm_reserved_credits', {
       p_reservation_id: reservation.reservation_id,
       p_description: `Story Studio — narration page ${page.sequence}`,
     })
@@ -140,22 +129,17 @@ export async function POST(
       pageId,
     })
   } catch (e) {
-    await adminClient.rpc('release_reserved_credits', {
+    await supabase.rpc('release_reserved_credits', {
       p_reservation_id: reservation.reservation_id,
       p_reason: `Failed: ${e instanceof Error ? e.message : 'Unknown'}`,
     })
 
-    const { data: existingAudio } = await supabase
-      .from('page_audio')
-      .select('id')
-      .eq('book_page_id', pageId)
-      .single()
-
-    if (existingAudio) {
-      await supabase.from('page_audio').update({ status: 'error', voice_map: {} }).eq('id', existingAudio.id)
-    } else {
-      await supabase.from('page_audio').insert({ book_page_id: pageId, status: 'error', voice_map: {} })
-    }
+    // Mark audio as error
+    await supabase.rpc('upsert_page_audio', {
+      p_book_page_id: pageId,
+      p_status: 'error',
+      p_voice_map: {},
+    })
 
     return apiError(
       e instanceof Error ? e.message : 'Failed to generate narration',

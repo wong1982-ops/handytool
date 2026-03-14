@@ -1,21 +1,20 @@
 'use client'
 
 import { Suspense, useState, useEffect, useCallback } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useStoriesList } from '@/tools/story-studio/use-stories-list'
 import { useStoryBook } from '@/tools/story-studio/use-story-book'
 import { useJobProgress } from '@/tools/story-studio/use-job-progress'
 import { StoryList } from '@/tools/story-studio/stories/story-list'
 import { CreateStoryModal } from '@/tools/story-studio/stories/create-story-modal'
-import { StoryEditor } from '@/tools/story-studio/stories/story-editor'
 import { PlotInput } from '@/tools/story-studio/plot-input'
 import { RefinementChat } from '@/tools/story-studio/refinement-chat'
 import { GenerationProgress } from '@/tools/story-studio/generation-progress'
 import { InProgressSection } from '@/tools/story-studio/job-card'
 import { signInWithOAuth } from '@/lib/supabase/auth'
 
-type View = 'list' | 'create-ai' | 'editor'
+type View = 'list' | 'create-ai'
 
 export default function StoriesPage() {
   return (
@@ -27,6 +26,7 @@ export default function StoriesPage() {
 
 function StoriesContent() {
   const { user, loading: authLoading } = useAuth()
+  const router = useRouter()
   const searchParams = useSearchParams()
   const urlSeriesId = searchParams.get('seriesId')
 
@@ -37,12 +37,33 @@ function StoriesContent() {
   const storyBook = useStoryBook()
 
   // Job progress
-  const { jobs: activeJobs, retryJob } = useJobProgress(user?.id)
+  const { jobs: activeJobs, retryJob, completedJobId, clearCompletion } = useJobProgress(user?.id)
 
   // View state
   const [view, setView] = useState<View>('list')
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [editingBookId, setEditingBookId] = useState<string | null>(null)
+
+  // When a job completes, fetch its book ID and open the editor
+  useEffect(() => {
+    if (!completedJobId) return
+    let cancelled = false
+    async function openCompletedBook() {
+      try {
+        const res = await fetch(`/api/v1/story/jobs/${completedJobId}`)
+        if (!res.ok) return
+        const { job } = await res.json()
+        if (cancelled) return
+        if (job?.book_id) {
+          storiesList.refresh()
+          storyBook.reset()
+          router.push(`/tools/story-studio/edit/${job.book_id}`)
+        }
+      } catch { /* ignore */ }
+      finally { if (!cancelled) clearCompletion() }
+    }
+    openCompletedBook()
+    return () => { cancelled = true }
+  }, [completedJobId, clearCompletion, storiesList, storyBook, router])
 
   // Handlers
   const handleCreateAI = useCallback(() => {
@@ -66,22 +87,19 @@ function StoriesContent() {
       })
       if (!res.ok) throw new Error('Failed to create')
       const { data } = await res.json()
-      setEditingBookId(data.id)
-      setView('editor')
       storiesList.refresh()
+      router.push(`/tools/story-studio/edit/${data.id}`)
     } catch {
       // show error
     }
-  }, [urlSeriesId, storiesList])
+  }, [urlSeriesId, storiesList, router])
 
   const handleEdit = useCallback((id: string) => {
-    setEditingBookId(id)
-    setView('editor')
-  }, [])
+    router.push(`/tools/story-studio/edit/${id}`)
+  }, [router])
 
   const handleBackToList = useCallback(() => {
     setView('list')
-    setEditingBookId(null)
     storyBook.reset()
     storiesList.refresh()
   }, [storyBook, storiesList])
@@ -107,7 +125,9 @@ function StoriesContent() {
   if (view === 'create-ai') {
     const { phase, plot, selectedConcept, book, progressEvents, loading, error,
       activeJobId, fetchConcepts, startGeneration,
-      setPhase, setSelectedConcept } = storyBook
+      setPhase, setSelectedConcept,
+      selectedCharacterIds, setSelectedCharacterIds,
+      selectedArtStyle, setSelectedArtStyle } = storyBook
 
     // If generation is complete, go back to list
     if (phase === 'viewer' && book?.status === 'complete') {
@@ -137,6 +157,10 @@ function StoriesContent() {
               onSubmit={fetchConcepts}
               loading={loading}
               initialPlot={plot || undefined}
+              selectedCharacterIds={selectedCharacterIds}
+              onCharacterIdsChange={setSelectedCharacterIds}
+              selectedArtStyle={selectedArtStyle}
+              onArtStyleChange={setSelectedArtStyle}
             />
             {error && (
               <div className="mt-3 px-4 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
@@ -149,7 +173,7 @@ function StoriesContent() {
           <RefinementChat
             concept={selectedConcept}
             onConceptUpdate={setSelectedConcept}
-            onGenerate={(concept) => startGeneration(plot || '', concept)}
+            onGenerate={(concept, options) => startGeneration(plot || '', concept, options)}
             onBack={() => setPhase('input')}
             loading={loading}
           />
@@ -162,16 +186,6 @@ function StoriesContent() {
           />
         )}
       </div>
-    )
-  }
-
-  // Story editor
-  if (view === 'editor' && editingBookId) {
-    return (
-      <StoryEditorWrapper
-        bookId={editingBookId}
-        onBack={handleBackToList}
-      />
     )
   }
 
@@ -210,84 +224,3 @@ function StoriesContent() {
   )
 }
 
-/**
- * Wrapper that fetches book data and renders StoryEditor.
- * Separated to avoid fetching when editor is not shown.
- */
-interface PageData {
-  sequence: number
-  sceneDescription: string
-  narrativeText: string
-  dialogue: { speaker: string; line: string }[]
-  mood: string
-  imagePrompt: string
-}
-
-function StoryEditorWrapper({ bookId, onBack }: { bookId: string; onBack: () => void }) {
-  const [bookData, setBookData] = useState<{ title: string; pages: PageData[] } | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      try {
-        const res = await fetch(`/api/v1/story/books/${bookId}`)
-        if (!res.ok) throw new Error('Not found')
-        const { data } = await res.json()
-        if (cancelled) return
-        setBookData({
-          title: data.title,
-          pages: (data.pages ?? []).map((p: Record<string, unknown>) => ({
-            sequence: p.sequence as number,
-            sceneDescription: (p.sceneDescription as string) || '',
-            narrativeText: (p.narrativeText as string) || '',
-            dialogue: (p.dialogue as { speaker: string; line: string }[]) || [],
-            mood: (p.mood as string) || '',
-            imagePrompt: (p.imagePrompt as string) || '',
-          })),
-        })
-      } catch {
-        // show error
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    load()
-    return () => { cancelled = true }
-  }, [bookId])
-
-  if (loading || !bookData) {
-    return (
-      <div className="animate-pulse space-y-4">
-        <div className="h-8 w-48 bg-slate-200 dark:bg-slate-700 rounded" />
-        <div className="h-64 bg-slate-200 dark:bg-slate-700 rounded-xl" />
-      </div>
-    )
-  }
-
-  async function handleSave(pages: PageData[]) {
-    await Promise.all(pages.map(page =>
-      fetch(`/api/v1/story/books/${bookId}/pages/${page.sequence}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          narrativeText: page.narrativeText,
-          sceneDescription: page.sceneDescription,
-          dialogue: page.dialogue,
-          mood: page.mood,
-          imagePrompt: page.imagePrompt,
-        }),
-      })
-    ))
-  }
-
-  return (
-    <StoryEditor
-      bookId={bookId}
-      title={bookData.title}
-      pages={bookData.pages}
-      onSave={handleSave}
-      onBack={onBack}
-    />
-  )
-}

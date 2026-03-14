@@ -7,12 +7,17 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   if (!effectiveUserId) return API_ERRORS.UNAUTHORIZED()
 
   const supabase = await createClient()
-  // Use RPC to bypass RLS
-  const { data: books } = await supabase.rpc('get_user_books', {
+  const { data: books, error } = await supabase.rpc('get_book_by_id', {
     p_user_id: effectiveUserId,
+    p_book_id: id,
   })
 
-  const book = (books || []).find((b: Record<string, unknown>) => b.id === id)
+  if (error) {
+    console.error('story/books/[id] GET:', error)
+    return API_ERRORS.INTERNAL()
+  }
+
+  const book = (books || [])[0]
   if (!book) return API_ERRORS.NOT_FOUND('Book')
 
   return apiSuccess(book)
@@ -26,7 +31,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const supabase = await createClient()
 
-  let body: { pageSequence: number; narrativeText?: string; dialogue?: { speaker: string; line: string }[]; imagePrompt?: string; imageUrl?: string }
+  let body: { pageSequence: number; narrativeText?: string; sceneDescription?: string; dialogue?: { speaker: string; line: string }[]; mood?: string; imagePrompt?: string; imageUrl?: string }
   try { body = await request.json() } catch { return API_ERRORS.VALIDATION({ message: 'Invalid JSON' }) }
 
   if (!body.pageSequence || body.pageSequence < 1) {
@@ -34,8 +39,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   // Load current book
-  const { data: books } = await supabase.rpc('get_user_books', { p_user_id: effectiveUserId })
-  const book = (books || []).find((b: Record<string, unknown>) => b.id === id)
+  const { data: books } = await supabase.rpc('get_book_by_id', {
+    p_user_id: effectiveUserId,
+    p_book_id: id,
+  })
+  const book = (books || [])[0]
   if (!book) return API_ERRORS.NOT_FOUND('Book')
 
   const bookData = book.data as Record<string, unknown>
@@ -46,7 +54,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (pageIndex === -1) return API_ERRORS.NOT_FOUND('Page')
 
   if (body.narrativeText !== undefined) pages[pageIndex].narrativeText = body.narrativeText
+  if (body.sceneDescription !== undefined) pages[pageIndex].sceneDescription = body.sceneDescription
   if (body.dialogue !== undefined) pages[pageIndex].dialogue = body.dialogue
+  if (body.mood !== undefined) pages[pageIndex].mood = body.mood
   if (body.imagePrompt !== undefined) pages[pageIndex].imagePrompt = body.imagePrompt
   if (body.imageUrl !== undefined) pages[pageIndex].imageUrl = body.imageUrl
 
