@@ -73,8 +73,8 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
         const res = await fetch(`/api/v1/story/characters/${characterId}/voice`)
         if (!cancelled) {
           if (res.ok) {
-            const data = await res.json() as VoiceState
-            setVoice(data)
+            const json = await res.json() as { data: VoiceState | null }
+            if (json.data && json.data.id) setVoice(json.data)
           } else if (res.status !== 404) {
             console.error('Failed to fetch voice:', res.status)
           }
@@ -222,8 +222,8 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
         const body = await res.json().catch(() => ({})) as { error?: string }
         throw new Error(body.error ?? 'Upload failed')
       }
-      const data = await res.json() as VoiceState
-      setVoice(data)
+      const json = await res.json() as { data: VoiceState }
+      if (json.data) setVoice(json.data)
       if (previewUrlRef.current) {
         URL.revokeObjectURL(previewUrlRef.current)
         previewUrlRef.current = null

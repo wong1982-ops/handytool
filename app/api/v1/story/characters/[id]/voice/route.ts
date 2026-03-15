@@ -19,18 +19,18 @@ export async function GET(
     p_character_id: id,
   })
   if (dbError) return apiError(dbError.message, 'DB_ERROR', 500)
-  if (!data) return apiSuccess(null)
 
-  const voice = {
-    id: data.id,
-    recordingUrl: data.recording_url,
-    provider: data.provider,
-    status: data.status,
-    errorMessage: data.error_message,
-    createdAt: data.created_at,
-  }
+  const row = (data || [])[0]
+  if (!row) return apiSuccess(null)
 
-  return apiSuccess(voice)
+  return apiSuccess({
+    id: row.id,
+    recordingUrl: row.recording_url,
+    provider: row.provider,
+    status: row.status,
+    errorMessage: row.error_message,
+    createdAt: row.created_at,
+  })
 }
 
 // POST /api/v1/story/characters/[id]/voice
@@ -85,11 +85,12 @@ export async function POST(
   })
   if (dbError) return apiError(dbError.message, 'DB_ERROR', 500)
 
+  const row = (data || [])[0]
   return apiSuccess(
     {
-      id: data.id,
+      id: row?.id,
       recordingUrl,
-      status: data.status,
+      status: row?.status || 'recorded',
     },
     201,
   )
@@ -105,11 +106,13 @@ export async function DELETE(
   const userId = await getAuthUserId()
   if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  const { data: deleted, error: dbError } = await supabase.rpc('delete_character_voice', {
+  const { data: deleteData, error: dbError } = await supabase.rpc('delete_character_voice', {
     p_user_id: userId,
     p_character_id: id,
   })
   if (dbError) return apiError(dbError.message, 'DB_ERROR', 500)
+
+  const deleted = (deleteData || [])[0]
   if (!deleted) return apiSuccess(null)
 
   // Best-effort R2 cleanup
