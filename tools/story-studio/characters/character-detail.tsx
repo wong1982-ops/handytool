@@ -5,6 +5,7 @@ import { useCharacterDetail, type UpdateCharacterInput, type CharacterPortrait, 
 import { useSeriesList } from '@/tools/story-studio/use-series'
 import { CharacterForm } from '@/tools/story-studio/characters/character-form'
 import { PortraitLightbox } from '@/tools/story-studio/characters/portrait-lightbox'
+import { VoiceRecorder } from '@/tools/story-studio/characters/voice-recorder'
 
 interface CharacterDetailProps {
   characterId: string
@@ -417,6 +418,17 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                 <span className="text-xs font-medium text-slate-400 uppercase">Voice</span>
                 <p className="text-sm text-slate-700 dark:text-slate-300">{character.voice}</p>
               </div>
+            )}
+          </div>
+
+          {/* Custom Voice Recording */}
+          <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
+            <h3 className="text-xs font-medium text-slate-400 uppercase mb-2">Custom Voice</h3>
+            <VoiceRecorder characterId={character.id} characterName={character.name} />
+            {character.voice && (
+              <p className="text-[11px] text-slate-400 mt-2 italic">
+                Custom voice will be used instead of the preset. Remove custom voice to use a preset.
+              </p>
             )}
           </div>
 
