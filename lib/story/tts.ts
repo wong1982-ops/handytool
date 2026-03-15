@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { uploadToR2 } from '@/lib/storage/r2'
 import type { Character, Dialogue } from '@/tools/story-studio/types'
+import { synthesizeWithClonedVoice, type VoiceCloneProvider } from '@/lib/story/voice-clone'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
@@ -25,6 +26,11 @@ export interface AudioSegment {
   speaker: string    // "narrator" | character name
   text: string
   voiceName: string  // resolved Gemini voice name
+  /** If set, use cloned voice instead of Gemini preset */
+  customVoice?: {
+    provider: string
+    providerVoiceId: string
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -393,15 +399,28 @@ export async function generateMultiVoicePageAudio(
 
   for (const segment of segments) {
     try {
-      const buf = await retry(
-        () => generateWithGemini(segment.text, segment.voiceName),
-        3,
-      )
+      let buf: Buffer
+
+      if (segment.customVoice) {
+        // Custom cloned voice — use voice clone provider
+        buf = await synthesizeWithClonedVoice(
+          segment.text,
+          segment.customVoice.provider as VoiceCloneProvider,
+          segment.customVoice.providerVoiceId,
+        )
+      } else {
+        // Preset voice — use Gemini
+        buf = await retry(
+          () => generateWithGemini(segment.text, segment.voiceName),
+          3,
+        )
+      }
+
       wavBuffers.push(buf)
     } catch (err) {
-      // If any segment fails on Gemini, fall back to single-voice OpenAI for entire page
+      // If any segment fails, fall back to single-voice OpenAI for entire page
       console.warn(
-        `Gemini TTS failed for segment "${segment.speaker}" on page ${pageNumber}, falling back to OpenAI single-voice:`,
+        `TTS failed for segment "${segment.speaker}" on page ${pageNumber}, falling back to OpenAI single-voice:`,
         err,
       )
       const fullText = segments.map(s => s.text).join('. ')

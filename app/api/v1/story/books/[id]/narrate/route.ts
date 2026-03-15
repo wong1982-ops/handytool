@@ -6,6 +6,7 @@ import {
   segmentPageAudio,
   generateMultiVoicePageAudio,
 } from '@/lib/story/tts'
+import { cloneVoice } from '@/lib/story/voice-clone'
 
 const narrateSchema = z.object({
   pageId: z.string().uuid(),
@@ -70,12 +71,14 @@ export async function POST(
       .filter((v: string, i: number, a: string[]) => a.indexOf(v) === i)
 
     let characterVoices: Record<string, string> = {}
+    let chars: { id: string; name: string; voice: string | null }[] = []
     if (dialogueSpeakers.length > 0) {
-      const { data: chars } = await supabase.rpc('get_characters_by_names', {
+      const { data: charRows } = await supabase.rpc('get_characters_by_names', {
         p_user_id: userId,
         p_names: dialogueSpeakers,
       })
-      for (const c of chars ?? []) {
+      chars = (charRows ?? []) as typeof chars
+      for (const c of chars) {
         if (c.voice) characterVoices[c.name] = c.voice
       }
     }
@@ -86,11 +89,127 @@ export async function POST(
       ...(voiceOverrides ?? {}),
     }
 
+    // Look up custom cloned voices for dialogue speakers
+    const customVoiceMap: Record<string, { provider: string; providerVoiceId: string }> = {}
+
+    if (dialogueSpeakers.length > 0) {
+      const charIds = (chars ?? [])
+        .filter((c: { id: string }) => c.id)
+        .map((c: { id: string }) => c.id)
+
+      if (charIds.length > 0) {
+        const { data: voiceRows } = await supabase.rpc('get_character_voices_by_ids', {
+          p_user_id: userId,
+          p_character_ids: charIds,
+        })
+
+        for (const v of voiceRows ?? []) {
+          if (v.status === 'ready' && v.provider && v.provider_voice_id) {
+            const char = (chars ?? []).find((c: { id: string }) => c.id === v.character_id)
+            if (char?.name) {
+              customVoiceMap[char.name] = {
+                provider: v.provider,
+                providerVoiceId: v.provider_voice_id,
+              }
+            }
+          } else if (v.status === 'recorded' && v.recording_url) {
+            // Lazy clone: trigger cloning now
+            try {
+              const audioRes = await fetch(v.recording_url)
+              const audioBuffer = Buffer.from(await audioRes.arrayBuffer())
+              const char = (chars ?? []).find((c: { id: string }) => c.id === v.character_id)
+              const result = await cloneVoice({
+                audioBuffer,
+                characterName: char?.name || 'character',
+              })
+
+              await supabase.rpc('update_character_voice_provider', {
+                p_user_id: userId,
+                p_character_id: v.character_id,
+                p_provider: result.provider,
+                p_provider_voice_id: result.providerVoiceId,
+                p_status: 'ready',
+              })
+
+              if (char?.name) {
+                customVoiceMap[char.name] = {
+                  provider: result.provider,
+                  providerVoiceId: result.providerVoiceId,
+                }
+              }
+            } catch (cloneErr) {
+              const errMsg = cloneErr instanceof Error ? cloneErr.message : String(cloneErr)
+              console.warn(`Lazy voice clone failed for character ${v.character_id}:`, cloneErr)
+              await supabase.rpc('update_character_voice_provider', {
+                p_user_id: userId,
+                p_character_id: v.character_id,
+                p_provider: null,
+                p_provider_voice_id: null,
+                p_status: 'error',
+                p_error_message: errMsg.slice(0, 500),
+              })
+            }
+          }
+        }
+      }
+    }
+
+    // Narrator custom voice resolution (if narratorVoice is a character UUID)
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    if (UUID_RE.test(narratorVoice)) {
+      const { data: narratorVoiceRows } = await supabase.rpc('get_character_voices_by_ids', {
+        p_user_id: userId,
+        p_character_ids: [narratorVoice],
+      })
+      const nv = (narratorVoiceRows ?? [])[0]
+      if (nv?.status === 'ready' && nv.provider && nv.provider_voice_id) {
+        customVoiceMap['narrator'] = {
+          provider: nv.provider,
+          providerVoiceId: nv.provider_voice_id,
+        }
+      } else if (nv?.status === 'recorded' && nv.recording_url) {
+        try {
+          const audioRes = await fetch(nv.recording_url)
+          const audioBuffer = Buffer.from(await audioRes.arrayBuffer())
+          const cloneResult = await cloneVoice({ audioBuffer, characterName: 'narrator' })
+          await supabase.rpc('update_character_voice_provider', {
+            p_user_id: userId,
+            p_character_id: narratorVoice,
+            p_provider: cloneResult.provider,
+            p_provider_voice_id: cloneResult.providerVoiceId,
+            p_status: 'ready',
+          })
+          customVoiceMap['narrator'] = {
+            provider: cloneResult.provider,
+            providerVoiceId: cloneResult.providerVoiceId,
+          }
+        } catch (cloneErr) {
+          const errMsg = cloneErr instanceof Error ? cloneErr.message : String(cloneErr)
+          console.warn(`Lazy voice clone failed for narrator character ${narratorVoice}:`, cloneErr)
+          await supabase.rpc('update_character_voice_provider', {
+            p_user_id: userId,
+            p_character_id: narratorVoice,
+            p_provider: null,
+            p_provider_voice_id: null,
+            p_status: 'error',
+            p_error_message: errMsg.slice(0, 500),
+          })
+        }
+      }
+    }
+
     const segments = segmentPageAudio(
       page.narrative_text || '',
       dialogue.length > 0 ? dialogue : undefined,
       finalVoiceMap,
     )
+
+    // Annotate segments with custom voice info
+    for (const seg of segments) {
+      if (customVoiceMap[seg.speaker]) {
+        seg.customVoice = customVoiceMap[seg.speaker]
+      }
+    }
 
     if (segments.length === 0) {
       await supabase.rpc('release_reserved_credits', {
