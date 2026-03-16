@@ -18,7 +18,7 @@ export function StoryCard({ story, onEdit, onDelete, onToggleShare }: StoryCardP
   return (
     <div className="group relative bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-md transition-shadow">
       {/* Cover image */}
-      <Link href={`/tools/story-studio/book/${story.slug}`} className="block">
+      <Link href={`/tools/story-studio/book/${story.slug}`} className="block" prefetch={true}>
         <div className="aspect-[3/4] bg-slate-100 dark:bg-slate-800 overflow-hidden">
           {story.coverImageUrl ? (
             <img
