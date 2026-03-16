@@ -93,6 +93,7 @@ export function useStoryBook() {
     setProgressEvents([])
     setLoading(false)
     setError(null)
+    setMode('speed')
     setCreditsUsed(null)
     saveToStorage(null)
     clearPlotDraft()
@@ -101,6 +102,7 @@ export function useStoryBook() {
   const [seriesId, setSeriesId] = useState<string | null>(null)
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>([])
   const [selectedArtStyle, setSelectedArtStyle] = useState<string | null>(null)
+  const [mode, setMode] = useState<'speed' | 'professional'>('speed')
 
   const fetchConcepts = useCallback(async (plotText: string, seriesIdOverride?: string) => {
     setLoading(true)
@@ -170,6 +172,7 @@ export function useStoryBook() {
         body: JSON.stringify({
           plot: plotText,
           concept,
+          mode,
           ...(seriesId ? { seriesId } : {}),
           ...(selectedCharacterIds.length > 0 ? { characterIds: selectedCharacterIds } : {}),
           ...(selectedArtStyle ? { artStyle: selectedArtStyle } : {}),
@@ -207,7 +210,7 @@ export function useStoryBook() {
     } finally {
       setLoading(false)
     }
-  }, [seriesId, selectedCharacterIds, selectedArtStyle])
+  }, [seriesId, selectedCharacterIds, selectedArtStyle, mode])
 
   return {
     phase,
@@ -232,6 +235,8 @@ export function useStoryBook() {
     setSelectedCharacterIds,
     selectedArtStyle,
     setSelectedArtStyle,
+    mode,
+    setMode,
     activeJobId,
     setActiveJobId,
     fetchConcepts,

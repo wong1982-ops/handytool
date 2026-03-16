@@ -37,7 +37,7 @@ function StoriesContent() {
   const storyBook = useStoryBook()
 
   // Job progress
-  const { jobs: activeJobs, retryJob, completedJobId, clearCompletion } = useJobProgress(user?.id)
+  const { jobs: activeJobs, retryJob, deleteJob, completedJobId, clearCompletion } = useJobProgress(user?.id)
 
   // View state
   const [view, setView] = useState<View>('list')
@@ -56,7 +56,12 @@ function StoriesContent() {
         if (job?.book_id) {
           storiesList.refresh()
           storyBook.reset()
-          router.push(`/tools/story-studio/edit/${job.book_id}`)
+          const jobMode = job.input?.mode || 'speed'
+          if (jobMode === 'professional') {
+            router.push(`/tools/story-studio/edit/${job.book_id}`)
+          } else {
+            router.push('/tools/story-studio/bookshelf')
+          }
         }
       } catch { /* ignore */ }
       finally { if (!cancelled) clearCompletion() }
@@ -66,9 +71,10 @@ function StoriesContent() {
   }, [completedJobId, clearCompletion, storiesList, storyBook, router])
 
   // Handlers
-  const handleCreateAI = useCallback(() => {
+  const handleSelectMode = useCallback((selectedMode: 'speed' | 'professional') => {
     setShowCreateModal(false)
     storyBook.reset()
+    storyBook.setMode(selectedMode)
     if (urlSeriesId) storyBook.setSeriesId(urlSeriesId)
     setView('create-ai')
   }, [storyBook, urlSeriesId])
@@ -176,6 +182,7 @@ function StoriesContent() {
             onGenerate={(concept, options) => startGeneration(plot || '', concept, options)}
             onBack={() => setPhase('input')}
             loading={loading}
+            mode={storyBook.mode}
           />
         )}
         {phase === 'generating' && (
@@ -195,7 +202,7 @@ function StoriesContent() {
       {/* In-progress jobs */}
       {activeJobs.length > 0 && (
         <div className="mb-6">
-          <InProgressSection jobs={activeJobs} onRetry={retryJob} />
+          <InProgressSection jobs={activeJobs} onRetry={retryJob} onDelete={deleteJob} />
         </div>
       )}
 
@@ -217,7 +224,7 @@ function StoriesContent() {
       <CreateStoryModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        onGenerateWithAI={handleCreateAI}
+        onSelectMode={handleSelectMode}
         onWriteFromScratch={handleWriteFromScratch}
       />
     </div>

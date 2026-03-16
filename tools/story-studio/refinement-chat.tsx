@@ -32,9 +32,10 @@ interface RefinementChatProps {
   onGenerate: (concept: StoryConcept, options?: { skipIllustration?: boolean; skipAudio?: boolean; skipValidation?: boolean }) => void
   onBack: () => void
   loading: boolean
+  mode?: 'speed' | 'professional'
 }
 
-export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, loading }: RefinementChatProps) {
+export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, loading, mode = 'professional' }: RefinementChatProps) {
   const [history, setHistory] = useState<ChatMessage[]>([])
   const [refining, setRefining] = useState(false)
   const [streamingReply, setStreamingReply] = useState('')
@@ -274,7 +275,52 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
       )}
 
       {/* Generation options + breakdown */}
-      {(() => {
+      {mode === 'speed' ? (
+        <div className="relative rounded-2xl overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-600/10 via-orange-600/10 to-yellow-500/10 dark:from-amber-400/5 dark:via-orange-400/5 dark:to-yellow-400/5" />
+          <div className="relative rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-amber-200/50 dark:border-amber-800/30 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center flex-shrink-0">
+                <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M11.983 1.907a.75.75 0 00-1.292-.657l-8.5 9.836A.75.75 0 002.75 12h6.572l-1.305 10.093a.75.75 0 001.292.657l8.5-9.836A.75.75 0 0017.25 12h-6.572l1.305-10.093z" />
+                </svg>
+              </div>
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Speed Mode</span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+              Generates story text and cover art only. You can add illustrations and narration later from the editor.
+            </p>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500">Credits are refunded if generation fails</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">20 credits</span>
+            </div>
+            <button
+              onClick={() => onGenerate(concept, { skipIllustration: true, skipAudio: true, skipValidation: true })}
+              disabled={loading || refining}
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 hover:from-amber-400 hover:via-orange-400 hover:to-yellow-400 text-white font-bold text-sm transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 cursor-pointer disabled:opacity-50 disabled:cursor-default disabled:shadow-none"
+              style={{ minHeight: '44px' }}
+            >
+              {loading ? (
+                <span className="inline-flex items-center gap-2">
+                  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.824 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  The magic is unfolding...
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M11.983 1.907a.75.75 0 00-1.292-.657l-8.5 9.836A.75.75 0 002.75 12h6.572l-1.305 10.093a.75.75 0 001.292.657l8.5-9.836A.75.75 0 0017.25 12h-6.572l1.305-10.093z" />
+                  </svg>
+                  Quick Generate
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-white/20 border border-white/30">~30s</span>
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+      ) : (() => {
         const pages = concept.tags.pageCount
         const isFullQuality = !skipValidation && !skipIllustration && !skipAudio
         const anySkipped = skipValidation || skipIllustration || skipAudio
@@ -488,3 +534,4 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
     </div>
   )
 }
+

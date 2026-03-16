@@ -3,11 +3,11 @@
 interface CreateStoryModalProps {
   open: boolean
   onClose: () => void
-  onGenerateWithAI: () => void
+  onSelectMode: (mode: 'speed' | 'professional') => void
   onWriteFromScratch: () => void
 }
 
-export function CreateStoryModal({ open, onClose, onGenerateWithAI, onWriteFromScratch }: CreateStoryModalProps) {
+export function CreateStoryModal({ open, onClose, onSelectMode, onWriteFromScratch }: CreateStoryModalProps) {
   if (!open) return null
 
   return (
@@ -28,9 +28,33 @@ export function CreateStoryModal({ open, onClose, onGenerateWithAI, onWriteFromS
         </div>
 
         <div className="space-y-3">
-          {/* Generate with AI */}
+          {/* Speed Mode */}
           <button
-            onClick={onGenerateWithAI}
+            onClick={() => onSelectMode('speed')}
+            className="w-full text-left p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700
+              hover:border-amber-300 dark:hover:border-amber-600 transition-colors cursor-pointer group"
+            style={{ minHeight: '44px' }}
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-900/30
+                flex items-center justify-center shrink-0 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/50">
+                <svg className="w-5 h-5 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M11.983 1.907a.75.75 0 00-1.292-.657l-8.5 9.836A.75.75 0 002.75 12h6.572l-1.305 10.093a.75.75 0 001.292.657l8.5-9.836A.75.75 0 0017.25 12h-6.572l1.305-10.093z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-medium text-sm text-slate-900 dark:text-white">Speed Mode</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Quick story with cover. Add illustrations &amp; narration later.
+                </p>
+                <p className="text-xs text-amber-500 mt-1.5">20 credits</p>
+              </div>
+            </div>
+          </button>
+
+          {/* Professional Mode */}
+          <button
+            onClick={() => onSelectMode('professional')}
             className="w-full text-left p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700
               hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors cursor-pointer group"
             style={{ minHeight: '44px' }}
@@ -38,16 +62,16 @@ export function CreateStoryModal({ open, onClose, onGenerateWithAI, onWriteFromS
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30
                 flex items-center justify-center shrink-0 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50">
-                <svg className="w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
                 </svg>
               </div>
               <div>
-                <h3 className="font-medium text-sm text-slate-900 dark:text-white">Generate with AI</h3>
+                <h3 className="font-medium text-sm text-slate-900 dark:text-white">Professional Mode</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Describe your plot and AI generates a full story draft with scenes, dialogue, and image prompts.
+                  Full creative control. Edit each page, fine-tune illustrations &amp; narration.
                 </p>
-                <p className="text-xs text-indigo-500 mt-1.5">10 credits</p>
+                <p className="text-xs text-indigo-500 mt-1.5">50 credits</p>
               </div>
             </div>
           </button>
