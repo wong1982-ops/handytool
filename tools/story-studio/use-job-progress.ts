@@ -18,6 +18,7 @@ export interface ActiveJob {
   error_message: string | null
   created_at: string
   updated_at: string
+  mode: 'speed' | 'professional'
 }
 
 /** Computed progress info for display. */
@@ -35,56 +36,80 @@ export interface JobProgress {
  * illustrations=50%, tts=20%, save=5%
  */
 function computeProgress(job: ActiveJob): { percent: number; label: string } {
-  const total = job.total_pages || 12 // fallback
-
-  // Base weight for pre-illustration steps
-  const preWeight = 20 // bible(5) + draft(5) + validate(5) + char_ref(5)
-  const coverWeight = 5
-  const illustrationWeight = 50
-  const ttsWeight = 20
-
+  const total = job.total_pages || 12
   let percent = 0
   let label = getStepLabel(job.current_step, undefined, total)
 
-  switch (job.current_step) {
-    case 'story_bible':
-      percent = 2
-      break
-    case 'story_draft':
-      percent = 7
-      break
-    case 'validate':
-      percent = 12
-      break
-    case 'character_ref':
-      percent = 17
-      break
-    case 'cover':
-      percent = preWeight + 2
-      break
-    case 'illustrate_page': {
-      const pageDone = job.pages_completed
-      const pagePercent = total > 0 ? (pageDone / total) * illustrationWeight : 0
-      percent = preWeight + coverWeight + pagePercent
-      label = getStepLabel('illustrate_page', pageDone + 1, total)
-      break
+  if (job.mode === 'speed') {
+    // Speed: story_draft(33%) → cover(66%) → save(90%) → done(100%)
+    switch (job.current_step) {
+      case 'story_draft':
+        percent = 20
+        break
+      case 'cover':
+        percent = 55
+        break
+      case 'save':
+        percent = 90
+        break
+      case 'done':
+        percent = 100
+        label = 'Complete!'
+        break
+      default:
+        percent = 5
     }
-    case 'tts_page': {
-      const audioDone = job.audio_completed
-      const audioPercent = total > 0 ? (audioDone / total) * ttsWeight : 0
-      percent = preWeight + coverWeight + illustrationWeight + audioPercent
-      label = getStepLabel('tts_page', audioDone + 1, total)
-      break
+  } else {
+    // Professional mode: keep existing logic exactly as-is
+    switch (job.current_step) {
+      case 'story_bible':
+        percent = 2
+        break
+      case 'story_draft':
+        percent = 7
+        break
+      case 'validate':
+        percent = 12
+        break
+      case 'character_ref':
+        percent = 17
+        break
+      case 'cover': {
+        const preWeight = 20
+        percent = preWeight + 2
+        break
+      }
+      case 'illustrate_page': {
+        const preWeight = 20
+        const coverWeight = 5
+        const illustrationWeight = 50
+        const pageDone = job.pages_completed
+        const pagePercent = total > 0 ? (pageDone / total) * illustrationWeight : 0
+        percent = preWeight + coverWeight + pagePercent
+        label = getStepLabel('illustrate_page', pageDone + 1, total)
+        break
+      }
+      case 'tts_page': {
+        const preWeight = 20
+        const coverWeight = 5
+        const illustrationWeight = 50
+        const ttsWeight = 20
+        const audioDone = job.audio_completed
+        const audioPercent = total > 0 ? (audioDone / total) * ttsWeight : 0
+        percent = preWeight + coverWeight + illustrationWeight + audioPercent
+        label = getStepLabel('tts_page', audioDone + 1, total)
+        break
+      }
+      case 'save':
+        percent = 95
+        break
+      case 'done':
+        percent = 100
+        label = 'Complete!'
+        break
+      default:
+        percent = 0
     }
-    case 'save':
-      percent = preWeight + coverWeight + illustrationWeight + ttsWeight
-      break
-    case 'done':
-      percent = 100
-      label = 'Complete!'
-      break
-    default:
-      percent = 0
   }
 
   return { percent: Math.min(Math.round(percent), 100), label }
@@ -172,6 +197,7 @@ export function useJobProgress(userId: string | null | undefined) {
               error_message: updated.error_message as string | null,
               created_at: prev[idx]?.created_at || (updated.created_at as string),
               updated_at: updated.updated_at as string,
+              mode: (prev[idx]?.mode) || 'speed',
             }
 
             // Try to extract title from input concept
@@ -218,6 +244,7 @@ export function useJobProgress(userId: string | null | undefined) {
             error_message: null,
             created_at: inserted.created_at as string,
             updated_at: inserted.updated_at as string,
+            mode: ((inserted.mode as string) || 'speed') as ActiveJob['mode'],
           }
 
           setJobs(prev => {
@@ -262,6 +289,20 @@ export function useJobProgress(userId: string | null | undefined) {
     }
   }, [])
 
+  // Delete a stuck or failed job
+  const deleteJob = useCallback(async (jobId: string) => {
+    try {
+      const res = await fetch(`/api/v1/story/jobs/${jobId}`, {
+        method: 'DELETE',
+      })
+      if (res.ok) {
+        setJobs(prev => prev.filter(j => j.id !== jobId))
+      }
+    } catch (err) {
+      console.error('[useJobProgress] Delete failed:', err)
+    }
+  }, [])
+
   // Compute progress for each job
   const jobsWithProgress: JobProgress[] = jobs.map(job => {
     const { percent, label } = computeProgress(job)
@@ -274,6 +315,7 @@ export function useJobProgress(userId: string | null | undefined) {
     completedJobId,
     clearCompletion,
     retryJob,
+    deleteJob,
     refetch: fetchJobs,
   }
 }

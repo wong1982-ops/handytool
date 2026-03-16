@@ -42,20 +42,21 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Reserve credits
+  // Reserve credits (mode-based pricing)
+  const creditCost = mode === 'speed' ? CREDIT_COSTS.speedGenerate : CREDIT_COSTS.professionalGenerate
   let reservationId: string | undefined
   if (process.env.NODE_ENV !== 'development') {
     const { data, error: reserveError } = await supabase.rpc('reserve_credits', {
       p_user_id: userId,
-      p_amount: CREDIT_COSTS.generate,
-      p_description: 'Story Studio — full book generation',
+      p_amount: creditCost,
+      p_description: `Story Studio — ${mode === 'speed' ? 'speed' : 'professional'} book generation`,
     })
 
     if (reserveError) {
       const isInsufficient = reserveError.message?.includes('insufficient_credits')
       return isInsufficient
         ? apiError('Insufficient credits', 'INSUFFICIENT_CREDITS', 402, {
-            required: CREDIT_COSTS.generate,
+            required: creditCost,
             message: 'You do not have enough credits to generate a story book.',
           })
         : API_ERRORS.INTERNAL()
