@@ -124,7 +124,7 @@ export function withJobStep(
       const currentPage = queryParams.page ? parseInt(queryParams.page, 10) : undefined
 
       // Determine the next step
-      const jobInput = jobRow.input as { skipIllustration?: boolean; skipAudio?: boolean }
+      const jobInput = jobRow.input as { skipIllustration?: boolean; skipAudio?: boolean; mode?: 'speed' | 'professional' }
       const nextStepInfo = result.nextStep
         ? { step: result.nextStep, params: result.nextParams }
         : getNextStep(stepName, {
@@ -133,6 +133,7 @@ export function withJobStep(
             completedTtsCount: result.triggerTtsBatch ? 0 : undefined,
             skipIllustration: jobInput.skipIllustration,
             skipAudio: jobInput.skipAudio,
+            mode: jobInput.mode,
           })
 
       const nextStepName = nextStepInfo === 'tts_batch'

@@ -61,12 +61,14 @@ export const POST = withJobStep('save', async (ctx) => {
   }
 
   // Save to books table
+  const bookMode = (job.input as { mode?: string }).mode || 'speed'
   const { data: insertedBook, error: insertError } = await supabase.rpc('insert_book', {
     p_user_id: job.user_id,
     p_slug: slug,
     p_data: finalBook,
     p_is_public: false,
     p_series_id: seriesId ?? null,
+    p_mode: bookMode,
   })
 
   if (insertError) {
