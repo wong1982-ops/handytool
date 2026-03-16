@@ -174,6 +174,7 @@ export function getNextStep(
     completedTtsCount?: number   // for tts_page: how many TTS are done (including this one)
     skipIllustration?: boolean   // skip illustrate_page steps (keep character_ref + cover)
     skipAudio?: boolean          // skip tts_page steps
+    mode?: 'speed' | 'professional'  // speed mode skips validate, character_ref, illustration, TTS
   },
 ): { step: PipelineStep; params?: Record<string, string> } | 'tts_batch' | null {
   switch (currentStep) {
@@ -181,6 +182,7 @@ export function getNextStep(
       return { step: 'story_draft' }
 
     case 'story_draft':
+      if (context.mode === 'speed') return { step: 'cover' }
       return { step: 'validate' }
 
     case 'validate':
@@ -194,6 +196,7 @@ export function getNextStep(
       return { step: 'cover' }
 
     case 'cover':
+      if (context.mode === 'speed') return { step: 'save' }
       // Start sequential illustration chain with page 1
       return { step: 'illustrate_page', params: { page: '1' } }
 

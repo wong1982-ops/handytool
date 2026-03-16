@@ -38,6 +38,7 @@ export const storyConceptSchema = z.object({
 export const generateRequestSchema = z.object({
   plot: z.string().min(10).max(2000),
   concept: storyConceptSchema,
+  mode: z.enum(['speed', 'professional']).default('speed'),
   seriesId: z.string().uuid().optional(),
   characterIds: z.array(z.string().uuid()).optional(),
   artStyle: z.string().max(100).optional(),

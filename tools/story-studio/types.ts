@@ -4,6 +4,7 @@ export type CharacterRole = 'protagonist' | 'antagonist' | 'supporting'
 export type BookStatus = 'generating' | 'complete'
 export type ImageStatus = 'pending' | 'generating' | 'done' | 'error'
 export type AppPhase = 'input' | 'refine' | 'generating' | 'viewer'
+export type StudioMode = 'speed' | 'professional'
 
 export interface ConceptSections {
   premise: string
