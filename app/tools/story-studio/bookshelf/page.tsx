@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useJobProgress } from '@/tools/story-studio/use-job-progress'
 import { InProgressSection } from '@/tools/story-studio/job-card'
@@ -17,9 +18,11 @@ interface BookItem {
   pageCount: number
   isPublic: boolean
   createdAt: string
+  mode: 'speed' | 'professional'
 }
 
 export default function BookshelfPage() {
+  const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const [books, setBooks] = useState<BookItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -28,7 +31,7 @@ export default function BookshelfPage() {
   const abortRef = useRef<AbortController | null>(null)
 
   // Background job progress tracking
-  const { jobs: activeJobs, completedJobId, clearCompletion, retryJob } = useJobProgress(user?.id)
+  const { jobs: activeJobs, completedJobId, clearCompletion, retryJob, deleteJob } = useJobProgress(user?.id)
 
   // When a job completes, refresh the bookshelf to show the new book
   useEffect(() => {
@@ -172,7 +175,7 @@ export default function BookshelfPage() {
         <PushPromptBanner hasActiveJobs={activeJobs.length > 0} />
 
         {/* In-progress jobs section */}
-        <InProgressSection jobs={activeJobs} onRetry={retryJob} />
+        <InProgressSection jobs={activeJobs} onRetry={retryJob} onDelete={deleteJob} />
 
         {loading ? (
           <div className="text-center py-16 text-slate-400">Loading...</div>
@@ -219,11 +222,18 @@ export default function BookshelfPage() {
                     </div>
                   )}
                   {/* Genre badge overlay */}
-                  {book.style && (
-                    <span className="absolute top-2 right-2 text-[10px] font-bold uppercase tracking-wider bg-amber-500 text-white px-2 py-0.5 rounded">
-                      {book.style}
-                    </span>
-                  )}
+                  <div className="absolute top-2 right-2 flex items-center gap-1">
+                    {book.mode === 'professional' && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-500 text-white px-2 py-0.5 rounded">
+                        Pro
+                      </span>
+                    )}
+                    {book.style && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500 text-white px-2 py-0.5 rounded">
+                        {book.style}
+                      </span>
+                    )}
+                  </div>
                 </Link>
 
                 {/* Info */}
@@ -252,6 +262,13 @@ export default function BookshelfPage() {
                       style={{ minHeight: '36px' }}
                     >
                       {book.isPublic ? 'Unshare' : 'Share'}
+                    </button>
+                    <button
+                      onClick={() => router.push(`/tools/story-studio/edit/${book.id}`)}
+                      className="flex-1 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                      style={{ minHeight: '36px' }}
+                    >
+                      Edit
                     </button>
                     <button
                       onClick={() => setDeleteConfirm(book.id)}

@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import { BookViewer } from '@/tools/story-studio/book-viewer'
+import { BulkGenerateActions } from '@/tools/story-studio/bulk-generate-actions'
 import type { StoryBook, Page } from '@/tools/story-studio/types'
 import { PageEditor } from './page-editor'
 
@@ -13,12 +14,14 @@ interface BookReaderClientProps {
   initialPages?: Record<string, unknown>[]
   /** Total page count from shell RPC */
   pageCount?: number
+  /** Book creation mode */
+  bookMode?: 'speed' | 'professional'
 }
 
 const PAGE_BATCH_SIZE = 4
 const PREFETCH_AHEAD = 2 // start fetching when user is within N pages of loaded boundary
 
-export function BookReaderClient({ bookData, bookId, isOwner, initialPages, pageCount }: BookReaderClientProps) {
+export function BookReaderClient({ bookData, bookId, isOwner, initialPages, pageCount, bookMode }: BookReaderClientProps) {
   // If initialPages provided (lazy-load mode), use them; otherwise fall back to bookData.pages (full load)
   const isLazyMode = initialPages !== undefined && pageCount !== undefined
   const allPagesFromData = (bookData.pages as Page[]) || []
@@ -122,17 +125,32 @@ export function BookReaderClient({ bookData, bookId, isOwner, initialPages, page
     }
   }
 
+  // Detect whether pages already have illustrations/narration
+  const hasIllustrations = pages.length > 0 && pages.some(p => !!p.imageUrl)
+  const hasNarration = pages.length > 0 && pages.some(p => !!p.audioUrl)
+  const showBulkActions = isOwner && bookId && bookMode === 'speed'
+
   return (
-    <BookViewer
-      book={book}
-      onEdit={() => {}}
-      onStartOver={() => {}}
-      readOnly
-      isOwner={isOwner}
-      onEditPage={isOwner && bookId ? (sequence) => setEditingPage(sequence) : undefined}
-      onPageChange={handlePageChange}
-      totalPages={totalPages}
-      pagesLoaded={loadedCount}
-    />
+    <>
+      {showBulkActions && (
+        <BulkGenerateActions
+          bookId={bookId}
+          pageCount={totalPages}
+          hasIllustrations={hasIllustrations}
+          hasNarration={hasNarration}
+        />
+      )}
+      <BookViewer
+        book={book}
+        onEdit={() => {}}
+        onStartOver={() => {}}
+        readOnly
+        isOwner={isOwner}
+        onEditPage={isOwner && bookId ? (sequence) => setEditingPage(sequence) : undefined}
+        onPageChange={handlePageChange}
+        totalPages={totalPages}
+        pagesLoaded={loadedCount}
+      />
+    </>
   )
 }

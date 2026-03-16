@@ -244,6 +244,18 @@ export default async function BookPage({ params }: BookPageProps) {
   const bookId = shell.id as string
   const pageCount = (shell.page_count as number) || 0
 
+  // Fetch book mode (speed/professional) for conditional UI
+  let bookMode: string = 'speed'
+  if (isOwner) {
+    const supabase = await createClient()
+    const { data: modeRow } = await supabase
+      .from('books')
+      .select('mode')
+      .eq('id', bookId)
+      .single()
+    if (modeRow?.mode) bookMode = modeRow.mode
+  }
+
   return (
     <BookPageShell>
       {/* SEO-only static preview (hidden visually, visible to crawlers) */}
@@ -259,6 +271,7 @@ export default async function BookPage({ params }: BookPageProps) {
         bookData={bookData}
         bookId={bookId}
         isOwner={isOwner}
+        bookMode={bookMode as 'speed' | 'professional'}
         {...(initialPages !== null ? {
           initialPages: initialPages as Record<string, unknown>[],
           pageCount,
