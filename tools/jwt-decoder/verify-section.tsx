@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ALL_ALGORITHMS, getAlgorithmType, verifyJwt } from './jwt-utils'
 
 interface VerifySectionProps {
