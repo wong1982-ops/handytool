@@ -160,7 +160,7 @@ export default function BookshelfPage() {
             </p>
           </div>
           <Link
-            href="/tools/story-studio"
+            href="/tools/story-studio/new"
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors"
             style={{ minHeight: '44px' }}
           >
@@ -189,7 +189,7 @@ export default function BookshelfPage() {
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">No books yet</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Create your first AI-illustrated story book!</p>
             <Link
-              href="/tools/story-studio"
+              href="/tools/story-studio/new"
               className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors"
               style={{ minHeight: '44px' }}
             >
@@ -307,7 +307,7 @@ export default function BookshelfPage() {
 
             {/* "Create New" card — dashed border like design */}
             <Link
-              href="/tools/story-studio"
+              href="/tools/story-studio/new"
               className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center gap-3 aspect-[3/5] hover:border-amber-400 dark:hover:border-amber-600 hover:bg-amber-50/50 dark:hover:bg-amber-900/10 transition-colors group"
             >
               <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center group-hover:bg-amber-200 dark:group-hover:bg-amber-900/50 transition-colors">

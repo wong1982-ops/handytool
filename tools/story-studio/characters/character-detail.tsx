@@ -423,11 +423,11 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
 
           {/* Custom Voice Recording */}
           <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
-            <h3 className="text-xs font-medium text-slate-400 uppercase mb-2">Custom Voice</h3>
+            <h3 className="text-xs font-medium text-slate-400 uppercase mb-2">Your Voice</h3>
             <VoiceRecorder characterId={character.id} characterName={character.name} />
             {character.voice && (
               <p className="text-[11px] text-slate-400 mt-2 italic">
-                Custom voice will be used instead of the preset. Remove custom voice to use a preset.
+                This voice will be used for the character. Delete it to pick a different one.
               </p>
             )}
           </div>

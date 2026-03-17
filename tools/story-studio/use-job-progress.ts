@@ -41,20 +41,20 @@ function computeProgress(job: ActiveJob): { percent: number; label: string } {
   let label = getStepLabel(job.current_step, undefined, total)
 
   if (job.mode === 'speed') {
-    // Speed: story_draft(33%) → cover(66%) → save(90%) → done(100%)
+    // Speed: story_bible(15%) → story_draft(50%) → save(90%) → done(100%)
     switch (job.current_step) {
-      case 'story_draft':
-        percent = 20
+      case 'story_bible':
+        percent = 15
         break
-      case 'cover':
-        percent = 55
+      case 'story_draft':
+        percent = 50
         break
       case 'save':
         percent = 90
         break
       case 'done':
         percent = 100
-        label = 'Complete!'
+        label = 'All done!'
         break
       default:
         percent = 5

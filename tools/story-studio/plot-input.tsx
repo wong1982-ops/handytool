@@ -93,17 +93,17 @@ export function PlotInput({
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">&#x1F389;</span>
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-            The Main Plot
+            Your Story Idea
           </h2>
         </div>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
-          Every epic journey starts with a single spark of imagination.
+          What should your story be about? Write a few sentences!
         </p>
 
         <textarea
           value={plot}
           onChange={(e) => updatePlot(e.target.value)}
-          placeholder="Example: A clockmaker in a city of clouds discovers a gear that can turn back time, but only for five minutes a day..."
+          placeholder="Example: Two kittens find a magic door that leads to a land made of candy..."
           className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm resize-none h-36 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none placeholder:text-slate-400 transition-all"
           maxLength={2000}
           disabled={rephrasing}

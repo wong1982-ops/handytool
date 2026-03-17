@@ -182,7 +182,7 @@ export function getNextStep(
       return { step: 'story_draft' }
 
     case 'story_draft':
-      if (context.mode === 'speed') return { step: 'cover' }
+      if (context.mode === 'speed') return { step: 'save' }
       return { step: 'validate' }
 
     case 'validate':
@@ -196,7 +196,6 @@ export function getNextStep(
       return { step: 'cover' }
 
     case 'cover':
-      if (context.mode === 'speed') return { step: 'save' }
       // Start sequential illustration chain with page 1
       return { step: 'illustrate_page', params: { page: '1' } }
 
@@ -230,21 +229,21 @@ export function getNextStep(
 /** Human-readable label for a step (used in progress UI). */
 export function getStepLabel(step: string, currentPage?: number, totalPages?: number): string {
   switch (step) {
-    case 'story_bible': return 'Building story foundation...'
+    case 'story_bible': return 'Dreaming up your story...'
     case 'story_draft': return 'Writing your story...'
-    case 'validate': return 'Reviewing for consistency...'
-    case 'character_ref': return 'Creating character reference...'
-    case 'cover': return 'Illustrating cover...'
+    case 'validate': return 'Checking everything looks good...'
+    case 'character_ref': return 'Drawing your characters...'
+    case 'cover': return 'Making your cover...'
     case 'illustrate_page':
       return currentPage && totalPages
-        ? `Illustrating page ${currentPage} of ${totalPages}...`
-        : 'Illustrating pages...'
+        ? `Drawing page ${currentPage} of ${totalPages}...`
+        : 'Drawing pictures...'
     case 'tts_page':
       return currentPage && totalPages
-        ? `Recording narration ${currentPage} of ${totalPages}...`
-        : 'Recording narration...'
+        ? `Adding voice ${currentPage} of ${totalPages}...`
+        : 'Adding voices...'
     case 'save': return 'Saving your book...'
-    case 'done': return 'Complete!'
+    case 'done': return 'All done!'
     default: return 'Processing...'
   }
 }

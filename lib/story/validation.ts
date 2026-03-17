@@ -24,7 +24,7 @@ export const CREDIT_COSTS = {
   regenerateStory: 10,
   regenerateImage: 5,
   // Mode-based pricing
-  speedGenerate: 20,         // Speed mode: draft + cover only
+  speedGenerate: 10,         // Speed mode: story text only
   professionalGenerate: 50,  // Professional mode: full pipeline
   illustratePage: 5,         // Per-page illustration (bulk add-on)
   narratePage: 3,            // Per-page narration (bulk add-on)

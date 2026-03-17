@@ -88,9 +88,10 @@ export async function POST(
   const row = (data || [])[0]
   return apiSuccess(
     {
-      id: row?.id,
+      id: row?.out_id,
       recordingUrl,
-      status: row?.status || 'recorded',
+      status: row?.out_status || 'recorded',
+      createdAt: new Date().toISOString(),
     },
     201,
   )

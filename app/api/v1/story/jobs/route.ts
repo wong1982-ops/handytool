@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
 
   // Trigger the first step
   // Dev: await to serialize (Turbopack single-writer). Prod: fire-and-forget.
-  const firstStep = mode === 'speed' ? 'story_draft' : 'story_bible'
+  const firstStep = 'story_bible'
   const p = triggerNextStep(jobId, firstStep)
   if (IS_DEV && p) await p
 

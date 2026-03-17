@@ -7,7 +7,6 @@ import { useStoriesList } from '@/tools/story-studio/use-stories-list'
 import { useStoryBook } from '@/tools/story-studio/use-story-book'
 import { useJobProgress } from '@/tools/story-studio/use-job-progress'
 import { StoryList } from '@/tools/story-studio/stories/story-list'
-import { CreateStoryModal } from '@/tools/story-studio/stories/create-story-modal'
 import { PlotInput } from '@/tools/story-studio/plot-input'
 import { RefinementChat } from '@/tools/story-studio/refinement-chat'
 import { GenerationProgress } from '@/tools/story-studio/generation-progress'
@@ -29,6 +28,7 @@ function StoriesContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const urlSeriesId = searchParams.get('seriesId')
+  const urlMode = searchParams.get('mode') as 'speed' | 'professional' | null
 
   // Stories list
   const storiesList = useStoriesList()
@@ -40,8 +40,16 @@ function StoriesContent() {
   const { jobs: activeJobs, retryJob, deleteJob, completedJobId, clearCompletion } = useJobProgress(user?.id)
 
   // View state
-  const [view, setView] = useState<View>('list')
-  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [view, setView] = useState<View>(urlMode ? 'create-ai' : 'list')
+
+  // Auto-start AI creation when mode is set via URL (coming from /new page)
+  useEffect(() => {
+    if (urlMode && view === 'create-ai' && !storyBook.mode) {
+      storyBook.reset()
+      storyBook.setMode(urlMode)
+      if (urlSeriesId) storyBook.setSeriesId(urlSeriesId)
+    }
+  }, [urlMode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // When a job completes, fetch its book ID and open the editor
   useEffect(() => {
@@ -71,35 +79,6 @@ function StoriesContent() {
   }, [completedJobId, clearCompletion, storiesList, storyBook, router])
 
   // Handlers
-  const handleSelectMode = useCallback((selectedMode: 'speed' | 'professional') => {
-    setShowCreateModal(false)
-    storyBook.reset()
-    storyBook.setMode(selectedMode)
-    if (urlSeriesId) storyBook.setSeriesId(urlSeriesId)
-    setView('create-ai')
-  }, [storyBook, urlSeriesId])
-
-  const handleWriteFromScratch = useCallback(async () => {
-    setShowCreateModal(false)
-    try {
-      const res = await fetch('/api/v1/story/books', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: 'Untitled Story',
-          status: 'draft',
-          seriesId: urlSeriesId || undefined,
-        }),
-      })
-      if (!res.ok) throw new Error('Failed to create')
-      const { data } = await res.json()
-      storiesList.refresh()
-      router.push(`/tools/story-studio/edit/${data.id}`)
-    } catch {
-      // show error
-    }
-  }, [urlSeriesId, storiesList, router])
-
   const handleEdit = useCallback((id: string) => {
     router.push(`/tools/story-studio/edit/${id}`)
   }, [router])
@@ -215,17 +194,10 @@ function StoriesContent() {
         onSortChange={storiesList.setSortBy}
         filterSeries={storiesList.filterSeries}
         onFilterSeriesChange={storiesList.setFilterSeries}
-        onCreateNew={() => setShowCreateModal(true)}
+        onCreateNew={() => router.push('/tools/story-studio/new')}
         onEdit={handleEdit}
         onDelete={storiesList.deleteStory}
         onToggleShare={storiesList.toggleShare}
-      />
-
-      <CreateStoryModal
-        open={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSelectMode={handleSelectMode}
-        onWriteFromScratch={handleWriteFromScratch}
       />
     </div>
   )

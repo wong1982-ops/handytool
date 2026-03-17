@@ -19,7 +19,7 @@ interface VoiceState {
 type RecorderPhase = 'idle' | 'recording' | 'preview'
 
 const RECORDING_SCRIPT =
-  'Once upon a time, in a land far away, a brave adventurer set out on a magical journey through enchanted forests and sparkling rivers, meeting wonderful friends along the way.'
+  'The little fox jumped over the log and ran through the tall grass. "Hello!" said the fox. "Do you want to play with me today?"'
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60)
@@ -29,19 +29,19 @@ function formatTime(seconds: number): string {
 
 const STATUS_BADGE: Record<VoiceState['status'], { label: string; cls: string }> = {
   ready: {
-    label: 'Ready',
+    label: 'All set!',
     cls: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
   },
   recorded: {
-    label: 'Processing',
+    label: 'Working on it…',
     cls: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
   },
   cloning: {
-    label: 'Cloning…',
+    label: 'Making your voice…',
     cls: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
   },
   error: {
-    label: 'Error',
+    label: 'Something went wrong',
     cls: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
   },
 }
@@ -119,7 +119,7 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true })
     } catch {
-      setSaveError('Microphone access denied. Please allow microphone access and try again.')
+      setSaveError('We need your microphone to record! Please say "yes" when your browser asks.')
       return
     }
     streamRef.current = stream
@@ -196,7 +196,7 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
       setVoice(null)
       setPhase('idle')
     } catch {
-      setSaveError('Failed to delete voice. Please try again.')
+      setSaveError('Oops, could not delete. Try again!')
     } finally {
       setDeleting(false)
     }
@@ -218,12 +218,11 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
         method: 'POST',
         body: formData,
       })
+      const json = await res.json().catch(() => null) as { data?: VoiceState; error?: string } | null
       if (!res.ok) {
-        const body = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(body.error ?? 'Upload failed')
+        throw new Error(json?.error ?? 'Upload failed')
       }
-      const json = await res.json() as { data: VoiceState }
-      if (json.data) setVoice(json.data)
+      if (json?.data) setVoice(json.data)
       if (previewUrlRef.current) {
         URL.revokeObjectURL(previewUrlRef.current)
         previewUrlRef.current = null
@@ -231,7 +230,7 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
       previewBlobRef.current = null
       setPhase('idle')
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Failed to save recording.')
+      setSaveError(err instanceof Error ? err.message : 'Could not save. Try again!')
     } finally {
       setSaving(false)
     }
@@ -256,7 +255,7 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
         </svg>
         <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-          Voice Clone — {characterName}
+          Record Your Voice — {characterName}
         </h3>
       </div>
 
@@ -315,7 +314,7 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
                   <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                 </svg>
               )}
-              Delete Voice
+              Delete
             </button>
           </div>
         </div>
@@ -327,7 +326,7 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
           {/* Script box */}
           <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/40 p-4">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
-              Read this aloud when recording
+              Read this out loud
             </p>
             <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               {RECORDING_SCRIPT}
@@ -369,11 +368,11 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
             {/* Hint text */}
             {elapsed >= 55 ? (
               <span className="text-xs font-medium text-orange-600 dark:text-orange-400">
-                auto-stop at 1:00
+                Almost done!
               </span>
             ) : elapsed >= 30 ? (
               <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
-                good length!
+                Great job!
               </span>
             ) : null}
           </div>
@@ -402,7 +401,7 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
       {phase === 'preview' && previewUrlRef.current && (
         <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 p-4 space-y-3">
           <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            Preview your recording before saving
+            Listen back and save if you like it!
           </p>
 
           {/* Audio playback */}
@@ -442,7 +441,7 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                 </svg>
               )}
-              {saving ? 'Saving…' : 'Save Recording'}
+              {saving ? 'Saving…' : 'Save'}
             </button>
           </div>
         </div>
