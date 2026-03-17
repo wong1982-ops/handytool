@@ -102,6 +102,8 @@ export const regenerateImageRequestSchema = z.object({
 
 export const exportPdfRequestSchema = z.object({
   title: z.string(),
+  authors: z.array(z.string()).optional(),
+  coverImageUrl: z.string().url().optional(),
   pages: z.array(z.object({
     sequence: z.number(),
     narrativeText: z.string(),

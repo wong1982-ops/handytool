@@ -22,6 +22,8 @@ export function ExportPanel({ book }: ExportPanelProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: book.title,
+          authors: book.authors,
+          coverImageUrl: book.coverImageUrl,
           pages: book.pages
             .filter((p) => p.imageUrl)
             .map((p) => ({
