@@ -285,14 +285,14 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                   <path d="M11.983 1.907a.75.75 0 00-1.292-.657l-8.5 9.836A.75.75 0 002.75 12h6.572l-1.305 10.093a.75.75 0 001.292.657l8.5-9.836A.75.75 0 0017.25 12h-6.572l1.305-10.093z" />
                 </svg>
               </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Speed Mode</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Quick Story</span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
-              Generates story text and cover art only. You can add illustrations and narration later from the editor.
+              Cast a spell and your story appears! You can add pictures and sound later.
             </p>
             <div className="flex items-center justify-between mb-3">
               <span className="text-[11px] text-slate-400 dark:text-slate-500">Credits are refunded if generation fails</span>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">20 credits</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">10 credits</span>
             </div>
             <button
               onClick={() => onGenerate(concept, { skipIllustration: true, skipAudio: true, skipValidation: true })}
@@ -306,15 +306,14 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.824 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  The magic is unfolding...
+                  Casting spell...
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M11.983 1.907a.75.75 0 00-1.292-.657l-8.5 9.836A.75.75 0 002.75 12h6.572l-1.305 10.093a.75.75 0 001.292.657l8.5-9.836A.75.75 0 0017.25 12h-6.572l1.305-10.093z" />
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
                   </svg>
-                  Quick Generate
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-white/20 border border-white/30">~30s</span>
+                  Cast a Spell!
                 </span>
               )}
             </button>

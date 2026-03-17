@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import type { ProgressEvent } from './types'
 
 interface GenerationProgressProps {
@@ -7,6 +8,8 @@ interface GenerationProgressProps {
   totalPages: number | null
   /** If set, generation is running in background via job queue */
   activeJobId?: string | null
+  /** Story mode — affects UI (speed shows spell animation) */
+  mode?: 'speed' | 'professional'
 }
 
 const FUN_TIPS = [
@@ -22,57 +25,158 @@ const FUN_TIPS = [
   'Untangling a ball of narrative yarn...',
 ]
 
-export function GenerationProgress({ events, totalPages, activeJobId }: GenerationProgressProps) {
-  // Background job mode: show a simpler UI with link to bookshelf
-  if (activeJobId) {
-    return (
-      <div className="max-w-lg mx-auto text-center py-10 md:py-14">
-        <div className="relative w-28 h-28 mx-auto mb-8">
-          <div className="absolute inset-0 rounded-full animate-[orb-pulse_3s_ease-in-out_infinite]" style={{
-            background: 'conic-gradient(from 0deg, #818cf8, #a78bfa, #c084fc, #e879f9, #f472b6, #fb923c, #fbbf24, #a3e635, #34d399, #22d3ee, #818cf8)',
-            filter: 'blur(12px)',
-            opacity: 0.4,
-          }} />
-          <div className="absolute inset-3 rounded-full bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 shadow-2xl flex items-center justify-center">
-            <svg className="w-10 h-10 text-amber-300 drop-shadow-lg animate-[orb-float_2s_ease-in-out_infinite]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-            </svg>
-          </div>
+const SPELL_MESSAGES = [
+  'Waving the magic wand...',
+  'Sprinkling story dust...',
+  'Stirring the cauldron of tales...',
+  'Whispering to enchanted quills...',
+  'Mixing imagination potion...',
+  'Summoning characters...',
+  'Painting with starlight...',
+  'Weaving words together...',
+]
+
+function SpellAnimation({ jobId: _jobId }: { jobId: string }) {
+  const [msgIndex, setMsgIndex] = useState(0)
+
+  // Rotate fun messages
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setMsgIndex(prev => (prev + 1) % SPELL_MESSAGES.length)
+    }, 3000)
+    return () => clearInterval(timer)
+  }, [])
+
+  return (
+    <div className="max-w-sm mx-auto text-center py-10 md:py-14">
+      {/* Sparkle wand animation */}
+      <div className="relative w-32 h-32 mx-auto mb-8">
+        <div className="absolute inset-0 rounded-full animate-[spell-glow_2s_ease-in-out_infinite]" style={{
+          background: 'conic-gradient(from 0deg, #fbbf24, #f59e0b, #d97706, #fbbf24, #fde68a, #fbbf24)',
+          filter: 'blur(16px)',
+          opacity: 0.5,
+        }} />
+        <div className="absolute inset-3 rounded-full bg-gradient-to-br from-amber-900 via-orange-900 to-yellow-950 shadow-2xl flex items-center justify-center">
+          <svg className="w-12 h-12 text-amber-300 drop-shadow-lg animate-[wand-wave_1.5s_ease-in-out_infinite]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+          </svg>
         </div>
+        {/* Floating sparkles */}
+        <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-400 animate-[sparkle_2s_ease-in-out_infinite_0.2s] opacity-0" />
+        <div className="absolute top-2 -left-2 w-2 h-2 rounded-full bg-yellow-300 animate-[sparkle_2s_ease-in-out_infinite_0.6s] opacity-0" />
+        <div className="absolute -bottom-1 right-4 w-2.5 h-2.5 rounded-full bg-orange-300 animate-[sparkle_2s_ease-in-out_infinite_1s] opacity-0" />
+      </div>
 
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
-          Your Book is Being Created
-        </h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
-          Your story is being generated in the background. You can safely leave this page.
-        </p>
-        <p className="text-xs text-slate-400 dark:text-slate-500 mb-6">
-          Track progress and find your completed book on the bookshelf.
-        </p>
+      <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+        Casting a Spell...
+      </h2>
+      <p className="text-sm text-amber-600 dark:text-amber-400 mb-2 h-5 transition-opacity">
+        {SPELL_MESSAGES[msgIndex]}
+      </p>
+      <p className="text-xs text-slate-400 dark:text-slate-500 mb-6">
+        Your story will be ready in a moment!
+      </p>
 
-        <a
-          href="/tools/story-studio/bookshelf"
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors"
-          style={{ minHeight: '44px' }}
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      {/* Pulsing progress dots */}
+      <div className="flex items-center justify-center gap-1.5 mb-6">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="w-2 h-2 rounded-full bg-amber-400"
+            style={{ animation: `dot-pulse 1.2s ease-in-out ${i * 0.2}s infinite` }}
+          />
+        ))}
+      </div>
+
+      <a
+        href="/tools/story-studio/bookshelf"
+        className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+      >
+        or go to bookshelf
+      </a>
+
+      <style jsx>{`
+        @keyframes spell-glow {
+          0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.4; }
+          50% { transform: scale(1.12) rotate(180deg); opacity: 0.6; }
+        }
+        @keyframes wand-wave {
+          0%, 100% { transform: rotate(-5deg) translateY(0); }
+          50% { transform: rotate(5deg) translateY(-3px); }
+        }
+        @keyframes sparkle {
+          0%, 100% { opacity: 0; transform: scale(0); }
+          50% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes dot-pulse {
+          0%, 100% { opacity: 0.3; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+function BackgroundJobProgress({ jobId: _jobId }: { jobId: string }) {
+  return (
+    <div className="max-w-lg mx-auto text-center py-10 md:py-14">
+      <div className="relative w-28 h-28 mx-auto mb-8">
+        <div className="absolute inset-0 rounded-full animate-[orb-pulse_3s_ease-in-out_infinite]" style={{
+          background: 'conic-gradient(from 0deg, #818cf8, #a78bfa, #c084fc, #e879f9, #f472b6, #fb923c, #fbbf24, #a3e635, #34d399, #22d3ee, #818cf8)',
+          filter: 'blur(12px)',
+          opacity: 0.4,
+        }} />
+        <div className="absolute inset-3 rounded-full bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 shadow-2xl flex items-center justify-center">
+          <svg className="w-10 h-10 text-amber-300 drop-shadow-lg animate-[orb-float_2s_ease-in-out_infinite]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
           </svg>
-          Go to Bookshelf
-        </a>
-
-        <style jsx>{`
-          @keyframes orb-pulse {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.08) rotate(180deg); }
-          }
-          @keyframes orb-float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
-          }
-        `}</style>
+        </div>
       </div>
-    )
+
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
+        Your Book is Being Created
+      </h2>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
+        Your story is being generated in the background. You can safely leave this page.
+      </p>
+      <p className="text-xs text-slate-400 dark:text-slate-500 mb-6">
+        Track progress and find your completed book on the bookshelf.
+      </p>
+
+      <a
+        href="/tools/story-studio/bookshelf"
+        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors"
+        style={{ minHeight: '44px' }}
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+        </svg>
+        Go to Bookshelf
+      </a>
+
+      <style jsx>{`
+        @keyframes orb-pulse {
+          0%, 100% { transform: scale(1) rotate(0deg); }
+          50% { transform: scale(1.08) rotate(180deg); }
+        }
+        @keyframes orb-float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+export function GenerationProgress({ events, totalPages, activeJobId, mode }: GenerationProgressProps) {
+  // Background job mode
+  if (activeJobId) {
+    // Speed mode: show spell animation inline
+    if (mode === 'speed') {
+      return <SpellAnimation jobId={activeJobId} />
+    }
+    // Professional mode: show background job UI with bookshelf link
+    return <BackgroundJobProgress jobId={activeJobId} />
   }
 
   const imagesDone = events.filter(e => e.type === 'image-done').length

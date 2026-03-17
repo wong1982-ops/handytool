@@ -169,6 +169,7 @@ function StoriesContent() {
             events={progressEvents}
             totalPages={storyBook.book?.pages?.length ?? null}
             activeJobId={activeJobId}
+            mode={storyBook.mode}
           />
         )}
       </div>
