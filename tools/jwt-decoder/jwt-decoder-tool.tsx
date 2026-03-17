@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { DecodeSection } from './decode-section'
+import { GenerateSection } from './generate-section'
 import { VerifySection } from './verify-section'
 
 const SAMPLE_JWT =
@@ -19,6 +20,7 @@ export function JwtDecoderTool() {
         onAlgorithmDetected={setDetectedAlgorithm}
       />
       <VerifySection token={token} detectedAlg={detectedAlgorithm || 'HS256'} />
+      <GenerateSection />
     </div>
   )
 }
