@@ -93,10 +93,11 @@ export async function POST(request: NextRequest) {
   }
 
   // Trigger the first step
-  // Dev: await to serialize (Turbopack single-writer). Prod: fire-and-forget.
+  // Speed mode: always fire-and-forget (fast response so spell animation shows immediately)
+  // Professional mode in dev: await to serialize (Turbopack single-writer)
   const firstStep = 'story_bible'
   const p = triggerNextStep(jobId, firstStep)
-  if (IS_DEV && p) await p
+  if (IS_DEV && mode !== 'speed' && p) await p
 
   return NextResponse.json({ jobId }, { status: 201 })
 }
