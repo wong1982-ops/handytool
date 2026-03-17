@@ -133,7 +133,7 @@ export async function verifyJwt(
 ): Promise<VerifyResult> {
   try {
     const algType = getAlgorithmType(algorithm)
-    let key: Uint8Array | CryptoKey
+    let key: Uint8Array | Awaited<ReturnType<typeof jose.importSPKI>>
 
     if (algType === 'HMAC') {
       key = new TextEncoder().encode(secret)
@@ -180,7 +180,7 @@ export async function signJwt(
 ): Promise<SignResult> {
   try {
     const algType = getAlgorithmType(algorithm)
-    let key: Uint8Array | CryptoKey
+    let key: Uint8Array | Awaited<ReturnType<typeof jose.importSPKI>>
 
     if (algType === 'HMAC') {
       key = new TextEncoder().encode(secret)
