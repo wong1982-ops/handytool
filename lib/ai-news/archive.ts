@@ -17,7 +17,7 @@ export async function archiveOldNews(): Promise<number> {
     .select('*')
     .eq('is_active', true)
     .lt('posted_at', cutoffIso)
-    .limit(500)
+    .limit(500) as { data: Record<string, unknown>[] | null; error: { message: string } | null }
 
   if (selectError || !oldItems || oldItems.length === 0) {
     if (selectError) console.error('[ai-radar] Archive select error:', selectError.message)
@@ -26,17 +26,17 @@ export async function archiveOldNews(): Promise<number> {
 
   const { error: insertError } = await supabase
     .from('ai_news_archive')
-    .upsert(oldItems, { onConflict: 'source,source_id', ignoreDuplicates: true })
+    .upsert(oldItems as never[], { onConflict: 'source,source_id', ignoreDuplicates: true })
 
   if (insertError) {
     console.error('[ai-radar] Archive insert error:', insertError.message)
     return 0
   }
 
-  const ids = oldItems.map((item) => item.id)
+  const ids = oldItems.map((item) => item.id as string)
   const { error: updateError } = await supabase
     .from('ai_news')
-    .update({ is_active: false })
+    .update({ is_active: false } as never)
     .in('id', ids)
 
   if (updateError) {

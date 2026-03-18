@@ -215,13 +215,13 @@ export async function POST(request: Request) {
         send({ type: 'status', message: 'Writing your story...' })
         let rawDraft
         try {
-          rawDraft = await generateStoryDraft({ plot, concept }, storyBible)
+          rawDraft = await generateStoryDraft(parsed.data, storyBible)
         } catch (draftErr) {
           if (isContentBlocked(draftErr)) {
             send({ type: 'status', message: 'Rephrasing your plot for safety compliance...' })
             const safePlot = await rephrasePlot(plot)
             send({ type: 'status', message: 'Retrying story draft...' })
-            rawDraft = await generateStoryDraft({ plot: safePlot, concept }, storyBible)
+            rawDraft = await generateStoryDraft({ ...parsed.data, plot: safePlot }, storyBible)
           } else {
             throw draftErr
           }

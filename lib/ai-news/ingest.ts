@@ -91,7 +91,7 @@ export async function ingestNewsItems(
 
   const { error } = await supabase
     .from('ai_news')
-    .upsert(rows, { onConflict: 'source,source_id', ignoreDuplicates: true })
+    .upsert(rows as never[], { onConflict: 'source,source_id', ignoreDuplicates: true })
 
   if (error) {
     console.error(`[ai-radar] Insert error for ${source}:`, error.message)

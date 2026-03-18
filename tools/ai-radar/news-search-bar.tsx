@@ -9,7 +9,7 @@ interface NewsSearchBarProps {
 
 export function NewsSearchBar({ value, onChange }: NewsSearchBarProps) {
   const [localValue, setLocalValue] = useState(value)
-  const timerRef = useRef<ReturnType<typeof setTimeout>>()
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     setLocalValue(value)

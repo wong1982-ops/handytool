@@ -86,7 +86,7 @@ export async function ingestJobs(
 
   const { error } = await supabase
     .from('jobs')
-    .upsert(rows, { onConflict: 'source,source_id,category', ignoreDuplicates: true })
+    .upsert(rows as never[], { onConflict: 'source,source_id,category', ignoreDuplicates: true })
 
   if (error) {
     console.error(`[job-radar] Insert error for ${source}:`, error.message)

@@ -14,7 +14,9 @@ function isContentBlocked(err: unknown): boolean {
 
 export const POST = withJobStep('story_draft', async (ctx) => {
   const { job } = ctx
-  const { plot, concept } = job.input as { plot: string; concept: StoryConcept }
+  const input = job.input as { plot: string; concept: StoryConcept; mode?: string }
+  const { plot, concept } = input
+  const mode = (input.mode as 'speed' | 'professional') || 'speed'
   const bible = job.state.bible
 
   // Idempotent
@@ -28,11 +30,11 @@ export const POST = withJobStep('story_draft', async (ctx) => {
 
   let rawDraft
   try {
-    rawDraft = await generateStoryDraft({ plot, concept }, bible as Parameters<typeof generateStoryDraft>[1])
+    rawDraft = await generateStoryDraft({ plot, concept, mode }, bible as Parameters<typeof generateStoryDraft>[1])
   } catch (draftErr) {
     if (isContentBlocked(draftErr)) {
       const safePlot = await rephrasePlot(plot)
-      rawDraft = await generateStoryDraft({ plot: safePlot, concept }, bible as Parameters<typeof generateStoryDraft>[1])
+      rawDraft = await generateStoryDraft({ plot: safePlot, concept, mode }, bible as Parameters<typeof generateStoryDraft>[1])
     } else {
       throw draftErr
     }

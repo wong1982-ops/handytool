@@ -18,7 +18,7 @@ export async function archiveOldJobs(): Promise<number> {
     .select('*')
     .eq('is_active', true)
     .lt('posted_at', cutoffIso)
-    .limit(500)
+    .limit(500) as { data: Record<string, unknown>[] | null; error: { message: string } | null }
 
   if (selectError || !oldJobs || oldJobs.length === 0) {
     if (selectError) console.error('[job-radar] Archive select error:', selectError.message)
@@ -28,7 +28,7 @@ export async function archiveOldJobs(): Promise<number> {
   // Insert into archive
   const { error: insertError } = await supabase
     .from('jobs_archive')
-    .upsert(oldJobs, { onConflict: 'source,source_id,category', ignoreDuplicates: true })
+    .upsert(oldJobs as never[], { onConflict: 'source,source_id,category', ignoreDuplicates: true })
 
   if (insertError) {
     console.error('[job-radar] Archive insert error:', insertError.message)
@@ -36,10 +36,10 @@ export async function archiveOldJobs(): Promise<number> {
   }
 
   // Mark as inactive in jobs table
-  const ids = oldJobs.map((j) => j.id)
+  const ids = oldJobs.map((j) => j.id as string)
   const { error: updateError } = await supabase
     .from('jobs')
-    .update({ is_active: false })
+    .update({ is_active: false } as never)
     .in('id', ids)
 
   if (updateError) {
