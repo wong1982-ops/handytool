@@ -13,6 +13,7 @@ export interface RawJob {
   hourlyRateMin?: number
   hourlyRateMax?: number
   salaryCurrency?: 'AUD' | 'NZD'
+  /** Full original job description from source — do NOT truncate */
   description: string
   tags?: string[]
   postedAt?: string // ISO date string
