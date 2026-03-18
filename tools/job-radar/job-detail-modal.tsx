@@ -49,8 +49,6 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
     }
   }, [job])
 
-  if (!job) return null
-
   return (
     <dialog
       ref={dialogRef}
@@ -58,8 +56,9 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
       onClick={(e) => {
         if (e.target === dialogRef.current) onClose()
       }}
-      className="fixed inset-0 z-50 m-0 p-0 w-full h-full max-w-none max-h-none bg-transparent backdrop:bg-black/50 lg:flex lg:items-center lg:justify-center"
+      className={`fixed inset-0 z-50 m-0 p-0 w-full h-full max-w-none max-h-none bg-transparent backdrop:bg-black/50 lg:flex lg:items-center lg:justify-center ${!job ? 'pointer-events-none hidden' : ''}`}
     >
+      {job && (
       <div className="absolute bottom-0 left-0 right-0 lg:static lg:w-full lg:max-w-2xl max-h-[85vh] overflow-y-auto rounded-t-2xl lg:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-2xl">
         {/* Header */}
         <div className="sticky top-0 flex items-start justify-between gap-4 p-5 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
@@ -170,6 +169,7 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
           </button>
         </div>
       </div>
+      )}
     </dialog>
   )
 }
