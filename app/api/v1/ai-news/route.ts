@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
-import { getAdminSupabase } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { apiSuccess, API_ERRORS } from '@/lib/api/response'
 
 export const dynamic = 'force-dynamic'
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   }
 
   const { category, page, limit, days, q } = parsed.data
-  const supabase = getAdminSupabase()
+  const supabase = await createClient()
   const offset = (page - 1) * limit
 
   let query = supabase

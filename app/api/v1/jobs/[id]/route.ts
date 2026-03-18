@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { getAdminSupabase } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { apiSuccess, API_ERRORS } from '@/lib/api/response'
 
 export const dynamic = 'force-dynamic'
@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  const supabase = getAdminSupabase()
+  const supabase = await createClient()
 
   const { data, error } = await supabase
     .from('jobs')
