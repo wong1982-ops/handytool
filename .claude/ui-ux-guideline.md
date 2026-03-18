@@ -379,6 +379,12 @@ xl: 1280px
 - Minimum 44x44px for all interactive elements
 - 8px minimum spacing between touch targets
 
+### Cursor (MANDATORY)
+
+- All clickable elements (`<button>`, `<a>`, clickable `<div>`/cards) MUST use `cursor-pointer`
+- Non-interactive elements MUST NOT use `cursor-pointer`
+- Disabled elements should use `cursor-not-allowed` (via `disabled:cursor-not-allowed`)
+
 ### Typography
 
 - Body text: static sizes (14px–18px)

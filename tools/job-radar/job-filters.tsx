@@ -146,7 +146,7 @@ export function JobFiltersPanel({ filters, onFilterChange }: JobFiltersProps) {
         <button
           type="button"
           onClick={clearAll}
-          className="col-span-2 sm:col-span-3 lg:col-span-1 h-10 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+          className="col-span-2 sm:col-span-3 lg:col-span-1 h-10 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
         >
           Clear all filters
         </button>
@@ -160,7 +160,7 @@ export function JobFiltersPanel({ filters, onFilterChange }: JobFiltersProps) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+        className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
         aria-expanded={isOpen}
         aria-controls="job-filters-panel"
       >

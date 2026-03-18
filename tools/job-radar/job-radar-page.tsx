@@ -31,7 +31,7 @@ function JobRadarContent() {
             type="button"
             aria-selected={activeCategory === tab.value}
             onClick={() => switchTab(tab.value)}
-            className={`px-4 sm:px-6 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            className={`px-4 sm:px-6 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
               activeCategory === tab.value
                 ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'

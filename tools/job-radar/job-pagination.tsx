@@ -39,7 +39,7 @@ export function JobPagination({ pagination, onPageChange }: JobPaginationProps) 
           type="button"
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+          className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           aria-label="Previous page"
         >
           Prev
@@ -54,7 +54,7 @@ export function JobPagination({ pagination, onPageChange }: JobPaginationProps) 
               type="button"
               onClick={() => onPageChange(p)}
               aria-current={p === page ? 'page' : undefined}
-              className={`min-w-[40px] h-[40px] flex items-center justify-center text-sm rounded-lg border transition-colors ${
+              className={`min-w-[40px] h-[40px] flex items-center justify-center text-sm rounded-lg border transition-colors cursor-pointer ${
                 p === page
                   ? 'bg-[var(--tk-color-primary-500)] text-white border-transparent'
                   : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -69,7 +69,7 @@ export function JobPagination({ pagination, onPageChange }: JobPaginationProps) 
           type="button"
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+          className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           aria-label="Next page"
         >
           Next

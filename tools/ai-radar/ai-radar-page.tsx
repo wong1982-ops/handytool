@@ -27,7 +27,7 @@ function AiRadarContent() {
               type="button"
               aria-selected={activeCategory === tab.value}
               onClick={() => switchTab(tab.value)}
-              className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+              className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all cursor-pointer ${
                 activeCategory === tab.value
                   ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
