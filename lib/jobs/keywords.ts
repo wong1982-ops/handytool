@@ -1,0 +1,73 @@
+import type { JobCategory } from './scrapers/types'
+
+/** Search keywords used by scrapers to find jobs for each category */
+export const SEARCH_KEYWORDS: Record<JobCategory, string[]> = {
+  it: [
+    'software engineer',
+    'software developer',
+    'web developer',
+    'frontend developer',
+    'backend developer',
+    'fullstack developer',
+    'full stack developer',
+    'mobile developer',
+    'devops engineer',
+    'cloud engineer',
+    'data engineer',
+    'data scientist',
+    'machine learning engineer',
+    'QA engineer',
+    'test engineer',
+    'security analyst',
+    'cybersecurity',
+    'network engineer',
+    'sysadmin',
+    'system administrator',
+    'IT support',
+    'IT manager',
+    'solutions architect',
+    'technical lead',
+    'scrum master',
+    'product manager IT',
+    'business analyst IT',
+    'database administrator',
+    'site reliability engineer',
+    'platform engineer',
+    'infrastructure engineer',
+  ],
+  french: [
+    'french speaking',
+    'french language',
+    'bilingual french',
+    'french english',
+    'french teacher',
+    'french tutor',
+    'french translator',
+    'french interpreter',
+    'francophone',
+    'parlez français',
+    'fluent french',
+    'native french',
+  ],
+}
+
+/** Keywords used to classify a job's category from its title/description */
+export const CATEGORY_MATCH_KEYWORDS: Record<JobCategory, string[]> = {
+  it: [
+    'software', 'developer', 'engineer', 'devops', 'frontend', 'front-end',
+    'backend', 'back-end', 'fullstack', 'full-stack', 'cloud', 'data',
+    'machine learning', 'ai ', 'artificial intelligence', 'cybersecurity',
+    'security analyst', 'network engineer', 'sysadmin', 'it support',
+    'it manager', 'scrum master', 'technical lead', 'tech lead',
+    'database', 'dba', 'qa ', 'quality assurance', 'test engineer',
+    'site reliability', 'sre', 'platform engineer', 'infrastructure',
+    'solutions architect', 'system administrator', 'helpdesk',
+    'web developer', 'mobile developer', 'ios developer', 'android developer',
+    'react', 'node.js', 'python', 'java ', 'typescript', '.net', 'aws',
+    'azure', 'gcp', 'kubernetes', 'docker',
+  ],
+  french: [
+    'french', 'francophone', 'français', 'bilingual', 'translator',
+    'interpreter', 'french teacher', 'french tutor',
+  ],
+}
