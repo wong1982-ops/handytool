@@ -60,26 +60,35 @@ export const POST = withJobStep('save', async (ctx) => {
     updatedAt: now,
   }
 
-  // Save to books table
+  // Save to books table (direct insert to bypass PostgREST schema cache issues)
   const bookMode = (job.input as { mode?: string }).mode || 'speed'
-  const { data: insertedBook, error: insertError } = await supabase.rpc('insert_book', {
-    p_user_id: job.user_id,
-    p_slug: slug,
-    p_data: finalBook,
-    p_is_public: false,
-    p_series_id: seriesId ?? null,
-    p_mode: bookMode,
-  })
+  const bookConcept = finalBook.concept as Record<string, unknown> | undefined
+  const tags = bookConcept?.tags as Record<string, unknown> | undefined
+
+  const { data: insertedBook, error: insertError } = await supabase
+    .from('books')
+    .insert({
+      user_id: job.user_id,
+      slug,
+      data: finalBook,
+      is_public: false,
+      series_id: seriesId ?? null,
+      mode: bookMode,
+      title: finalBook.title || 'Untitled',
+      cover_url: finalBook.coverImageUrl?.startsWith('http') ? finalBook.coverImageUrl : null,
+      page_count: finalBook.pages?.length ?? 0,
+      audience: (tags?.audience as string) || '',
+      style: (tags?.style as string) || '',
+    })
+    .select('id')
+    .single()
 
   if (insertError) {
     console.error('[save] Failed to save book:', insertError)
     throw new Error(`Failed to save book: ${insertError.message}`)
   }
 
-  // Extract the book UUID from the RPC result
-  // insert_book returns UUID directly (not an object)
-  const row = Array.isArray(insertedBook) ? insertedBook[0] : insertedBook
-  const savedBookId = typeof row === 'string' ? row : (row?.id || row?.book_id)
+  const savedBookId = insertedBook?.id
 
   // Complete the job
   if (savedBookId) {

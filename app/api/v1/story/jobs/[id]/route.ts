@@ -106,3 +106,33 @@ export async function GET(
     },
   })
 }
+
+/**
+ * DELETE /api/v1/story/jobs/[id] — Delete a stuck or failed job.
+ * Uses SECURITY DEFINER RPC to bypass RLS (no DELETE policy on book_jobs).
+ */
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
+  const { id: jobId } = await params
+  const supabase = await createClient()
+
+  const { data: deleted, error } = await supabase.rpc('delete_book_job', {
+    p_job_id: jobId,
+    p_user_id: userId,
+  })
+
+  if (error) {
+    return NextResponse.json({ error: 'Failed to delete job' }, { status: 500 })
+  }
+
+  if (!deleted) {
+    return NextResponse.json({ error: 'Job not found' }, { status: 404 })
+  }
+
+  return NextResponse.json({ success: true })
+}
