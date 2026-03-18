@@ -16,6 +16,38 @@
     {
       "path": "/api/cron/process-jobs",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/scrape-jobs/seek",
+      "schedule": "0 19 * * *"
+    },
+    {
+      "path": "/api/cron/scrape-jobs/indeed",
+      "schedule": "15 19 * * *"
+    },
+    {
+      "path": "/api/cron/scrape-jobs/linkedin",
+      "schedule": "30 19 * * *"
+    },
+    {
+      "path": "/api/cron/scrape-jobs/trademe",
+      "schedule": "45 19 * * *"
+    },
+    {
+      "path": "/api/cron/archive-jobs",
+      "schedule": "0 20 * * 0"
+    },
+    {
+      "path": "/api/cron/collect-ai-news/rss",
+      "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/collect-ai-news/community",
+      "schedule": "15 18 * * *"
+    },
+    {
+      "path": "/api/cron/archive-ai-news",
+      "schedule": "0 20 * * 0"
     }
   ]
 }
