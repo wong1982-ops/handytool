@@ -1,0 +1,22 @@
+-- Seed data for Job Radar local testing
+INSERT INTO public.jobs (source, source_id, source_url, title, title_normalised, company, company_normalised, location, location_normalised, category, country, employment_type, work_mode, salary_min, salary_max, hourly_rate_min, hourly_rate_max, salary_currency, description, tags, posted_at, scraped_at)
+VALUES
+  ('seek', 'seek-001', 'https://seek.com.au/job/001', 'Senior Software Engineer', 'software engineer', 'Atlassian', 'atlassian', 'Sydney, NSW', 'sydney', 'it', 'AU', 'full-time', 'hybrid', 180000, 220000, NULL, NULL, 'AUD', 'Join our team to build next-generation developer tools. Experience with React, TypeScript, and distributed systems required.', ARRAY['React', 'TypeScript', 'Distributed Systems'], now() - interval '1 day', now()),
+
+  ('indeed', 'indeed-001', 'https://indeed.com.au/job/001', 'DevOps Engineer', 'devops engineer', 'Canva Pty Ltd', 'canva', 'Sydney CBD', 'sydney', 'it', 'AU', 'full-time', 'remote', 160000, 200000, NULL, NULL, 'AUD', 'Build and maintain CI/CD pipelines and cloud infrastructure on AWS.', ARRAY['AWS', 'Kubernetes', 'Terraform', 'CI/CD'], now() - interval '2 days', now()),
+
+  ('linkedin', 'linkedin-001', 'https://linkedin.com/jobs/001', 'Frontend Developer', 'frontend developer', 'The Iconic', 'iconic', 'Melbourne, VIC', 'melbourne', 'it', 'AU', 'contract', 'onsite', NULL, NULL, 95, 120, 'AUD', 'Build responsive e-commerce experiences with React and Next.js.', ARRAY['React', 'Next.js', 'CSS', 'E-commerce'], now() - interval '3 days', now()),
+
+  ('trademe', 'trademe-001', 'https://trademe.co.nz/jobs/001', 'Full Stack Developer', 'fullstack developer', 'Xero Limited', 'xero', 'Wellington', 'wellington', 'it', 'NZ', 'full-time', 'hybrid', 120000, 160000, NULL, NULL, 'NZD', 'Work on our cloud accounting platform. TypeScript, Node.js, and PostgreSQL experience preferred.', ARRAY['TypeScript', 'Node.js', 'PostgreSQL'], now() - interval '1 day', now()),
+
+  ('seek', 'seek-002', 'https://seek.com.au/job/002', 'Data Engineer', 'data engineer', 'Commonwealth Bank', 'commonwealth bank', 'Sydney, NSW', 'sydney', 'it', 'AU', 'full-time', 'hybrid', 150000, 190000, NULL, NULL, 'AUD', 'Design and build data pipelines for real-time analytics. Python, Spark, and Airflow experience required.', ARRAY['Python', 'Spark', 'Airflow', 'SQL'], now() - interval '5 days', now()),
+
+  ('indeed', 'indeed-002', 'https://indeed.com.au/job/002', 'QA Test Engineer', 'qa test engineer', 'REA Group', 'rea group', 'Melbourne, VIC', 'melbourne', 'it', 'AU', 'contract', 'remote', NULL, NULL, 80, 100, 'AUD', 'Automated testing for real estate platform. Playwright and Jest experience needed.', ARRAY['Playwright', 'Jest', 'TypeScript', 'QA'], now() - interval '7 days', now()),
+
+  ('seek', 'seek-003', 'https://seek.com.au/job/003', 'Cloud Security Analyst', 'cloud security analyst', 'NAB', 'nab', 'Melbourne CBD', 'melbourne', 'it', 'AU', 'full-time', 'onsite', 140000, 170000, NULL, NULL, 'AUD', 'Monitor and respond to security threats across cloud infrastructure.', ARRAY['AWS', 'Azure', 'SIEM', 'Security'], now() - interval '10 days', now()),
+
+  ('seek', 'seek-f01', 'https://seek.com.au/job/f01', 'French Speaking Customer Support', 'french speaking customer support', 'Airbus Pacific', 'airbus pacific', 'Sydney, NSW', 'sydney', 'french', 'AU', 'full-time', 'hybrid', 70000, 85000, NULL, NULL, 'AUD', 'Provide customer support in French and English for our Asia-Pacific customers.', ARRAY['French', 'Customer Support', 'Bilingual'], now() - interval '2 days', now()),
+
+  ('trademe', 'trademe-f01', 'https://trademe.co.nz/jobs/f01', 'French Language Teacher', 'french language teacher', 'Alliance Française', 'alliance francaise', 'Auckland', 'auckland', 'french', 'NZ', 'part-time', 'onsite', 55000, 70000, NULL, NULL, 'NZD', 'Teach French language courses to adult learners. Native French speaker required.', ARRAY['French', 'Teaching', 'Education'], now() - interval '4 days', now()),
+
+  ('indeed', 'indeed-f01', 'https://indeed.com.au/job/f01', 'French-English Translator', 'french english translator', 'SBS Australia', 'sbs australia', 'Melbourne, VIC', 'melbourne', 'french', 'AU', 'contract', 'remote', NULL, NULL, 55, 75, 'AUD', 'Translate media content from French to English. Experience in journalism preferred.', ARRAY['French', 'Translation', 'Media', 'Journalism'], now() - interval '6 days', now());
