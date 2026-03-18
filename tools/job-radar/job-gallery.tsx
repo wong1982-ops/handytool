@@ -105,8 +105,8 @@ export function JobGallery({ category }: JobGalleryProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Search + filter bar — sticky on mobile */}
-      <div className="sticky top-0 z-10 bg-[var(--tk-color-bg-primary)] pb-3 -mx-4 px-4 pt-2 lg:static lg:mx-0 lg:px-0 lg:pt-0 lg:pb-0 lg:bg-transparent lg:z-auto">
+      {/* Search + filter bar — sticky on mobile with solid bg to prevent content bleed-through */}
+      <div className="sticky top-0 z-10 bg-white dark:bg-slate-950 pb-3 -mx-4 px-4 pt-2 border-b border-slate-200/50 dark:border-slate-800/50 lg:static lg:mx-0 lg:px-0 lg:pt-0 lg:pb-0 lg:bg-transparent lg:z-auto lg:border-b-0">
         <div className="flex flex-col gap-3">
           <JobSearchBar
             value={filters.q ?? ''}

@@ -4,7 +4,7 @@ DELETE FROM public.jobs WHERE source_id LIKE 'seek-%' OR source_id LIKE 'indeed-
 
 INSERT INTO public.jobs (source, source_id, source_url, title, title_normalised, company, company_normalised, location, location_normalised, category, country, employment_type, work_mode, salary_min, salary_max, hourly_rate_min, hourly_rate_max, salary_currency, description, tags, posted_at, scraped_at)
 VALUES
-  ('seek', 'seek-001', 'https://seek.com.au/job/001', 'Senior Software Engineer', 'software engineer', 'Atlassian', 'atlassian', 'Sydney, NSW', 'sydney', 'it', 'AU', 'full-time', 'hybrid', 180000, 220000, NULL, NULL, 'AUD',
+  ('seek', 'seek-001', 'https://www.seek.com.au/software-engineer-jobs/in-Sydney-NSW', 'Senior Software Engineer', 'software engineer', 'Atlassian', 'atlassian', 'Sydney, NSW', 'sydney', 'it', 'AU', 'full-time', 'hybrid', 180000, 220000, NULL, NULL, 'AUD',
    'About the role
 
 We are looking for a Senior Software Engineer to join our Developer Experience team in Sydney. You will be responsible for building next-generation developer tools that empower millions of software teams worldwide.
@@ -33,7 +33,7 @@ Benefits:
 - Stock options and competitive salary package',
    ARRAY['React', 'TypeScript', 'Node.js', 'AWS', 'Distributed Systems'], now() - interval '1 day', now()),
 
-  ('indeed', 'indeed-001', 'https://indeed.com.au/job/001', 'DevOps Engineer', 'devops engineer', 'Canva Pty Ltd', 'canva', 'Sydney CBD', 'sydney', 'it', 'AU', 'full-time', 'remote', 160000, 200000, NULL, NULL, 'AUD',
+  ('indeed', 'indeed-001', 'https://au.indeed.com/jobs?q=devops+engineerhttps://indeed.com.au/job/001l=Sydney', 'DevOps Engineer', 'devops engineer', 'Canva Pty Ltd', 'canva', 'Sydney CBD', 'sydney', 'it', 'AU', 'full-time', 'remote', 160000, 200000, NULL, NULL, 'AUD',
    'About Canva
 
 At Canva, our mission is to empower the world to design. We are looking for a DevOps Engineer to join our Platform Engineering team.
@@ -56,7 +56,7 @@ What we are looking for:
 This is a fully remote role open to candidates anywhere in Australia.',
    ARRAY['AWS', 'Kubernetes', 'Terraform', 'Docker', 'CI/CD', 'Python'], now() - interval '2 days', now()),
 
-  ('linkedin', 'linkedin-001', 'https://linkedin.com/jobs/001', 'Frontend Developer', 'frontend developer', 'The Iconic', 'iconic', 'Melbourne, VIC', 'melbourne', 'it', 'AU', 'contract', 'onsite', NULL, NULL, 95, 120, 'AUD',
+  ('linkedin', 'linkedin-001', 'https://www.linkedin.com/jobs/search/?keywords=frontend+developerhttps://linkedin.com/jobs/001location=Melbourne', 'Frontend Developer', 'frontend developer', 'The Iconic', 'iconic', 'Melbourne, VIC', 'melbourne', 'it', 'AU', 'contract', 'onsite', NULL, NULL, 95, 120, 'AUD',
    'Contract: 6 months with potential extension
 
 The Iconic is Australia''s leading online fashion retailer. We are seeking a skilled Frontend Developer to join our e-commerce platform team on a contract basis.
@@ -78,7 +78,7 @@ Required skills:
 Rate: $95-$120/hr + super, paid weekly',
    ARRAY['React', 'Next.js', 'TypeScript', 'CSS', 'Tailwind', 'E-commerce'], now() - interval '3 days', now()),
 
-  ('trademe', 'trademe-001', 'https://trademe.co.nz/jobs/001', 'Full Stack Developer', 'fullstack developer', 'Xero Limited', 'xero', 'Wellington', 'wellington', 'it', 'NZ', 'full-time', 'hybrid', 120000, 160000, NULL, NULL, 'NZD',
+  ('trademe', 'trademe-001', 'https://www.trademe.co.nz/a/jobs/it/search?search_string=full+stack+developer', 'Full Stack Developer', 'fullstack developer', 'Xero Limited', 'xero', 'Wellington', 'wellington', 'it', 'NZ', 'full-time', 'hybrid', 120000, 160000, NULL, NULL, 'NZD',
    'About Xero
 
 Xero is a global small business platform with 3.95 million subscribers. We are hiring a Full Stack Developer for our Wellington office.
@@ -104,7 +104,7 @@ We offer:
 - Learning & development budget',
    ARRAY['TypeScript', 'React', 'Node.js', 'PostgreSQL', 'REST API'], now() - interval '1 day', now()),
 
-  ('seek', 'seek-002', 'https://seek.com.au/job/002', 'Data Engineer', 'data engineer', 'Commonwealth Bank', 'commonwealth bank', 'Sydney, NSW', 'sydney', 'it', 'AU', 'full-time', 'hybrid', 150000, 190000, NULL, NULL, 'AUD',
+  ('seek', 'seek-002', 'https://www.seek.com.au/data-engineer-jobs/in-Sydney-NSW', 'Data Engineer', 'data engineer', 'Commonwealth Bank', 'commonwealth bank', 'Sydney, NSW', 'sydney', 'it', 'AU', 'full-time', 'hybrid', 150000, 190000, NULL, NULL, 'AUD',
    'Commonwealth Bank — Data & Analytics Division
 
 We are seeking a Data Engineer to design, build, and maintain data pipelines that power real-time analytics and machine learning across our banking platform.
@@ -126,7 +126,7 @@ Requirements:
 Security clearance may be required for this role.',
    ARRAY['Python', 'Spark', 'Airflow', 'SQL', 'AWS', 'Kafka'], now() - interval '5 days', now()),
 
-  ('indeed', 'indeed-002', 'https://indeed.com.au/job/002', 'QA Test Engineer', 'qa test engineer', 'REA Group', 'rea group', 'Melbourne, VIC', 'melbourne', 'it', 'AU', 'contract', 'remote', NULL, NULL, 80, 100, 'AUD',
+  ('indeed', 'indeed-002', 'https://au.indeed.com/jobs?q=qa+test+engineerhttps://indeed.com.au/job/002l=Melbourne', 'QA Test Engineer', 'qa test engineer', 'REA Group', 'rea group', 'Melbourne, VIC', 'melbourne', 'it', 'AU', 'contract', 'remote', NULL, NULL, 80, 100, 'AUD',
    'Contract: 12 months | Fully Remote
 
 REA Group (realestate.com.au) is looking for a QA Test Engineer to join our Quality Engineering team.
@@ -150,7 +150,7 @@ What you need:
 Rate: $80-$100/hr inclusive of super',
    ARRAY['Playwright', 'Jest', 'TypeScript', 'API Testing', 'QA', 'GitHub Actions'], now() - interval '7 days', now()),
 
-  ('seek', 'seek-003', 'https://seek.com.au/job/003', 'Cloud Security Analyst', 'cloud security analyst', 'NAB', 'nab', 'Melbourne CBD', 'melbourne', 'it', 'AU', 'full-time', 'onsite', 140000, 170000, NULL, NULL, 'AUD',
+  ('seek', 'seek-003', 'https://www.seek.com.au/cloud-security-analyst-jobs/in-Melbourne-VIC', 'Cloud Security Analyst', 'cloud security analyst', 'NAB', 'nab', 'Melbourne CBD', 'melbourne', 'it', 'AU', 'full-time', 'onsite', 140000, 170000, NULL, NULL, 'AUD',
    'National Australia Bank — Cyber Security Division
 
 NAB is seeking a Cloud Security Analyst to protect our cloud infrastructure and ensure compliance with regulatory requirements.
@@ -172,7 +172,7 @@ Requirements:
 - Australian citizenship required (security clearance)',
    ARRAY['AWS', 'Azure', 'SIEM', 'Splunk', 'Security', 'CISSP'], now() - interval '10 days', now()),
 
-  ('seek', 'seek-f01', 'https://seek.com.au/job/f01', 'French Speaking Customer Support', 'french speaking customer support', 'Airbus Pacific', 'airbus pacific', 'Sydney, NSW', 'sydney', 'french', 'AU', 'full-time', 'hybrid', 70000, 85000, NULL, NULL, 'AUD',
+  ('seek', 'seek-f01', 'https://www.seek.com.au/french-speaking-jobs/in-Sydney-NSW', 'French Speaking Customer Support', 'french speaking customer support', 'Airbus Pacific', 'airbus pacific', 'Sydney, NSW', 'sydney', 'french', 'AU', 'full-time', 'hybrid', 70000, 85000, NULL, NULL, 'AUD',
    'Airbus Pacific — Customer Support Centre
 
 We are looking for a French Speaking Customer Support Specialist to join our Asia-Pacific customer support centre in Sydney.
@@ -194,7 +194,7 @@ Requirements:
 Working hours: Monday-Friday, 8am-5pm AEST with occasional evening shifts for European coverage',
    ARRAY['French', 'Customer Support', 'Bilingual', 'Salesforce', 'CRM'], now() - interval '2 days', now()),
 
-  ('trademe', 'trademe-f01', 'https://trademe.co.nz/jobs/f01', 'French Language Teacher', 'french language teacher', 'Alliance Française', 'alliance francaise', 'Auckland', 'auckland', 'french', 'NZ', 'part-time', 'onsite', 55000, 70000, NULL, NULL, 'NZD',
+  ('trademe', 'trademe-f01', 'https://www.trademe.co.nz/a/jobs/education/search?search_string=french+teacher', 'French Language Teacher', 'french language teacher', 'Alliance Française', 'alliance francaise', 'Auckland', 'auckland', 'french', 'NZ', 'part-time', 'onsite', 55000, 70000, NULL, NULL, 'NZD',
    'Alliance Française Auckland
 
 We are seeking a passionate French Language Teacher to deliver engaging French language courses to adult learners at our Auckland campus.
@@ -216,7 +216,7 @@ Requirements:
 This is a part-time position (20 hours/week) with the possibility of increasing to full-time.',
    ARRAY['French', 'Teaching', 'Education', 'CEFR', 'Language'], now() - interval '4 days', now()),
 
-  ('indeed', 'indeed-f01', 'https://indeed.com.au/job/f01', 'French-English Translator', 'french english translator', 'SBS Australia', 'sbs australia', 'Melbourne, VIC', 'melbourne', 'french', 'AU', 'contract', 'remote', NULL, NULL, 55, 75, 'AUD',
+  ('indeed', 'indeed-f01', 'https://au.indeed.com/jobs?q=french+translatorhttps://indeed.com.au/job/f01l=Melbourne', 'French-English Translator', 'french english translator', 'SBS Australia', 'sbs australia', 'Melbourne, VIC', 'melbourne', 'french', 'AU', 'contract', 'remote', NULL, NULL, 55, 75, 'AUD',
    'SBS Australia — Language Services
 
 SBS is seeking a French-English Translator to support our multilingual media content production.
