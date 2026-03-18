@@ -17,8 +17,24 @@ function AiRadarContent() {
 
   return (
     <>
-      {/* Scrollable tabs */}
-      <div className="overflow-x-auto -mx-4 px-4 pb-1">
+      {/* Mobile: dropdown select (avoids swipe-back gesture conflict) */}
+      <div className="sm:hidden">
+        <select
+          value={activeCategory}
+          onChange={(e) => switchTab(e.target.value as NewsCategory | 'all')}
+          aria-label="Select AI news category"
+          className="w-full h-12 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]/50 cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M2%204l4%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_16px_center] bg-no-repeat"
+        >
+          {CATEGORY_TABS.map((tab) => (
+            <option key={tab.value} value={tab.value}>
+              {tab.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Desktop/Tablet: tab buttons */}
+      <div className="hidden sm:block">
         <div role="tablist" aria-label="AI news categories" className="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800 w-fit">
           {CATEGORY_TABS.map((tab) => (
             <button

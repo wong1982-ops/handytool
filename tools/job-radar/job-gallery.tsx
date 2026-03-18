@@ -105,15 +105,23 @@ export function JobGallery({ category }: JobGalleryProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Search bar */}
-      <JobSearchBar
-        value={filters.q ?? ''}
-        onChange={(q) => updateFilters({ q: q || undefined, page: 1 })}
-      />
+      {/* Search + filter bar — sticky on mobile */}
+      <div className="sticky top-0 z-10 bg-[var(--tk-color-bg-primary)] pb-3 -mx-4 px-4 pt-2 lg:static lg:mx-0 lg:px-0 lg:pt-0 lg:pb-0 lg:bg-transparent lg:z-auto">
+        <div className="flex flex-col gap-3">
+          <JobSearchBar
+            value={filters.q ?? ''}
+            onChange={(q) => updateFilters({ q: q || undefined, page: 1 })}
+          />
+          <div className="lg:hidden">
+            <JobFiltersPanel filters={filters} onFilterChange={updateFilters} mode="mobile" />
+          </div>
+        </div>
+      </div>
 
       <div className="flex gap-6">
-        {/* Filter panel — handles mobile drawer + desktop sidebar */}
-        <JobFiltersPanel filters={filters} onFilterChange={updateFilters} />
+        <div className="hidden lg:block">
+          <JobFiltersPanel filters={filters} onFilterChange={updateFilters} mode="desktop" />
+        </div>
 
         {/* Main content */}
         <div className="flex-1 min-w-0">

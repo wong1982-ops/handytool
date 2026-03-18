@@ -7,6 +7,7 @@ import { EMPLOYMENT_TYPE_LABELS, WORK_MODE_LABELS, DAYS_OPTIONS } from './types'
 interface JobFiltersProps {
   filters: JobFilters
   onFilterChange: (updates: Partial<JobFilters>) => void
+  mode?: 'mobile' | 'desktop'
 }
 
 function FilterSelect({
@@ -41,7 +42,7 @@ function FilterSelect({
   )
 }
 
-export function JobFiltersPanel({ filters, onFilterChange }: JobFiltersProps) {
+export function JobFiltersPanel({ filters, onFilterChange, mode }: JobFiltersProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const hasActiveFilters =
@@ -154,13 +155,22 @@ export function JobFiltersPanel({ filters, onFilterChange }: JobFiltersProps) {
     </div>
   )
 
+  if (mode === 'desktop') {
+    return (
+      <aside className="w-64 shrink-0 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 h-fit sticky top-24">
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Filters</h2>
+        {filterContent}
+      </aside>
+    )
+  }
+
+  // Mobile: collapsible drawer
   return (
     <>
-      {/* Mobile: collapsible drawer toggle */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+        className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
         aria-expanded={isOpen}
         aria-controls="job-filters-panel"
       >
@@ -173,18 +183,11 @@ export function JobFiltersPanel({ filters, onFilterChange }: JobFiltersProps) {
         )}
       </button>
 
-      {/* Mobile: collapsible panel */}
       {isOpen && (
-        <div id="job-filters-panel" className="lg:hidden p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+        <div id="job-filters-panel" className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
           {filterContent}
         </div>
       )}
-
-      {/* Desktop: always-visible sidebar */}
-      <aside className="hidden lg:block w-64 shrink-0 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 h-fit sticky top-24">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Filters</h2>
-        {filterContent}
-      </aside>
     </>
   )
 }
