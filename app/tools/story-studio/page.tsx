@@ -16,14 +16,27 @@ import type { StoryConcept } from '@/tools/story-studio/types'
 
 type View = 'list' | 'create-ai'
 
-/** Speed mode: show concept as read-only card + async Generate button */
+const QUICK_SPELLS = [
+  { label: 'More giggles & sunshine', value: 'Make it funnier and more lighthearted', icon: '\u2728' },
+  { label: 'Epic quests & daring feats', value: 'Add more action and adventure', icon: '\u2694\uFE0F' },
+  { label: 'Whispers in the dark', value: 'Make it more mysterious and suspenseful', icon: '\u{1F319}' },
+  { label: 'A twist nobody sees coming', value: 'Add a surprise twist ending', icon: '\u{1F3AD}' },
+  { label: 'Characters you\'ll remember', value: 'Make the characters more relatable', icon: '\u{1F4AB}' },
+  { label: 'A lesson from the heart', value: 'Add a moral lesson for kids', icon: '\u{1F31F}' },
+  { label: 'A world that breathes', value: 'Make the world more detailed and immersive', icon: '\u{1F3F0}' },
+  { label: 'A magical companion', value: 'Add a magical companion or sidekick', icon: '\u{1F98A}' },
+]
+
+/** Speed mode: show concept as read-only card + optional spell radio + async Generate button */
 function SpeedModeConfirm({ concept, loading, error, onGenerate, onBack }: {
   concept: StoryConcept
   loading: boolean
   error: string | null
-  onGenerate: () => void
+  onGenerate: (refinementInstruction?: string) => void
   onBack: () => void
 }) {
+  const [selectedSpell, setSelectedSpell] = useState<string | null>(null)
+
   const SECTIONS: { key: keyof StoryConcept['sections']; label: string; icon: string }[] = [
     { key: 'premise', label: 'The Story', icon: '\u{1F4D6}' },
     { key: 'narrativeArc', label: 'How It Unfolds', icon: '\u{1F5FA}\uFE0F' },
@@ -84,6 +97,53 @@ function SpeedModeConfirm({ concept, loading, error, onGenerate, onBack }: {
         </div>
       </div>
 
+      {/* Cast a Spell — optional radio cards */}
+      <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+            <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Cast a Spell</h3>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500">Optional — pick an enchantment to shape your story</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+          {QUICK_SPELLS.map((spell) => {
+            const isSelected = selectedSpell === spell.value
+            return (
+              <button
+                key={spell.value}
+                type="button"
+                onClick={() => setSelectedSpell(isSelected ? null : spell.value)}
+                className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl text-left border-2 transition-all cursor-pointer ${
+                  isSelected
+                    ? 'border-purple-500 bg-purple-50/80 dark:bg-purple-900/20 shadow-sm'
+                    : 'border-slate-200/70 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 hover:border-purple-300 dark:hover:border-purple-700'
+                }`}
+                style={{ minHeight: '44px' }}
+              >
+                <span className="text-lg shrink-0">{spell.icon}</span>
+                <span className={`text-sm font-medium ${
+                  isSelected
+                    ? 'text-purple-700 dark:text-purple-300'
+                    : 'text-slate-700 dark:text-slate-300'
+                }`}>
+                  {spell.label}
+                </span>
+                {isSelected && (
+                  <svg className="w-4 h-4 text-purple-500 shrink-0 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       {/* Generate button — async job submission */}
       <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-3">
@@ -121,7 +181,7 @@ function SpeedModeConfirm({ concept, loading, error, onGenerate, onBack }: {
           </button>
           <button
             type="button"
-            onClick={onGenerate}
+            onClick={() => onGenerate(selectedSpell ?? undefined)}
             disabled={loading}
             className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 hover:from-amber-400 hover:via-orange-400 hover:to-yellow-400 text-white font-bold text-sm transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 cursor-pointer disabled:opacity-50 disabled:cursor-default disabled:shadow-none"
             style={{ minHeight: '44px' }}
@@ -293,8 +353,8 @@ function StoriesContent() {
             concept={selectedConcept}
             loading={loading}
             error={error}
-            onGenerate={async () => {
-              await startGeneration(plot || '', selectedConcept, { skipIllustration: true, skipAudio: true, skipValidation: true })
+            onGenerate={async (refinementInstruction) => {
+              await startGeneration(plot || '', selectedConcept, { skipIllustration: true, skipAudio: true, skipValidation: true, refinementInstruction })
               // After job is submitted, go back to story list — job shows in InProgressSection
               handleBackToList()
             }}

@@ -45,6 +45,7 @@ export const generateRequestSchema = z.object({
   skipIllustration: z.boolean().optional(),
   skipAudio: z.boolean().optional(),
   skipValidation: z.boolean().optional(),
+  refinementInstruction: z.string().max(500).optional(),
 })
 
 // --- Concept refinement ---

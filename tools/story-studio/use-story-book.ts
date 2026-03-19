@@ -158,7 +158,7 @@ export function useStoryBook() {
    * Submits to POST /api/v1/story/jobs and returns immediately.
    * Progress is tracked via useJobProgress (Supabase Realtime).
    */
-  const startGeneration = useCallback(async (plotText: string, concept: StoryConcept, options?: { skipIllustration?: boolean; skipAudio?: boolean; skipValidation?: boolean }) => {
+  const startGeneration = useCallback(async (plotText: string, concept: StoryConcept, options?: { skipIllustration?: boolean; skipAudio?: boolean; skipValidation?: boolean; refinementInstruction?: string }) => {
     setLoading(true)
     setError(null)
     setErrorCode(null)
@@ -179,6 +179,7 @@ export function useStoryBook() {
           ...(options?.skipIllustration ? { skipIllustration: true } : {}),
           ...(options?.skipAudio ? { skipAudio: true } : {}),
           ...(options?.skipValidation ? { skipValidation: true } : {}),
+          ...(options?.refinementInstruction ? { refinementInstruction: options.refinementInstruction } : {}),
         }),
       })
 

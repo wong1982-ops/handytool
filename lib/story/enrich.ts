@@ -574,13 +574,17 @@ ${CONTENT_SAFETY_RULES}`,
     },
   })
 
+  const refinementLine = input.refinementInstruction
+    ? `\n\nCreative direction: ${input.refinementInstruction}`
+    : ''
+
   const userMessage = sanitizePlotText(`Story concept: ${concept.title}
 
 Author's intent: ${concept.sections.authorIntent}
 Premise: ${concept.sections.premise}
 Message to audience: ${concept.sections.messageToAudience}
 
-Original plot idea: ${plot}`)
+Original plot idea: ${plot}${refinementLine}`)
 
   const result = await model.generateContent(userMessage)
   const text = result.response.text()
