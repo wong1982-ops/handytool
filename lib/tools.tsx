@@ -86,6 +86,17 @@ export const tools: Tool[] = [
     color: 'from-lime-500 to-emerald-400',
   },
   {
+    name: 'Favicon Generator',
+    href: '/tools/favicon-generator',
+    description: 'Create favicons from text, icons, images, or AI',
+    icon: (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V5.25a1.5 1.5 0 00-1.5-1.5H3.75a1.5 1.5 0 00-1.5 1.5v14.25a1.5 1.5 0 001.5 1.5z" />
+      </svg>
+    ),
+    color: 'from-fuchsia-500 to-pink-400',
+  },
+  {
     name: 'ID Photo Editor',
     href: '/tools/id-photo',
     description: 'Create passport & visa photos',
