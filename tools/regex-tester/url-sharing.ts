@@ -1,11 +1,16 @@
 import type { RegexState } from './types'
 
 function toBase64(str: string): string {
-  return btoa(unescape(encodeURIComponent(str)))
+  const bytes = new TextEncoder().encode(str)
+  let binary = ''
+  for (const b of bytes) binary += String.fromCharCode(b)
+  return btoa(binary)
 }
 
 function fromBase64(str: string): string {
-  return decodeURIComponent(escape(atob(str)))
+  const binary = atob(str)
+  const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0))
+  return new TextDecoder().decode(bytes)
 }
 
 export function encodeStateToHash(state: RegexState): string {
