@@ -58,7 +58,7 @@ export function MobileShell({ children }: MobileShellProps) {
   // Full-screen routes (e.g. Story Studio) render children directly — no tabs, no bottom bar
   if (isFullScreen) {
     return (
-      <div className="fixed inset-0 z-[60] flex flex-col bg-slate-50 dark:bg-slate-950">
+      <div className="fixed inset-0 z-[60] flex flex-col bg-slate-50 dark:bg-slate-950 overflow-y-auto">
         {children}
       </div>
     )

@@ -100,8 +100,8 @@ export function NewsFeed({ category }: NewsFeedProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Search + days filter row */}
-      <div className="flex gap-3 items-center">
+      {/* Search + days filter row — sticky on mobile with solid bg like Job Radar */}
+      <div className="sticky top-0 z-10 bg-white dark:bg-slate-950 pb-3 -mx-4 px-4 pt-2 border-b border-slate-200/50 dark:border-slate-800/50 sm:static sm:mx-0 sm:px-0 sm:pt-0 sm:pb-0 sm:bg-transparent sm:z-auto sm:border-b-0 flex gap-3 items-center">
         <div className="flex-1">
           <NewsSearchBar
             value={filters.q ?? ''}
