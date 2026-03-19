@@ -182,7 +182,8 @@ export function getNextStep(
       return { step: 'story_draft' }
 
     case 'story_draft':
-      if (context.mode === 'speed') return { step: 'save' }
+      // Speed mode still needs validate to produce storyData/slug/authorName
+      // (validate handles skipValidation gracefully — uses draft as-is)
       return { step: 'validate' }
 
     case 'validate':
