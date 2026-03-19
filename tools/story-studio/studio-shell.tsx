@@ -85,7 +85,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
 
       {/* Tab navigation */}
       <div className="sticky top-0 z-20">
-        <TabNavigation hasActiveBook={!!activeBook} />
+        <TabNavigation />
       </div>
 
       {/* Tab content */}

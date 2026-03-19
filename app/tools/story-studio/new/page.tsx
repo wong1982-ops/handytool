@@ -23,7 +23,7 @@ function NewStoryContent() {
     const params = new URLSearchParams()
     params.set('mode', mode)
     if (seriesId) params.set('seriesId', seriesId)
-    router.push(`/tools/story-studio?${params.toString()}`)
+    router.push(`/tools/story-studio/build?${params.toString()}`)
   }, [router, seriesId])
 
   const handleWriteFromScratch = useCallback(async () => {

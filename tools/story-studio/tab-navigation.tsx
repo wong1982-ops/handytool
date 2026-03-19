@@ -7,8 +7,6 @@ export interface TabItem {
   label: string
   href: string
   icon: React.ReactNode
-  /** If true, tab requires an active book to be enabled */
-  requiresBook?: boolean
 }
 
 const TABS: TabItem[] = [
@@ -31,39 +29,23 @@ const TABS: TabItem[] = [
     ),
   },
   {
-    label: 'Illustrations',
-    href: '/tools/story-studio/illustrations',
+    label: 'Bookshelf',
+    href: '/tools/story-studio/bookshelf',
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 0 0 1.5-1.5V5.25a1.5 1.5 0 0 0-1.5-1.5H3.75a1.5 1.5 0 0 0-1.5 1.5v14.25a1.5 1.5 0 0 0 1.5 1.5Z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
       </svg>
     ),
-    requiresBook: true,
-  },
-  {
-    label: 'Narration',
-    href: '/tools/story-studio/narration',
-    icon: (
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-      </svg>
-    ),
-    requiresBook: true,
   },
 ]
 
-interface TabNavigationProps {
-  hasActiveBook: boolean
-}
-
-export function TabNavigation({ hasActiveBook }: TabNavigationProps) {
+export function TabNavigation() {
   const pathname = usePathname()
 
   function getActiveTab(): string {
     if (pathname.startsWith('/tools/story-studio/characters')) return '/tools/story-studio/characters'
-    if (pathname.startsWith('/tools/story-studio/illustrations')) return '/tools/story-studio/illustrations'
-    if (pathname.startsWith('/tools/story-studio/narration')) return '/tools/story-studio/narration'
-    // Default: Stories tab (covers /tools/story-studio, /tools/story-studio/bookshelf, etc.)
+    if (pathname.startsWith('/tools/story-studio/bookshelf')) return '/tools/story-studio/bookshelf'
+    // Default: Stories tab (covers /tools/story-studio, /tools/story-studio/build, /tools/story-studio/new, etc.)
     return '/tools/story-studio'
   }
 
@@ -77,24 +59,6 @@ export function TabNavigation({ hasActiveBook }: TabNavigationProps) {
     >
       {TABS.map((tab) => {
         const isActive = activeHref === tab.href
-        const isDisabled = tab.requiresBook && !hasActiveBook
-
-        if (isDisabled) {
-          return (
-            <span
-              key={tab.href}
-              aria-disabled={true}
-              className="flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap
-                text-slate-300 dark:text-slate-600 cursor-not-allowed
-                border-b-2 border-transparent"
-              style={{ minHeight: '44px' }}
-              title="Select a book first"
-            >
-              {tab.icon}
-              {tab.label}
-            </span>
-          )
-        }
 
         return (
           <Link
