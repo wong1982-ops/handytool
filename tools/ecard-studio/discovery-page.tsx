@@ -72,9 +72,20 @@ export function DiscoveryPage() {
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
           What&apos;s the occasion?
         </h1>
-        <p className="text-slate-400 text-sm sm:text-base">
+        <p className="text-slate-400 text-sm sm:text-base mb-4">
           Choose a template to get started
         </p>
+        <button
+          onClick={() => router.push('/tools/ecard-studio/ai-business-card')}
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-purple-600 hover:from-amber-400 hover:via-orange-400 hover:to-purple-500 text-white font-bold text-sm transition-all shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 cursor-pointer"
+          style={{ minHeight: '44px' }}
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+          </svg>
+          Create Business Card with AI
+          <span className="text-xs px-2 py-0.5 rounded-full bg-white/20">1 credit</span>
+        </button>
       </section>
 
       {/* Unified Sticky Filter Bar */}
