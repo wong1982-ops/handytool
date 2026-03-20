@@ -6,6 +6,7 @@ import { ProfilePrompt } from "@/components/auth/profile-prompt";
 import { InstallPrompt } from "@/components/layout/install-prompt";
 import { PageTracker } from "@/lib/hooks/use-page-tracker";
 import { MobileShell } from "@/components/mobile/mobile-shell";
+import { TrackingPixels } from "@/components/analytics/tracking-pixels";
 import "./globals.scss";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://toolk1t.com";
@@ -132,6 +133,7 @@ export default function RootLayout({
         <InstallPrompt />
         <PageTracker />
         {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
+        <TrackingPixels />
       </body>
     </html>
   );
