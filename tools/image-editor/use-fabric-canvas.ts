@@ -84,7 +84,7 @@ export interface FabricCanvasAPI {
   exportMask: () => string | null
   clearMask: () => void
   addAiResultLayer: (imageDataUrl: string, label: string) => void
-  onSegmentClick: React.MutableRefObject<((point: { x: number; y: number }) => void) | null>
+  onSegmentClick: React.RefObject<((point: { x: number; y: number }) => void) | null>
 }
 
 // ---------------------------------------------------------------------------
