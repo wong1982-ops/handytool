@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef, type DragEvent, type ChangeEvent } from 'react'
 import { EditorToolbar, type ToolType } from '@/tools/image-editor/editor-toolbar'
 import { AdjustmentsPanel, type Adjustments } from '@/tools/image-editor/adjustments-panel'
+import { AiToolsPanel } from '@/tools/image-editor/ai-tools-panel'
 import { FILTER_PRESETS } from '@/tools/image-editor/filter-presets'
 import { useFabricCanvas } from '@/tools/image-editor/use-fabric-canvas'
 import { LayersPanel } from '@/tools/image-editor/layers-panel'
@@ -32,6 +33,11 @@ export default function ImageEditorPage() {
   const [showMobileAdjustments, setShowMobileAdjustments] = useState(false)
   const [showExport, setShowExport] = useState(false)
   const [mobileTab, setMobileTab] = useState<'adjustments' | 'layers'>('adjustments')
+
+  // AI state
+  const [aiProcessing, setAiProcessing] = useState(false)
+  const [aiError, setAiError] = useState<string | null>(null)
+  const [activeAiTool, setActiveAiTool] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const layerFileInputRef = useRef<HTMLInputElement>(null)
@@ -206,6 +212,175 @@ export default function ImageEditorPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.reset])
 
+  // ------------------------------------------------------------------
+  // AI tool handlers
+  // ------------------------------------------------------------------
+
+  const handleRemoveBg = useCallback(async () => {
+    const imageData = fabric.exportCurrentImage()
+    if (!imageData) return
+    setAiProcessing(true)
+    setAiError(null)
+    setActiveAiTool('remove-bg')
+    try {
+      const res = await fetch('/api/v1/image-editor/remove-bg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: imageData }),
+      })
+      if (!res.ok) throw new Error((await res.json()).error || 'Remove background failed')
+      const data = await res.json()
+      fabric.addAiResultLayer(data.result, 'Background Removed')
+    } catch (err: any) {
+      setAiError(err.message || 'Remove background failed')
+    } finally {
+      setAiProcessing(false)
+      setActiveAiTool(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.exportCurrentImage, fabric.addAiResultLayer])
+
+  const handleSegmentStart = useCallback(() => {
+    setActiveAiTool('segment')
+    fabric.setAiMode('segment-click')
+    fabric.onSegmentClick.current = async (point) => {
+      const imageData = fabric.exportCurrentImage()
+      if (!imageData) return
+      setAiProcessing(true)
+      setAiError(null)
+      try {
+        const res = await fetch('/api/v1/image-editor/segment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: imageData,
+            point,
+            dimensions: fabric.imageSize,
+          }),
+        })
+        if (!res.ok) throw new Error((await res.json()).error || 'Segmentation failed')
+        const data = await res.json()
+        fabric.addAiResultLayer(data.result, 'Segmented Object')
+      } catch (err: any) {
+        setAiError(err.message || 'Segmentation failed')
+      } finally {
+        setAiProcessing(false)
+        setActiveAiTool(null)
+        fabric.setAiMode('none')
+        fabric.onSegmentClick.current = null
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.setAiMode, fabric.exportCurrentImage, fabric.addAiResultLayer, fabric.imageSize])
+
+  const handleInpaintStart = useCallback((brushSize: number) => {
+    setActiveAiTool('inpaint')
+    fabric.setAiMaskBrushSize(brushSize)
+    fabric.setAiMode('brush-mask')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.setAiMode, fabric.setAiMaskBrushSize])
+
+  const handleInpaintExecute = useCallback(async (prompt: string) => {
+    const imageData = fabric.exportCurrentImage()
+    const maskData = fabric.exportMask()
+    if (!imageData) return
+    setAiProcessing(true)
+    setAiError(null)
+    try {
+      const res = await fetch('/api/v1/image-editor/inpaint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: imageData, mask: maskData, prompt }),
+      })
+      if (!res.ok) throw new Error((await res.json()).error || 'Inpainting failed')
+      const data = await res.json()
+      fabric.clearMask()
+      fabric.addAiResultLayer(data.result, 'Inpainted')
+    } catch (err: any) {
+      setAiError(err.message || 'Inpainting failed')
+    } finally {
+      setAiProcessing(false)
+      setActiveAiTool(null)
+      fabric.setAiMode('none')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.exportCurrentImage, fabric.exportMask, fabric.clearMask, fabric.addAiResultLayer, fabric.setAiMode])
+
+  const handleInpaintCancel = useCallback(() => {
+    fabric.clearMask()
+    fabric.setAiMode('none')
+    setActiveAiTool(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.clearMask, fabric.setAiMode])
+
+  const handleEnhance = useCallback(async (mode: 'upscale' | 'denoise' | 'restore-faces' | 'sharpen') => {
+    if (mode === 'sharpen') {
+      // Client-side: apply sharpen adjustment
+      setAdjustments((prev) => ({ ...prev, sharpen: Math.min(prev.sharpen + 25, 100) }))
+      return
+    }
+    const imageData = fabric.exportCurrentImage()
+    if (!imageData) return
+    setAiProcessing(true)
+    setAiError(null)
+    setActiveAiTool('enhance')
+    try {
+      const res = await fetch('/api/v1/image-editor/enhance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: imageData, mode }),
+      })
+      if (!res.ok) throw new Error((await res.json()).error || 'Enhancement failed')
+      const data = await res.json()
+      fabric.addAiResultLayer(data.result, 'Enhanced')
+    } catch (err: any) {
+      setAiError(err.message || 'Enhancement failed')
+    } finally {
+      setAiProcessing(false)
+      setActiveAiTool(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.exportCurrentImage, fabric.addAiResultLayer])
+
+  const handleGenerativeFillStart = useCallback((brushSize: number) => {
+    setActiveAiTool('generative-fill')
+    fabric.setAiMaskBrushSize(brushSize)
+    fabric.setAiMode('brush-mask')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.setAiMode, fabric.setAiMaskBrushSize])
+
+  const handleGenerativeFillExecute = useCallback(async (prompt: string) => {
+    const imageData = fabric.exportCurrentImage()
+    const maskData = fabric.exportMask()
+    if (!imageData) return
+    setAiProcessing(true)
+    setAiError(null)
+    try {
+      const res = await fetch('/api/v1/image-editor/generative-fill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: imageData, mask: maskData, prompt }),
+      })
+      if (!res.ok) throw new Error((await res.json()).error || 'Generative fill failed')
+      const data = await res.json()
+      fabric.clearMask()
+      fabric.addAiResultLayer(data.result, 'Generated Fill')
+    } catch (err: any) {
+      setAiError(err.message || 'Generative fill failed')
+    } finally {
+      setAiProcessing(false)
+      setActiveAiTool(null)
+      fabric.setAiMode('none')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.exportCurrentImage, fabric.exportMask, fabric.clearMask, fabric.addAiResultLayer, fabric.setAiMode])
+
+  const handleGenerativeFillCancel = useCallback(() => {
+    fabric.clearMask()
+    fabric.setAiMode('none')
+    setActiveAiTool(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.clearMask, fabric.setAiMode])
 
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-[#101622]">
@@ -515,6 +690,22 @@ export default function ImageEditorPage() {
               onZoomChange={setZoom}
               imageSize={fabric.imageSize}
               canvasRef={fabric.canvasRef}
+            />
+            <AiToolsPanel
+              isReady={fabric.isReady && !!fabric.imageSize}
+              aiProcessing={aiProcessing}
+              aiError={aiError}
+              onClearError={() => setAiError(null)}
+              onRemoveBg={handleRemoveBg}
+              onSegmentStart={handleSegmentStart}
+              onInpaintStart={handleInpaintStart}
+              onInpaintExecute={handleInpaintExecute}
+              onInpaintCancel={handleInpaintCancel}
+              onEnhance={handleEnhance}
+              onGenerativeFillStart={handleGenerativeFillStart}
+              onGenerativeFillExecute={handleGenerativeFillExecute}
+              onGenerativeFillCancel={handleGenerativeFillCancel}
+              activeAiTool={activeAiTool}
             />
           </div>
 

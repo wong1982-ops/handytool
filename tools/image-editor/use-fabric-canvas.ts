@@ -75,6 +75,16 @@ export interface FabricCanvasAPI {
   moveLayerBackward: (id: string) => void
   moveLayerToFront: (id: string) => void
   moveLayerToBack: (id: string) => void
+  // AI mode operations
+  aiMode: 'none' | 'segment-click' | 'brush-mask'
+  setAiMode: (mode: 'none' | 'segment-click' | 'brush-mask') => void
+  aiMaskBrushSize: number
+  setAiMaskBrushSize: (size: number) => void
+  exportCurrentImage: () => string | null
+  exportMask: () => string | null
+  clearMask: () => void
+  addAiResultLayer: (imageDataUrl: string, label: string) => void
+  onSegmentClick: React.MutableRefObject<((point: { x: number; y: number }) => void) | null>
 }
 
 // ---------------------------------------------------------------------------
@@ -1383,6 +1393,215 @@ export function useFabricCanvas(): FabricCanvasAPI {
   }, [isReady])
 
   // ------------------------------------------------------------------
+  // AI mode state & methods
+  // ------------------------------------------------------------------
+
+  const [aiMode, setAiModeState] = useState<'none' | 'segment-click' | 'brush-mask'>('none')
+  const [aiMaskBrushSize, setAiMaskBrushSize] = useState(30)
+  const onSegmentClick = useRef<((point: { x: number; y: number }) => void) | null>(null)
+  const maskDataRef = useRef<{ paths: Array<{ x: number; y: number }[]> }>({ paths: [] })
+  const aiModeCleanupRef = useRef<(() => void) | null>(null)
+
+  const setAiMode = useCallback((mode: 'none' | 'segment-click' | 'brush-mask') => {
+    const canvas = fabricRef.current
+    const fabric = fabricModuleRef.current
+    if (!canvas || !fabric) return
+
+    // Cleanup previous AI mode
+    if (aiModeCleanupRef.current) {
+      aiModeCleanupRef.current()
+      aiModeCleanupRef.current = null
+    }
+
+    setAiModeState(mode)
+
+    if (mode === 'segment-click') {
+      canvas.isDrawingMode = false
+      canvas.selection = false
+      canvas.defaultCursor = 'crosshair'
+      // Disable object selection
+      const allObjects = canvas.getObjects() as any[]
+      allObjects.forEach((obj: any) => { obj.selectable = false; obj.evented = false })
+
+      const handler = (opt: any) => {
+        const imgSize = imageSizeRef.current
+        if (!imgSize) return
+        const pointer = canvas.getScenePoint(opt.e)
+        // Convert to fraction of image dimensions
+        const point = { x: pointer.x / imgSize.width, y: pointer.y / imgSize.height }
+        if (onSegmentClick.current) onSegmentClick.current(point)
+      }
+      canvas.on('mouse:down', handler)
+      aiModeCleanupRef.current = () => { canvas.off('mouse:down', handler) }
+    } else if (mode === 'brush-mask') {
+      canvas.isDrawingMode = true
+      const brush = new fabric.PencilBrush(canvas)
+      brush.width = aiMaskBrushSize
+      brush.color = 'rgba(255,0,0,0.4)'
+      canvas.freeDrawingBrush = brush
+      canvas.selection = false
+
+      // Track drawn paths for mask export
+      const pathHandler = (opt: any) => {
+        const path = opt.path
+        if (path) {
+          // Extract points from the path object
+          const points: { x: number; y: number }[] = []
+          if (path.path) {
+            for (const segment of path.path) {
+              // Each segment is like ['M', x, y] or ['Q', cx, cy, x, y] or ['L', x, y]
+              if (segment.length >= 3) {
+                points.push({ x: segment[segment.length - 2], y: segment[segment.length - 1] })
+              }
+            }
+          }
+          maskDataRef.current.paths.push(points)
+          // Tag the path as mask so we can remove it later
+          ;(path as any).__isMaskPath = true
+        }
+      }
+      canvas.on('path:created', pathHandler)
+      aiModeCleanupRef.current = () => {
+        canvas.off('path:created', pathHandler)
+      }
+    } else {
+      // 'none' — restore defaults
+      canvas.isDrawingMode = false
+      canvas.defaultCursor = 'default'
+      canvas.selection = true
+      // Re-enable selectable on non-bg objects
+      const allObjects = canvas.getObjects() as any[]
+      allObjects.forEach((obj: any) => {
+        if (!obj.__isBgImage && !obj.__isCropRect && !obj.__isMaskPath) {
+          obj.selectable = true
+          obj.evented = true
+        }
+      })
+    }
+    canvas.renderAll()
+  }, [aiMaskBrushSize])
+
+  const setAiMaskBrushSizeWrapped = useCallback((size: number) => {
+    setAiMaskBrushSize(size)
+    const canvas = fabricRef.current
+    if (canvas?.freeDrawingBrush && canvas.isDrawingMode) {
+      canvas.freeDrawingBrush.width = size
+    }
+  }, [])
+
+  const exportCurrentImage = useCallback((): string | null => {
+    const canvas = fabricRef.current
+    const imgSize = imageSizeRef.current
+    if (!canvas || !imgSize) return null
+
+    // Save current viewport
+    const savedVPT = [...canvas.viewportTransform!]
+    const savedW = canvas.width ?? 0
+    const savedH = canvas.height ?? 0
+
+    // Set to full resolution for export
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0])
+    canvas.setDimensions({ width: imgSize.width, height: imgSize.height })
+
+    // Hide mask paths temporarily
+    const objects = canvas.getObjects() as any[]
+    const maskPaths = objects.filter((o: any) => o.__isMaskPath)
+    maskPaths.forEach((p: any) => { p.visible = false })
+
+    canvas.renderAll()
+    const dataUrl = canvas.toDataURL({ format: 'png' })
+
+    // Restore mask paths
+    maskPaths.forEach((p: any) => { p.visible = true })
+
+    // Restore viewport
+    canvas.setViewportTransform(savedVPT as any)
+    canvas.setDimensions({ width: savedW, height: savedH })
+    canvas.renderAll()
+
+    return dataUrl
+  }, [])
+
+  const exportMask = useCallback((): string | null => {
+    const imgSize = imageSizeRef.current
+    const canvas = fabricRef.current
+    if (!imgSize || !canvas) return null
+
+    // Collect mask path objects from the canvas
+    const objects = canvas.getObjects() as any[]
+    const maskPaths = objects.filter((o: any) => o.__isMaskPath)
+    if (maskPaths.length === 0) return null
+
+    // Create a temporary canvas at image dimensions
+    const tempCanvas = document.createElement('canvas')
+    tempCanvas.width = imgSize.width
+    tempCanvas.height = imgSize.height
+    const ctx = tempCanvas.getContext('2d')!
+    ctx.fillStyle = 'black'
+    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
+
+    // Render each mask path as white
+    ctx.strokeStyle = 'white'
+    ctx.fillStyle = 'white'
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+
+    for (const pathObj of maskPaths) {
+      if (!pathObj.path) continue
+      ctx.lineWidth = pathObj.strokeWidth || 30
+      ctx.beginPath()
+      for (const seg of pathObj.path) {
+        if (seg[0] === 'M') {
+          ctx.moveTo(seg[1], seg[2])
+        } else if (seg[0] === 'L') {
+          ctx.lineTo(seg[1], seg[2])
+        } else if (seg[0] === 'Q') {
+          ctx.quadraticCurveTo(seg[1], seg[2], seg[3], seg[4])
+        } else if (seg[0] === 'C') {
+          ctx.bezierCurveTo(seg[1], seg[2], seg[3], seg[4], seg[5], seg[6])
+        }
+      }
+      ctx.stroke()
+    }
+
+    return tempCanvas.toDataURL('image/png')
+  }, [])
+
+  const clearMask = useCallback(() => {
+    maskDataRef.current = { paths: [] }
+    const canvas = fabricRef.current
+    if (!canvas) return
+    const objects = canvas.getObjects() as any[]
+    objects.forEach((obj: any) => {
+      if (obj.__isMaskPath) canvas.remove(obj)
+    })
+    canvas.renderAll()
+  }, [])
+
+  const addAiResultLayer = useCallback((imageDataUrl: string, label: string) => {
+    const canvas = fabricRef.current
+    const fabric = fabricModuleRef.current
+    if (!canvas || !fabric) return
+
+    const imgEl = new Image()
+    imgEl.onload = () => {
+      const fabricImg = new fabric.FabricImage(imgEl, {
+        left: 0,
+        top: 0,
+        selectable: true,
+        evented: true,
+      }) as any
+      fabricImg.__layerId = crypto.randomUUID().slice(0, 8)
+      fabricImg.__layerName = label
+      canvas.add(fabricImg)
+      canvas.renderAll()
+      syncLayersFromCanvas()
+      pushHistory(label)
+    }
+    imgEl.src = imageDataUrl
+  }, [syncLayersFromCanvas, pushHistory])
+
+  // ------------------------------------------------------------------
   // Return public API
   // ------------------------------------------------------------------
 
@@ -1435,5 +1654,15 @@ export function useFabricCanvas(): FabricCanvasAPI {
     moveLayerBackward,
     moveLayerToFront,
     moveLayerToBack,
+    // AI mode operations
+    aiMode,
+    setAiMode,
+    aiMaskBrushSize,
+    setAiMaskBrushSize: setAiMaskBrushSizeWrapped,
+    exportCurrentImage,
+    exportMask,
+    clearMask,
+    addAiResultLayer,
+    onSegmentClick,
   }
 }
