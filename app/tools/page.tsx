@@ -60,6 +60,78 @@ async function getTrendingTools(): Promise<TrendingTool[]> {
   }
 }
 
+async function LatestBlogPosts() {
+  let posts: { slug: string; title: string; description: string; category: string; reading_time_min: number; published_at: string }[] = []
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('blog_posts')
+      .select('slug, title, description, category, reading_time_min, published_at')
+      .not('published_at', 'is', null)
+      .order('published_at', { ascending: false })
+      .limit(3)
+    posts = data ?? []
+  } catch {
+    // Table might not have new columns yet
+  }
+
+  if (posts.length === 0) return null
+
+  const categoryColors: Record<string, string> = {
+    'tool-announcement': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+    'how-to-guide': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+    'weekly-roundup': 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+  }
+
+  const categoryLabels: Record<string, string> = {
+    'tool-announcement': 'New Tool',
+    'how-to-guide': 'How-To',
+    'weekly-roundup': 'Roundup',
+  }
+
+  return (
+    <section className="mt-12 pt-10 border-t border-slate-200 dark:border-slate-800">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <svg className="w-5 h-5 text-[var(--tk-color-primary-500)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6V7.5Z" />
+          </svg>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Latest from the Blog
+          </h2>
+        </div>
+        <Link href="/blog" className="text-sm font-medium text-[var(--tk-color-primary-500)] hover:underline">
+          View all
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {posts.map((post) => (
+          <Link
+            key={post.slug}
+            href={`/blog/${post.slug}`}
+            className="group p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${categoryColors[post.category] || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
+                {categoryLabels[post.category] || post.category}
+              </span>
+              <span className="text-xs text-slate-400">{post.reading_time_min} min read</span>
+            </div>
+            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-[var(--tk-color-primary-500)] transition-colors line-clamp-2 mb-1">
+              {post.title}
+            </h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{post.description}</p>
+            <time className="text-xs text-slate-400 mt-2 block">
+              {new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </time>
+          </Link>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 export default async function ToolsPage() {
   const trending = await getTrendingTools()
 
@@ -125,6 +197,9 @@ export default async function ToolsPage() {
           )
         })}
       </div>
+
+      {/* Latest from the Blog */}
+      <LatestBlogPosts />
     </main>
   )
 }
