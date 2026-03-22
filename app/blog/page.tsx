@@ -26,6 +26,7 @@ interface BlogPost {
   published_at: string
   tool_slug: string | null
   post_type: string
+  cover_image_url: string | null
 }
 
 export default async function BlogListingPage({
@@ -40,7 +41,7 @@ export default async function BlogListingPage({
     const supabase = await createClient()
     let query = supabase
       .from('blog_posts')
-      .select('slug, title, description, category, tags, reading_time_min, published_at, tool_slug, post_type')
+      .select('slug, title, description, category, tags, reading_time_min, published_at, tool_slug, post_type, cover_image_url')
       .not('published_at', 'is', null)
       .order('published_at', { ascending: false })
       .limit(50)

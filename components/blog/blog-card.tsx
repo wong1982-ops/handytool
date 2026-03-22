@@ -9,6 +9,7 @@ interface BlogCardPost {
   reading_time_min: number
   published_at: string
   tool_slug?: string | null
+  cover_image_url?: string | null
 }
 
 const CATEGORY_GRADIENTS: Record<string, string> = {
@@ -22,8 +23,16 @@ export function BlogCard({ post }: { post: BlogCardPost }) {
 
   return (
     <article className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
-      {/* Gradient banner */}
-      <div className={`relative h-32 bg-gradient-to-br ${gradient}`}>
+      {/* Cover image or gradient fallback */}
+      <div className={`relative h-40 ${post.cover_image_url ? '' : `bg-gradient-to-br ${gradient}`}`}>
+        {post.cover_image_url && (
+          <img
+            src={post.cover_image_url}
+            alt={post.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        )}
         <span className="absolute top-3 left-3 text-xs font-medium px-2.5 py-1 rounded-full bg-white/20 text-white backdrop-blur-sm">
           {post.category.replace(/-/g, ' ')}
         </span>

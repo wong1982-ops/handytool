@@ -159,6 +159,18 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           )}
         </header>
 
+        {/* Cover image */}
+        {post.cover_image_url && (
+          <div className="mb-8 rounded-xl overflow-hidden">
+            <img
+              src={post.cover_image_url}
+              alt={post.title}
+              className="w-full h-auto max-h-[400px] object-cover"
+              loading="eager"
+            />
+          </div>
+        )}
+
         {isLegacy ? (
           /* Legacy post types: weekly-roundup, trending, tool-spotlight */
           <BlogPostRenderer content={post.content} />
