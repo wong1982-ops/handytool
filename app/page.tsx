@@ -1,46 +1,10 @@
 import Link from 'next/link'
-import { tools } from '@/lib/tools'
 import { createClient } from '@/lib/supabase/server'
-import { FavoriteButton } from '@/components/ui/favorite-button'
 import { HeroSection } from '@/components/home/hero-section'
+import { BentoShowcase } from '@/components/home/bento-showcase'
 import { CtaBanner } from '@/components/home/cta-banner'
 
 export const revalidate = 3600
-
-interface TrendingInfo {
-  slug: string
-  rank: number
-  views: number
-}
-
-async function getTrendingSlugs(): Promise<Map<string, TrendingInfo>> {
-  try {
-    const supabase = await createClient()
-    const { data } = await supabase.rpc('tool_popularity', { time_range_days: 7 })
-    if (!data || data.length === 0) return new Map()
-
-    const map = new Map<string, TrendingInfo>()
-    data.slice(0, 5).forEach((item: { tool_slug: string; view_count: number }, i: number) => {
-      map.set(item.tool_slug, { slug: item.tool_slug, rank: i + 1, views: item.view_count ?? 0 })
-    })
-    return map
-  } catch {
-    return new Map()
-  }
-}
-
-function formatCount(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K`
-  return String(n)
-}
-
-const RANK_BADGE = [
-  'bg-yellow-400 text-yellow-900',
-  'bg-slate-300 text-slate-700',
-  'bg-amber-600 text-white',
-  'bg-white/20 text-white',
-  'bg-white/20 text-white',
-]
 
 async function LatestBlogPosts() {
   let posts: { slug: string; title: string; description: string; category: string; reading_time_min: number; published_at: string }[] = []
@@ -106,78 +70,10 @@ async function LatestBlogPosts() {
 }
 
 export default async function HomePage() {
-  const trendingMap = await getTrendingSlugs()
-
   return (
     <div>
       <HeroSection />
-
-      {/* All Tools — Bento Grid */}
-      <section id="all-tools" className="py-20 px-4 bg-gradient-to-b from-[#101922] to-[#0c1219]">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center text-white mb-2">
-            All <span className="bg-gradient-to-r from-[var(--tk-color-primary-400)] to-cyan-400 bg-clip-text text-transparent">Tools</span>
-          </h2>
-          <p className="text-center text-slate-400 mb-12 max-w-lg mx-auto">
-            Developer tools, image editors, converters, and more — right in your browser.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {tools.map((tool) => {
-              const slug = tool.href.replace('/tools/', '')
-              const trending = trendingMap.get(slug)
-
-              return (
-                <Link
-                  key={tool.href}
-                  href={tool.href}
-                  className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 overflow-hidden hover:scale-[1.02] hover:border-white/20 transition-all duration-300"
-                >
-                  {/* Hover glow */}
-                  <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br ${tool.color.replace('from-', 'from-').replace('to-', 'to-')}/10 to-transparent rounded-2xl pointer-events-none`} />
-
-                  {/* Trending badge */}
-                  {trending && (
-                    <span className={`absolute -top-1.5 -right-1.5 z-10 w-7 h-7 rounded-full text-[10px] font-bold flex items-center justify-center shadow-lg ${RANK_BADGE[trending.rank - 1]}`}>
-                      #{trending.rank}
-                    </span>
-                  )}
-
-                  {/* Icon */}
-                  <div className="relative mb-3">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tool.color} shadow-lg group-hover:scale-110 transition-transform flex items-center justify-center text-white`}>
-                      <div className="w-6 h-6 [&>svg]:w-6 [&>svg]:h-6">{tool.icon}</div>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="relative">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-white text-sm">{tool.name}</h3>
-                      {trending && (
-                        <span className="text-[10px] text-orange-400 font-medium flex items-center gap-0.5">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
-                          </svg>
-                          {formatCount(trending.views)}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-slate-400 mt-1 line-clamp-2">{tool.description}</p>
-                    <span className="text-xs text-[var(--tk-color-primary-400)] mt-2 inline-block group-hover:translate-x-1 transition-transform">Try it →</span>
-                  </div>
-
-                  {/* Favorite */}
-                  <div className="absolute top-3 right-3 z-10">
-                    <FavoriteButton slug={slug} name={tool.name} />
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
+      <BentoShowcase />
       <LatestBlogPosts />
       <CtaBanner />
     </div>
