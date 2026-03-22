@@ -1,13 +1,63 @@
-import crypto from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
-import { generateIllustration } from '@/lib/story/illustrate'
+import { uploadToR2 } from '@/lib/storage/r2'
 import { ART_STYLES } from '@/tools/sketch-to-art/types'
 
 // Allow up to 120s for generating 4 images in parallel
 export const maxDuration = 120
 
 const CREDIT_COST = 1
+const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
+const GEMINI_MODEL = 'gemini-3.1-flash-image-preview'
+
+/**
+ * Call Gemini API directly via REST fetch.
+ * Bypasses @google/genai SDK which sets Authorization header
+ * (broken on Vercel due to invisible chars in env var).
+ * Uses API key as query parameter instead.
+ */
+async function callGeminiImageGeneration(
+  sketchBase64: string,
+  sketchMime: string,
+  prompt: string,
+): Promise<Buffer> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{
+        parts: [
+          { inline_data: { mime_type: sketchMime, data: sketchBase64 } },
+          { text: prompt },
+        ],
+      }],
+      generationConfig: {
+        responseModalities: ['TEXT', 'IMAGE'],
+      },
+    }),
+  })
+
+  if (!response.ok) {
+    const errText = await response.text()
+    throw new Error(`Gemini API ${response.status}: ${errText.substring(0, 300)}`)
+  }
+
+  const data = await response.json()
+  const parts = data.candidates?.[0]?.content?.parts
+  if (!parts) throw new Error('No parts in Gemini response')
+
+  for (const part of parts) {
+    // REST API response uses camelCase (inlineData) not snake_case (inline_data)
+    const imageData = part.inlineData?.data || part.inline_data?.data
+    if (imageData) {
+      return Buffer.from(imageData, 'base64')
+    }
+  }
+
+  throw new Error('No image in Gemini response')
+}
 
 export async function POST(request: Request) {
   const userId = await getAuthUserId()
@@ -48,9 +98,10 @@ export async function POST(request: Request) {
     return API_ERRORS.INTERNAL()
   }
 
-  // Convert data URL to Buffer for generateIllustration
+  // Extract mime type and raw base64 from data URL
+  const mimeMatch = sketch.match(/^data:(image\/[^;]+);base64,/)
+  const sketchMime = mimeMatch?.[1] || 'image/jpeg'
   const sketchBase64 = sketch.replace(/^data:image\/[^;]+;base64,/, '')
-  const sketchBuffer = Buffer.from(sketchBase64, 'base64')
 
   // Resolve style name
   const styleName =
@@ -67,18 +118,17 @@ export async function POST(request: Request) {
   ]
 
   try {
-    // Use the same generateIllustration from Story Studio (proven to work on production)
+    // Call Gemini REST API directly — bypasses SDK Authorization header issue on Vercel
     const results = await Promise.allSettled(
       prompts.map(async (prompt) => {
-        const result = await generateIllustration({
-          imagePrompt: prompt,
-          referenceImage: sketchBuffer,
-        })
-        return { imageUrl: result.url, prompt }
+        const imageBuffer = await callGeminiImageGeneration(sketchBase64, sketchMime, prompt)
+        const r2Path = `sketch-art/${crypto.randomUUID()}.png`
+        const imageUrl = await uploadToR2(r2Path, imageBuffer, 'image/png')
+        return { imageUrl, prompt }
       }),
     )
 
-    // Log results for debugging
+    // Log results
     results.forEach((r, i) => {
       if (r.status === 'rejected') {
         const err = (r as PromiseRejectedResult).reason
