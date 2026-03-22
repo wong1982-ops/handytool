@@ -11,6 +11,31 @@ interface SketchInputProps {
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp']
+const MAX_DIMENSION = 1024
+
+/** Resize image to max 1024x1024 to prevent huge payloads to the API */
+function resizeImage(dataUrl: string): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => {
+      if (img.width <= MAX_DIMENSION && img.height <= MAX_DIMENSION) {
+        resolve(dataUrl)
+        return
+      }
+      const scale = Math.min(MAX_DIMENSION / img.width, MAX_DIMENSION / img.height)
+      const w = Math.round(img.width * scale)
+      const h = Math.round(img.height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(img, 0, 0, w, h)
+      resolve(canvas.toDataURL('image/png'))
+    }
+    img.onerror = () => resolve(dataUrl) // fallback to original
+    img.src = dataUrl
+  })
+}
 
 export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
   const [activeTab, setActiveTab] = useState<InputMethod>('upload')
@@ -143,9 +168,10 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
   }, [])
 
   // --- Use Sketch ---
-  const handleUseSketch = useCallback(() => {
+  const handleUseSketch = useCallback(async () => {
     if (preview) {
-      onSketchReady(preview)
+      const resized = await resizeImage(preview)
+      onSketchReady(resized)
     }
   }, [preview, onSketchReady])
 

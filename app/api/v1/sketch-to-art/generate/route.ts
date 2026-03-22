@@ -5,6 +5,9 @@ import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/respo
 import { uploadToR2 } from '@/lib/storage/r2'
 import { ART_STYLES } from '@/tools/sketch-to-art/types'
 
+// Allow up to 120s for generating 4 images in parallel
+export const maxDuration = 120
+
 const CREDIT_COST = 1
 
 export async function POST(request: Request) {
@@ -98,6 +101,13 @@ export async function POST(request: Request) {
         return { imageUrl, prompt }
       }),
     )
+
+    // Log failed variations for debugging
+    const failed = results.filter((r) => r.status === 'rejected')
+    if (failed.length > 0) {
+      console.error(`[sketch-to-art] ${failed.length}/4 variations failed:`,
+        failed.map((r) => (r as PromiseRejectedResult).reason?.message || String((r as PromiseRejectedResult).reason)).join('; '))
+    }
 
     const variations = results
       .filter(

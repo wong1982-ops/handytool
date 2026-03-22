@@ -4,6 +4,8 @@ import { GoogleGenAI } from '@google/genai'
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 import { uploadToR2 } from '@/lib/storage/r2'
 
+export const maxDuration = 60
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 export async function POST(request: Request) {
