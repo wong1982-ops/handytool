@@ -1,8 +1,7 @@
 import crypto from 'crypto'
-import { GoogleGenAI } from '@google/genai'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
-import { uploadToR2 } from '@/lib/storage/r2'
+import { generateIllustration } from '@/lib/story/illustrate'
 import { ART_STYLES } from '@/tools/sketch-to-art/types'
 
 // Allow up to 120s for generating 4 images in parallel
@@ -49,10 +48,9 @@ export async function POST(request: Request) {
     return API_ERRORS.INTERNAL()
   }
 
-  // Extract mime type and raw base64 from data URL
-  const mimeMatch = sketch.match(/^data:(image\/[^;]+);base64,/)
-  const sketchMime = mimeMatch?.[1] || 'image/png'
+  // Convert data URL to Buffer for generateIllustration
   const sketchBase64 = sketch.replace(/^data:image\/[^;]+;base64,/, '')
+  const sketchBuffer = Buffer.from(sketchBase64, 'base64')
 
   // Resolve style name
   const styleName =
@@ -68,73 +66,27 @@ export async function POST(request: Request) {
     `Create a ${styleName} interpretation of this drawing with creative artistic flair. Honor the original sketch's composition and subjects.`,
   ]
 
-  // Aggressively sanitize API key — strip ALL non-printable/non-ASCII chars
-  const apiKey = (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
-  const nanoBanana = new GoogleGenAI({ apiKey })
-
   try {
+    // Use the same generateIllustration from Story Studio (proven to work on production)
     const results = await Promise.allSettled(
       prompts.map(async (prompt) => {
-        // Try primary model, fall back to alternate if it fails
-        const models = ['gemini-3.1-flash-image-preview']
-        let response: Awaited<ReturnType<typeof nanoBanana.models.generateContent>> | null = null
-        let lastErr: Error | null = null
-
-        for (const model of models) {
-          try {
-            response = await nanoBanana.models.generateContent({
-              model,
-              contents: [
-                {
-                  role: 'user',
-                  parts: [
-                    { inlineData: { mimeType: sketchMime, data: sketchBase64 } },
-                    { text: prompt },
-                  ],
-                },
-              ],
-              config: { responseModalities: ['IMAGE', 'TEXT'] },
-            })
-            break // success
-          } catch (err) {
-            lastErr = err instanceof Error ? err : new Error(String(err))
-            console.warn(`[sketch-to-art] Model ${model} failed: ${lastErr.message}`)
-          }
-        }
-
-        if (!response) throw lastErr || new Error('All models failed')
-
-        // Extract image from response
-        const parts = response.candidates?.[0]?.content?.parts
-        const imagePart = parts?.find(
-          (p: { inlineData?: { data?: string; mimeType?: string } }) => p.inlineData?.data,
-        )
-        if (!imagePart?.inlineData?.data) {
-          throw new Error('No image in response')
-        }
-
-        const imageBuffer = Buffer.from(imagePart.inlineData.data, 'base64')
-        const r2Path = `sketch-art/${crypto.randomUUID()}.png`
-        const imageUrl = await uploadToR2(r2Path, imageBuffer, 'image/png')
-
-        return { imageUrl, prompt }
+        const result = await generateIllustration({
+          imagePrompt: prompt,
+          referenceImage: sketchBuffer,
+        })
+        return { imageUrl: result.url, prompt }
       }),
     )
 
-    // Log ALL results for debugging
+    // Log results for debugging
     results.forEach((r, i) => {
       if (r.status === 'rejected') {
         const err = (r as PromiseRejectedResult).reason
-        console.error(`[sketch-to-art] Variation ${i + 1} FAILED:`, err?.message || String(err), err?.stack?.split('\n')[1] || '')
+        console.error(`[sketch-to-art] Variation ${i + 1} FAILED:`, err?.message || String(err))
       } else {
-        console.log(`[sketch-to-art] Variation ${i + 1} OK:`, (r as PromiseFulfilledResult<{ imageUrl: string }>).value.imageUrl?.substring(0, 60))
+        console.log(`[sketch-to-art] Variation ${i + 1} OK`)
       }
     })
-
-    const failed = results.filter((r) => r.status === 'rejected')
-    if (failed.length > 0) {
-      console.error(`[sketch-to-art] ${failed.length}/4 failed. Sketch base64 length: ${sketchBase64.length}, mime: ${sketchMime}`)
-    }
 
     const variations = results
       .filter(

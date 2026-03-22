@@ -1,14 +1,10 @@
-import crypto from 'crypto'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { GoogleGenAI } from '@google/genai'
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
-import { uploadToR2 } from '@/lib/storage/r2'
+import { generateIllustration } from '@/lib/story/illustrate'
 
 export const maxDuration = 60
 
-// Aggressively sanitize API key — strip ALL non-printable/non-ASCII chars
-const sanitizedKey = (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
-const genAI = new GoogleGenerativeAI(sanitizedKey)
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
 export async function POST(request: Request) {
   const userId = await getAuthUserId()
@@ -53,46 +49,17 @@ export async function POST(request: Request) {
     const refinedPrompt = result.response.text()?.trim()
     if (!refinedPrompt) throw new Error('No refined prompt from AI')
 
-    // Step 2: Fetch current image and convert to base64
-    const currentImageResponse = await fetch(currentImageUrl)
-    const currentImageArrayBuffer = await currentImageResponse.arrayBuffer()
-    const currentImageBase64 = Buffer.from(currentImageArrayBuffer).toString('base64')
-
-    // Step 3: Strip data URL prefix from original sketch
+    // Step 2: Convert original sketch to Buffer
     const sketchBase64 = originalSketch.replace(/^data:image\/[^;]+;base64,/, '')
+    const sketchBuffer = Buffer.from(sketchBase64, 'base64')
 
-    // Step 4: Generate new image with Nano Banana
-    const nanoBanana = new GoogleGenAI({ apiKey: sanitizedKey })
-
-    const response = await nanoBanana.models.generateContent({
-      model: 'gemini-3.1-flash-image-preview',
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            { inlineData: { mimeType: 'image/png', data: sketchBase64 } },
-            { inlineData: { mimeType: 'image/png', data: currentImageBase64 } },
-            { text: refinedPrompt },
-          ],
-        },
-      ],
-      config: { responseModalities: ['IMAGE', 'TEXT'] },
+    // Step 3: Generate new image using the proven illustrate pipeline
+    const genResult = await generateIllustration({
+      imagePrompt: refinedPrompt,
+      referenceImage: sketchBuffer,
     })
 
-    // Extract image from response
-    const parts = response.candidates?.[0]?.content?.parts
-    const imagePart = parts?.find(
-      (p: { inlineData?: { data?: string; mimeType?: string } }) => p.inlineData?.data,
-    )
-    if (!imagePart?.inlineData?.data) {
-      throw new Error('No image in refinement response')
-    }
-
-    const imageBuffer = Buffer.from(imagePart.inlineData.data, 'base64')
-    const r2Path = `sketch-art/${crypto.randomUUID()}.png`
-    const imageUrl = await uploadToR2(r2Path, imageBuffer, 'image/png')
-
-    return apiSuccess({ imageUrl, prompt: refinedPrompt })
+    return apiSuccess({ imageUrl: genResult.url, prompt: refinedPrompt })
   } catch (err) {
     console.error('sketch-to-art/refine error:', err)
     return apiError(
