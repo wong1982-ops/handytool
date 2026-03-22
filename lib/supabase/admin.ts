@@ -27,9 +27,13 @@ export function getAdminSupabase() {
     // Production or cloud dev (DEV_USER_ID set but not local Docker)
     url = process.env.NEXT_PUBLIC_SUPABASE_URL!
     key = prodKey
-  } else if (localKey) {
-    // Fallback: local key without isLocalDev flag
-    url = process.env.NEXT_PUBLIC_SUPABASE_LOCAL_URL || 'http://127.0.0.1:54321'
+  } else if (localKey && process.env.NEXT_PUBLIC_SUPABASE_LOCAL_URL) {
+    // Fallback: local key WITH local URL explicitly set (don't fall back to 127.0.0.1 in production)
+    url = process.env.NEXT_PUBLIC_SUPABASE_LOCAL_URL
+    key = localKey
+  } else if (localKey && !process.env.VERCEL) {
+    // Only use local key with default URL when NOT on Vercel
+    url = 'http://127.0.0.1:54321'
     key = localKey
   } else {
     throw new Error(

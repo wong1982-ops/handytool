@@ -68,13 +68,15 @@ export async function POST(request: Request) {
     `Create a ${styleName} interpretation of this drawing with creative artistic flair. Honor the original sketch's composition and subjects.`,
   ]
 
-  const nanoBanana = new GoogleGenAI({ apiKey: (process.env.GEMINI_API_KEY || '').trim() })
+  // Aggressively sanitize API key — strip ALL non-printable/non-ASCII chars
+  const apiKey = (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
+  const nanoBanana = new GoogleGenAI({ apiKey })
 
   try {
     const results = await Promise.allSettled(
       prompts.map(async (prompt) => {
         // Try primary model, fall back to alternate if it fails
-        const models = ['gemini-2.5-flash-image', 'gemini-3.1-flash-image-preview']
+        const models = ['gemini-3.1-flash-image-preview']
         let response: Awaited<ReturnType<typeof nanoBanana.models.generateContent>> | null = null
         let lastErr: Error | null = null
 
