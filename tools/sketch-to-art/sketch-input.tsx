@@ -11,28 +11,48 @@ interface SketchInputProps {
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp']
-const MAX_DIMENSION = 1024
+const MAX_DIMENSION = 768
+const MAX_PAYLOAD_BYTES = 3 * 1024 * 1024 // 3MB max base64 payload
 
-/** Resize image to max 1024x1024 to prevent huge payloads to the API */
+/**
+ * Resize and compress image for API payload.
+ * - Max 768px on longest side (sufficient for AI)
+ * - JPEG at 0.7 quality (much smaller than PNG for photos)
+ * - If still too large, reduce quality further
+ */
 function resizeImage(dataUrl: string): Promise<string> {
   return new Promise((resolve) => {
     const img = new Image()
     img.onload = () => {
-      if (img.width <= MAX_DIMENSION && img.height <= MAX_DIMENSION) {
-        resolve(dataUrl)
-        return
+      let w = img.width
+      let h = img.height
+
+      // Resize if needed
+      if (w > MAX_DIMENSION || h > MAX_DIMENSION) {
+        const scale = Math.min(MAX_DIMENSION / w, MAX_DIMENSION / h)
+        w = Math.round(w * scale)
+        h = Math.round(h * scale)
       }
-      const scale = Math.min(MAX_DIMENSION / img.width, MAX_DIMENSION / img.height)
-      const w = Math.round(img.width * scale)
-      const h = Math.round(img.height * scale)
+
       const canvas = document.createElement('canvas')
       canvas.width = w
       canvas.height = h
       const ctx = canvas.getContext('2d')!
       ctx.drawImage(img, 0, 0, w, h)
-      resolve(canvas.toDataURL('image/png'))
+
+      // Try JPEG at decreasing quality until under payload limit
+      for (const quality of [0.7, 0.5, 0.3]) {
+        const result = canvas.toDataURL('image/jpeg', quality)
+        if (result.length < MAX_PAYLOAD_BYTES) {
+          resolve(result)
+          return
+        }
+      }
+
+      // Last resort: smallest quality
+      resolve(canvas.toDataURL('image/jpeg', 0.2))
     }
-    img.onerror = () => resolve(dataUrl) // fallback to original
+    img.onerror = () => resolve(dataUrl)
     img.src = dataUrl
   })
 }
@@ -97,9 +117,11 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
     }
 
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const result = e.target?.result as string
-      setPreview(result)
+      // Resize immediately on upload to prevent huge state
+      const resized = await resizeImage(result)
+      setPreview(resized)
     }
     reader.readAsDataURL(file)
   }, [])
@@ -150,9 +172,11 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
     if (!ctx) return
 
     ctx.drawImage(video, 0, 0)
-    const dataUrl = canvas.toDataURL('image/png')
-    setCapturedPhoto(dataUrl)
-    setPreview(dataUrl)
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.7)
+    resizeImage(dataUrl).then((resized) => {
+      setCapturedPhoto(resized)
+      setPreview(resized)
+    })
     stopCamera()
   }, [stopCamera])
 
@@ -168,10 +192,9 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
   }, [])
 
   // --- Use Sketch ---
-  const handleUseSketch = useCallback(async () => {
+  const handleUseSketch = useCallback(() => {
     if (preview) {
-      const resized = await resizeImage(preview)
-      onSketchReady(resized)
+      onSketchReady(preview) // already resized on upload/capture
     }
   }, [preview, onSketchReady])
 

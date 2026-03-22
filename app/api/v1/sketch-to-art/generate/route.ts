@@ -49,7 +49,9 @@ export async function POST(request: Request) {
     return API_ERRORS.INTERNAL()
   }
 
-  // Strip data URL prefix to get raw base64
+  // Extract mime type and raw base64 from data URL
+  const mimeMatch = sketch.match(/^data:(image\/[^;]+);base64,/)
+  const sketchMime = mimeMatch?.[1] || 'image/png'
   const sketchBase64 = sketch.replace(/^data:image\/[^;]+;base64,/, '')
 
   // Resolve style name
@@ -77,7 +79,7 @@ export async function POST(request: Request) {
             {
               role: 'user',
               parts: [
-                { inlineData: { mimeType: 'image/png', data: sketchBase64 } },
+                { inlineData: { mimeType: sketchMime, data: sketchBase64 } },
                 { text: prompt },
               ],
             },
