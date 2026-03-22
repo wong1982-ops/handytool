@@ -1,4 +1,6 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
+import { GoogleGenAI } from '@google/genai'
+import { uploadToR2 } from '@/lib/storage/r2'
 
 export interface GeneratedPost {
   slug: string
@@ -16,6 +18,47 @@ export interface GeneratedPost {
   reading_time_min: number
   tool_slug: string | null
   author: string
+  cover_image_url: string | null
+}
+
+const NANO_BANANA_MODEL = 'gemini-2.0-flash-exp'
+const nanoBananaClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! })
+
+/**
+ * Generate a blog cover image using Nano Banana (Gemini native image generation).
+ * Returns the R2 public URL of the uploaded image, or null on failure.
+ */
+export async function generateCoverImage(title: string, toolName?: string): Promise<string | null> {
+  try {
+    const prompt = `Create a modern, professional blog cover image (landscape 16:9 ratio) for a tech article titled "${title}".${
+      toolName ? ` The article is about a free online tool called "${toolName}".` : ''
+    } Style: clean, minimal, dark background (#101922), subtle gradient accents with blue (#3D6AF2) and purple (#8B5CF6). Include abstract geometric shapes or icons related to the topic. No text in the image. High quality, suitable for a tech blog header.`
+
+    const response = await nanoBananaClient.models.generateContent({
+      model: NANO_BANANA_MODEL,
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      config: { responseModalities: ['IMAGE', 'TEXT'] },
+    })
+
+    // Extract image from response
+    const parts = response.candidates?.[0]?.content?.parts
+    if (!parts) return null
+
+    for (const part of parts) {
+      if (part.inlineData?.mimeType?.startsWith('image/')) {
+        const buffer = Buffer.from(part.inlineData.data!, 'base64')
+        const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)
+        const path = `blog-covers/${slug}-${Date.now()}.png`
+        const url = await uploadToR2(path, buffer, 'image/png')
+        return url
+      }
+    }
+
+    return null
+  } catch (err) {
+    console.error('[blog] Cover image generation failed:', err)
+    return null
+  }
 }
 
 export interface GenerateInput {
@@ -145,6 +188,9 @@ export async function generateBlogPost(input: GenerateInput): Promise<GeneratedP
     tags: string[]
   }
 
+  // Generate cover image in parallel (non-blocking — null on failure)
+  const coverUrl = await generateCoverImage(parsed.title, input.toolName)
+
   return {
     slug: slugify(parsed.title),
     title: parsed.title,
@@ -161,5 +207,6 @@ export async function generateBlogPost(input: GenerateInput): Promise<GeneratedP
     reading_time_min: calculateReadingTime(parsed.markdown),
     tool_slug: input.toolSlug ?? null,
     author: 'Toolk1t Team',
+    cover_image_url: coverUrl,
   }
 }

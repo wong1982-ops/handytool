@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
           reading_time_min: post.reading_time_min,
           tool_slug: post.tool_slug,
           author: post.author,
+          cover_image_url: post.cover_image_url,
           published_at: new Date().toISOString(),
         })
 
