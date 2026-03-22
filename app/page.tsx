@@ -24,9 +24,9 @@ async function LatestBlogPosts() {
   if (posts.length === 0) return null
 
   const categoryColors: Record<string, string> = {
-    'tool-announcement': 'bg-blue-500/20 text-blue-300',
-    'how-to-guide': 'bg-green-500/20 text-green-300',
-    'weekly-roundup': 'bg-amber-500/20 text-amber-300',
+    'tool-announcement': 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
+    'how-to-guide': 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300',
+    'weekly-roundup': 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
   }
 
   const categoryLabels: Record<string, string> = {
@@ -36,28 +36,28 @@ async function LatestBlogPosts() {
   }
 
   return (
-    <section className="py-16 px-4 bg-[#0c1219]">
+    <section className="py-16 px-4 bg-slate-50 dark:bg-[#0c1219]">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <svg className="w-5 h-5 text-[var(--tk-color-primary-500)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6V7.5Z" />
             </svg>
-            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">Latest from the Blog</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Latest from the Blog</h2>
           </div>
           <Link href="/blog" className="text-sm font-medium text-[var(--tk-color-primary-500)] hover:underline">View all</Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {posts.map((post) => (
-            <Link key={post.slug} href={`/blog/${post.slug}`} className="group p-4 rounded-xl bg-white/5 backdrop-blur border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all">
+            <Link key={post.slug} href={`/blog/${post.slug}`} className="group p-4 rounded-xl bg-white dark:bg-white/5 backdrop-blur border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-50 dark:hover:bg-white/10 transition-all shadow-sm dark:shadow-none">
               <div className="flex items-center gap-2 mb-2">
-                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${categoryColors[post.category] || 'bg-slate-500/20 text-slate-400'}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${categoryColors[post.category] || 'bg-slate-100 text-slate-600 dark:bg-slate-500/20 dark:text-slate-400'}`}>
                   {categoryLabels[post.category] || post.category}
                 </span>
                 <span className="text-xs text-slate-500">{post.reading_time_min} min read</span>
               </div>
-              <h3 className="font-bold text-white group-hover:text-[var(--tk-color-primary-400)] transition-colors line-clamp-2 mb-1">{post.title}</h3>
-              <p className="text-sm text-slate-400 line-clamp-2">{post.description}</p>
+              <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-[var(--tk-color-primary-400)] transition-colors line-clamp-2 mb-1">{post.title}</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{post.description}</p>
               <time className="text-xs text-slate-500 mt-2 block">
                 {new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </time>

@@ -14,6 +14,13 @@ function randomVelocity(): number {
   return Math.random() > 0.5 ? speed : -speed
 }
 
+function getThemeColors(isDark: boolean) {
+  return {
+    particle: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)',
+    line: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+  }
+}
+
 export function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const rafRef = useRef<number>(0)
@@ -22,6 +29,7 @@ export function ParticleCanvas() {
   const [isMobile, setIsMobile] = useState(false)
   const reducedMotionRef = useRef(false)
   const visibleRef = useRef(true)
+  const themeColorsRef = useRef(getThemeColors(true))
 
   const resize = useCallback(() => {
     const canvas = canvasRef.current
@@ -42,6 +50,21 @@ export function ParticleCanvas() {
       reducedMotionRef.current = e.matches
     }
     mq.addEventListener('change', motionHandler)
+
+    // Theme detection
+    const isDark = document.documentElement.classList.contains('dark')
+    themeColorsRef.current = getThemeColors(isDark)
+
+    // Watch for theme changes via MutationObserver on <html> class
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.attributeName === 'class') {
+          const dark = document.documentElement.classList.contains('dark')
+          themeColorsRef.current = getThemeColors(dark)
+        }
+      }
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -74,13 +97,13 @@ export function ParticleCanvas() {
     canvas.addEventListener('mouseleave', handleMouseLeave)
 
     // Intersection observer
-    const observer = new IntersectionObserver(
+    const visObserver = new IntersectionObserver(
       ([entry]) => {
         visibleRef.current = entry.isIntersecting
       },
       { threshold: 0.1 }
     )
-    observer.observe(canvas)
+    visObserver.observe(canvas)
 
     // Resize handler
     window.addEventListener('resize', resize)
@@ -91,12 +114,13 @@ export function ParticleCanvas() {
       for (const p of particles) {
         ctx.beginPath()
         ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(255,255,255,0.3)'
+        ctx.fillStyle = themeColorsRef.current.particle
         ctx.fill()
       }
       return () => {
         canvas.removeEventListener('mousemove', handleMouseMove)
         canvas.removeEventListener('mouseleave', handleMouseLeave)
+        visObserver.disconnect()
         observer.disconnect()
         window.removeEventListener('resize', resize)
         mq.removeEventListener('change', motionHandler)
@@ -115,6 +139,7 @@ export function ParticleCanvas() {
       const h = canvas.height
       const mx = mouseRef.current.x
       const my = mouseRef.current.y
+      const colors = themeColorsRef.current
 
       for (const p of particles) {
         p.x += p.vx
@@ -128,7 +153,7 @@ export function ParticleCanvas() {
 
         ctx.beginPath()
         ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(255,255,255,0.3)'
+        ctx.fillStyle = colors.particle
         ctx.fill()
       }
 
@@ -149,7 +174,7 @@ export function ParticleCanvas() {
             ctx.beginPath()
             ctx.moveTo(a.x, a.y)
             ctx.lineTo(b.x, b.y)
-            ctx.strokeStyle = 'rgba(255,255,255,0.08)'
+            ctx.strokeStyle = colors.line
             ctx.stroke()
           }
         }
@@ -164,6 +189,7 @@ export function ParticleCanvas() {
       cancelAnimationFrame(rafRef.current)
       canvas.removeEventListener('mousemove', handleMouseMove)
       canvas.removeEventListener('mouseleave', handleMouseLeave)
+      visObserver.disconnect()
       observer.disconnect()
       window.removeEventListener('resize', resize)
       mq.removeEventListener('change', motionHandler)

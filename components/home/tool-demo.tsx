@@ -89,11 +89,11 @@ export function ToolDemo() {
       onMouseLeave={() => setPaused(false)}
     >
       <div className="flex items-center gap-3 flex-wrap justify-center">
-        <span className="text-slate-400 text-sm">Try</span>
+        <span className="text-slate-500 dark:text-slate-400 text-sm">Try</span>
         <select
           value={activeTool.id}
           onChange={handleToolChange}
-          className="rounded-lg bg-white/10 border border-white/10 text-white text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] min-h-[44px]"
+          className="rounded-lg bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] min-h-[44px]"
         >
           {DEMO_TOOLS.map((tool) => (
             <option key={tool.id} value={tool.id} className="bg-slate-900 text-white">
@@ -110,7 +110,7 @@ export function ToolDemo() {
             if (e.key === 'Enter') handleGo()
           }}
           placeholder={activeTool.placeholder}
-          className="rounded-lg bg-white/10 border border-white/10 text-white font-mono text-sm px-3 py-2 w-48 sm:w-64 outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] placeholder:text-slate-500 min-h-[44px]"
+          className="rounded-lg bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-mono text-sm px-3 py-2 w-48 sm:w-64 outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] placeholder:text-slate-400 dark:placeholder:text-slate-500 min-h-[44px]"
         />
         <button
           onClick={handleGo}
@@ -121,8 +121,8 @@ export function ToolDemo() {
       </div>
 
       {result && (
-        <div className="bg-white/10 backdrop-blur border border-white/10 rounded-xl px-6 py-3 animate-slide-up">
-          <p className="text-white text-sm font-mono">{result}</p>
+        <div className="bg-white dark:bg-white/10 backdrop-blur border border-slate-200 dark:border-white/10 rounded-xl px-6 py-3 animate-slide-up">
+          <p className="text-slate-900 dark:text-white text-sm font-mono">{result}</p>
           <Link
             href={activeTool.href}
             className="text-xs text-[var(--tk-color-primary-400)] mt-1 inline-block hover:underline"

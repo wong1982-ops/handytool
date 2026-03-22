@@ -66,7 +66,7 @@ export function FloatingIcons() {
       {ICONS.map((icon, i) => (
         <div
           key={i}
-          className="absolute text-white"
+          className="absolute text-slate-900 dark:text-white"
           style={{
             top: icon.top,
             left: icon.left,

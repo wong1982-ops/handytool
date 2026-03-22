@@ -19,19 +19,19 @@ const bentoItems = [
         <div className="flex-1 flex flex-col justify-center gap-2.5 mt-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] text-slate-500 w-14 text-right">Brightness</span>
-            <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+            <div className="flex-1 h-2 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
               <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-amber-400 to-yellow-400" />
             </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] text-slate-500 w-14 text-right">Contrast</span>
-            <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+            <div className="flex-1 h-2 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
               <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-orange-400 to-amber-400" />
             </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] text-slate-500 w-14 text-right">Saturation</span>
-            <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+            <div className="flex-1 h-2 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
               <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-pink-400 to-rose-400" />
             </div>
           </div>
@@ -143,8 +143,8 @@ const bentoItems = [
           </svg>
         </div>
         <div className="flex flex-col gap-1.5 flex-1">
-          <div className="h-2 rounded-full bg-white/10 w-full" />
-          <div className="h-2 rounded-full bg-white/10 w-3/4" />
+          <div className="h-2 rounded-full bg-slate-200 dark:bg-white/10 w-full" />
+          <div className="h-2 rounded-full bg-slate-200 dark:bg-white/10 w-3/4" />
         </div>
       </div>
     ),
@@ -327,8 +327,8 @@ const bentoItems = [
             <div className="h-1 rounded-full bg-yellow-400/30 w-8" />
           </div>
           <div className="flex flex-col gap-0.5">
-            <div className="h-1 rounded-full bg-white/10 w-full" />
-            <div className="h-1 rounded-full bg-white/10 w-3/4" />
+            <div className="h-1 rounded-full bg-slate-200 dark:bg-white/10 w-full" />
+            <div className="h-1 rounded-full bg-slate-200 dark:bg-white/10 w-3/4" />
           </div>
           <div className="border-t border-yellow-400/20 pt-0.5">
             <div className="h-1 rounded-full bg-yellow-400/20 w-6 mx-auto" />
@@ -370,7 +370,7 @@ const bentoItems = [
         {[0, 1, 2].map((i) => (
           <div key={i} className="rounded border border-sky-400/20 bg-sky-400/5 p-1.5 flex flex-col gap-0.5">
             <div className="h-1 rounded-full bg-sky-400/30 w-10" />
-            <div className="h-1 rounded-full bg-white/10 w-16" />
+            <div className="h-1 rounded-full bg-slate-200 dark:bg-white/10 w-16" />
           </div>
         ))}
       </div>
@@ -398,15 +398,15 @@ const bentoItems = [
 
 export function BentoShowcase() {
   return (
-    <section className="py-20 px-4 bg-gradient-to-b from-[#101922] to-[#0c1219]">
+    <section className="py-20 px-4 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-[#101922] dark:to-[#0c1219]">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-white mb-2">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-900 dark:text-white mb-2">
           Powerful Tools,{' '}
           <span className="bg-gradient-to-r from-[var(--tk-color-primary-400)] to-cyan-400 bg-clip-text text-transparent">
             Zero Cost
           </span>
         </h2>
-        <p className="text-center text-slate-400 mb-12 max-w-lg mx-auto">
+        <p className="text-center text-slate-500 dark:text-slate-400 mb-12 max-w-lg mx-auto">
           All your tools — right in your browser.
         </p>
 
@@ -415,19 +415,19 @@ export function BentoShowcase() {
             <Link
               key={item.href}
               href={item.href}
-              className={`group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 overflow-hidden hover:scale-[1.02] hover:border-white/20 transition-all duration-300 cursor-pointer ${item.gridClass}`}
+              className={`group relative bg-white dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-5 overflow-hidden hover:scale-[1.02] hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300 cursor-pointer shadow-sm dark:shadow-none ${item.gridClass}`}
             >
               {/* Hover glow */}
               <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br ${item.glowClass} to-transparent rounded-2xl`} />
 
               {/* Mini preview */}
-              <div className="relative mb-3 h-24 lg:h-32 rounded-xl bg-white/5 overflow-hidden flex items-center justify-center">
+              <div className="relative mb-3 h-24 lg:h-32 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden flex items-center justify-center">
                 {item.preview}
               </div>
 
               {/* Label */}
-              <h3 className="relative font-bold text-white text-sm">{item.name}</h3>
-              <p className="relative text-xs text-slate-400 mt-1 line-clamp-1">{item.description}</p>
+              <h3 className="relative font-bold text-slate-900 dark:text-white text-sm">{item.name}</h3>
+              <p className="relative text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">{item.description}</p>
               <span className="relative text-xs text-[var(--tk-color-primary-400)] mt-2 inline-block group-hover:translate-x-1 transition-transform">
                 Try it →
               </span>
