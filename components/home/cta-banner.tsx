@@ -12,10 +12,10 @@ export function CtaBanner() {
           }}
         />
         <h2 className="relative text-2xl lg:text-3xl font-bold text-white mb-3">
-          Start using Toolk1t — it&apos;s free
+          Start using Toolk1t
         </h2>
         <p className="relative text-white/70 mb-6 max-w-lg mx-auto">
-          No sign-up required. Open any tool and start working instantly.
+          No sign-up required. Open any tool and start working instantly. AI-powered features use credits.
         </p>
         <a
           href="#all-tools"
