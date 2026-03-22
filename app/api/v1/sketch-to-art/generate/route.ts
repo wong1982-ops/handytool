@@ -122,10 +122,13 @@ export async function POST(request: Request) {
     // v7: REST API with key as query param — NO Authorization header at all
     console.log('[sketch-to-art] v8 REST, model:', GEMINI_MODEL, 'key:', GEMINI_API_KEY.substring(0, 10) + '...', 'len:', GEMINI_API_KEY.length, 'sketch bytes:', sketchBase64.length)
     const results = await Promise.allSettled(
-      prompts.map(async (prompt) => {
+      prompts.map(async (prompt, idx) => {
+        console.log(`[sketch-to-art] V${idx + 1} calling Gemini...`)
         const imageBuffer = await callGeminiImageGeneration(sketchBase64, sketchMime, prompt)
+        console.log(`[sketch-to-art] V${idx + 1} Gemini OK, ${imageBuffer.length} bytes. Uploading to R2...`)
         const r2Path = `sketch-art/${crypto.randomUUID()}.png`
         const imageUrl = await uploadToR2(r2Path, imageBuffer, 'image/png')
+        console.log(`[sketch-to-art] V${idx + 1} R2 OK: ${imageUrl.substring(0, 60)}`)
         return { imageUrl, prompt }
       }),
     )
