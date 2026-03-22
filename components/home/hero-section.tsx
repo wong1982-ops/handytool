@@ -21,7 +21,7 @@ export function HeroSection() {
           </span>
         </h1>
         <p className="text-lg text-slate-500 dark:text-slate-400 mb-10 max-w-xl mx-auto">
-          Developer tools, image editors, converters, and more — all free, all in your browser.
+          Developer tools, image editors, converters, and more — right in your browser.
         </p>
 
         <ToolDemo />
