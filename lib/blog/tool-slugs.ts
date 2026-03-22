@@ -22,4 +22,5 @@ export const TOOL_ENTRIES: { slug: string; name: string; description: string; hr
   { slug: 'story-studio', name: 'Story Studio', description: 'Create AI-illustrated picture books', href: '/tools/story-studio' },
   { slug: 'job-radar', name: 'Job Radar', description: 'AU and NZ tech and French language jobs', href: '/tools/job-radar' },
   { slug: 'ai-radar', name: 'AI Radar', description: 'Latest AI model releases and updates', href: '/tools/ai-radar' },
+  { slug: 'sketch-to-art', name: 'Sketch to Art', description: 'Turn drawings into stunning art with AI', href: '/tools/sketch-to-art' },
 ]

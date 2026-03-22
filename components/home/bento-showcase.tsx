@@ -394,6 +394,30 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'Sketch to Art',
+    description: 'Turn drawings into stunning art with AI',
+    href: '/tools/sketch-to-art',
+    gridClass: '',
+    glowClass: 'from-pink-500/10',
+    preview: (
+      <div className="w-full h-full flex items-center justify-center gap-2.5">
+        {/* Pencil sketch (gray lines) */}
+        <div className="w-10 h-10 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-white/5 flex items-center justify-center">
+          <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+            <circle cx="12" cy="10" r="4" />
+            <path d="M8 18c0-2.2 1.8-4 4-4s4 1.8 4 4" />
+          </svg>
+        </div>
+        {/* Arrow */}
+        <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+        {/* Colorful art result */}
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-400 via-violet-400 to-cyan-400 shadow-lg shadow-pink-500/20" />
+      </div>
+    ),
+  },
 ]
 
 export function BentoShowcase() {
