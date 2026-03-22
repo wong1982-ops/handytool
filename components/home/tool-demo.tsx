@@ -12,11 +12,11 @@ const DEMO_TOOLS = [
     mock: (v: string) => (v ? '\u{1F4CD} Mountain View, US \u00B7 Google LLC' : null),
   },
   {
-    id: 'regex-tester',
-    label: 'Regex Tester',
-    placeholder: '\\d{3}-\\d{4}',
-    href: '/tools/regex-tester',
-    mock: (v: string) => (v ? '\u2713 Pattern valid \u00B7 3 matches found' : null),
+    id: 'story-studio',
+    label: 'Story Studio',
+    placeholder: 'A brave kitten finds a magic door...',
+    href: '/tools/story-studio',
+    mock: (v: string) => (v ? '\u2728 Story concept ready \u00B7 8 pages \u00B7 Illustrated' : null),
   },
   {
     id: 'json-converter',
