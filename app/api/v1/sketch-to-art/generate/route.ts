@@ -120,7 +120,7 @@ export async function POST(request: Request) {
 
   try {
     // v7: REST API with key as query param — NO Authorization header at all
-    console.log('[sketch-to-art] v7 REST approach, model:', GEMINI_MODEL, 'key length:', GEMINI_API_KEY.length)
+    console.log('[sketch-to-art] v8 REST, model:', GEMINI_MODEL, 'key:', GEMINI_API_KEY.substring(0, 10) + '...', 'len:', GEMINI_API_KEY.length, 'sketch bytes:', sketchBase64.length)
     const results = await Promise.allSettled(
       prompts.map(async (prompt) => {
         const imageBuffer = await callGeminiImageGeneration(sketchBase64, sketchMime, prompt)
@@ -148,10 +148,17 @@ export async function POST(request: Request) {
       .map((r) => r.value)
 
     if (variations.length === 0) {
+      // Collect error details for debugging
+      const errors = results
+        .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
+        .map((r) => r.reason?.message || String(r.reason))
+      const firstError = errors[0] || 'Unknown error'
+      console.error('[sketch-to-art] All variations failed. Errors:', errors)
       return apiError(
-        'Failed to generate any art variations. Your credit has been deducted — please try again.',
+        `Generation failed: ${firstError}`,
         'GENERATION_FAILED',
         500,
+        { errors },
       )
     }
 
