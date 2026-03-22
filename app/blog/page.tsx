@@ -146,9 +146,9 @@ function BentoCard({ post, size = 'default' }: { post: BlogPost; size?: 'default
 export default async function BlogListingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>
+  searchParams: Promise<{ category?: string; tag?: string }>
 }) {
-  const { category } = await searchParams
+  const { category, tag } = await searchParams
   let posts: BlogPost[] = []
 
   try {
@@ -162,6 +162,10 @@ export default async function BlogListingPage({
 
     if (category) {
       query = query.eq('category', category)
+    }
+
+    if (tag) {
+      query = query.contains('tags', [tag])
     }
 
     const { data } = await query
