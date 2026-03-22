@@ -248,7 +248,15 @@ export function ProfileForm() {
     if (error) {
       setMessage({ type: 'error', text: 'Failed to save profile. Please try again.' })
     } else {
-      setMessage({ type: 'success', text: 'Profile saved successfully!' })
+      setMessage({ type: 'success', text: 'Profile saved! Redirecting...' })
+      // Navigate back after a brief delay so user sees the success message
+      setTimeout(() => {
+        if (window.history.length > 1) {
+          router.back()
+        } else {
+          router.push('/')
+        }
+      }, 1000)
     }
   }
 
