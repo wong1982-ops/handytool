@@ -14,7 +14,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://toolk1t.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Toolk1t - Free Online Tools",
+    default: "Toolk1t - Online Tools",
     template: "%s | Toolk1t",
   },
   description:

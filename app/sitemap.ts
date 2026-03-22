@@ -28,11 +28,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Supabase unavailable during build — skip blog entries
   }
 
-  // Story Studio static sub-pages
-  const storyStudioPages = [
+  // Sub-pages for specific tools
+  const subPages = [
     '/tools/story-studio/bookshelf',
     '/tools/story-studio/series',
     '/tools/story-studio/scan',
+    '/tools/story-studio/build',
+    '/tools/story-studio/characters',
+    '/tools/ecard-studio/ai-business-card',
   ]
 
   return [
@@ -44,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
-    ...storyStudioPages.map((page) => ({
+    ...subPages.map((page) => ({
       url: `${SITE_URL}${page}`,
       lastModified: now,
       changeFrequency: 'monthly' as const,

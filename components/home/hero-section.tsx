@@ -14,7 +14,7 @@ export function HeroSection() {
 
       <div className="relative z-10 text-center px-4 max-w-3xl mx-auto py-20">
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
-          Free Online Tools,
+          Online Tools,
           <br />
           <span className="bg-gradient-to-r from-[var(--tk-color-primary-400)] via-purple-400 to-cyan-400 bg-clip-text text-transparent">
             Supercharged.
