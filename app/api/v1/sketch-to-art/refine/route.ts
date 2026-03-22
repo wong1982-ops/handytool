@@ -6,7 +6,7 @@ import { uploadToR2 } from '@/lib/storage/r2'
 
 export const maxDuration = 60
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+const genAI = new GoogleGenerativeAI((process.env.GEMINI_API_KEY || '').trim())
 
 export async function POST(request: Request) {
   const userId = await getAuthUserId()
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     const sketchBase64 = originalSketch.replace(/^data:image\/[^;]+;base64,/, '')
 
     // Step 4: Generate new image with Nano Banana
-    const nanoBanana = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! })
+    const nanoBanana = new GoogleGenAI({ apiKey: (process.env.GEMINI_API_KEY || '').trim() })
 
     const response = await nanoBanana.models.generateContent({
       model: 'gemini-3.1-flash-image-preview',

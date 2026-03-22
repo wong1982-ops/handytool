@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     `Create a ${styleName} interpretation of this drawing with creative artistic flair. Honor the original sketch's composition and subjects.`,
   ]
 
-  const nanoBanana = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! })
+  const nanoBanana = new GoogleGenAI({ apiKey: (process.env.GEMINI_API_KEY || '').trim() })
 
   try {
     const results = await Promise.allSettled(
