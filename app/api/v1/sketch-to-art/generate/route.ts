@@ -73,19 +73,34 @@ export async function POST(request: Request) {
   try {
     const results = await Promise.allSettled(
       prompts.map(async (prompt) => {
-        const response = await nanoBanana.models.generateContent({
-          model: 'gemini-3.1-flash-image-preview',
-          contents: [
-            {
-              role: 'user',
-              parts: [
-                { inlineData: { mimeType: sketchMime, data: sketchBase64 } },
-                { text: prompt },
+        // Try primary model, fall back to alternate if it fails
+        const models = ['gemini-2.0-flash-exp', 'gemini-3.1-flash-image-preview']
+        let response: Awaited<ReturnType<typeof nanoBanana.models.generateContent>> | null = null
+        let lastErr: Error | null = null
+
+        for (const model of models) {
+          try {
+            response = await nanoBanana.models.generateContent({
+              model,
+              contents: [
+                {
+                  role: 'user',
+                  parts: [
+                    { inlineData: { mimeType: sketchMime, data: sketchBase64 } },
+                    { text: prompt },
+                  ],
+                },
               ],
-            },
-          ],
-          config: { responseModalities: ['IMAGE', 'TEXT'] },
-        })
+              config: { responseModalities: ['IMAGE', 'TEXT'] },
+            })
+            break // success
+          } catch (err) {
+            lastErr = err instanceof Error ? err : new Error(String(err))
+            console.warn(`[sketch-to-art] Model ${model} failed: ${lastErr.message}`)
+          }
+        }
+
+        if (!response) throw lastErr || new Error('All models failed')
 
         // Extract image from response
         const parts = response.candidates?.[0]?.content?.parts
@@ -104,11 +119,19 @@ export async function POST(request: Request) {
       }),
     )
 
-    // Log failed variations for debugging
+    // Log ALL results for debugging
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') {
+        const err = (r as PromiseRejectedResult).reason
+        console.error(`[sketch-to-art] Variation ${i + 1} FAILED:`, err?.message || String(err), err?.stack?.split('\n')[1] || '')
+      } else {
+        console.log(`[sketch-to-art] Variation ${i + 1} OK:`, (r as PromiseFulfilledResult<{ imageUrl: string }>).value.imageUrl?.substring(0, 60))
+      }
+    })
+
     const failed = results.filter((r) => r.status === 'rejected')
     if (failed.length > 0) {
-      console.error(`[sketch-to-art] ${failed.length}/4 variations failed:`,
-        failed.map((r) => (r as PromiseRejectedResult).reason?.message || String((r as PromiseRejectedResult).reason)).join('; '))
+      console.error(`[sketch-to-art] ${failed.length}/4 failed. Sketch base64 length: ${sketchBase64.length}, mime: ${sketchMime}`)
     }
 
     const variations = results
