@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "JWT Decoder, Verifier & Generator — Free Online Tool",
+  title: "JWT Decoder, Verifier & Generator — Online Tool",
   description:
     "Decode, verify, and generate JSON Web Tokens (JWT) online. Supports all algorithms: HS256, HS384, HS512, RS256, RS384, RS512, ES256, ES384, ES512, EdDSA. 100% client-side — your tokens never leave your browser.",
   alternates: {

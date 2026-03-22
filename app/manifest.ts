@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Toolk1t - Free Online Tools",
+    name: "Toolk1t - Online Tools",
     short_name: "Toolk1t",
     description:
-      "Free online tools for developers and creators — IP lookup, JSON converter, image editor, PDF tools, speed test, and more.",
+      "Online tools for developers and creators — IP lookup, JSON converter, image editor, PDF tools, speed test, and more.",
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

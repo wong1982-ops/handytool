@@ -58,7 +58,7 @@ export function BlogPostRenderer({ content }: { content: BlogContent }) {
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Try These Tools</h2>
         <p className="text-slate-600 dark:text-slate-300">
           Explore all our{' '}
-          <Link href="/tools" className="text-blue-600 dark:text-blue-400 hover:underline">free online tools</Link>
+          <Link href="/tools" className="text-blue-600 dark:text-blue-400 hover:underline">online tools</Link>
           {' '}&mdash; from JSON converters to speed tests, passport photo makers to currency converters.
         </p>
       </section>

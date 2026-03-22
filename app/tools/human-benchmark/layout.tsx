@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/tools/human-benchmark' },
   openGraph: {
     title: 'Human Benchmark | Toolk1t',
-    description: 'Test your cognitive abilities with 8 brain games. Free online tool.',
+    description: 'Test your cognitive abilities with 8 brain games. Online tool.',
     url: '/tools/human-benchmark',
   },
 }

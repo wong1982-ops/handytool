@@ -3,14 +3,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "JSON/XML Formatter & Converter - JSON, YAML, CSV, XML",
   description:
-    "Format, validate, and convert between JSON, YAML, CSV, and XML. Tree view, diff comparison, JSON Schema validation, JMESPath queries. Free online tool.",
+    "Format, validate, and convert between JSON, YAML, CSV, and XML. Tree view, diff comparison, JSON Schema validation, JMESPath queries. Online tool.",
   alternates: {
     canonical: "/tools/json-converter",
   },
   openGraph: {
     title: "JSON/XML Formatter & Converter | Toolk1t",
     description:
-      "Convert between JSON, YAML, CSV, and XML. Tree view, diff, schema validation, and JMESPath queries. Free online tool.",
+      "Convert between JSON, YAML, CSV, and XML. Tree view, diff, schema validation, and JMESPath queries. Online tool.",
     url: "/tools/json-converter",
   },
 };

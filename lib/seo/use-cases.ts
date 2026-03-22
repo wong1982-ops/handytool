@@ -15,7 +15,7 @@ export const useCases: UseCase[] = [
   {
     slug: 'prepare-visa-photo',
     title: 'How to Prepare a Visa Photo Online',
-    description: 'Create a compliant visa photo from home. Crop, resize, and format your photo to meet embassy requirements. Free online tool.',
+    description: 'Create a compliant visa photo from home. Crop, resize, and format your photo to meet embassy requirements. Online tool.',
     h1: 'How to Prepare a Visa Photo Online',
     toolSlug: 'id-photo',
     toolName: 'ID Photo Editor',
@@ -100,7 +100,7 @@ export const useCases: UseCase[] = [
   {
     slug: 'design-thank-you-card',
     title: 'How to Design a Professional Thank You Card',
-    description: 'Create beautiful digital thank you cards for clients, colleagues, or events. Professional templates, free online.',
+    description: 'Create beautiful digital thank you cards for clients, colleagues, or events. Professional templates, online.',
     h1: 'How to Design a Professional Thank You Card',
     toolSlug: 'ecard-studio',
     toolName: 'ECard Studio',
@@ -134,7 +134,7 @@ export const useCases: UseCase[] = [
   {
     slug: 'debug-openapi-spec',
     title: 'How to Debug an OpenAPI Specification',
-    description: 'Find and fix errors in your Swagger/OpenAPI spec with real-time validation and visual preview. Free online editor.',
+    description: 'Find and fix errors in your Swagger/OpenAPI spec with real-time validation and visual preview. Online editor.',
     h1: 'How to Debug an OpenAPI Specification',
     toolSlug: 'swagger-editor',
     toolName: 'Swagger Editor',
@@ -168,7 +168,7 @@ export const useCases: UseCase[] = [
   {
     slug: 'vectorize-logo',
     title: 'How to Vectorize a Logo from PNG',
-    description: 'Convert a raster logo (PNG, JPEG) to scalable SVG vector format. Clean vector output for print and web. Free online.',
+    description: 'Convert a raster logo (PNG, JPEG) to scalable SVG vector format. Clean vector output for print and web. Online.',
     h1: 'How to Vectorize a Logo from PNG',
     toolSlug: 'svg-converter',
     toolName: 'SVG Converter',

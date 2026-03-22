@@ -19,7 +19,7 @@ export function TermsSheetContent() {
       <section>
         <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1.5">Description of Service</h3>
         <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-          Toolk1t provides a collection of free online tools including IP lookup, currency converter,
+          Toolk1t provides a collection of online tools including IP lookup, currency converter,
           image editor, PDF tools, and other utilities. These tools are provided as-is for personal
           and professional use. We may add, modify, or discontinue tools at any time.
         </p>

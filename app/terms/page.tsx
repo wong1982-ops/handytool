@@ -3,13 +3,13 @@ import { GlassCard } from '@/components/ui/glass-card'
 
 export const metadata: Metadata = {
   title: 'Terms of Service — Toolk1t',
-  description: 'Terms of Service for Toolk1t, your free online toolkit.',
+  description: 'Terms of Service for Toolk1t, your online toolkit.',
   alternates: {
     canonical: '/terms',
   },
   openGraph: {
     title: 'Terms of Service | Toolk1t',
-    description: 'Terms of Service for Toolk1t, your free online toolkit.',
+    description: 'Terms of Service for Toolk1t, your online toolkit.',
     url: '/terms',
   },
 }
@@ -38,7 +38,7 @@ export default function TermsOfServicePage() {
           Description of Service
         </h2>
         <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-          Toolk1t provides a collection of free online tools including, but not limited to,
+          Toolk1t provides a collection of online tools including, but not limited to,
           IP lookup, currency converter, image editor, PDF tools, and other utilities. These
           tools are provided as-is for personal and professional use. We may add, modify, or
           discontinue tools at any time without prior notice.

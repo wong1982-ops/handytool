@@ -31,7 +31,7 @@ const nanoBananaClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! }
 export async function generateCoverImage(title: string, toolName?: string): Promise<string | null> {
   try {
     const prompt = `Create a modern, professional blog cover image (landscape 16:9 ratio) for a tech article titled "${title}".${
-      toolName ? ` The article is about a free online tool called "${toolName}".` : ''
+      toolName ? ` The article is about an online tool called "${toolName}".` : ''
     } Style: clean, minimal, dark background (#101922), subtle gradient accents with blue (#3D6AF2) and purple (#8B5CF6). Include abstract geometric shapes or icons related to the topic. No text in the image. High quality, suitable for a tech blog header.`
 
     const response = await nanoBananaClient.models.generateContent({
@@ -74,7 +74,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 const SYSTEM_PROMPTS: Record<GenerateInput['type'], string> = {
   'tool-announcement':
-    'You are an SEO content writer for Toolk1t (https://toolk1t.com), a free online tools website. Write a blog post announcing a new tool. Structure: engaging intro paragraph → What is [Tool Name]? → Key Features (3-5 with ### subheadings) → How to Use It (step-by-step) → Real-World Use Cases (3 examples) → Why It\'s Free → Conclusion with CTA. Use markdown ## and ### headings. Include a link to the tool page. Write 800-1200 words. Make it SEO-friendly targeting long-tail keywords.',
+    'You are an SEO content writer for Toolk1t (https://toolk1t.com), an online tools website. Write a blog post announcing a new tool. Structure: engaging intro paragraph → What is [Tool Name]? → Key Features (3-5 with ### subheadings) → How to Use It (step-by-step) → Real-World Use Cases (3 examples) → Why It\'s Free → Conclusion with CTA. Use markdown ## and ### headings. Include a link to the tool page. Write 800-1200 words. Make it SEO-friendly targeting long-tail keywords.',
   'how-to-guide':
     'You are an SEO content writer for Toolk1t. Write a comprehensive how-to guide. Structure: intro explaining the problem → What You\'ll Need → Step-by-Step Guide (### numbered steps) → Pro Tips → Common Mistakes to Avoid → Frequently Asked Questions → Conclusion with CTA. Use markdown ## and ### headings. Write 1000-1500 words.',
 }

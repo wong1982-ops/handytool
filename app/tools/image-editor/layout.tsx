@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Online Image Editor | Toolk1t",
     description:
-      "Edit images with adjustments, filters, and zoom. Free online tool, no upload to server.",
+      "Edit images with adjustments, filters, and zoom. Online tool, no upload to server.",
     url: "/tools/image-editor",
   },
 };

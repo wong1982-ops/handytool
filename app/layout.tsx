@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | Toolk1t",
   },
   description:
-    "Free online tools for developers and creators — IP lookup, JSON converter, image editor, PDF tools, speed test, and more.",
+    "Online tools for developers and creators — IP lookup, JSON converter, image editor, PDF tools, speed test, and more.",
   openGraph: {
     type: "website",
     siteName: "Toolk1t",
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Toolk1t - Free Online Tools",
+    title: "Toolk1t - Online Tools",
     description:
-      "Free online tools for developers and creators — IP lookup, JSON converter, image editor, PDF tools, speed test, and more.",
+      "Online tools for developers and creators — IP lookup, JSON converter, image editor, PDF tools, speed test, and more.",
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
@@ -42,7 +42,7 @@ const organizationJsonLd = {
   "@type": "Organization",
   name: "Toolk1t",
   url: SITE_URL,
-  description: "Free online tools for developers and creators",
+  description: "Online tools for developers and creators",
 };
 
 const websiteJsonLd = {
@@ -50,7 +50,7 @@ const websiteJsonLd = {
   "@type": "WebSite",
   name: "Toolk1t",
   url: SITE_URL,
-  description: "Free online tools for developers and creators — IP lookup, JSON converter, image editor, PDF tools, speed test, and more.",
+  description: "Online tools for developers and creators — IP lookup, JSON converter, image editor, PDF tools, speed test, and more.",
   potentialAction: {
     "@type": "SearchAction",
     target: {

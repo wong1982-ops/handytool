@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "IP Address & Domain Lookup - Check Any IP",
   description:
-    "Look up any IP address or domain name. Get geolocation, ISP, proxy detection, ASN, and detailed network information. Free online tool.",
+    "Look up any IP address or domain name. Get geolocation, ISP, proxy detection, ASN, and detailed network information. Online tool.",
   alternates: {
     canonical: "/tools/ipcheck",
   },

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ID Photo Editor - Passport & Visa Photos | Toolk1t",
     description:
-      "Create compliant passport and visa photos with face detection and compliance checking. Free online.",
+      "Create compliant passport and visa photos with face detection and compliance checking. Online.",
     url: "/tools/id-photo",
   },
 };

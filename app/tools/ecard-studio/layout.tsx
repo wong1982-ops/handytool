@@ -3,12 +3,12 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'ECard Studio - Design Professional E-Cards',
   description:
-    'Design and customize professional e-cards for business occasions. Choose templates, personalize messages, and download instantly. Free online tool.',
+    'Design and customize professional e-cards for business occasions. Choose templates, personalize messages, and download instantly. Online tool.',
   alternates: { canonical: '/tools/ecard-studio' },
   openGraph: {
     title: 'ECard Studio | Toolk1t',
     description:
-      'Design professional e-cards for business occasions. Free online tool.',
+      'Design professional e-cards for business occasions. Online tool.',
     url: '/tools/ecard-studio',
   },
 }

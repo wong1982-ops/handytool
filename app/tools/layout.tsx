@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 import { ToolsLayoutClient } from "./tools-layout-client";
 
 export const metadata: Metadata = {
-  title: "Free Online Tools",
+  title: "Online Tools",
   description:
-    "Browse all free online tools: IP lookup, speed test, PDF converter, image editor, JSON formatter, currency exchange, SVG converter, Swagger editor, and ID photo maker.",
+    "Browse all online tools: IP lookup, speed test, PDF converter, image editor, JSON formatter, currency exchange, SVG converter, Swagger editor, and ID photo maker.",
   alternates: {
     canonical: "/tools",
   },
   openGraph: {
-    title: "Free Online Tools | Toolk1t",
+    title: "Online Tools | Toolk1t",
     description:
-      "Browse all free online tools: IP lookup, speed test, PDF converter, image editor, JSON formatter, currency exchange, and more.",
+      "Browse all online tools: IP lookup, speed test, PDF converter, image editor, JSON formatter, currency exchange, and more.",
     url: "/tools",
   },
 };
@@ -19,9 +19,9 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  name: "Free Online Tools",
+  name: "Online Tools",
   description:
-    "A collection of free online tools for developers and everyday use.",
+    "A collection of online tools for developers and everyday use.",
   url: "https://toolk1t.com/tools",
   isPartOf: {
     "@type": "WebSite",

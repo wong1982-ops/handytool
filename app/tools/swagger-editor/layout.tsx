@@ -3,14 +3,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Swagger Editor - Edit & Preview OpenAPI Specs",
   description:
-    "Edit OpenAPI/Swagger YAML specifications with live preview, real-time validation, and Swagger UI rendering. Free online API documentation editor.",
+    "Edit OpenAPI/Swagger YAML specifications with live preview, real-time validation, and Swagger UI rendering. Online API documentation editor.",
   alternates: {
     canonical: "/tools/swagger-editor",
   },
   openGraph: {
     title: "Swagger Editor - OpenAPI Spec Editor | Toolk1t",
     description:
-      "Edit OpenAPI/Swagger YAML with live Swagger UI preview and real-time validation. Free online.",
+      "Edit OpenAPI/Swagger YAML with live Swagger UI preview and real-time validation. Online.",
     url: "/tools/swagger-editor",
   },
 };

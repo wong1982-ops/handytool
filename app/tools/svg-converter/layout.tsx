@@ -3,14 +3,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "SVG Converter - Vectorize Images to SVG, EPS, PDF & PNG",
   description:
-    "Convert raster images to vector graphics with batch processing. Export to SVG, EPS, PDF, and high-res PNG. Color and B&W modes, optimization stats. Free online tool.",
+    "Convert raster images to vector graphics with batch processing. Export to SVG, EPS, PDF, and high-res PNG. Color and B&W modes, optimization stats. Online tool.",
   alternates: {
     canonical: "/tools/svg-converter",
   },
   openGraph: {
     title: "SVG Converter - Vectorize to SVG, EPS, PDF, PNG | Toolk1t",
     description:
-      "Batch convert images to vector graphics. Export SVG, EPS, PDF, PNG with color/B&W modes. Free online converter.",
+      "Batch convert images to vector graphics. Export SVG, EPS, PDF, PNG with color/B&W modes. Online converter.",
     url: "/tools/svg-converter",
   },
 };

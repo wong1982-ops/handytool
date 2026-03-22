@@ -34,7 +34,7 @@ export const landingPages: LandingPage[] = [
   {
     slug: 'json-to-csv-converter',
     title: 'Free JSON to CSV Converter',
-    description: 'Convert JSON data to CSV format instantly. Supports nested objects and arrays. Free online tool, no installation needed.',
+    description: 'Convert JSON data to CSV format instantly. Supports nested objects and arrays. Online tool, no installation needed.',
     h1: 'Free JSON to CSV Converter',
     toolSlug: 'json-converter',
     toolName: 'JSON Converter',
@@ -63,9 +63,9 @@ export const landingPages: LandingPage[] = [
   },
   {
     slug: 'online-ip-lookup',
-    title: 'Free Online IP Address Lookup',
+    title: 'Online IP Address Lookup',
     description: 'Look up any IP address to find its geolocation, ISP, organization, and network details. Free IP lookup tool.',
-    h1: 'Free Online IP Address Lookup',
+    h1: 'Online IP Address Lookup',
     toolSlug: 'ipcheck',
     toolName: 'IP Check',
     searchIntent: 'ip address lookup',
@@ -94,7 +94,7 @@ export const landingPages: LandingPage[] = [
   {
     slug: 'internet-speed-test',
     title: 'Free Internet Speed Test',
-    description: 'Test your internet download and upload speed instantly. Measure ping, jitter, and bandwidth. Free online speed test.',
+    description: 'Test your internet download and upload speed instantly. Measure ping, jitter, and bandwidth. Online speed test.',
     h1: 'Free Internet Speed Test',
     toolSlug: 'speedtest',
     toolName: 'Speed Test',
@@ -109,7 +109,7 @@ export const landingPages: LandingPage[] = [
   {
     slug: 'passport-photo-maker',
     title: 'Free Passport Photo Maker',
-    description: 'Create passport and visa photos that meet official requirements. Crop, resize, and format photos for any country. Free online tool.',
+    description: 'Create passport and visa photos that meet official requirements. Crop, resize, and format photos for any country. Online tool.',
     h1: 'Free Passport Photo Maker',
     toolSlug: 'id-photo',
     toolName: 'ID Photo Editor',
@@ -153,9 +153,9 @@ export const landingPages: LandingPage[] = [
   },
   {
     slug: 'image-filter-editor',
-    title: 'Free Online Image Filter Editor',
+    title: 'Online Image Filter Editor',
     description: 'Apply filters, adjust brightness, contrast, and saturation to your photos online. Instagram-style filters, free.',
-    h1: 'Free Online Image Filter Editor',
+    h1: 'Online Image Filter Editor',
     toolSlug: 'image-editor',
     toolName: 'Image Editor',
     searchIntent: 'image filter editor online',
@@ -199,7 +199,7 @@ export const landingPages: LandingPage[] = [
   {
     slug: 'business-ecard-maker',
     title: 'Free Business E-Card Maker',
-    description: 'Design professional digital greeting cards for business occasions. Thank you, holiday, and congratulations cards. Free online tool.',
+    description: 'Design professional digital greeting cards for business occasions. Thank you, holiday, and congratulations cards. Online tool.',
     h1: 'Free Business E-Card Maker',
     toolSlug: 'ecard-studio',
     toolName: 'ECard Studio',
@@ -228,9 +228,9 @@ export const landingPages: LandingPage[] = [
   },
   {
     slug: 'swagger-api-editor',
-    title: 'Free Online Swagger/OpenAPI Editor',
+    title: 'Online Swagger/OpenAPI Editor',
     description: 'Edit and preview OpenAPI specifications in real-time. Validate Swagger/OpenAPI 3.0 files with instant visual preview.',
-    h1: 'Free Online Swagger/OpenAPI Editor',
+    h1: 'Online Swagger/OpenAPI Editor',
     toolSlug: 'swagger-editor',
     toolName: 'Swagger Editor',
     searchIntent: 'swagger editor online',
