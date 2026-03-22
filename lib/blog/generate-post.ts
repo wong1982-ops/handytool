@@ -21,7 +21,7 @@ export interface GeneratedPost {
   cover_image_url: string | null
 }
 
-const NANO_BANANA_MODEL = 'gemini-2.0-flash-exp'
+const NANO_BANANA_MODEL = 'gemini-3.1-flash-image-preview'
 const nanoBananaClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! })
 
 /**
