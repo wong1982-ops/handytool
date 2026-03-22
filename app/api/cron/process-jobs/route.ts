@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAdminSupabase } from '@/lib/supabase/admin'
 import { triggerNextStep, triggerTtsBatch, type PipelineStep } from '@/lib/story/queue'
 
 const CRON_SECRET = process.env.CRON_SECRET || ''
+
+// Build admin client inline — avoid importing getAdminSupabase which fails without service role key
+function getSupabaseAdmin() {
+  const { createClient } = require('@supabase/supabase-js')
+
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+
+  if (!serviceKey || !url) {
+    return null // Can't create admin client without service role key
+  }
+
+  return createClient(url, serviceKey)
+}
 
 /**
  * GET /api/cron/process-jobs — Safety net cron (runs every 1 minute).
@@ -18,8 +31,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabase: any = getAdminSupabase()
+  const supabase = getSupabaseAdmin()
+
+  if (!supabase) {
+    // No service role key — skip gracefully
+    console.warn('[cron] SUPABASE_SERVICE_ROLE_KEY not set — skipping job processing')
+    return NextResponse.json({ ok: true, processed: 0, skipped: true, reason: 'No service role key configured' })
+  }
 
   // Find stuck jobs: running but no update for >2 minutes
   const twoMinAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString()
