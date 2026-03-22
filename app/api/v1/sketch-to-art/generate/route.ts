@@ -7,7 +7,8 @@ import { ART_STYLES } from '@/tools/sketch-to-art/types'
 export const maxDuration = 120
 
 const CREDIT_COST = 1
-const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
+// Use dedicated key for sketch-to-art (separate from main GEMINI_API_KEY to avoid Vercel env var issues)
+const GEMINI_API_KEY = process.env.SKETCH_TO_ART_GEMINI_KEY || (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
 const GEMINI_MODEL = 'gemini-3.1-flash-image-preview'
 
 /**
@@ -118,7 +119,8 @@ export async function POST(request: Request) {
   ]
 
   try {
-    // Call Gemini REST API directly — bypasses SDK Authorization header issue on Vercel
+    // v7: REST API with key as query param — NO Authorization header at all
+    console.log('[sketch-to-art] v7 REST approach, model:', GEMINI_MODEL, 'key length:', GEMINI_API_KEY.length)
     const results = await Promise.allSettled(
       prompts.map(async (prompt) => {
         const imageBuffer = await callGeminiImageGeneration(sketchBase64, sketchMime, prompt)
