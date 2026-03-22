@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     const results = await Promise.allSettled(
       prompts.map(async (prompt) => {
         // Try primary model, fall back to alternate if it fails
-        const models = ['gemini-2.0-flash-exp', 'gemini-3.1-flash-image-preview']
+        const models = ['gemini-2.5-flash-image', 'gemini-3.1-flash-image-preview']
         let response: Awaited<ReturnType<typeof nanoBanana.models.generateContent>> | null = null
         let lastErr: Error | null = null
 
