@@ -215,17 +215,16 @@ export default function SketchToArtPage() {
       }`}
     >
       <div className="w-full max-w-4xl relative">
+        {/* Breadcrumb + Mode toggle row */}
+        <div className="flex items-center justify-between mb-4">
+          <ToolBreadcrumb toolName="Sketch to Art" toolSlug="sketch-to-art" />
+          <ModeToggle mode={mode} onToggle={handleModeToggle} />
+        </div>
+
         {/* Showcase Gallery — visible before upload on step 1 */}
         {state.step === 1 && !state.sketchDataUrl && (
           <ShowcaseGallery mode={mode} />
         )}
-
-        {/* Mode toggle */}
-        <div className="flex justify-end mb-4">
-          <ModeToggle mode={mode} onToggle={handleModeToggle} />
-        </div>
-
-        <ToolBreadcrumb toolName="Sketch to Art" toolSlug="sketch-to-art" />
 
         {/* Title */}
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white text-center mb-8">
