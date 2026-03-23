@@ -1,13 +1,10 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import Cropper, { type Area, type Point } from 'react-easy-crop'
-import { getCroppedImage, resizeImage } from './image-utils'
+import { useState, useRef, useCallback } from 'react'
+import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop'
+import 'react-image-crop/dist/ReactCrop.css'
+import { resizeImage } from './image-utils'
 import type { SketchMode } from './types'
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
 
 interface ImageEditorProps {
   src: string
@@ -18,16 +15,7 @@ interface ImageEditorProps {
   applyLabel?: string
 }
 
-interface AspectPreset {
-  label: string
-  value: number | undefined
-}
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const ASPECT_PRESETS: AspectPreset[] = [
+const ASPECT_PRESETS: { label: string; value: number | undefined }[] = [
   { label: 'Free', value: undefined },
   { label: '1:1', value: 1 },
   { label: '4:3', value: 4 / 3 },
@@ -37,23 +25,9 @@ const ASPECT_PRESETS: AspectPreset[] = [
 
 const MIN_CROP_SIZE = 128
 
-// ---------------------------------------------------------------------------
-// SVG Icons
-// ---------------------------------------------------------------------------
-
 function RotateLeftIcon() {
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
       <path d="M3 3v5h5" />
     </svg>
@@ -62,26 +36,73 @@ function RotateLeftIcon() {
 
 function RotateRightIcon() {
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
       <path d="M21 3v5h-5" />
     </svg>
   )
 }
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+/**
+ * Extract cropped region from an image using canvas.
+ * Applies rotation, then extracts the crop area.
+ */
+function cropImageToCanvas(
+  imgEl: HTMLImageElement,
+  crop: PixelCrop,
+  rotation: number,
+): string {
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')!
+
+  // If rotated 90 or 270, swap source dimensions
+  const rotated = rotation % 180 !== 0
+  const srcW = rotated ? imgEl.naturalHeight : imgEl.naturalWidth
+  const srcH = rotated ? imgEl.naturalWidth : imgEl.naturalHeight
+
+  // Scale factor: displayed size vs natural size
+  const scaleX = srcW / imgEl.width
+  const scaleY = srcH / imgEl.height
+
+  canvas.width = crop.width * scaleX
+  canvas.height = crop.height * scaleY
+
+  ctx.save()
+  // Move origin to center of the crop output
+  ctx.translate(canvas.width / 2, canvas.height / 2)
+  ctx.rotate((rotation * Math.PI) / 180)
+
+  // Calculate where to draw the source image so the crop aligns
+  const drawW = rotation % 180 !== 0 ? imgEl.naturalHeight : imgEl.naturalWidth
+  const drawH = rotation % 180 !== 0 ? imgEl.naturalWidth : imgEl.naturalHeight
+
+  ctx.drawImage(
+    imgEl,
+    -(crop.x * scaleX) - canvas.width / 2 + (rotation % 180 !== 0 ? (drawW - canvas.width) / 2 : 0),
+    -(crop.y * scaleY) - canvas.height / 2 + (rotation % 180 !== 0 ? (drawH - canvas.height) / 2 : 0),
+    drawW,
+    drawH,
+  )
+  ctx.restore()
+
+  // Simpler approach for 0 rotation (most common)
+  if (rotation === 0) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.drawImage(
+      imgEl,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    )
+  }
+
+  return canvas.toDataURL('image/jpeg', 0.85)
+}
 
 export default function ImageEditor({
   src,
@@ -91,78 +112,92 @@ export default function ImageEditor({
   initialAspect,
   applyLabel,
 }: ImageEditorProps) {
-  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
-  const [rotation, setRotation] = useState(0)
+  const imgRef = useRef<HTMLImageElement>(null)
+  const [crop, setCrop] = useState<Crop>()
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
   const [aspect, setAspect] = useState<number | undefined>(initialAspect)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+  const [rotation, setRotation] = useState(0)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const onCropComplete = useCallback((_: Area, pixels: Area) => {
-    setCroppedAreaPixels(pixels)
-    setError(null)
+  const handleAspectChange = useCallback((value: number | undefined) => {
+    setAspect(value)
+    // Reset crop when aspect changes
+    setCrop(undefined)
+    setCompletedCrop(undefined)
   }, [])
 
-  const handleReset = () => {
-    setCrop({ x: 0, y: 0 })
-    setZoom(1)
-    setRotation(0)
+  const handleReset = useCallback(() => {
+    setCrop(undefined)
+    setCompletedCrop(undefined)
     setAspect(initialAspect)
+    setRotation(0)
     setError(null)
-  }
+  }, [initialAspect])
 
-  const handleRotateLeft = () => setRotation((r) => (r - 90 + 360) % 360)
-  const handleRotateRight = () => setRotation((r) => (r + 90) % 360)
-
-  const handleApply = async () => {
-    if (!croppedAreaPixels) return
-
-    // Validate minimum crop size
-    if (croppedAreaPixels.width < MIN_CROP_SIZE || croppedAreaPixels.height < MIN_CROP_SIZE) {
-      setError(`Crop area too small — minimum ${MIN_CROP_SIZE}×${MIN_CROP_SIZE}px required.`)
-      return
-    }
+  const handleApply = useCallback(async () => {
+    const img = imgRef.current
+    if (!img) return
 
     setProcessing(true)
     setError(null)
 
     try {
-      const cropped = await getCroppedImage(src, croppedAreaPixels, rotation)
-      const resized = await resizeImage(cropped)
+      let dataUrl: string
+
+      if (completedCrop && completedCrop.width > 0 && completedCrop.height > 0) {
+        // Validate minimum size
+        const scaleX = img.naturalWidth / img.width
+        const realW = completedCrop.width * scaleX
+        const realH = completedCrop.height * (img.naturalHeight / img.height)
+        if (realW < MIN_CROP_SIZE || realH < MIN_CROP_SIZE) {
+          setError(`Crop area too small — minimum ${MIN_CROP_SIZE}x${MIN_CROP_SIZE}px`)
+          setProcessing(false)
+          return
+        }
+        dataUrl = cropImageToCanvas(img, completedCrop, rotation)
+      } else {
+        // No crop — use full image with rotation only
+        if (rotation === 0) {
+          dataUrl = src
+        } else {
+          const canvas = document.createElement('canvas')
+          const ctx = canvas.getContext('2d')!
+          const rotated = rotation % 180 !== 0
+          canvas.width = rotated ? img.naturalHeight : img.naturalWidth
+          canvas.height = rotated ? img.naturalWidth : img.naturalHeight
+          ctx.translate(canvas.width / 2, canvas.height / 2)
+          ctx.rotate((rotation * Math.PI) / 180)
+          ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2)
+          dataUrl = canvas.toDataURL('image/jpeg', 0.85)
+        }
+      }
+
+      const resized = await resizeImage(dataUrl)
       onComplete(resized)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to process image.')
+      setError(err instanceof Error ? err.message : 'Failed to process image')
     } finally {
       setProcessing(false)
     }
-  }
-
-  const defaultApplyLabel = 'Use this sketch'
-  const resolvedApplyLabel = applyLabel ?? defaultApplyLabel
+  }, [completedCrop, rotation, src, onComplete])
 
   return (
     <div className="flex flex-col gap-4 w-full">
       {/* Aspect ratio pills */}
-      <div
-        className="flex flex-wrap gap-2"
-        role="group"
-        aria-label="Aspect ratio"
-      >
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Aspect ratio">
         {ASPECT_PRESETS.map((preset) => {
           const isActive = aspect === preset.value
           return (
             <button
               key={preset.label}
               type="button"
-              onClick={() => setAspect(preset.value)}
-              className={[
-                'px-3 py-1.5 rounded-full text-sm font-medium transition-colors min-h-[44px]',
-                'border',
+              onClick={() => handleAspectChange(preset.value)}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors min-h-[44px] border ${
                 isActive
                   ? 'bg-[var(--tk-color-primary-500)] text-white border-[var(--tk-color-primary-500)]'
-                  : 'bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-secondary)] border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-600)] hover:border-[var(--tk-color-primary-500)] hover:text-[var(--tk-color-primary-500)]',
-              ].join(' ')}
+                  : 'bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-secondary)] border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-600)] hover:border-[var(--tk-color-primary-500)]'
+              }`}
               aria-pressed={isActive}
             >
               {preset.label}
@@ -171,112 +206,97 @@ export default function ImageEditor({
         })}
       </div>
 
-      {/* Cropper area */}
-      <div className="relative aspect-square rounded-xl overflow-hidden bg-black w-full">
-        <Cropper
-          image={src}
+      {/* Crop area — drag edges and corners to resize */}
+      <div
+        className="relative rounded-xl overflow-hidden bg-black"
+        style={{ transform: `rotate(${rotation}deg)`, transition: 'transform 0.3s ease' }}
+      >
+        <ReactCrop
           crop={crop}
-          zoom={zoom}
-          rotation={rotation}
+          onChange={(c) => setCrop(c)}
+          onComplete={(c) => setCompletedCrop(c)}
           aspect={aspect}
-          onCropChange={setCrop}
-          onZoomChange={setZoom}
-          onCropComplete={onCropComplete}
-          showGrid
-          style={{
-            containerStyle: { borderRadius: '0.75rem' },
-          }}
-        />
+          minWidth={30}
+          minHeight={30}
+          className="max-h-[500px]"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            ref={imgRef}
+            src={src}
+            alt="Edit image"
+            className="max-w-full max-h-[500px] object-contain mx-auto"
+            crossOrigin="anonymous"
+          />
+        </ReactCrop>
       </div>
 
-      {/* Zoom slider */}
-      <div className="flex items-center gap-3">
-        <span className="text-xs text-[var(--tk-color-text-secondary)] shrink-0 w-10">
-          Zoom
-        </span>
-        <input
-          type="range"
-          min={1}
-          max={3}
-          step={0.05}
-          value={zoom}
-          onChange={(e) => setZoom(Number(e.target.value))}
-          className="flex-1 accent-[var(--tk-color-primary-500)] min-h-[44px]"
-          aria-label="Zoom level"
-        />
-        <span className="text-xs text-[var(--tk-color-text-secondary)] shrink-0 w-8 text-right">
-          {zoom.toFixed(1)}×
-        </span>
-      </div>
+      {/* Hint */}
+      <p className="text-xs text-center text-slate-400 dark:text-slate-500">
+        Drag edges or corners to crop. Select an aspect ratio to lock proportions.
+      </p>
 
       {/* Rotate + Reset row */}
       <div className="flex items-center justify-center gap-3">
         <button
           type="button"
-          onClick={handleRotateLeft}
+          onClick={() => setRotation((r) => (r - 90 + 360) % 360)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] transition-colors bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-primary)] hover:bg-[var(--tk-color-surface-200)] dark:hover:bg-[var(--tk-color-surface-600)] border border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-600)]"
-          aria-label="Rotate 90° left"
+          aria-label="Rotate 90 degrees left"
         >
           <RotateLeftIcon />
-          <span>Rotate Left</span>
+          Rotate
         </button>
 
         <button
           type="button"
           onClick={handleReset}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] transition-colors bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-secondary)] hover:bg-[var(--tk-color-surface-200)] dark:hover:bg-[var(--tk-color-surface-600)] border border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-600)]"
-          aria-label="Reset crop, zoom, and rotation"
         >
           Reset
         </button>
 
         <button
           type="button"
-          onClick={handleRotateRight}
+          onClick={() => setRotation((r) => (r + 90) % 360)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] transition-colors bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-primary)] hover:bg-[var(--tk-color-surface-200)] dark:hover:bg-[var(--tk-color-surface-600)] border border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-600)]"
-          aria-label="Rotate 90° right"
+          aria-label="Rotate 90 degrees right"
         >
-          <span>Rotate Right</span>
+          Rotate
           <RotateRightIcon />
         </button>
       </div>
 
-      {/* Validation error */}
+      {/* Error */}
       {error && (
-        <p
-          role="alert"
-          className="text-sm text-red-500 dark:text-red-400 text-center px-2"
-        >
+        <p role="alert" className="text-sm text-red-500 dark:text-red-400 text-center">
           {error}
         </p>
       )}
 
       {/* Action buttons */}
-      <div className="flex gap-3 pt-1">
+      <div className="flex gap-3">
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
             disabled={processing}
-            className="flex-1 px-4 py-2 rounded-xl text-sm font-medium min-h-[44px] transition-colors bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-secondary)] hover:bg-[var(--tk-color-surface-200)] dark:hover:bg-[var(--tk-color-surface-600)] border border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-600)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-2 rounded-xl text-sm font-medium min-h-[44px] transition-colors bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-secondary)] hover:bg-[var(--tk-color-surface-200)] dark:hover:bg-[var(--tk-color-surface-600)] border border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-600)] disabled:opacity-50"
           >
             Cancel
           </button>
         )}
-
         <button
           type="button"
           onClick={handleApply}
-          disabled={processing || !croppedAreaPixels}
-          className={[
-            'flex-1 px-4 py-2 rounded-xl text-sm font-semibold min-h-[44px] transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed',
+          disabled={processing}
+          className={`flex-1 px-4 py-2 rounded-xl text-sm font-semibold min-h-[44px] transition-colors text-white disabled:opacity-50 ${
             mode === 'fun'
               ? 'bg-gradient-to-r from-[var(--tk-color-primary-500)] to-[var(--tk-color-secondary-500)] hover:brightness-110'
-              : 'bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600)]',
-          ].join(' ')}
-          aria-busy={processing}
+              : 'bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600)]'
+          }`}
         >
-          {processing ? 'Processing…' : resolvedApplyLabel}
+          {processing ? 'Processing...' : applyLabel || 'Use this sketch'}
         </button>
       </div>
     </div>
