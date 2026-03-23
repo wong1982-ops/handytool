@@ -8,6 +8,7 @@ import StylePicker from '@/tools/sketch-to-art/style-picker'
 import GenerationResults from '@/tools/sketch-to-art/generation-results'
 import RefinementChat from '@/tools/sketch-to-art/refinement-chat'
 import SaveShare from '@/tools/sketch-to-art/save-share'
+import { ShowcaseGallery } from '@/tools/sketch-to-art/showcase-gallery'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { signInWithOAuth } from '@/lib/supabase/auth'
 import type {
@@ -214,6 +215,11 @@ export default function SketchToArtPage() {
       }`}
     >
       <div className="w-full max-w-2xl relative">
+        {/* Showcase Gallery — visible before upload on step 1 */}
+        {state.step === 1 && !state.sketchDataUrl && (
+          <ShowcaseGallery mode={mode} />
+        )}
+
         {/* Mode toggle */}
         <div className="flex justify-end mb-4">
           <ModeToggle mode={mode} onToggle={handleModeToggle} />
@@ -249,6 +255,9 @@ export default function SketchToArtPage() {
             </div>
           ))}
         </div>
+
+        {/* Wizard content */}
+        <div id="wizard" style={{ scrollMarginTop: '80px' }}>
 
         {/* Back button (steps 2-5) */}
         {state.step > 1 && (
@@ -353,6 +362,8 @@ export default function SketchToArtPage() {
             onStartOver={handleStartOver}
           />
         )}
+
+        </div>{/* end #wizard */}
       </div>
     </main>
   )
