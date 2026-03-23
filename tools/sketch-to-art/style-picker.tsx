@@ -1,8 +1,75 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useState, useCallback } from 'react'
+import Image from 'next/image'
 import { ART_STYLES, STYLE_CATEGORIES } from './types'
 import type { SketchMode } from './types'
+
+const SHOWCASE_BASE = 'https://pub-8feef024ac6a4d26b109ddfe22f033c1.r2.dev/sketch-art/showcase'
+
+function StyleCard({
+  style,
+  isSelected,
+  isFun,
+  onSelect,
+}: {
+  style: (typeof ART_STYLES)[number]
+  isSelected: boolean
+  isFun: boolean
+  onSelect: (id: string) => void
+}) {
+  const [imgError, setImgError] = useState(false)
+  const imgUrl = `${SHOWCASE_BASE}/mermaid-${style.id}.png`
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(style.id)}
+      className={`group relative flex flex-col items-center gap-1.5 rounded-xl p-1.5 transition-all ${
+        isFun ? 'hover:scale-105' : 'hover:brightness-110'
+      } ${
+        isSelected
+          ? 'ring-2 ring-[var(--tk-color-primary-500)] ring-offset-2 dark:ring-offset-[var(--tk-color-surface-900)]'
+          : ''
+      }`}
+    >
+      {/* Image card */}
+      <div className="relative w-full aspect-square rounded-lg overflow-hidden">
+        {imgError ? (
+          <div className={`w-full h-full bg-gradient-to-br ${style.gradient} flex items-center justify-center`} />
+        ) : (
+          <Image
+            src={imgUrl}
+            alt={`${style.name} style`}
+            fill
+            sizes="(max-width: 640px) 30vw, (max-width: 1024px) 20vw, 14vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-110"
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
+        )}
+        {/* Selected checkmark */}
+        {isSelected && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[var(--tk-color-primary-500)]">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5" aria-hidden="true">
+                <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+              </svg>
+            </span>
+          </div>
+        )}
+      </div>
+      {/* Label */}
+      <span className={`text-center leading-tight ${
+        isFun
+          ? 'text-xs font-medium text-[var(--tk-color-text-primary)]'
+          : 'text-xs text-[var(--tk-color-text-secondary)]'
+      }`}>
+        {isFun ? style.funLabel : style.name}
+      </span>
+    </button>
+  )
+}
 
 interface StylePickerProps {
   selectedStyle: string | null
@@ -53,58 +120,15 @@ export default function StylePicker({
               {category.label}
             </h3>
             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
-              {styles.map((style) => {
-                const isSelected = selectedStyle === style.id
-                return (
-                  <button
-                    key={style.id}
-                    type="button"
-                    onClick={() => handleSelectPreset(style.id)}
-                    className={`group relative flex flex-col items-center gap-1 rounded-xl p-2 transition-all ${
-                      isFun ? 'hover:scale-105' : 'hover:brightness-110'
-                    } ${
-                      isSelected
-                        ? 'ring-2 ring-[var(--tk-color-primary-500)] ring-offset-2 dark:ring-offset-[var(--tk-color-surface-900)]'
-                        : ''
-                    }`}
-                  >
-                    {/* Gradient card */}
-                    <div
-                      className={`w-full rounded-lg bg-gradient-to-br ${style.gradient} ${
-                        isFun ? 'aspect-square' : 'aspect-[4/3]'
-                      } flex items-center justify-center`}
-                    >
-                      {isSelected && (
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-[var(--tk-color-primary-500)]">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            className="h-5 w-5"
-                            aria-hidden="true"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </span>
-                      )}
-                    </div>
-                    {/* Label */}
-                    <span
-                      className={`text-center leading-tight ${
-                        isFun
-                          ? 'text-xs font-medium text-[var(--tk-color-text-primary)]'
-                          : 'text-xs text-[var(--tk-color-text-secondary)]'
-                      }`}
-                    >
-                      {isFun ? style.funLabel : style.name}
-                    </span>
-                  </button>
-                )
-              })}
+              {styles.map((style) => (
+                <StyleCard
+                  key={style.id}
+                  style={style}
+                  isSelected={selectedStyle === style.id}
+                  isFun={isFun}
+                  onSelect={handleSelectPreset}
+                />
+              ))}
             </div>
           </section>
         )
