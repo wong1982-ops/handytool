@@ -1,8 +1,10 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand, DeleteObjectsCommand } from '@aws-sdk/client-s3'
 
-const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID!
-const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID!
-const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY!
+// Strip non-printable/non-ASCII chars — Vercel env vars can pick up invisible characters
+const sanitize = (s: string) => s.replace(/[^\x20-\x7E]/g, '').trim()
+const R2_ACCOUNT_ID = sanitize(process.env.R2_ACCOUNT_ID || '')
+const R2_ACCESS_KEY_ID = sanitize(process.env.R2_ACCESS_KEY_ID || '')
+const R2_SECRET_ACCESS_KEY = sanitize(process.env.R2_SECRET_ACCESS_KEY || '')
 const R2_BUCKET = process.env.R2_BUCKET || 'story-assets'
 const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL || 'https://pub-8feef024ac6a4d26b109ddfe22f033c1.r2.dev'
 
