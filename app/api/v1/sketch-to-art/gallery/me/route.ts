@@ -1,0 +1,24 @@
+import { createClient } from '@/lib/supabase/server'
+import { getAuthUserId, apiSuccess, API_ERRORS } from '@/lib/api/response'
+
+export const dynamic = 'force-dynamic'
+
+export async function GET() {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('sketch_gallery')
+    .select('id, title, original_sketch_url, result_image_url, style, created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(50)
+
+  if (error) {
+    console.error('sketch-to-art/gallery/me GET error:', error)
+    return API_ERRORS.INTERNAL()
+  }
+
+  return apiSuccess({ entries: data || [] })
+}

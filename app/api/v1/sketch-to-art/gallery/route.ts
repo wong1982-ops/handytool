@@ -5,21 +5,15 @@ export async function POST(request: Request) {
   const userId = await getAuthUserId()
   if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  let body: { title: string; originalSketchUrl: string; resultImageUrl: string; style: string }
+  let body: { title?: string; originalSketchUrl?: string; resultImageUrl: string; style: string; isPublic?: boolean }
   try {
     body = await request.json()
   } catch {
     return API_ERRORS.VALIDATION({ message: 'Invalid JSON body' })
   }
 
-  const { title, originalSketchUrl, resultImageUrl, style } = body
+  const { title, originalSketchUrl, resultImageUrl, style, isPublic } = body
 
-  if (!title?.trim()) {
-    return apiError('Title is required', 'VALIDATION_ERROR', 400)
-  }
-  if (!originalSketchUrl?.trim()) {
-    return apiError('Original sketch URL is required', 'VALIDATION_ERROR', 400)
-  }
   if (!resultImageUrl?.trim()) {
     return apiError('Result image URL is required', 'VALIDATION_ERROR', 400)
   }
@@ -29,11 +23,11 @@ export async function POST(request: Request) {
     .from('sketch_gallery')
     .insert({
       user_id: userId,
-      title: title.trim(),
-      original_sketch_url: originalSketchUrl.trim(),
+      title: title?.trim() || `${style || 'Art'} — ${new Date().toLocaleDateString()}`,
+      original_sketch_url: originalSketchUrl?.trim() || '',
       result_image_url: resultImageUrl.trim(),
       style: style?.trim() || 'unknown',
-      is_public: true,
+      is_public: isPublic ?? false,
     })
     .select('id')
     .single()

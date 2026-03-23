@@ -8,6 +8,7 @@ import StylePicker from '@/tools/sketch-to-art/style-picker'
 import GenerationResults from '@/tools/sketch-to-art/generation-results'
 import RefinementChat from '@/tools/sketch-to-art/refinement-chat'
 import SaveShare from '@/tools/sketch-to-art/save-share'
+import MyCreations from '@/tools/sketch-to-art/my-creations'
 import { ShowcaseGallery } from '@/tools/sketch-to-art/showcase-gallery'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { signInWithOAuth } from '@/lib/supabase/auth'
@@ -27,6 +28,7 @@ const STEPS: WizardStep[] = [1, 2, 3, 4, 5]
 export default function SketchToArtPage() {
   const [state, setState] = useState<WizardState>(DEFAULT_WIZARD_STATE)
   const [mode, setMode] = useState<SketchMode>('fun')
+  const [activeTab, setActiveTab] = useState<'create' | 'creations'>('create')
   const { user, loading: authLoading } = useAuth()
 
   // Load mode from localStorage
@@ -80,11 +82,25 @@ export default function SketchToArtPage() {
         return
       }
 
+      const variations = json.data.variations as GeneratedVariation[]
       setState((s) => ({
         ...s,
         loading: false,
-        variations: json.data.variations,
+        variations,
       }))
+
+      // Auto-save all variations to gallery
+      const styleName = state.customStyle || state.selectedStyle || 'Art'
+      for (const v of variations) {
+        fetch('/api/v1/sketch-to-art/gallery', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            resultImageUrl: v.imageUrl,
+            style: styleName,
+          }),
+        }).catch(() => { /* silent — auto-save is best-effort */ })
+      }
     } catch (err) {
       setState((s) => ({
         ...s,
@@ -226,11 +242,45 @@ export default function SketchToArtPage() {
           <ShowcaseGallery mode={mode} />
         )}
 
-        {/* Title */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white text-center mb-8">
-          {isFun ? '✨ Turn Your Drawing Into Art!' : 'Sketch to Art'}
+        {/* Title + Tabs */}
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white text-center mb-4">
+          {isFun ? '\u2728 Turn Your Drawing Into Art!' : 'Sketch to Art'}
         </h1>
 
+        {/* Create / My Creations tabs */}
+        {user && (
+          <div className="flex justify-center mb-6">
+            <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 gap-1">
+              <button
+                type="button"
+                onClick={() => setActiveTab('create')}
+                className={`px-4 sm:px-6 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeTab === 'create'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                {isFun ? '\u{1F3A8} Create' : 'Create'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('creations')}
+                className={`px-4 sm:px-6 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeTab === 'creations'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                {isFun ? '\u{1F5BC}\u{FE0F} My Creations' : 'My Creations'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* My Creations tab */}
+        <MyCreations mode={mode} visible={activeTab === 'creations'} />
+
+        {activeTab === 'create' && (<>
         {/* Step indicator — labeled stepper */}
         {(() => {
           const stepLabels = isFun
@@ -430,6 +480,7 @@ export default function SketchToArtPage() {
         )}
 
         </div>{/* end #wizard */}
+        </>)}
       </div>
     </main>
   )
