@@ -878,11 +878,254 @@ git commit -m "feat(sketch-to-art): wire showcase gallery into page with visibil
 
 ---
 
+## Task 9: Redesign Generation Results as Swipeable Carousel
+
+Replace the 2x2 grid of generated variations with a swipeable card carousel. Shows one large image at a time with swipe/arrow navigation, dot indicators, and a "Use this one" button.
+
+**Files:**
+- Modify: `tools/sketch-to-art/generation-results.tsx`
+
+- [ ] **Step 1: Rewrite the results display as a carousel**
+
+Replace the grid section (lines 90-138) with a carousel layout:
+
+```tsx
+'use client'
+
+import { useState, useEffect, useRef, useCallback } from 'react'
+import Image from 'next/image'
+import { FUN_LOADING_MESSAGES } from './types'
+import type { GeneratedVariation, SketchMode } from './types'
+
+interface GenerationResultsProps {
+  variations: GeneratedVariation[]
+  selectedIndex: number | null
+  onSelect: (index: number) => void
+  loading: boolean
+  mode: SketchMode
+}
+
+export default function GenerationResults({
+  variations,
+  selectedIndex,
+  onSelect,
+  loading,
+  mode,
+}: GenerationResultsProps) {
+  const isFun = mode === 'fun'
+  const [funMessageIndex, setFunMessageIndex] = useState(0)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+
+  // Rotate fun loading messages every 2 seconds
+  useEffect(() => {
+    if (!loading || !isFun) return
+    const interval = setInterval(() => {
+      setFunMessageIndex((prev) => (prev + 1) % FUN_LOADING_MESSAGES.length)
+    }, 2000)
+    return () => clearInterval(interval)
+  }, [loading, isFun])
+
+  const goTo = useCallback((index: number) => {
+    const clamped = Math.max(0, Math.min(index, variations.length - 1))
+    setActiveIndex(clamped)
+  }, [variations.length])
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (loading || variations.length === 0) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') goTo(activeIndex - 1)
+      else if (e.key === 'ArrowRight') goTo(activeIndex + 1)
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [activeIndex, goTo, loading, variations.length])
+
+  // Touch swipe handling
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  }, [])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return
+    const dx = e.changedTouches[0].clientX - touchStartRef.current.x
+    const dy = e.changedTouches[0].clientY - touchStartRef.current.y
+    touchStartRef.current = null
+    // Only swipe if horizontal movement > vertical and > 50px
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx < 0) goTo(activeIndex + 1)
+      else goTo(activeIndex - 1)
+    }
+  }, [activeIndex, goTo])
+
+  if (loading) {
+    if (isFun) {
+      return (
+        <div className="flex flex-col items-center justify-center gap-4 py-12">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="h-12 w-12 animate-spin text-[var(--tk-color-primary-500)]"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <p className="text-lg font-medium text-[var(--tk-color-text-primary)] animate-pulse">
+            {FUN_LOADING_MESSAGES[funMessageIndex]}
+          </p>
+        </div>
+      )
+    }
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 py-12">
+        <svg
+          className="h-5 w-5 animate-spin text-[var(--tk-color-primary-500)]"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        <span className="text-sm text-[var(--tk-color-text-secondary)]">Generating variations...</span>
+      </div>
+    )
+  }
+
+  if (variations.length === 0) return null
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      {/* Heading */}
+      <p className="text-sm font-medium text-[var(--tk-color-text-secondary)]">
+        {isFun ? 'Pick your favourite!' : `Variation ${activeIndex + 1} of ${variations.length}`}
+      </p>
+
+      {/* Carousel viewport */}
+      <div
+        ref={trackRef}
+        className="relative w-full max-w-[480px] overflow-hidden rounded-2xl"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Track */}
+        <div
+          className="flex transition-transform duration-300 ease-out"
+          style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+        >
+          {variations.map((variation, index) => (
+            <div key={index} className="w-full flex-shrink-0">
+              <div className="relative aspect-square">
+                <Image
+                  src={variation.imageUrl}
+                  alt={`Art variation ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, 480px"
+                  priority={index === 0}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Prev/Next arrows */}
+        {activeIndex > 0 && (
+          <button
+            type="button"
+            onClick={() => goTo(activeIndex - 1)}
+            className="absolute left-2 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm hover:bg-black/60 transition-colors"
+            aria-label="Previous variation"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        )}
+        {activeIndex < variations.length - 1 && (
+          <button
+            type="button"
+            onClick={() => goTo(activeIndex + 1)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm hover:bg-black/60 transition-colors"
+            aria-label="Next variation"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        )}
+      </div>
+
+      {/* Dot indicators */}
+      <div className="flex items-center gap-2" role="tablist" aria-label="Variation selector">
+        {variations.map((_, index) => (
+          <button
+            key={index}
+            type="button"
+            role="tab"
+            aria-selected={activeIndex === index}
+            aria-label={`Variation ${index + 1}`}
+            onClick={() => goTo(index)}
+            className={`rounded-full transition-all ${
+              activeIndex === index
+                ? 'w-3 h-3 bg-[var(--tk-color-primary-500)]'
+                : 'w-2 h-2 bg-[var(--tk-color-surface-400)] dark:bg-[var(--tk-color-surface-500)] hover:bg-[var(--tk-color-surface-500)]'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Select button */}
+      <button
+        type="button"
+        onClick={() => onSelect(activeIndex)}
+        className={`min-h-[44px] w-full max-w-[480px] rounded-xl font-semibold text-white transition-all ${
+          isFun
+            ? 'bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 text-lg'
+            : 'bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600)]'
+        }`}
+      >
+        {isFun ? 'Use this one!' : 'Select this variation'}
+      </button>
+    </div>
+  )
+}
+```
+
+- [ ] **Step 2: Verify carousel works**
+
+Run: `pnpm dev`
+Navigate through the wizard to Step 3 (generate art).
+Expected:
+- One large variation image displayed at a time
+- Swipe left/right on mobile (touch) to navigate
+- Arrow buttons on left/right edges
+- Dot indicators below showing current position
+- Left/Right keyboard arrows navigate
+- "Use this one" button selects the currently visible variation and advances to Step 4
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add tools/sketch-to-art/generation-results.tsx
+git commit -m "feat(sketch-to-art): redesign generation results as swipeable carousel"
+```
+
+---
+
 ## Summary
 
 | # | Task | Key Files |
 |---|------|-----------|
-| 1 | Swap dependencies | `package.json` |
+| 1 | Add react-easy-crop | `package.json` |
 | 2 | Extract image utils | `tools/sketch-to-art/image-utils.ts`, `sketch-input.tsx` |
 | 3 | ImageEditor component | `tools/sketch-to-art/image-editor.tsx` |
 | 4 | Integrate into Step 1 | `tools/sketch-to-art/sketch-input.tsx` |
@@ -890,3 +1133,4 @@ git commit -m "feat(sketch-to-art): wire showcase gallery into page with visibil
 | 6 | Generate showcase images | `scripts/generate-showcase.ts` |
 | 7 | Showcase gallery component | `tools/sketch-to-art/showcase-gallery.tsx` |
 | 8 | Wire gallery into page | `app/tools/sketch-to-art/page.tsx` |
+| 9 | Carousel for generation results | `tools/sketch-to-art/generation-results.tsx` |
