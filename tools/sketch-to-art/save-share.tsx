@@ -2,7 +2,10 @@
 
 import { useState, useCallback } from 'react'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import type { GeneratedVariation, SketchMode } from './types'
+
+const ImageEditor = dynamic(() => import('./image-editor'), { ssr: false })
 
 interface SaveShareProps {
   finalImage: GeneratedVariation
@@ -22,6 +25,9 @@ export default function SaveShare({
   const isFun = mode === 'fun'
   const [linkCopied, setLinkCopied] = useState(false)
   const [showGallery, setShowGallery] = useState(false)
+  const [editedUrl, setEditedUrl] = useState<string | null>(null)
+  const [editing, setEditing] = useState(false)
+  const activeUrl = editedUrl || finalImage.imageUrl
   const [galleryTitle, setGalleryTitle] = useState('')
   const [publishing, setPublishing] = useState(false)
   const [published, setPublished] = useState(false)
@@ -29,7 +35,7 @@ export default function SaveShare({
 
   const handleDownload = useCallback(async () => {
     try {
-      const response = await fetch(finalImage.imageUrl)
+      const response = await fetch(activeUrl)
       const blob = await response.blob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -42,38 +48,38 @@ export default function SaveShare({
     } catch (err) {
       console.error('Download failed:', err)
     }
-  }, [finalImage.imageUrl])
+  }, [activeUrl])
 
   const handleCopyLink = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(finalImage.imageUrl)
+      await navigator.clipboard.writeText(activeUrl)
       setLinkCopied(true)
       setTimeout(() => setLinkCopied(false), 2000)
     } catch (err) {
       console.error('Copy failed:', err)
     }
-  }, [finalImage.imageUrl])
+  }, [activeUrl])
 
   const handleShareX = useCallback(() => {
     const text = encodeURIComponent(
       'Check out this art I made from a sketch! Made with Sketch to Art on Toolk1t',
     )
-    const url = encodeURIComponent(finalImage.imageUrl)
+    const url = encodeURIComponent(activeUrl)
     window.open(
       `https://x.com/intent/tweet?text=${text}&url=${url}`,
       '_blank',
       'noopener',
     )
-  }, [finalImage.imageUrl])
+  }, [activeUrl])
 
   const handleShareLinkedIn = useCallback(() => {
-    const url = encodeURIComponent(finalImage.imageUrl)
+    const url = encodeURIComponent(activeUrl)
     window.open(
       `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
       '_blank',
       'noopener',
     )
-  }, [finalImage.imageUrl])
+  }, [activeUrl])
 
   const handlePublish = useCallback(async () => {
     if (!galleryTitle.trim() || publishing) return
@@ -88,7 +94,7 @@ export default function SaveShare({
         body: JSON.stringify({
           title: galleryTitle.trim(),
           originalSketchDataUrl: originalSketch,
-          resultImageUrl: finalImage.imageUrl,
+          resultImageUrl: activeUrl,
           style,
         }),
       })
@@ -105,7 +111,7 @@ export default function SaveShare({
     } finally {
       setPublishing(false)
     }
-  }, [galleryTitle, publishing, originalSketch, finalImage.imageUrl, style])
+  }, [galleryTitle, publishing, originalSketch, activeUrl, style])
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -116,17 +122,49 @@ export default function SaveShare({
 
       {/* Final image */}
       <div className="mx-auto w-full max-w-lg">
-        <div className="relative aspect-square overflow-hidden rounded-2xl shadow-lg">
-          <Image
+        {editing ? (
+          <ImageEditor
             src={finalImage.imageUrl}
-            alt="Final artwork"
-            fill
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, 512px"
-            priority
+            onComplete={(edited) => { setEditedUrl(edited); setEditing(false) }}
+            onCancel={() => setEditing(false)}
+            mode={mode}
+            applyLabel="Apply"
           />
-        </div>
+        ) : (
+          <div className="relative aspect-square overflow-hidden rounded-2xl shadow-lg">
+            <Image
+              src={activeUrl}
+              alt="Final artwork"
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, 512px"
+              priority
+            />
+          </div>
+        )}
       </div>
+
+      {/* Edit / Reset buttons */}
+      {!editing && (
+        <div className="flex w-full max-w-sm gap-2">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="min-h-[44px] flex-1 rounded-xl border border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] px-4 py-3 text-sm font-medium text-[var(--tk-color-text-primary)] transition-colors hover:bg-[var(--tk-color-surface-100)] dark:hover:bg-[var(--tk-color-surface-700)]"
+          >
+            {isFun ? 'Crop / Rotate' : 'Edit'}
+          </button>
+          {editedUrl && (
+            <button
+              type="button"
+              onClick={() => setEditedUrl(null)}
+              className="min-h-[44px] flex-1 rounded-xl border border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] px-4 py-3 text-sm font-medium text-[var(--tk-color-text-primary)] transition-colors hover:bg-[var(--tk-color-surface-100)] dark:hover:bg-[var(--tk-color-surface-700)]"
+            >
+              Reset to original
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Download button */}
       <button
