@@ -25,7 +25,7 @@ function StyleCard({
     <button
       type="button"
       onClick={() => onSelect(style.id)}
-      className={`group relative flex flex-col items-center gap-1.5 rounded-xl p-1.5 transition-all ${
+      className={`group relative flex flex-col items-center gap-1.5 rounded-xl p-1.5 transition-all cursor-pointer ${
         isFun ? 'hover:scale-105' : 'hover:brightness-110'
       } ${
         isSelected
