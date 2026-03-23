@@ -141,7 +141,7 @@ Demonstrate the tool's capabilities with a visual "wow" — one mermaid sketch t
 ## 4. Dependencies
 
 - **Add:** `react-easy-crop` — pan/zoom/crop with aspect ratio support (~10KB gzipped)
-- **Remove:** `react-image-crop` — not used, replaced by react-easy-crop
+- **Keep:** `react-image-crop` — still used by SVG Converter tool
 
 ## 5. Data Flow
 
