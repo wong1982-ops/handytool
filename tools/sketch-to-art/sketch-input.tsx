@@ -1,9 +1,15 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import type { SketchMode, InputMethod } from './types'
 import DrawingCanvas from './drawing-canvas'
-import { resizeImage } from './image-utils'
+import { resizeImage, getImageDimensions, isEditorEligible } from './image-utils'
+
+const ImageEditor = dynamic(
+  () => import('./image-editor').then((m) => ({ default: m.ImageEditor })),
+  { ssr: false },
+)
 
 interface SketchInputProps {
   onSketchReady: (dataUrl: string) => void
@@ -18,6 +24,8 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
   const [preview, setPreview] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [editorEligible, setEditorEligible] = useState(false)
+  const [rawPreview, setRawPreview] = useState<string | null>(null)
 
   // Camera state
   const [cameraActive, setCameraActive] = useState(false)
@@ -75,9 +83,17 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
     const reader = new FileReader()
     reader.onload = async (e) => {
       const result = e.target?.result as string
-      // Resize immediately on upload to prevent huge state
-      const resized = await resizeImage(result)
-      setPreview(resized)
+      // Check original dimensions for editor eligibility
+      const dims = await getImageDimensions(result)
+      const eligible = isEditorEligible(dims.width, dims.height)
+      setEditorEligible(eligible)
+      if (eligible) {
+        setRawPreview(result)  // Store raw for editor (resized in crop pipeline)
+        setPreview(result)     // Show editor
+      } else {
+        const resized = await resizeImage(result)
+        setPreview(resized)    // Small image: show plain preview
+      }
     }
     reader.readAsDataURL(file)
   }, [])
@@ -129,9 +145,18 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
 
     ctx.drawImage(video, 0, 0)
     const dataUrl = canvas.toDataURL('image/jpeg', 0.7)
-    resizeImage(dataUrl).then((resized) => {
-      setCapturedPhoto(resized)
-      setPreview(resized)
+    getImageDimensions(dataUrl).then(async (dims) => {
+      const eligible = isEditorEligible(dims.width, dims.height)
+      setEditorEligible(eligible)
+      if (eligible) {
+        setRawPreview(dataUrl)
+        setCapturedPhoto(dataUrl)
+        setPreview(dataUrl)
+      } else {
+        const resized = await resizeImage(dataUrl)
+        setCapturedPhoto(resized)
+        setPreview(resized)
+      }
     })
     stopCamera()
   }, [stopCamera])
@@ -157,6 +182,8 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
   const handleClearPreview = useCallback(() => {
     setPreview(null)
     setCapturedPhoto(null)
+    setRawPreview(null)
+    setEditorEligible(false)
   }, [])
 
   return (
@@ -301,33 +328,44 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
         {/* Preview (shown for any tab after input) */}
         {preview && (
           <div className="flex flex-col items-center gap-4">
-            <div className="relative w-full max-w-[512px]">
-              <img
-                src={preview}
-                alt="Sketch preview"
-                className="w-full aspect-square rounded-xl object-contain border-2 border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] bg-white"
+            {editorEligible && rawPreview ? (
+              <ImageEditor
+                src={rawPreview}
+                onComplete={(edited: string) => onSketchReady(edited)}
+                onCancel={handleClearPreview}
+                mode={mode}
               />
-            </div>
-            <div className="flex gap-2 w-full max-w-[512px]">
-              <button
-                type="button"
-                className="min-h-[44px] flex-1 rounded-xl font-medium bg-[var(--tk-color-surface-200)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-primary)] hover:bg-[var(--tk-color-surface-300)] dark:hover:bg-[var(--tk-color-surface-600)] transition-colors"
-                onClick={handleClearPreview}
-              >
-                {isFun ? '🔄 Try Again' : 'Change'}
-              </button>
-              <button
-                type="button"
-                className={`min-h-[44px] flex-1 rounded-xl font-semibold text-white transition-all ${
-                  isFun
-                    ? 'bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-lg'
-                    : 'bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600)]'
-                }`}
-                onClick={handleUseSketch}
-              >
-                {isFun ? '✨ Use this sketch →' : 'Use this sketch →'}
-              </button>
-            </div>
+            ) : (
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative w-full max-w-[512px]">
+                  <img
+                    src={preview}
+                    alt="Sketch preview"
+                    className="w-full aspect-square rounded-xl object-contain border-2 border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] bg-white"
+                  />
+                </div>
+                <div className="flex gap-2 w-full max-w-[512px]">
+                  <button
+                    type="button"
+                    className="min-h-[44px] flex-1 rounded-xl font-medium bg-[var(--tk-color-surface-200)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-primary)] hover:bg-[var(--tk-color-surface-300)] dark:hover:bg-[var(--tk-color-surface-600)] transition-colors"
+                    onClick={handleClearPreview}
+                  >
+                    {isFun ? 'Try Again' : 'Change'}
+                  </button>
+                  <button
+                    type="button"
+                    className={`min-h-[44px] flex-1 rounded-xl font-semibold text-white transition-all ${
+                      isFun
+                        ? 'bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-lg'
+                        : 'bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600)]'
+                    }`}
+                    onClick={handleUseSketch}
+                  >
+                    {isFun ? 'Use this sketch' : 'Use this sketch'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
