@@ -214,7 +214,7 @@ export default function SketchToArtPage() {
           : ''
       }`}
     >
-      <div className="w-full max-w-2xl relative">
+      <div className="w-full max-w-4xl relative">
         {/* Showcase Gallery — visible before upload on step 1 */}
         {state.step === 1 && !state.sketchDataUrl && (
           <ShowcaseGallery mode={mode} />
@@ -232,29 +232,96 @@ export default function SketchToArtPage() {
           {isFun ? '✨ Turn Your Drawing Into Art!' : 'Sketch to Art'}
         </h1>
 
-        {/* Step indicator */}
-        <div className="flex items-center justify-center gap-2 mb-8" role="list" aria-label="Progress">
-          {STEPS.map((s) => (
-            <div
-              key={s}
-              role="listitem"
-              aria-label={`Step ${s}${s === state.step ? ' (current)' : s < state.step ? ' (completed)' : ''}`}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                s < state.step
-                  ? 'bg-[var(--tk-color-primary-500)]'
-                  : s === state.step
-                  ? 'bg-[var(--tk-color-primary-500)] ring-4 ring-[var(--tk-color-primary-500)]/20'
-                  : 'bg-slate-300 dark:bg-slate-600'
-              }`}
-            >
-              {s < state.step && (
-                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* Step indicator — labeled stepper */}
+        {(() => {
+          const stepLabels = isFun
+            ? ['Sketch', 'Style', 'Magic', 'Refine', 'Share']
+            : ['Upload', 'Style', 'Generate', 'Refine', 'Save']
+          // Icons reserved for future use
+          return (
+            <nav aria-label="Wizard progress" className="mb-8">
+              {/* Desktop: full labeled stepper */}
+              <ol className="hidden sm:flex items-center justify-center gap-0">
+                {STEPS.map((s, i) => {
+                  const isCompleted = s < state.step
+                  const isCurrent = s === state.step
+                  const _isFuture = s > state.step
+                  return (
+                    <li key={s} className="flex items-center">
+                      <div className="flex flex-col items-center">
+                        {/* Circle */}
+                        <div className={`flex items-center justify-center w-9 h-9 rounded-full border-2 transition-all duration-300 ${
+                          isCompleted
+                            ? 'bg-[var(--tk-color-primary-500)] border-[var(--tk-color-primary-500)]'
+                            : isCurrent
+                            ? 'border-[var(--tk-color-primary-500)] bg-[var(--tk-color-primary-500)]/10'
+                            : 'border-slate-300 dark:border-slate-600 bg-transparent'
+                        }`}>
+                          {isCompleted ? (
+                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <span className={`text-xs font-bold ${
+                              isCurrent ? 'text-[var(--tk-color-primary-500)]' : 'text-slate-400 dark:text-slate-500'
+                            }`}>{s}</span>
+                          )}
+                        </div>
+                        {/* Label */}
+                        <span className={`mt-1.5 text-[11px] font-medium transition-colors ${
+                          isCompleted || isCurrent
+                            ? 'text-[var(--tk-color-primary-500)]'
+                            : 'text-slate-400 dark:text-slate-500'
+                        }`}>
+                          {stepLabels[i]}
+                        </span>
+                      </div>
+                      {/* Connector line */}
+                      {i < STEPS.length - 1 && (
+                        <div className={`w-12 lg:w-20 h-0.5 mx-2 rounded-full transition-colors duration-300 ${
+                          s < state.step ? 'bg-[var(--tk-color-primary-500)]' : 'bg-slate-200 dark:bg-slate-700'
+                        }`} />
+                      )}
+                    </li>
+                  )
+                })}
+              </ol>
+
+              {/* Mobile: compact pill stepper */}
+              <div className="flex sm:hidden items-center justify-center gap-1.5">
+                {STEPS.map((s, i) => {
+                  const isCompleted = s < state.step
+                  const isCurrent = s === state.step
+                  return (
+                    <div key={s} className="flex items-center gap-1.5">
+                      <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
+                        isCompleted
+                          ? 'bg-[var(--tk-color-primary-500)] text-white'
+                          : isCurrent
+                          ? 'bg-[var(--tk-color-primary-500)]/15 text-[var(--tk-color-primary-500)] ring-1 ring-[var(--tk-color-primary-500)]/30'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                      }`}>
+                        {isCompleted ? (
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          <span>{s}</span>
+                        )}
+                        {isCurrent && <span>{stepLabels[i]}</span>}
+                      </div>
+                      {i < STEPS.length - 1 && (
+                        <div className={`w-3 h-0.5 rounded-full ${
+                          s < state.step ? 'bg-[var(--tk-color-primary-500)]' : 'bg-slate-200 dark:bg-slate-700'
+                        }`} />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </nav>
+          )
+        })()}
 
         {/* Wizard content */}
         <div id="wizard" style={{ scrollMarginTop: '80px' }}>
