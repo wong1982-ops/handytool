@@ -7,16 +7,9 @@ import { ART_STYLES } from '@/tools/sketch-to-art/types'
 export const maxDuration = 120
 
 const CREDIT_COST = 1
-// Use dedicated key for sketch-to-art (separate from main GEMINI_API_KEY to avoid Vercel env var issues)
 const GEMINI_API_KEY = process.env.SKETCH_TO_ART_GEMINI_KEY || (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
 const GEMINI_MODEL = 'gemini-3.1-flash-image-preview'
 
-/**
- * Call Gemini API directly via REST fetch.
- * Bypasses @google/genai SDK which sets Authorization header
- * (broken on Vercel due to invisible chars in env var).
- * Uses API key as query parameter instead.
- */
 async function callGeminiImageGeneration(
   sketchBase64: string,
   sketchMime: string,
@@ -50,7 +43,6 @@ async function callGeminiImageGeneration(
   if (!parts) throw new Error('No parts in Gemini response')
 
   for (const part of parts) {
-    // REST API response uses camelCase (inlineData) not snake_case (inline_data)
     const imageData = part.inlineData?.data || part.inline_data?.data
     if (imageData) {
       return Buffer.from(imageData, 'base64')
@@ -99,18 +91,16 @@ export async function POST(request: Request) {
     return API_ERRORS.INTERNAL()
   }
 
-  // Extract mime type and raw base64 from data URL
   const mimeMatch = sketch.match(/^data:(image\/[^;]+);base64,/)
   const sketchMime = mimeMatch?.[1] || 'image/jpeg'
   const sketchBase64 = sketch.replace(/^data:image\/[^;]+;base64,/, '')
 
-  // Resolve style name
   const styleName =
     customStyle?.trim() ||
     ART_STYLES.find((s) => s.id === style)?.name ||
     style
 
-  // Build 4 prompt variations
+  // Generate only 1 variation first to isolate issues, then do remaining 3
   const prompts = [
     `Transform this child's sketch into beautiful ${styleName} art. Maintain the original composition and subjects but elevate it with professional ${styleName} artistic quality.`,
     `Reimagine this hand-drawn sketch as a stunning ${styleName} masterpiece. Keep all the elements from the original drawing but enhance them.`,
@@ -119,57 +109,58 @@ export async function POST(request: Request) {
   ]
 
   try {
-    // v7: REST API with key as query param — NO Authorization header at all
-    console.log('[sketch-to-art] v8 REST, model:', GEMINI_MODEL, 'key:', GEMINI_API_KEY.substring(0, 10) + '...', 'len:', GEMINI_API_KEY.length, 'sketch bytes:', sketchBase64.length)
-    const results = await Promise.allSettled(
-      prompts.map(async (prompt, idx) => {
-        console.log(`[sketch-to-art] V${idx + 1} calling Gemini...`)
-        const imageBuffer = await callGeminiImageGeneration(sketchBase64, sketchMime, prompt)
-        console.log(`[sketch-to-art] V${idx + 1} Gemini OK, ${imageBuffer.length} bytes. Uploading to R2...`)
-        const r2Path = `sketch-art/${crypto.randomUUID()}.png`
-        const imageUrl = await uploadToR2(r2Path, imageBuffer, 'image/png')
-        console.log(`[sketch-to-art] V${idx + 1} R2 OK: ${imageUrl.substring(0, 60)}`)
-        return { imageUrl, prompt }
+    console.log('[sketch-to-art] v9, key:', GEMINI_API_KEY.substring(0, 10) + '...', 'len:', GEMINI_API_KEY.length)
+
+    // Step 1: Test Gemini call
+    let imageBuffer: Buffer
+    try {
+      console.log('[sketch-to-art] Step 1: Calling Gemini...')
+      imageBuffer = await callGeminiImageGeneration(sketchBase64, sketchMime, prompts[0])
+      console.log('[sketch-to-art] Step 1 OK: Gemini returned', imageBuffer.length, 'bytes')
+    } catch (geminiErr) {
+      const msg = geminiErr instanceof Error ? geminiErr.message : String(geminiErr)
+      console.error('[sketch-to-art] Step 1 FAILED (Gemini):', msg)
+      return apiError(`Gemini failed: ${msg}`, 'GENERATION_FAILED', 500)
+    }
+
+    // Step 2: Test R2 upload
+    let firstUrl: string
+    try {
+      console.log('[sketch-to-art] Step 2: Uploading to R2...')
+      const r2Path = `sketch-art/${crypto.randomUUID()}.png`
+      firstUrl = await uploadToR2(r2Path, imageBuffer, 'image/png')
+      console.log('[sketch-to-art] Step 2 OK: R2 URL', firstUrl.substring(0, 60))
+    } catch (r2Err) {
+      const msg = r2Err instanceof Error ? `${r2Err.message} | stack: ${r2Err.stack?.substring(0, 200)}` : String(r2Err)
+      console.error('[sketch-to-art] Step 2 FAILED (R2):', msg)
+      return apiError(`R2 upload failed: ${r2Err instanceof Error ? r2Err.message : String(r2Err)}`, 'GENERATION_FAILED', 500)
+    }
+
+    // Step 3: Generate remaining 3 in parallel
+    console.log('[sketch-to-art] Step 3: Generating remaining 3 variations...')
+    const remaining = await Promise.allSettled(
+      prompts.slice(1).map(async (prompt) => {
+        const buf = await callGeminiImageGeneration(sketchBase64, sketchMime, prompt)
+        const path = `sketch-art/${crypto.randomUUID()}.png`
+        const url = await uploadToR2(path, buf, 'image/png')
+        return { imageUrl: url, prompt }
       }),
     )
 
-    // Log results
-    results.forEach((r, i) => {
-      if (r.status === 'rejected') {
-        const err = (r as PromiseRejectedResult).reason
-        console.error(`[sketch-to-art] Variation ${i + 1} FAILED:`, err?.message || String(err))
-      } else {
-        console.log(`[sketch-to-art] Variation ${i + 1} OK`)
-      }
-    })
+    const variations = [
+      { imageUrl: firstUrl, prompt: prompts[0] },
+      ...remaining
+        .filter((r): r is PromiseFulfilledResult<{ imageUrl: string; prompt: string }> => r.status === 'fulfilled')
+        .map((r) => r.value),
+    ]
 
-    const variations = results
-      .filter(
-        (r): r is PromiseFulfilledResult<{ imageUrl: string; prompt: string }> =>
-          r.status === 'fulfilled',
-      )
-      .map((r) => r.value)
-
-    if (variations.length === 0) {
-      // Collect error details for debugging
-      const errors = results
-        .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
-        .map((r) => r.reason?.message || String(r.reason))
-      const firstError = errors[0] || 'Unknown error'
-      console.error('[sketch-to-art] All variations failed. Errors:', errors)
-      return apiError(
-        `Generation failed: ${firstError}`,
-        'GENERATION_FAILED',
-        500,
-        { errors },
-      )
-    }
-
+    console.log(`[sketch-to-art] Done: ${variations.length}/4 variations`)
     return apiSuccess({ variations })
   } catch (err) {
-    console.error('sketch-to-art/generate error:', err)
+    const msg = err instanceof Error ? `${err.message} | stack: ${err.stack?.substring(0, 300)}` : String(err)
+    console.error('[sketch-to-art] Unexpected error:', msg)
     return apiError(
-      'Failed to generate art. Your credit has been deducted — please try again.',
+      `Generation error: ${err instanceof Error ? err.message : String(err)}`,
       'GENERATION_FAILED',
       500,
     )
