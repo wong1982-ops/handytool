@@ -44,62 +44,62 @@ function RotateRightIcon() {
 }
 
 /**
- * Extract cropped region from an image using canvas.
- * Applies rotation, then extracts the crop area.
+ * Rotate an image by 90 degrees and return a new data URL.
+ * The image is pre-rotated so the crop UI always works on a normal (non-rotated) image.
  */
-function cropImageToCanvas(
-  imgEl: HTMLImageElement,
-  crop: PixelCrop,
-  rotation: number,
-): string {
+function rotateImageData(src: string, degrees: number): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')!
+      const rad = (degrees * Math.PI) / 180
+
+      // For 90/270, swap dimensions
+      if (degrees === 90 || degrees === 270) {
+        canvas.width = img.height
+        canvas.height = img.width
+      } else {
+        canvas.width = img.width
+        canvas.height = img.height
+      }
+
+      ctx.translate(canvas.width / 2, canvas.height / 2)
+      ctx.rotate(rad)
+      ctx.drawImage(img, -img.width / 2, -img.height / 2)
+
+      resolve(canvas.toDataURL('image/jpeg', 0.9))
+    }
+    img.onerror = () => resolve(src)
+    img.src = src
+  })
+}
+
+/**
+ * Extract cropped region from the displayed image.
+ */
+function cropToCanvas(imgEl: HTMLImageElement, crop: PixelCrop): string {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')!
 
-  // If rotated 90 or 270, swap source dimensions
-  const rotated = rotation % 180 !== 0
-  const srcW = rotated ? imgEl.naturalHeight : imgEl.naturalWidth
-  const srcH = rotated ? imgEl.naturalWidth : imgEl.naturalHeight
-
-  // Scale factor: displayed size vs natural size
-  const scaleX = srcW / imgEl.width
-  const scaleY = srcH / imgEl.height
+  const scaleX = imgEl.naturalWidth / imgEl.width
+  const scaleY = imgEl.naturalHeight / imgEl.height
 
   canvas.width = crop.width * scaleX
   canvas.height = crop.height * scaleY
 
-  ctx.save()
-  // Move origin to center of the crop output
-  ctx.translate(canvas.width / 2, canvas.height / 2)
-  ctx.rotate((rotation * Math.PI) / 180)
-
-  // Calculate where to draw the source image so the crop aligns
-  const drawW = rotation % 180 !== 0 ? imgEl.naturalHeight : imgEl.naturalWidth
-  const drawH = rotation % 180 !== 0 ? imgEl.naturalWidth : imgEl.naturalHeight
-
   ctx.drawImage(
     imgEl,
-    -(crop.x * scaleX) - canvas.width / 2 + (rotation % 180 !== 0 ? (drawW - canvas.width) / 2 : 0),
-    -(crop.y * scaleY) - canvas.height / 2 + (rotation % 180 !== 0 ? (drawH - canvas.height) / 2 : 0),
-    drawW,
-    drawH,
+    crop.x * scaleX,
+    crop.y * scaleY,
+    crop.width * scaleX,
+    crop.height * scaleY,
+    0,
+    0,
+    canvas.width,
+    canvas.height,
   )
-  ctx.restore()
-
-  // Simpler approach for 0 rotation (most common)
-  if (rotation === 0) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.drawImage(
-      imgEl,
-      crop.x * scaleX,
-      crop.y * scaleY,
-      crop.width * scaleX,
-      crop.height * scaleY,
-      0,
-      0,
-      canvas.width,
-      canvas.height,
-    )
-  }
 
   return canvas.toDataURL('image/jpeg', 0.85)
 }
@@ -113,27 +113,36 @@ export default function ImageEditor({
   applyLabel,
 }: ImageEditorProps) {
   const imgRef = useRef<HTMLImageElement>(null)
+  const [displaySrc, setDisplaySrc] = useState(src) // rotated version of src
   const [crop, setCrop] = useState<Crop>()
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
   const [aspect, setAspect] = useState<number | undefined>(initialAspect)
-  const [rotation, setRotation] = useState(0)
+  const [rotating, setRotating] = useState(false)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleAspectChange = useCallback((value: number | undefined) => {
     setAspect(value)
-    // Reset crop when aspect changes
     setCrop(undefined)
     setCompletedCrop(undefined)
   }, [])
 
+  const handleRotate = useCallback(async (degrees: number) => {
+    setRotating(true)
+    setCrop(undefined)
+    setCompletedCrop(undefined)
+    const rotated = await rotateImageData(displaySrc, degrees)
+    setDisplaySrc(rotated)
+    setRotating(false)
+  }, [displaySrc])
+
   const handleReset = useCallback(() => {
+    setDisplaySrc(src) // back to original
     setCrop(undefined)
     setCompletedCrop(undefined)
     setAspect(initialAspect)
-    setRotation(0)
     setError(null)
-  }, [initialAspect])
+  }, [src, initialAspect])
 
   const handleApply = useCallback(async () => {
     const img = imgRef.current
@@ -146,31 +155,19 @@ export default function ImageEditor({
       let dataUrl: string
 
       if (completedCrop && completedCrop.width > 0 && completedCrop.height > 0) {
-        // Validate minimum size
         const scaleX = img.naturalWidth / img.width
+        const scaleY = img.naturalHeight / img.height
         const realW = completedCrop.width * scaleX
-        const realH = completedCrop.height * (img.naturalHeight / img.height)
+        const realH = completedCrop.height * scaleY
         if (realW < MIN_CROP_SIZE || realH < MIN_CROP_SIZE) {
           setError(`Crop area too small — minimum ${MIN_CROP_SIZE}x${MIN_CROP_SIZE}px`)
           setProcessing(false)
           return
         }
-        dataUrl = cropImageToCanvas(img, completedCrop, rotation)
+        dataUrl = cropToCanvas(img, completedCrop)
       } else {
-        // No crop — use full image with rotation only
-        if (rotation === 0) {
-          dataUrl = src
-        } else {
-          const canvas = document.createElement('canvas')
-          const ctx = canvas.getContext('2d')!
-          const rotated = rotation % 180 !== 0
-          canvas.width = rotated ? img.naturalHeight : img.naturalWidth
-          canvas.height = rotated ? img.naturalWidth : img.naturalHeight
-          ctx.translate(canvas.width / 2, canvas.height / 2)
-          ctx.rotate((rotation * Math.PI) / 180)
-          ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2)
-          dataUrl = canvas.toDataURL('image/jpeg', 0.85)
-        }
+        // No crop — use the (possibly rotated) display image as-is
+        dataUrl = displaySrc
       }
 
       const resized = await resizeImage(dataUrl)
@@ -180,7 +177,7 @@ export default function ImageEditor({
     } finally {
       setProcessing(false)
     }
-  }, [completedCrop, rotation, src, onComplete])
+  }, [completedCrop, displaySrc, onComplete])
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -206,11 +203,13 @@ export default function ImageEditor({
         })}
       </div>
 
-      {/* Crop area — drag edges and corners to resize */}
-      <div
-        className="relative rounded-xl overflow-hidden bg-black"
-        style={{ transform: `rotate(${rotation}deg)`, transition: 'transform 0.3s ease' }}
-      >
+      {/* Crop area */}
+      <div className="relative rounded-xl overflow-hidden bg-black">
+        {rotating && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
         <ReactCrop
           crop={crop}
           onChange={(c) => setCrop(c)}
@@ -223,7 +222,7 @@ export default function ImageEditor({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             ref={imgRef}
-            src={src}
+            src={displaySrc}
             alt="Edit image"
             className="max-w-full max-h-[500px] object-contain mx-auto"
             crossOrigin="anonymous"
@@ -233,16 +232,17 @@ export default function ImageEditor({
 
       {/* Hint */}
       <p className="text-xs text-center text-slate-400 dark:text-slate-500">
-        Drag edges or corners to crop. Select an aspect ratio to lock proportions.
+        Drag edges or corners to crop
       </p>
 
-      {/* Rotate + Reset row */}
+      {/* Rotate + Reset */}
       <div className="flex items-center justify-center gap-3">
         <button
           type="button"
-          onClick={() => setRotation((r) => (r - 90 + 360) % 360)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] transition-colors bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-primary)] hover:bg-[var(--tk-color-surface-200)] dark:hover:bg-[var(--tk-color-surface-600)] border border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-600)]"
-          aria-label="Rotate 90 degrees left"
+          onClick={() => handleRotate(270)}
+          disabled={rotating}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] transition-colors bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-primary)] hover:bg-[var(--tk-color-surface-200)] dark:hover:bg-[var(--tk-color-surface-600)] border border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-600)] disabled:opacity-50"
+          aria-label="Rotate left"
         >
           <RotateLeftIcon />
           Rotate
@@ -258,9 +258,10 @@ export default function ImageEditor({
 
         <button
           type="button"
-          onClick={() => setRotation((r) => (r + 90) % 360)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] transition-colors bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-primary)] hover:bg-[var(--tk-color-surface-200)] dark:hover:bg-[var(--tk-color-surface-600)] border border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-600)]"
-          aria-label="Rotate 90 degrees right"
+          onClick={() => handleRotate(90)}
+          disabled={rotating}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] transition-colors bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-primary)] hover:bg-[var(--tk-color-surface-200)] dark:hover:bg-[var(--tk-color-surface-600)] border border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-600)] disabled:opacity-50"
+          aria-label="Rotate right"
         >
           Rotate
           <RotateRightIcon />
@@ -269,12 +270,10 @@ export default function ImageEditor({
 
       {/* Error */}
       {error && (
-        <p role="alert" className="text-sm text-red-500 dark:text-red-400 text-center">
-          {error}
-        </p>
+        <p role="alert" className="text-sm text-red-500 dark:text-red-400 text-center">{error}</p>
       )}
 
-      {/* Action buttons */}
+      {/* Actions */}
       <div className="flex gap-3">
         {onCancel && (
           <button
@@ -289,7 +288,7 @@ export default function ImageEditor({
         <button
           type="button"
           onClick={handleApply}
-          disabled={processing}
+          disabled={processing || rotating}
           className={`flex-1 px-4 py-2 rounded-xl text-sm font-semibold min-h-[44px] transition-colors text-white disabled:opacity-50 ${
             mode === 'fun'
               ? 'bg-gradient-to-r from-[var(--tk-color-primary-500)] to-[var(--tk-color-secondary-500)] hover:brightness-110'
