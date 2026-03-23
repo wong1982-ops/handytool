@@ -229,6 +229,7 @@ export default function SketchToArtPage() {
           ? 'bg-gradient-to-b from-pink-50 to-violet-50 dark:from-[#1a1025] dark:to-[#101922]'
           : ''
       }`}
+      style={{ overscrollBehaviorX: 'none' }}
     >
       <div className="w-full max-w-4xl relative">
         {/* Breadcrumb + Mode toggle row */}
