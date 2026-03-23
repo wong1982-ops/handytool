@@ -35,7 +35,6 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
 
   const tabs: { id: InputMethod; label: string; funLabel: string }[] = [
     { id: 'upload', label: 'Upload', funLabel: '📁 Upload' },
-    { id: 'camera', label: 'Camera', funLabel: '📸 Camera' },
     { id: 'draw', label: 'Draw', funLabel: '✏️ Draw' },
   ]
 
