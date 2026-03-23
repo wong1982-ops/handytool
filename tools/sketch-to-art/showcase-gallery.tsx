@@ -10,7 +10,9 @@ interface ShowcaseGalleryProps {
   mode: SketchMode
 }
 
-// ─── Before/After Drag Slider ────────────────────────────────────────────────
+// ─── Crosshair Before/After Splitter ─────────────────────────────────────────
+// Drag the crosshair handle to reveal the sketch (before) from any corner.
+// Before image clips to a rectangle from top-left to the handle position.
 
 function BeforeAfterSlider({ beforeSrc, afterSrc, afterLabel }: {
   beforeSrc: string
@@ -18,27 +20,29 @@ function BeforeAfterSlider({ beforeSrc, afterSrc, afterLabel }: {
   afterLabel: string
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [position, setPosition] = useState(50)
+  const [posX, setPosX] = useState(50)
+  const [posY, setPosY] = useState(50)
   const [dragging, setDragging] = useState(false)
 
-  const updatePosition = useCallback((clientX: number) => {
+  const updatePosition = useCallback((clientX: number, clientY: number) => {
     const container = containerRef.current
     if (!container) return
     const rect = container.getBoundingClientRect()
-    const x = clientX - rect.left
-    const pct = Math.max(0, Math.min(100, (x / rect.width) * 100))
-    setPosition(pct)
+    const x = Math.max(2, Math.min(98, ((clientX - rect.left) / rect.width) * 100))
+    const y = Math.max(2, Math.min(98, ((clientY - rect.top) / rect.height) * 100))
+    setPosX(x)
+    setPosY(y)
   }, [])
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     setDragging(true)
-    updatePosition(e.clientX)
+    updatePosition(e.clientX, e.clientY)
     ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
   }, [updatePosition])
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!dragging) return
-    updatePosition(e.clientX)
+    updatePosition(e.clientX, e.clientY)
   }, [dragging, updatePosition])
 
   const handlePointerUp = useCallback(() => {
@@ -48,43 +52,64 @@ function BeforeAfterSlider({ beforeSrc, afterSrc, afterLabel }: {
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-square rounded-2xl overflow-hidden cursor-col-resize select-none touch-none"
+      className="relative w-full aspect-square rounded-2xl overflow-hidden cursor-crosshair select-none touch-none"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       role="slider"
-      aria-label="Before and after comparison"
-      aria-valuenow={Math.round(position)}
-      aria-valuemin={0}
-      aria-valuemax={100}
+      aria-label="Before and after comparison — drag to reveal"
     >
       {/* After (full, behind) */}
       <div className="absolute inset-0">
         <Image src={afterSrc} alt="After" fill sizes="(max-width: 640px) 90vw, 500px" className="object-cover" />
       </div>
 
-      {/* Before (clipped) */}
-      <div className="absolute inset-0 overflow-hidden" style={{ width: `${position}%` }}>
-        <div className="relative w-full h-full" style={{ width: containerRef.current ? `${containerRef.current.offsetWidth}px` : '100vw' }}>
+      {/* Before (clipped to rectangle from top-left to handle) */}
+      <div
+        className="absolute top-0 left-0 overflow-hidden"
+        style={{ width: `${posX}%`, height: `${posY}%` }}
+      >
+        <div
+          className="relative h-full"
+          style={{ width: containerRef.current ? `${containerRef.current.offsetWidth}px` : '100vw', height: containerRef.current ? `${containerRef.current.offsetHeight}px` : '100vh' }}
+        >
           <Image src={beforeSrc} alt="Before" fill sizes="(max-width: 640px) 90vw, 500px" className="object-contain bg-white" />
         </div>
       </div>
 
-      {/* Divider line + handle */}
-      <div className="absolute top-0 bottom-0 z-10" style={{ left: `${position}%`, transform: 'translateX(-50%)' }}>
-        <div className="w-0.5 h-full bg-white shadow-lg" />
-        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-xl flex items-center justify-center">
+      {/* Horizontal line */}
+      <div
+        className="absolute left-0 right-0 z-10 pointer-events-none"
+        style={{ top: `${posY}%`, transform: 'translateY(-50%)' }}
+      >
+        <div className="w-full h-[2px] bg-white/80 shadow-sm" />
+      </div>
+
+      {/* Vertical line */}
+      <div
+        className="absolute top-0 bottom-0 z-10 pointer-events-none"
+        style={{ left: `${posX}%`, transform: 'translateX(-50%)' }}
+      >
+        <div className="h-full w-[2px] bg-white/80 shadow-sm" />
+      </div>
+
+      {/* Crosshair handle */}
+      <div
+        className="absolute z-20 pointer-events-none"
+        style={{ left: `${posX}%`, top: `${posY}%`, transform: 'translate(-50%, -50%)' }}
+      >
+        <div className={`w-10 h-10 rounded-full bg-white shadow-xl flex items-center justify-center transition-transform ${dragging ? 'scale-110' : ''}`}>
           <svg className="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
           </svg>
         </div>
       </div>
 
-      {/* Labels */}
+      {/* Corner labels */}
       <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white text-xs font-medium">
         Sketch
       </div>
-      <div className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white text-xs font-medium">
+      <div className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white text-xs font-medium">
         {afterLabel}
       </div>
     </div>
