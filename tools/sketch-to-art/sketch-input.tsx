@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import type { SketchMode, InputMethod } from './types'
 import DrawingCanvas from './drawing-canvas'
+import { resizeImage } from './image-utils'
 
 interface SketchInputProps {
   onSketchReady: (dataUrl: string) => void
@@ -11,51 +12,6 @@ interface SketchInputProps {
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp']
-const MAX_DIMENSION = 768
-const MAX_PAYLOAD_BYTES = 3 * 1024 * 1024 // 3MB max base64 payload
-
-/**
- * Resize and compress image for API payload.
- * - Max 768px on longest side (sufficient for AI)
- * - JPEG at 0.7 quality (much smaller than PNG for photos)
- * - If still too large, reduce quality further
- */
-function resizeImage(dataUrl: string): Promise<string> {
-  return new Promise((resolve) => {
-    const img = new Image()
-    img.onload = () => {
-      let w = img.width
-      let h = img.height
-
-      // Resize if needed
-      if (w > MAX_DIMENSION || h > MAX_DIMENSION) {
-        const scale = Math.min(MAX_DIMENSION / w, MAX_DIMENSION / h)
-        w = Math.round(w * scale)
-        h = Math.round(h * scale)
-      }
-
-      const canvas = document.createElement('canvas')
-      canvas.width = w
-      canvas.height = h
-      const ctx = canvas.getContext('2d')!
-      ctx.drawImage(img, 0, 0, w, h)
-
-      // Try JPEG at decreasing quality until under payload limit
-      for (const quality of [0.7, 0.5, 0.3]) {
-        const result = canvas.toDataURL('image/jpeg', quality)
-        if (result.length < MAX_PAYLOAD_BYTES) {
-          resolve(result)
-          return
-        }
-      }
-
-      // Last resort: smallest quality
-      resolve(canvas.toDataURL('image/jpeg', 0.2))
-    }
-    img.onerror = () => resolve(dataUrl)
-    img.src = dataUrl
-  })
-}
 
 export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
   const [activeTab, setActiveTab] = useState<InputMethod>('upload')
