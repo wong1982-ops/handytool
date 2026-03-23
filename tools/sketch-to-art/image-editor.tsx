@@ -204,7 +204,7 @@ export default function ImageEditor({
       </div>
 
       {/* Crop area */}
-      <div className="relative rounded-xl overflow-hidden bg-black">
+      <div className="relative rounded-xl overflow-hidden bg-black touch-none">
         {rotating && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
             <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />

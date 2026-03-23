@@ -147,7 +147,7 @@ export default function GenerationResults({
 
       {/* Carousel viewport */}
       <div
-        className="relative w-full max-w-[480px] overflow-hidden rounded-2xl"
+        className="relative w-full max-w-[480px] overflow-hidden rounded-2xl touch-none"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         aria-label="Variation carousel"
