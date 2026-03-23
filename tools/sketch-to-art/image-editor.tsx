@@ -83,7 +83,7 @@ function RotateRightIcon() {
 // Component
 // ---------------------------------------------------------------------------
 
-export function ImageEditor({
+export default function ImageEditor({
   src,
   onComplete,
   onCancel,

@@ -6,10 +6,7 @@ import type { SketchMode, InputMethod } from './types'
 import DrawingCanvas from './drawing-canvas'
 import { resizeImage, getImageDimensions, isEditorEligible } from './image-utils'
 
-const ImageEditor = dynamic(
-  () => import('./image-editor').then((m) => ({ default: m.ImageEditor })),
-  { ssr: false },
-)
+const ImageEditor = dynamic(() => import('./image-editor'), { ssr: false })
 
 interface SketchInputProps {
   onSketchReady: (dataUrl: string) => void
