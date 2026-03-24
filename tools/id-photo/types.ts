@@ -89,6 +89,7 @@ export const PHOTO_FORMATS: PhotoFormat[] = [
   { id: 'driving-license', name: 'Driving License', country: 'International', widthMm: 35, heightMm: 45, dimensions: 'ID-1 (35 × 45 mm)' },
   { id: 'canada-passport', name: 'Canada Passport', country: 'Canada', widthMm: 50, heightMm: 70, dimensions: '50 × 70 mm' },
   { id: 'australia-passport', name: 'Australia Passport', country: 'Australia', widthMm: 35, heightMm: 45, dimensions: '35 × 45 mm' },
+  { id: 'nz-passport', name: 'New Zealand Passport', country: 'New Zealand', widthMm: 35, heightMm: 45, dimensions: '35 × 45 mm' },
   { id: 'china-visa', name: 'China Visa', country: 'China', widthMm: 33, heightMm: 48, dimensions: '33 × 48 mm' },
   { id: 'india-passport', name: 'India Passport', country: 'India', widthMm: 35, heightMm: 35, dimensions: '35 × 35 mm' },
   { id: 'japan-visa', name: 'Japan Visa', country: 'Japan', widthMm: 35, heightMm: 45, dimensions: '35 × 45 mm' },
