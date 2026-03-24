@@ -25,12 +25,10 @@ function StyleCard({
     <button
       type="button"
       onClick={() => onSelect(style.id)}
-      className={`group relative flex flex-col items-center gap-1.5 rounded-xl p-1.5 transition-all cursor-pointer ${
-        isFun ? 'hover:scale-105' : 'hover:brightness-110'
-      } ${
+      className={`group relative flex flex-col items-center gap-2 rounded-2xl p-2 transition-all duration-300 cursor-pointer hover:scale-[1.03] ${
         isSelected
-          ? 'ring-2 ring-[var(--tk-color-primary-500)] ring-offset-2 dark:ring-offset-[var(--tk-color-surface-900)]'
-          : ''
+          ? 'shadow-[0_0_0_3px_#3D6AF2,0_0_20px_rgba(61,106,242,0.4)] bg-[#131a23]'
+          : 'hover:bg-[#131a23]/60'
       }`}
     >
       {/* Image card */}
@@ -107,16 +105,14 @@ export default function StylePicker({
   )
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {STYLE_CATEGORIES.map((category) => {
         const styles = ART_STYLES.filter((s) => s.category === category.id)
+        const categoryIcons: Record<string, string> = { classic: '\u{1F3A8}', modern: '\u{26A1}', fantasy: '\u{2728}' }
         return (
           <section key={category.id}>
-            <h3
-              className={`mb-3 font-semibold ${
-                isFun ? 'text-lg' : 'text-sm uppercase tracking-wider text-[var(--tk-color-text-secondary)]'
-              }`}
-            >
+            <h3 className="flex items-center gap-2 mb-4 text-sm font-semibold uppercase tracking-wider text-[#a6abb5]">
+              <span>{categoryIcons[category.id] || '\u{2728}'}</span>
               {category.label}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

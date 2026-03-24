@@ -82,53 +82,58 @@ export default function GenerationResults({
   }
 
   if (loading) {
-    if (isFun) {
-      return (
-        <div className="flex flex-col items-center justify-center gap-4 py-12">
-          {/* Animated sparkle */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="h-12 w-12 animate-spin text-[var(--tk-color-primary-500)]"
-            aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5z"
-              clipRule="evenodd"
+    return (
+      <div className="flex flex-col items-center justify-center gap-6 py-12 px-4">
+        {/* Progress ring */}
+        <div className="relative w-24 h-24">
+          <svg className="w-24 h-24 -rotate-90" viewBox="0 0 96 96">
+            <circle cx="48" cy="48" r="40" fill="none" stroke="#1e2631" strokeWidth="4" />
+            <circle
+              cx="48" cy="48" r="40" fill="none"
+              stroke="url(#progress-gradient)" strokeWidth="4"
+              strokeLinecap="round"
+              strokeDasharray={`${2 * Math.PI * 40}`}
+              strokeDashoffset={`${2 * Math.PI * 40 * 0.18}`}
+              className="animate-spin"
+              style={{ animationDuration: '3s' }}
             />
+            <defs>
+              <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#3D6AF2" />
+                <stop offset="100%" stopColor="#af88ff" />
+              </linearGradient>
+            </defs>
           </svg>
-          <p className="text-lg font-medium text-[var(--tk-color-text-primary)] animate-pulse">
-            {FUN_LOADING_MESSAGES[funMessageIndex]}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <svg className="w-8 h-8 text-[#93aaff]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Heading */}
+        <div className="text-center">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-white mb-2">
+            {isFun ? 'Weaving your ' : 'Generating '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#af88ff]">
+              {isFun ? 'brushstrokes' : 'variations'}
+            </span>
+            {isFun ? ' into art.' : '...'}
+          </h2>
+          <p className="text-sm text-[#a6abb5] animate-pulse">
+            {isFun ? FUN_LOADING_MESSAGES[funMessageIndex] : 'Processing your sketch...'}
           </p>
         </div>
-      )
-    }
 
-    // Pro loading: spinner
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-center gap-2 py-4">
-          <svg
-            className="h-5 w-5 animate-spin text-[var(--tk-color-primary-500)]"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          <span className="text-sm text-[var(--tk-color-text-secondary)]">Generating variations...</span>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          {[0, 1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="aspect-square animate-pulse rounded-2xl bg-[var(--tk-color-surface-200)] dark:bg-[var(--tk-color-surface-700)]"
-            />
-          ))}
+        {/* Synthesis phase bar */}
+        <div className="w-full max-w-xs">
+          <div className="flex justify-between text-[10px] uppercase tracking-wider text-[#70767f] mb-1.5">
+            <span>Synthesis Phase</span>
+            <span className="text-[#93aaff]">In Progress</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-[#1e2631] overflow-hidden">
+            <div className="h-full rounded-full bg-gradient-to-r from-[#3D6AF2] to-[#af88ff] animate-pulse" style={{ width: '65%' }} />
+          </div>
         </div>
       </div>
     )
