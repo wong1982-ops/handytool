@@ -1,90 +1,64 @@
 /**
- * Background removal using Replicate API (lucataco/remove-bg model).
- * Adapted from media-agent project's proven implementation.
+ * Client-side background removal using @imgly/background-removal.
+ * Runs entirely in the browser via ONNX/WebAssembly — no API key needed.
+ * The ONNX model (~5MB) is downloaded on first use and cached by the browser.
  */
 
-const REMOVE_BG_MODEL_VERSION = '95fcc2a26d3899cd6c2691c900465aaeff466285a65c14638cc5f36f34befaf1'
+import { removeBackground as imglyRemoveBackground } from '@imgly/background-removal'
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
+/**
+ * Remove background from an image data URL.
+ * Returns a new data URL with transparent background.
+ *
+ * @param imageDataUrl - The image as a data URL (data:image/...)
+ * @returns Data URL of the image with background removed (PNG with transparency)
+ */
+export async function removeBackgroundClient(imageDataUrl: string): Promise<string> {
+  // Convert data URL to blob
+  const response = await fetch(imageDataUrl)
+  const blob = await response.blob()
 
-function parseOutput(output: unknown): string {
-  if (typeof output === 'string') return output
-  if (Array.isArray(output) && typeof output[0] === 'string') return output[0]
-  if (output && typeof output === 'object' && 'output' in output) {
-    return String((output as { output: unknown }).output)
-  }
-  throw new Error('Unexpected Replicate output format')
+  // Run background removal (downloads ONNX model on first use)
+  const resultBlob = await imglyRemoveBackground(blob, {
+    output: { format: 'image/png' },
+  })
+
+  // Convert result blob back to data URL
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(resultBlob)
+  })
 }
 
 /**
- * Remove background from an image using Replicate API.
- * Returns the URL of the background-removed image.
+ * Apply a solid background color to a transparent PNG data URL.
+ * Used after background removal to set the ID photo background color.
  *
- * @param imageUrl - Public URL or base64 data URL of the image
+ * @param transparentDataUrl - PNG data URL with transparent background
+ * @param bgColor - Hex color string (e.g., '#FFFFFF')
+ * @returns Data URL with solid background applied
  */
-export async function removeBackground(imageUrl: string): Promise<string> {
-  const token = process.env.REPLICATE_API_TOKEN
-  if (!token) {
-    console.warn('[id-photo] REPLICATE_API_TOKEN not set — skipping background removal')
-    return ''
-  }
+export function applyBackgroundColor(transparentDataUrl: string, bgColor: string): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+      const ctx = canvas.getContext('2d')!
 
-  const MAX_RETRIES = 2
-  const BASE_DELAY_MS = 1000
-  const MAX_DELAY_MS = 12000
+      // Fill with background color first
+      ctx.fillStyle = bgColor
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-  let lastError: Error | null = null
+      // Draw the transparent image on top
+      ctx.drawImage(img, 0, 0)
 
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    try {
-      const res = await fetch('https://api.replicate.com/v1/predictions', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          Prefer: 'wait', // Synchronous mode — blocks until result ready
-        },
-        body: JSON.stringify({
-          version: REMOVE_BG_MODEL_VERSION,
-          input: { image: imageUrl },
-        }),
-        signal: AbortSignal.timeout(120_000), // 2-minute timeout
-      })
-
-      // Retry on rate limit or temporary server errors
-      if (res.status === 429 || res.status === 503) {
-        if (attempt === MAX_RETRIES) throw new Error(`Replicate API error: ${res.status}`)
-        const delay = Math.min(BASE_DELAY_MS * Math.pow(2, attempt - 1), MAX_DELAY_MS)
-        await sleep(delay)
-        continue
-      }
-
-      if (!res.ok) {
-        throw new Error(`Replicate API error: ${res.status} ${res.statusText}`)
-      }
-
-      const data = await res.json()
-      if (data.status === 'failed' || data.status === 'canceled') {
-        throw new Error(`Prediction ${data.status}: ${data.error ?? 'Unknown error'}`)
-      }
-
-      const resultUrl = parseOutput(data.output)
-      if (!resultUrl.startsWith('http')) {
-        throw new Error(`Invalid URL from Replicate: ${resultUrl.slice(0, 100)}`)
-      }
-      return resultUrl
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error))
-      const isNetworkError =
-        lastError.name === 'AbortError' ||
-        lastError.name === 'TypeError' ||
-        lastError.message.includes('ECONNRESET')
-      if (!isNetworkError || attempt === MAX_RETRIES) throw lastError
-      await sleep(Math.min(BASE_DELAY_MS * Math.pow(2, attempt - 1), MAX_DELAY_MS))
+      resolve(canvas.toDataURL('image/png'))
     }
-  }
-
-  throw lastError ?? new Error('Failed to remove background')
+    img.onerror = () => resolve(transparentDataUrl) // fallback
+    img.src = transparentDataUrl
+  })
 }

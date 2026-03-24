@@ -3,30 +3,34 @@
 import { useState, useCallback } from 'react'
 import type { EnhanceResult } from './types'
 
-export type EnhanceState = 'idle' | 'enhancing' | 'done' | 'rejected' | 'error'
+export type EnhanceState = 'idle' | 'enhancing' | 'removing-bg' | 'done' | 'rejected' | 'error'
 
 interface UseAIEnhanceReturn {
   state: EnhanceState
   result: EnhanceResult | null
+  bgRemovedUrl: string | null
   error: string | null
   rejectReason: string | null
-  enhance: (imageDataUrl: string) => Promise<void>
+  enhance: (imageDataUrl: string, bgColor?: string) => Promise<void>
   reset: () => void
 }
 
 export function useAIEnhance(): UseAIEnhanceReturn {
   const [state, setState] = useState<EnhanceState>('idle')
   const [result, setResult] = useState<EnhanceResult | null>(null)
+  const [bgRemovedUrl, setBgRemovedUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [rejectReason, setRejectReason] = useState<string | null>(null)
 
-  const enhance = useCallback(async (imageDataUrl: string) => {
+  const enhance = useCallback(async (imageDataUrl: string, bgColor: string = '#FFFFFF') => {
     setState('enhancing')
     setError(null)
     setRejectReason(null)
     setResult(null)
+    setBgRemovedUrl(null)
 
     try {
+      // Step 1: Server-side analysis (Gemini)
       const res = await fetch('/api/v1/id-photo/enhance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -48,7 +52,21 @@ export function useAIEnhance(): UseAIEnhanceReturn {
         throw new Error(json.error || 'Enhancement failed')
       }
 
-      setResult(json.data as EnhanceResult)
+      const enhanceResult = json.data as EnhanceResult
+      setResult(enhanceResult)
+
+      // Step 2: Client-side background removal
+      setState('removing-bg')
+      try {
+        const { removeBackgroundClient, applyBackgroundColor } = await import('@/lib/id-photo/background-removal')
+        const transparentUrl = await removeBackgroundClient(imageDataUrl)
+        const withBgUrl = await applyBackgroundColor(transparentUrl, bgColor)
+        setBgRemovedUrl(withBgUrl)
+      } catch (bgErr) {
+        console.error('[id-photo] Background removal failed:', bgErr)
+        // Continue without BG removal — not a hard failure
+      }
+
       setState('done')
     } catch (err) {
       setState('error')
@@ -59,9 +77,10 @@ export function useAIEnhance(): UseAIEnhanceReturn {
   const reset = useCallback(() => {
     setState('idle')
     setResult(null)
+    setBgRemovedUrl(null)
     setError(null)
     setRejectReason(null)
   }, [])
 
-  return { state, result, error, rejectReason, enhance, reset }
+  return { state, result, bgRemovedUrl, error, rejectReason, enhance, reset }
 }

@@ -34,7 +34,7 @@ export default function IdPhotoPage() {
   const [compliance, setCompliance] = useState<Compliance>(DEFAULT_COMPLIANCE)
 
   // AI Enhancement
-  const { state: enhanceState, result: enhanceResult, error: enhanceError, rejectReason, enhance: runEnhance, reset: resetEnhance } = useAIEnhance()
+  const { state: enhanceState, result: enhanceResult, bgRemovedUrl, error: enhanceError, rejectReason, enhance: runEnhance, reset: resetEnhance } = useAIEnhance()
 
   // Face analysis (real server-side detection)
   const { state: analysisState, result: analysisResult, error: analysisError, analyze: analyzeFace, reset: resetAnalysis } = useFaceAnalysis()
@@ -117,11 +117,12 @@ export default function IdPhotoPage() {
     if (enhanceState === 'done' && enhanceResult) {
       setAdjustments(enhanceResult.adjustments)
       setTransform(enhanceResult.cropTransform)
-      if (enhanceResult.enhancedImageUrl) {
-        setPhotoUrl(enhanceResult.enhancedImageUrl)
+      // Apply background-removed image if available
+      if (bgRemovedUrl) {
+        setPhotoUrl(bgRemovedUrl)
       }
     }
-  }, [enhanceState, enhanceResult])
+  }, [enhanceState, enhanceResult, bgRemovedUrl])
 
   // --- Format selection ---
   const handleFormatSelect = useCallback((format: PhotoFormat) => {
@@ -344,8 +345,8 @@ export default function IdPhotoPage() {
             onFileSelect={handleFileSelect}
           />
 
-          {/* AI enhancing overlay */}
-          {enhanceState === 'enhancing' && (
+          {/* AI enhancing / bg removal overlay */}
+          {(enhanceState === 'enhancing' || enhanceState === 'removing-bg') && (
             <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm rounded-xl">
               <div className="relative w-20 h-20 mb-4">
                 <svg className="w-20 h-20 -rotate-90 animate-spin" style={{ animationDuration: '3s' }} viewBox="0 0 80 80">
@@ -354,8 +355,12 @@ export default function IdPhotoPage() {
                     strokeDasharray={`${2 * Math.PI * 32}`} strokeDashoffset={`${2 * Math.PI * 32 * 0.2}`} />
                 </svg>
               </div>
-              <p className="text-white font-bold text-lg">Enhancing your photo...</p>
-              <p className="text-slate-400 text-sm mt-1 animate-pulse">AI is analyzing and optimizing</p>
+              <p className="text-white font-bold text-lg">
+                {enhanceState === 'removing-bg' ? 'Removing background...' : 'Enhancing your photo...'}
+              </p>
+              <p className="text-slate-400 text-sm mt-1 animate-pulse">
+                {enhanceState === 'removing-bg' ? 'AI is isolating the portrait' : 'AI is analyzing and optimizing'}
+              </p>
             </div>
           )}
 
