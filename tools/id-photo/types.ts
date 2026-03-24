@@ -101,6 +101,10 @@ export interface AIPhotoAnalysis {
   face_detected: boolean
   face_angle: { yaw: number; pitch: number }
   face_bounds: { x: number; y: number; width: number; height: number }
+  eye_line_y?: number       // normalized 0-1 Y position of eyes
+  chin_y?: number           // normalized 0-1 Y position of chin
+  head_top_y?: number       // normalized 0-1 Y position of head top
+  face_center_x?: number    // normalized 0-1 X position of face center
   brightness_score: number
   sharpness_score: number
   contrast_score: number
