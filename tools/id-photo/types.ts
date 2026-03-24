@@ -95,3 +95,27 @@ export const PHOTO_FORMATS: PhotoFormat[] = [
   { id: 'japan-visa', name: 'Japan Visa', country: 'Japan', widthMm: 35, heightMm: 45, dimensions: '35 × 45 mm' },
   { id: 'korea-passport', name: 'Korea Passport', country: 'South Korea', widthMm: 35, heightMm: 45, dimensions: '35 × 45 mm' },
 ]
+
+/** AI analysis result from Gemini */
+export interface AIPhotoAnalysis {
+  face_detected: boolean
+  face_angle: { yaw: number; pitch: number }
+  face_bounds: { x: number; y: number; width: number; height: number }
+  brightness_score: number
+  sharpness_score: number
+  contrast_score: number
+  background_complexity: 'clean' | 'cluttered' | 'busy'
+  obstructions: string[]
+  face_rotation_needed: boolean
+  overall_quality: 'good' | 'fixable' | 'reject'
+  reject_reason: string | null
+}
+
+/** Result from the enhance API */
+export interface EnhanceResult {
+  analysis: AIPhotoAnalysis
+  enhancedImageUrl: string | null
+  adjustments: Adjustments
+  cropTransform: Transform
+  faceRotationAvailable: boolean
+}
