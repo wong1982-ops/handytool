@@ -224,11 +224,7 @@ export default function SketchToArtPage() {
 
   return (
     <main
-      className={`flex-1 flex flex-col items-center py-10 px-4 ${
-        isFun
-          ? 'bg-gradient-to-b from-pink-50 to-violet-50 dark:from-[#1a1025] dark:to-[#101922]'
-          : ''
-      }`}
+      className="flex-1 flex flex-col items-center py-10 px-4 bg-[#090f16]"
       style={{ overscrollBehaviorX: 'none' }}
     >
       <div className="w-full max-w-4xl relative">
@@ -244,21 +240,24 @@ export default function SketchToArtPage() {
         )}
 
         {/* Title + Tabs */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white text-center mb-4">
-          {isFun ? '\u2728 Turn Your Drawing Into Art!' : 'Sketch to Art'}
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-white text-center mb-2 tracking-tight">
+          Bring your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#af88ff]">vision</span> to life
         </h1>
+        <p className="text-sm text-[#a6abb5] text-center mb-6">
+          {isFun ? 'Upload a sketch and watch AI transform it into art' : 'Step ' + state.step + ': ' + ['Upload your sketch', 'Choose a style', 'Generating art', 'Refine your art', 'Save and share'][state.step - 1]}
+        </p>
 
         {/* Create / My Creations tabs */}
         {user && (
           <div className="flex justify-center mb-6">
-            <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 gap-1">
+            <div className="inline-flex rounded-xl bg-[#131a23]/60 backdrop-blur-xl p-1 gap-1">
               <button
                 type="button"
                 onClick={() => setActiveTab('create')}
                 className={`px-4 sm:px-6 py-2 rounded-lg text-sm font-medium transition-all ${
                   activeTab === 'create'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                    ? 'bg-[#3D6AF2]/20 text-[#93aaff]'
+                    : 'text-[#a6abb5] hover:text-white'
                 }`}
               >
                 {isFun ? '\u{1F3A8} Create' : 'Create'}
@@ -268,8 +267,8 @@ export default function SketchToArtPage() {
                 onClick={() => setActiveTab('creations')}
                 className={`px-4 sm:px-6 py-2 rounded-lg text-sm font-medium transition-all ${
                   activeTab === 'creations'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                    ? 'bg-[#3D6AF2]/20 text-[#93aaff]'
+                    : 'text-[#a6abb5] hover:text-white'
                 }`}
               >
                 {isFun ? '\u{1F5BC}\u{FE0F} My Creations' : 'My Creations'}
@@ -295,17 +294,16 @@ export default function SketchToArtPage() {
                 {STEPS.map((s, i) => {
                   const isCompleted = s < state.step
                   const isCurrent = s === state.step
-                  const _isFuture = s > state.step
                   return (
                     <li key={s} className="flex items-center">
                       <div className="flex flex-col items-center">
                         {/* Circle */}
                         <div className={`flex items-center justify-center w-9 h-9 rounded-full border-2 transition-all duration-300 ${
                           isCompleted
-                            ? 'bg-[var(--tk-color-primary-500)] border-[var(--tk-color-primary-500)]'
+                            ? 'bg-[#3D6AF2] border-[#3D6AF2]'
                             : isCurrent
-                            ? 'border-[var(--tk-color-primary-500)] bg-[var(--tk-color-primary-500)]/10'
-                            : 'border-slate-300 dark:border-slate-600 bg-transparent'
+                            ? 'border-[#3D6AF2] bg-[#3D6AF2]/20 shadow-[0_0_15px_rgba(61,106,242,0.4)]'
+                            : 'border-[#1e2631] bg-transparent'
                         }`}>
                           {isCompleted ? (
                             <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -313,15 +311,15 @@ export default function SketchToArtPage() {
                             </svg>
                           ) : (
                             <span className={`text-xs font-bold ${
-                              isCurrent ? 'text-[var(--tk-color-primary-500)]' : 'text-slate-400 dark:text-slate-500'
+                              isCurrent ? 'text-[#93aaff]' : 'text-[#70767f]'
                             }`}>{s}</span>
                           )}
                         </div>
                         {/* Label */}
                         <span className={`mt-1.5 text-[11px] font-medium transition-colors ${
                           isCompleted || isCurrent
-                            ? 'text-[var(--tk-color-primary-500)]'
-                            : 'text-slate-400 dark:text-slate-500'
+                            ? 'text-[#93aaff]'
+                            : 'text-[#70767f]'
                         }`}>
                           {stepLabels[i]}
                         </span>
@@ -329,7 +327,7 @@ export default function SketchToArtPage() {
                       {/* Connector line */}
                       {i < STEPS.length - 1 && (
                         <div className={`w-12 lg:w-20 h-0.5 mx-2 rounded-full transition-colors duration-300 ${
-                          s < state.step ? 'bg-[var(--tk-color-primary-500)]' : 'bg-slate-200 dark:bg-slate-700'
+                          s < state.step ? 'bg-gradient-to-r from-[#3D6AF2] to-[#3D6AF2]' : 'bg-[#1e2631]'
                         }`} />
                       )}
                     </li>
