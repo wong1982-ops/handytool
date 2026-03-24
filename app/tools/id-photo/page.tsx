@@ -11,6 +11,7 @@ import { PrintPreview } from '@/tools/id-photo/print-preview'
 import { FavoriteButton } from '@/components/ui/favorite-button'
 import { BackButton } from '@/components/ui/back-button'
 import { useFaceAnalysis } from '@/tools/id-photo/use-face-analysis'
+import { useAIEnhance } from '@/tools/id-photo/use-ai-enhance'
 import {
   PHOTO_FORMATS,
   DEFAULT_TRANSFORM,
@@ -31,6 +32,9 @@ export default function IdPhotoPage() {
   const [bgColor, setBgColor] = useState('#FFFFFF')
   const [showGuides, setShowGuides] = useState(true)
   const [compliance, setCompliance] = useState<Compliance>(DEFAULT_COMPLIANCE)
+
+  // AI Enhancement
+  const { state: enhanceState, result: enhanceResult, error: enhanceError, rejectReason, enhance: runEnhance, reset: resetEnhance } = useAIEnhance()
 
   // Face analysis (real server-side detection)
   const { state: analysisState, result: analysisResult, error: analysisError, analyze: analyzeFace, reset: resetAnalysis } = useFaceAnalysis()
@@ -68,10 +72,12 @@ export default function IdPhotoPage() {
 
     const reader = new FileReader()
     reader.onload = (e) => {
-      setPhotoUrl(e.target?.result as string)
+      const url = e.target?.result as string
+      setPhotoUrl(url)
       setTransform(DEFAULT_TRANSFORM)
       showToast('Analyzing face...')
       analyzeFace(file)
+      runEnhance(url)
     }
     reader.readAsDataURL(file)
   }, [showToast])
@@ -106,6 +112,17 @@ export default function IdPhotoPage() {
     }
   }, [analysisResult, showToast])
 
+  // --- Apply AI enhancement results ---
+  useEffect(() => {
+    if (enhanceState === 'done' && enhanceResult) {
+      setAdjustments(enhanceResult.adjustments)
+      setTransform(enhanceResult.cropTransform)
+      if (enhanceResult.enhancedImageUrl) {
+        setPhotoUrl(enhanceResult.enhancedImageUrl)
+      }
+    }
+  }, [enhanceState, enhanceResult])
+
   // --- Format selection ---
   const handleFormatSelect = useCallback((format: PhotoFormat) => {
     setSelectedFormatId(format.id)
@@ -118,8 +135,9 @@ export default function IdPhotoPage() {
     setTransform(DEFAULT_TRANSFORM)
     setAdjustments(DEFAULT_ADJUSTMENTS)
     resetAnalysis()
+    resetEnhance()
     setCompliance(DEFAULT_COMPLIANCE)
-  }, [resetAnalysis])
+  }, [resetAnalysis, resetEnhance])
 
   // --- Download ---
   const handleDownload = useCallback(async () => {
@@ -311,26 +329,92 @@ export default function IdPhotoPage() {
         )}
 
         {/* CENTER: Interactive Canvas */}
-        <InteractiveCanvas
-          photoUrl={photoUrl}
-          transform={transform}
-          adjustments={adjustments}
-          selectedFormat={selectedFormat}
-          showGuides={showGuides}
-          bgColor={bgColor}
-          faceDetected={faceDetected}
-          analysisState={analysisState}
-          faceBox={analysisResult?.faceBox ?? null}
-          onTransformChange={setTransform}
-          onFileSelect={handleFileSelect}
-        />
+        <div className="flex-1 flex flex-col relative min-w-0">
+          <InteractiveCanvas
+            photoUrl={photoUrl}
+            transform={transform}
+            adjustments={adjustments}
+            selectedFormat={selectedFormat}
+            showGuides={showGuides}
+            bgColor={bgColor}
+            faceDetected={faceDetected}
+            analysisState={analysisState}
+            faceBox={analysisResult?.faceBox ?? null}
+            onTransformChange={setTransform}
+            onFileSelect={handleFileSelect}
+          />
+
+          {/* AI enhancing overlay */}
+          {enhanceState === 'enhancing' && (
+            <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm rounded-xl">
+              <div className="relative w-20 h-20 mb-4">
+                <svg className="w-20 h-20 -rotate-90 animate-spin" style={{ animationDuration: '3s' }} viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#1e2631" strokeWidth="4" />
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#3D6AF2" strokeWidth="4" strokeLinecap="round"
+                    strokeDasharray={`${2 * Math.PI * 32}`} strokeDashoffset={`${2 * Math.PI * 32 * 0.2}`} />
+                </svg>
+              </div>
+              <p className="text-white font-bold text-lg">Enhancing your photo...</p>
+              <p className="text-slate-400 text-sm mt-1 animate-pulse">AI is analyzing and optimizing</p>
+            </div>
+          )}
+
+          {/* AI rejection overlay */}
+          {enhanceState === 'rejected' && (
+            <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm rounded-xl p-6">
+              <div className="w-14 h-14 mb-4 rounded-2xl bg-red-500/20 flex items-center justify-center">
+                <svg className="w-7 h-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+              </div>
+              <p className="text-white font-bold text-base mb-1">Photo needs improvement</p>
+              <p className="text-slate-400 text-sm text-center mb-4 max-w-xs">{rejectReason}</p>
+              <ul className="text-xs text-slate-400 space-y-1.5 mb-5 text-left">
+                <li className="flex gap-2"><span className="text-blue-400">•</span> Use a well-lit, front-facing photo</li>
+                <li className="flex gap-2"><span className="text-blue-400">•</span> Avoid hats, sunglasses, or obstructions</li>
+                <li className="flex gap-2"><span className="text-blue-400">•</span> Use a plain or simple background</li>
+              </ul>
+              <button type="button" onClick={() => { resetEnhance(); setPhotoUrl(null) }}
+                className="min-h-[44px] px-5 rounded-xl bg-[#3D6AF2] text-white text-sm font-semibold hover:opacity-90 cursor-pointer">
+                Upload Another
+              </button>
+            </div>
+          )}
+
+          {/* Face rotation prompt */}
+          {enhanceState === 'done' && enhanceResult?.faceRotationAvailable && (
+            <div className="rounded-xl bg-slate-100 dark:bg-slate-800 p-4 flex items-start gap-3 mx-4 md:mx-6 mb-2">
+              <div className="w-10 h-10 rounded-lg bg-[#3D6AF2]/20 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-[#3D6AF2]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-slate-900 dark:text-white">Face Angle Correction</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">AI can generate a front-facing version for better compliance.</p>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <button type="button" className="min-h-[44px] px-3 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-white cursor-pointer">Skip</button>
+                <button type="button" className="min-h-[44px] px-3 rounded-lg bg-[#3D6AF2] text-white text-xs font-semibold hover:opacity-90 cursor-pointer">Fix — 1 credit</button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* RIGHT: Settings Panel — desktop */}
         <aside className="hidden xl:flex flex-col w-72 2xl:w-80 shrink-0 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 overflow-y-auto">
           <div className="p-4 space-y-6">
             <BackgroundPicker bgColor={bgColor} onChange={setBgColor} />
             <hr className="border-slate-100 dark:border-slate-800" />
-            <AdjustmentsPanel adjustments={adjustments} onChange={setAdjustments} />
+            <div>
+              {enhanceState === 'done' && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#3D6AF2]/10 text-[#3D6AF2] text-[10px] font-bold uppercase tracking-wider mb-2">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5z" /></svg>
+                  AI Enhanced
+                </span>
+              )}
+              <AdjustmentsPanel adjustments={adjustments} onChange={setAdjustments} />
+            </div>
             <hr className="border-slate-100 dark:border-slate-800" />
             <CompliancePanel compliance={compliance} />
             <hr className="border-slate-100 dark:border-slate-800" />
@@ -374,7 +458,15 @@ export default function IdPhotoPage() {
               <div className="p-4 space-y-6">
                 <BackgroundPicker bgColor={bgColor} onChange={setBgColor} />
                 <hr className="border-slate-100 dark:border-slate-800" />
-                <AdjustmentsPanel adjustments={adjustments} onChange={setAdjustments} />
+                <div>
+                  {enhanceState === 'done' && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#3D6AF2]/10 text-[#3D6AF2] text-[10px] font-bold uppercase tracking-wider mb-2">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5z" /></svg>
+                      AI Enhanced
+                    </span>
+                  )}
+                  <AdjustmentsPanel adjustments={adjustments} onChange={setAdjustments} />
+                </div>
                 <hr className="border-slate-100 dark:border-slate-800" />
                 <CompliancePanel compliance={compliance} />
                 <hr className="border-slate-100 dark:border-slate-800" />
