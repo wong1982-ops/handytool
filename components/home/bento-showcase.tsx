@@ -415,6 +415,27 @@ const bentoItems = [
       )
     })(),
   },
+  {
+    name: 'Logo Generator',
+    description: 'Create professional logos with AI',
+    href: '/tools/logo-generator',
+    gridClass: '',
+    glowClass: 'from-blue-500/10',
+    preview: (
+      <div className="w-full h-full flex items-center justify-center gap-3">
+        <div className="w-10 h-10 rounded-xl border border-[#3D6AF2]/30 bg-[#3D6AF2]/5 flex items-center justify-center">
+          <svg className="w-5 h-5 text-[#3D6AF2]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
+          </svg>
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="h-1.5 rounded-full bg-gradient-to-r from-[#3D6AF2]/40 to-[#32A9D9]/40 w-12" />
+          <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 w-8" />
+        </div>
+      </div>
+    ),
+  },
 ]
 
 export function BentoShowcase() {

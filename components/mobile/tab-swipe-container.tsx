@@ -4,8 +4,6 @@ import { Children, useRef, useState, useCallback, type ReactNode } from 'react'
 import type { TabId } from '@/components/mobile/bottom-tab-bar'
 
 const TAB_ORDER: TabId[] = ['tools', 'favorites', 'billing', 'profile']
-const SWIPE_THRESHOLD = 60
-const VELOCITY_THRESHOLD = 0.3
 const PULL_REFRESH_THRESHOLD = 100
 
 interface TabSwipeContainerProps {
@@ -14,7 +12,8 @@ interface TabSwipeContainerProps {
   children: [ReactNode, ReactNode, ReactNode, ReactNode]
 }
 
-export function TabSwipeContainer({ activeTab, onTabChange, children }: TabSwipeContainerProps) {
+export function TabSwipeContainer({ activeTab, onTabChange: _onTabChange, children }: TabSwipeContainerProps) {
+  void _onTabChange // kept for API compat — tabs switch via BottomTabBar only
   const activeIndex = TAB_ORDER.indexOf(activeTab)
   const [swiping, setSwiping] = useState(false)
   const [swipeX, setSwipeX] = useState(0)
@@ -55,14 +54,13 @@ export function TabSwipeContainer({ activeTab, onTabChange, children }: TabSwipe
     // Determine lock direction on first significant movement
     if (!touchRef.current.locked) {
       if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-        if (Math.abs(dx) > Math.abs(dy)) {
-          touchRef.current.locked = 'x'
-        } else if (dy > 0) {
+        if (dy > 0 && Math.abs(dy) > Math.abs(dx)) {
           // Pulling down — check if scroll is at top
           const panel = panelRefs.current[activeIndex]
           const atTop = !panel || panel.scrollTop <= 0
           touchRef.current.locked = atTop ? 'pull' : 'y'
         } else {
+          // Horizontal swipe disabled — let it pass through as vertical scroll
           touchRef.current.locked = 'y'
         }
       } else {
@@ -80,17 +78,6 @@ export function TabSwipeContainer({ activeTab, onTabChange, children }: TabSwipe
 
     // If vertical scroll, let it happen naturally
     if (touchRef.current.locked === 'y') return
-
-    // Horizontal swipe — prevent scroll and track offset
-    e.preventDefault()
-    setSwiping(true)
-
-    // Add resistance at edges
-    const atLeftEdge = activeIndex === 0 && dx > 0
-    const atRightEdge = activeIndex === TAB_ORDER.length - 1 && dx < 0
-    const dampened = (atLeftEdge || atRightEdge) ? dx * 0.2 : dx
-
-    setSwipeX(dampened)
   }
 
   const handleTouchEnd = () => {
@@ -107,19 +94,6 @@ export function TabSwipeContainer({ activeTab, onTabChange, children }: TabSwipe
       setPullY(0)
       touchRef.current = null
       return
-    }
-
-    const elapsed = (Date.now() - touchRef.current.startTime) / 1000
-    const velocity = elapsed > 0 ? swipeX / elapsed : 0
-
-    if (touchRef.current.locked === 'x') {
-      if (Math.abs(swipeX) > SWIPE_THRESHOLD || Math.abs(velocity) > VELOCITY_THRESHOLD * 1000) {
-        if (swipeX > 0 && activeIndex > 0) {
-          onTabChange(TAB_ORDER[activeIndex - 1])
-        } else if (swipeX < 0 && activeIndex < TAB_ORDER.length - 1) {
-          onTabChange(TAB_ORDER[activeIndex + 1])
-        }
-      }
     }
 
     touchRef.current = null

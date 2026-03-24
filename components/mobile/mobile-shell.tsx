@@ -13,7 +13,7 @@ import { ProfileTab } from '@/components/mobile/profile-tab'
 import { ToolsTab } from '@/components/mobile/tools-tab'
 
 /** Routes that opt out of MobileShell wrapping (custom full-screen layout) */
-const FULL_SCREEN_PATHS = ['/tools/story-studio']
+const FULL_SCREEN_PATHS = ['/tools/story-studio', '/tools/id-photo']
 
 interface MobileShellProps {
   children: React.ReactNode // the tools content (existing page)
@@ -55,10 +55,11 @@ export function MobileShell({ children }: MobileShellProps) {
 
   if (!isMobile) return null
 
-  // Full-screen routes (e.g. Story Studio) render children directly — no tabs, no bottom bar
+  // Full-screen routes (e.g. Story Studio, ID Photo) render children directly — no tabs, no bottom bar
+  // pointer-events-none on wrapper so the page's own fixed layout receives clicks
   if (isFullScreen) {
     return (
-      <div className="fixed inset-0 z-[60] flex flex-col bg-slate-50 dark:bg-slate-950 overflow-y-auto">
+      <div className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
         {children}
       </div>
     )

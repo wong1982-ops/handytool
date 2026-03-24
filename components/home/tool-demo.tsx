@@ -93,7 +93,7 @@ export function ToolDemo() {
         <select
           value={activeTool.id}
           onChange={handleToolChange}
-          className="rounded-lg bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] min-h-[44px]"
+          className="rounded-lg bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm px-3 h-11 outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]"
         >
           {DEMO_TOOLS.map((tool) => (
             <option key={tool.id} value={tool.id} className="bg-slate-900 text-white">
@@ -110,11 +110,11 @@ export function ToolDemo() {
             if (e.key === 'Enter') handleGo()
           }}
           placeholder={activeTool.placeholder}
-          className="rounded-lg bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-mono text-sm px-3 py-2 w-48 sm:w-64 outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] placeholder:text-slate-400 dark:placeholder:text-slate-500 min-h-[44px]"
+          className="rounded-lg bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-mono text-sm px-3 h-11 w-48 sm:w-64 outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] placeholder:text-slate-400 dark:placeholder:text-slate-500"
         />
         <button
           onClick={handleGo}
-          className="rounded-lg bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600)] text-white px-4 py-2 text-sm font-medium transition-colors min-h-[44px] cursor-pointer"
+          className="rounded-lg bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600)] text-white px-4 h-11 text-sm font-medium transition-colors cursor-pointer"
         >
           Go &rarr;
         </button>
