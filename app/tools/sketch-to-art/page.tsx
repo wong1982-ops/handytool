@@ -135,10 +135,9 @@ export default function SketchToArtPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           currentImageUrl: state.currentImage?.imageUrl,
-          instruction: message,
-          sketch: state.sketchDataUrl,
-          style: state.selectedStyle,
-          customStyle: state.customStyle,
+          feedback: message,
+          originalSketch: state.sketchDataUrl,
+          style: state.selectedStyle || state.customStyle,
         }),
       })
 
