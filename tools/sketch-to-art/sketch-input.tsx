@@ -24,6 +24,8 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
   const [editorEligible, setEditorEligible] = useState(false)
   const [rawPreview, setRawPreview] = useState<string | null>(null)
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   // Camera state
   const [cameraActive, setCameraActive] = useState(false)
   const [cameraError, setCameraError] = useState<string | null>(null)
@@ -360,7 +362,16 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                 <p className="text-xs text-[#70767f]">PNG, JPG, or WebP — max 10 MB</p>
               </div>
 
-              <label
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".png,.jpg,.jpeg,.webp"
+                className="hidden"
+                onChange={handleFileSelect}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
                 className={`relative z-10 min-h-[44px] inline-flex items-center px-6 rounded-xl font-semibold cursor-pointer transition-colors text-sm ${
                   isFun
                     ? 'bg-gradient-to-r from-pink-400 to-purple-500 text-white hover:from-pink-500 hover:to-purple-600'
@@ -368,13 +379,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                 }`}
               >
                 {isFun ? '📂 Browse Files' : 'Browse Files'}
-                <input
-                  type="file"
-                  accept=".png,.jpg,.jpeg,.webp"
-                  className="sr-only"
-                  onChange={handleFileSelect}
-                />
-              </label>
+              </button>
 
               {error && (
                 <p className="relative z-10 text-sm text-red-400" role="alert">
