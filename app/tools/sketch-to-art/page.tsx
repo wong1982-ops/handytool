@@ -373,19 +373,7 @@ export default function SketchToArtPage() {
         {/* Wizard content */}
         <div id="wizard" style={{ scrollMarginTop: '80px' }}>
 
-        {/* Back button (steps 2-5) */}
-        {state.step > 1 && (
-          <button
-            type="button"
-            onClick={handleBack}
-            className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-[var(--tk-color-primary-500)] transition-colors min-h-[44px]"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            Back
-          </button>
-        )}
+        {/* Back button removed — replaced by sticky action footer below */}
 
         {/* Error display */}
         {state.error && (
@@ -475,6 +463,32 @@ export default function SketchToArtPage() {
             mode={mode}
             onStartOver={handleStartOver}
           />
+        )}
+
+        {/* Sticky action footer — Prev / Next */}
+        {state.step > 1 && state.step < 5 && (
+          <div className="sticky bottom-0 z-20 mt-6 -mx-4 px-4 py-3 bg-[#090f16]/90 backdrop-blur-lg border-t border-[#1e2631]">
+            <div className="flex items-center justify-between max-w-4xl mx-auto">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="min-h-[44px] px-5 py-2 rounded-xl text-sm font-medium text-[#a6abb5] hover:text-white bg-[#131a23] hover:bg-[#1e2631] transition-colors cursor-pointer inline-flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+                {isFun
+                  ? ['', 'Sketch', 'Style', 'Magic', 'Refine'][state.step - 1]
+                  : 'Previous'}
+              </button>
+              <span className="text-xs text-[#70767f]">
+                Step {state.step} of 5
+              </span>
+              {state.step === 1 && (
+                <div className="w-20" /> // spacer
+              )}
+            </div>
+          </div>
         )}
 
         </div>{/* end #wizard */}
