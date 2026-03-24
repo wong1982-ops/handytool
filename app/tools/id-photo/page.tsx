@@ -236,7 +236,7 @@ export default function IdPhotoPage() {
   }, [handleDownload])
 
   return (
-    <div className="flex flex-col overflow-hidden bg-slate-50 dark:bg-slate-950 fixed inset-0 top-[100px] z-30">
+    <div className="flex flex-col overflow-hidden bg-slate-50 dark:bg-slate-950 fixed inset-0 top-[60px] md:top-[100px] z-30">
       {/* Top bar with breadcrumb */}
       <div className="shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 md:px-6 py-2.5 flex items-center justify-between">
         <div className="flex items-center gap-3">

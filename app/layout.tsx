@@ -112,6 +112,7 @@ export default function RootLayout({
       </head>
       <body
         className="antialiased min-h-screen flex flex-col"
+        style={{ overscrollBehaviorX: 'none' }}
       >
         <script
           type="application/ld+json"

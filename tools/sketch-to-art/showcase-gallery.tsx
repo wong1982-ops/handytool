@@ -120,8 +120,8 @@ function BentoTile({
   const imgUrl = `${SHOWCASE_BASE}/mermaid-${style.id}.png`
 
   const sizeClasses = {
-    hero: 'col-span-2 row-span-2',
-    tall: 'row-span-2',
+    hero: 'sm:col-span-2 sm:row-span-2',
+    tall: 'sm:row-span-2',
     normal: '',
   }
 
@@ -267,7 +267,7 @@ export function ShowcaseGallery({ mode: _mode }: ShowcaseGalleryProps) {
       </div>
 
       {/* Bento grid — all 18 styles */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 auto-rows-[160px] sm:auto-rows-[180px]">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 auto-rows-[140px] sm:auto-rows-[180px]">
         {ART_STYLES.map((style, index) => (
           <BentoTile
             key={style.id}
