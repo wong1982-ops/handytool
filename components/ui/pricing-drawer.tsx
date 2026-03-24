@@ -76,7 +76,7 @@ export function PricingDrawer({ open, onClose }: PricingDrawerProps) {
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
           open ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         style={{ zIndex: 9998 }}
@@ -86,7 +86,7 @@ export function PricingDrawer({ open, onClose }: PricingDrawerProps) {
       {/* Drawer panel — slides from left */}
       <div
         ref={drawerRef}
-        className={`fixed top-0 left-0 h-full w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto ${
+        className={`fixed top-0 left-0 h-full w-full max-w-md bg-white dark:bg-[#0d1117] shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{ zIndex: 9999 }}
@@ -95,7 +95,7 @@ export function PricingDrawer({ open, onClose }: PricingDrawerProps) {
         aria-label="Pricing"
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 px-5 py-4 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-white/95 dark:bg-[#0d1117]/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 px-5 py-4 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">Pricing</h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Buy credit packs</p>
