@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { FontProject, DEFAULT_FONT_PROJECT, WizardStep, FontCharacter } from '@/tools/font-generator/types'
+import { DescribeStep } from './describe-step'
 
 type Tab = 'create' | 'history'
 
@@ -352,16 +353,19 @@ export default function FontWizard() {
           {/* Step content */}
           <div id="wizard-content" style={{ scrollMarginTop: '80px' }}>
             {project.step === 1 && (
-              <div className="text-white text-center py-20">
-                <p className="text-lg font-bold mb-2">Describe Step</p>
-                <p className="text-sm text-[#70767f]">Coming in Task 6</p>
-                <button
-                  onClick={() => setProject((p) => ({ ...p, step: 2 }))}
-                  className="mt-4 px-4 py-2 bg-[#3D6AF2] rounded-lg text-sm cursor-pointer"
-                >
-                  Next (temp)
-                </button>
-              </div>
+              <DescribeStep
+                stylePreset={project.stylePreset}
+                customPrompt={project.customPrompt}
+                colors={project.colors}
+                colorMode={project.colorMode}
+                referenceImageBase64={project.referenceImageBase64}
+                onStyleChange={(s) => setProject((p) => ({ ...p, stylePreset: s }))}
+                onCustomPromptChange={(v) => setProject((p) => ({ ...p, customPrompt: v }))}
+                onColorsChange={(c) => setProject((p) => ({ ...p, colors: c }))}
+                onColorModeChange={(m) => setProject((p) => ({ ...p, colorMode: m }))}
+                onReferenceChange={(base64) => setProject((p) => ({ ...p, referenceImageBase64: base64 }))}
+                onNext={() => handlePreview(project)}
+              />
             )}
 
             {project.step === 2 && (
