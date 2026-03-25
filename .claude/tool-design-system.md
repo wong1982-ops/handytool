@@ -315,6 +315,7 @@ Client-side: show credit purchase prompt or redirect to billing.
 
 ## 7. Mobile Rules
 
+### Layout
 1. **All tools**: Add `style={{ overscrollBehaviorX: 'none' }}` on `<main>` to prevent swipe-back
 2. **Studio tools**: Add to `FULL_SCREEN_PATHS` in `components/mobile/mobile-shell.tsx`
 3. **Sidebars on mobile**: Hidden by default, opened via FAB or gear icon
@@ -323,6 +324,45 @@ Client-side: show credit purchase prompt or redirect to billing.
    - Cards: `grid-cols-2 sm:grid-cols-3 lg:grid-cols-4`
    - Character grids: `grid-cols-3 sm:grid-cols-4 md:grid-cols-6`
    - Launchpads: `grid-cols-2 sm:grid-cols-4`
+
+### Scroll Performance (MANDATORY)
+
+Mobile scroll jank is the #1 UX complaint. Follow these rules:
+
+1. **Images**: ALL images MUST use Next.js `<Image>` with `sizes` prop for responsive loading. Never serve 1000px+ images to a 375px viewport. Use `loading="lazy"` for below-fold images.
+   ```tsx
+   // ✅ Correct
+   <Image src={url} alt="" width={400} height={300} sizes="(max-width: 768px) 50vw, 33vw" loading="lazy" />
+
+   // ❌ Wrong — sends full-res to mobile
+   <img src={url} className="w-full" />
+   ```
+
+2. **DOM count**: Keep under 800 elements per page on mobile. If a list has 20+ cards, use virtualization or pagination — don't render all at once.
+
+3. **Scroll containers**: Avoid nested scroll containers. One main scroll per page. Use `-webkit-overflow-scrolling: touch` (or Tailwind `scroll-smooth`) on the primary scroll container.
+
+4. **Heavy CSS properties**: Minimize these on scrollable content:
+   - `backdrop-filter: blur()` — use sparingly, only on fixed/sticky headers
+   - `box-shadow` — use `shadow-lg` not custom multi-layer shadows
+   - `overflow: hidden` — only where needed, not on every card
+
+5. **Fixed elements during scroll**: Keep fixed elements lightweight (headers, FABs). Never put `backdrop-blur` on large fixed overlays during scroll.
+
+6. **`will-change`**: Add `will-change: transform` on elements that animate during scroll (carousels, sticky headers). Remove after animation completes.
+
+7. **Image cards**: Use `aspect-ratio` instead of padding-bottom hack. Use `object-cover` with explicit dimensions.
+   ```tsx
+   // ✅ Correct
+   <div className="aspect-[4/3] rounded-lg overflow-hidden">
+     <Image src={url} fill sizes="50vw" className="object-cover" />
+   </div>
+   ```
+
+8. **Long lists**: For story/book lists with cover images:
+   - Show max 6-8 cards initially on mobile
+   - "Load more" button or intersection observer for infinite scroll
+   - Each card: fixed height, lazy images, minimal DOM nesting
 
 ---
 

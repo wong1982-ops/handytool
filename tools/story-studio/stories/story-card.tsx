@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import type { StoryItem } from '@/tools/story-studio/use-stories-list'
 
 interface StoryCardProps {
@@ -19,12 +20,15 @@ export function StoryCard({ story, onEdit, onDelete, onToggleShare }: StoryCardP
     <div className="group relative bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-md transition-shadow">
       {/* Cover image */}
       <Link href={`/tools/story-studio/book/${story.slug}`} className="block" prefetch={true}>
-        <div className="aspect-[3/4] bg-slate-100 dark:bg-slate-800 overflow-hidden">
+        <div className="relative aspect-[3/4] bg-slate-100 dark:bg-slate-800 overflow-hidden">
           {story.coverImageUrl ? (
-            <img
+            <Image
               src={story.coverImageUrl}
               alt={story.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+              fill
+              sizes="(max-width: 768px) 50vw, 33vw"
+              className="object-cover group-hover:scale-105 transition-transform"
+              loading="lazy"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -67,7 +71,7 @@ export function StoryCard({ story, onEdit, onDelete, onToggleShare }: StoryCardP
             className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium
               text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg
               transition-colors cursor-pointer"
-            style={{ minHeight: '36px' }}
+            style={{ minHeight: '44px' }}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />

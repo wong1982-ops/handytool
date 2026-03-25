@@ -3,6 +3,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { JobProgress } from './use-job-progress'
 
 interface JobCardProps {
@@ -36,9 +37,9 @@ export function JobCard({ jobProgress, onRetry, onRequestDelete }: JobCardProps)
 
       <div className="flex items-start gap-3">
         {/* Cover thumbnail or spinner placeholder */}
-        <div className="w-14 h-[72px] rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0 flex items-center justify-center">
+        <div className="relative w-14 h-[72px] rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0 flex items-center justify-center">
           {job.cover_url ? (
-            <img src={job.cover_url} alt="" className="w-full h-full object-cover" />
+            <Image src={job.cover_url} alt="" fill sizes="56px" className="object-cover" loading="lazy" />
           ) : (
             <svg className="w-5 h-5 text-slate-300 dark:text-slate-600 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
