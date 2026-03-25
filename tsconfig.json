@@ -31,5 +31,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "admin", "ui", "public/sw.js"]
+  "exclude": ["node_modules", "admin", "ui", "public/sw.js", "scripts/vblog-server"]
 }
