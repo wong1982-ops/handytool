@@ -13,7 +13,7 @@ import { ProfileTab } from '@/components/mobile/profile-tab'
 import { ToolsTab } from '@/components/mobile/tools-tab'
 
 /** Routes that opt out of MobileShell wrapping (custom full-screen layout) */
-const FULL_SCREEN_PATHS = ['/tools/story-studio', '/tools/id-photo', '/tools/music-studio']
+const FULL_SCREEN_PATHS = ['/tools/story-studio', '/tools/id-photo', '/tools/music-studio', '/tools/mood-board']
 
 interface MobileShellProps {
   children: React.ReactNode // the tools content (existing page)
@@ -71,16 +71,16 @@ export function MobileShell({ children }: MobileShellProps) {
 
       <TabSwipeContainer activeTab={activeTab} onTabChange={handleTabChange}>
         {/* Tools tab — drill-down navigation with back button */}
-        <div className="pb-16"><ToolsTab>{children}</ToolsTab></div>
+        <div className="pb-20"><ToolsTab>{children}</ToolsTab></div>
 
         {/* Favorites tab */}
-        <div className="pb-16"><FavoritesTab onNavigate={() => handleTabChange('tools')} /></div>
+        <div className="pb-20"><FavoritesTab onNavigate={() => handleTabChange('tools')} /></div>
 
         {/* Billing tab */}
-        <div className="pb-16"><BillingTab /></div>
+        <div className="pb-20"><BillingTab /></div>
 
         {/* Profile tab */}
-        <div className="pb-16"><ProfileTab /></div>
+        <div className="pb-20"><ProfileTab /></div>
       </TabSwipeContainer>
 
       <BottomTabBar activeTab={activeTab} onTabChange={handleTabChange} user={user} />

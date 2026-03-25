@@ -111,13 +111,13 @@ export function BoardToolbar({
             <rect x="3" y="14" width="7" height="7" />
             <rect x="14" y="14" width="7" height="7" />
           </svg>
-          My Boards
+          <span className="hidden sm:inline">My Boards</span>
         </button>
 
         {/* Share button */}
         <button
           onClick={onShare}
-          className="min-h-[44px] bg-[#131a23] hover:bg-[#1e2631] rounded-lg px-3 py-2 text-sm text-[#a6abb5] transition-colors flex items-center gap-1.5"
+          className="min-h-[44px] bg-[#131a23] hover:bg-[#1e2631] rounded-lg px-3 py-2 text-sm text-[#a6abb5] transition-colors flex items-center gap-1.5 cursor-pointer"
         >
           {/* Share icon */}
           <svg
@@ -136,14 +136,14 @@ export function BoardToolbar({
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
           </svg>
-          Share
+          <span className="hidden sm:inline">Share</span>
         </button>
 
         {/* Download dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={toggleDownload}
-            className="min-h-[44px] bg-[#131a23] hover:bg-[#1e2631] rounded-lg px-3 py-2 text-sm text-[#a6abb5] transition-colors flex items-center gap-1.5"
+            className="min-h-[44px] bg-[#131a23] hover:bg-[#1e2631] rounded-lg px-3 py-2 text-sm text-[#a6abb5] transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             {/* Download icon */}
             <svg
@@ -160,7 +160,7 @@ export function BoardToolbar({
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            Download
+            <span className="hidden sm:inline">Download</span>
             {/* Chevron */}
             <svg
               width="12"

@@ -110,7 +110,7 @@ export default function ColorPalettePage() {
   }
 
   return (
-    <main className="flex-1 flex flex-col items-center py-10 px-4">
+    <main className="flex-1 flex flex-col items-center py-10 px-4 overflow-x-hidden">
       <div className="w-full max-w-[1200px] flex flex-col gap-6">
         <ToolBreadcrumb toolName="Color Palette" toolSlug="color-palette" />
 

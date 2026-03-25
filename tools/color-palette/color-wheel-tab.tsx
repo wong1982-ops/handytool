@@ -175,7 +175,7 @@ export function ColorWheelTab({
       </div>
 
       {/* Harmony rule selector */}
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-1.5 overflow-x-auto">
         {rules.map(([rule, label]) => (
           <button
             key={rule}
