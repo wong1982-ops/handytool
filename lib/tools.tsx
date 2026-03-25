@@ -241,4 +241,15 @@ export const tools: Tool[] = [
     ),
     color: 'from-[#3D6AF2] to-[#32A9D9]',
   },
+  {
+    name: 'Font Generator',
+    href: '/tools/font-generator',
+    description: 'Create custom fonts and alphabets with AI',
+    icon: (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h8m-8 6h16M7 3v3m10-3v3" />
+      </svg>
+    ),
+    color: 'from-pink-500 to-blue-500',
+  },
 ]

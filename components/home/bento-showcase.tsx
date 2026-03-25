@@ -436,6 +436,28 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'Font Generator',
+    description: 'Create custom fonts with AI',
+    href: '/tools/font-generator',
+    gridClass: '',
+    glowClass: 'from-pink-500/10',
+    preview: (
+      <div className="w-full h-full flex items-center justify-center gap-3">
+        <div className="flex gap-1.5">
+          {['A', 'B', 'C'].map((letter) => (
+            <div key={letter} className="w-8 h-8 rounded-lg border border-pink-500/30 bg-pink-500/5 flex items-center justify-center text-pink-400/60 text-sm font-bold">
+              {letter}
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="h-1.5 rounded-full bg-gradient-to-r from-pink-500/40 to-blue-500/40 w-12" />
+          <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 w-8" />
+        </div>
+      </div>
+    ),
+  },
 ]
 
 export function BentoShowcase() {
