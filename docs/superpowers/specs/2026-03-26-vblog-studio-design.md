@@ -1,8 +1,8 @@
-# VBlog Studio — Design Specification
+# VBlog Studio — Design Specification (v1 Simplified)
 
 ## Overview
 
-Fully automated marketing video generator for Toolk1t tools. One-click generates a complete video: AI-written script, automated Playwright screen recording, TTS voiceover (cloned voice or AI voice), your pre-recorded intro/outro face clips, assembled into a polished talking-head + demo video. Auto-published to YouTube, TikTok, Instagram Reels, Twitter/X, and Toolk1t blog.
+Automated marketing video generator for Toolk1t tools. One-click generates a complete video: AI-written script, automated Playwright screen recording, TTS voiceover (cloned voice or AI voice), your pre-recorded intro/outro face clips, assembled into a polished talking-head + demo video. Downloads as ready-to-upload files for each platform. Manual upload by user in v1.
 
 ## User Flow
 
@@ -12,11 +12,11 @@ Fully automated marketing video generator for Toolk1t tools. One-click generates
 4. Choose target duration (60s / 120s / 180s)
 5. Click "Generate" → pipeline starts
 6. Monitor progress on dashboard
-7. Preview finished video, auto-published to all platforms
+7. Preview finished video, download master + platform variants
 
 ## Pipeline Steps
 
-7-step async pipeline. Each step produces an artifact in R2, retryable independently.
+6-step async pipeline. Each step produces an artifact in R2, retryable independently.
 
 ```
 Step 1: SCRIPT        → Gemini generates structured script with actions
@@ -25,14 +25,19 @@ Step 3: VOICE         → TTS generates voiceover from script (clone or AI)
 Step 4: ASSETS        → Generate title card, lower third, end card graphics
 Step 5: ASSEMBLY      → FFmpeg combines intro + title + demo + voice + outro → master.mp4
 Step 6: ADAPT         → FFmpeg crops/resizes for TikTok (9:16), Reels (9:16), Twitter (1:1)
-Step 7: PUBLISH       → Upload to YouTube, TikTok, Instagram, Twitter/X, create blog post
 ```
+
+Each step writes output to `vblog/{jobId}/`:
+- `script.json` — generated script with timestamps
+- `screen-*.webm` — raw Playwright capture per section
+- `voiceover.mp3` — TTS audio
+- `title-card.png`, `lower-third.png`, `end-card.png` — graphics
+- `master.mp4` — final 16:9 video
+- `tiktok.mp4`, `reels.mp4`, `twitter.mp4` — adapted variants
 
 ## Step 1: Script Generation
 
-Gemini writes the script from tool metadata.
-
-**Input:** Tool name, description, URL, extracted features, script style, target duration.
+Gemini writes the script from tool metadata. Reads from `lib/tools.tsx` + crawls tool page for features.
 
 **Output:**
 ```json
@@ -51,7 +56,13 @@ Gemini writes the script from tool metadata.
       "text": "First, enter your business name...",
       "duration": 15,
       "visualNote": "screen-recording",
-      "actions": ["click input#businessName", "type 'Bright Spark'", "click #industry"]
+      "actions": ["click input#businessName", "type 'Bright Spark'"]
+    },
+    {
+      "type": "outro",
+      "text": "Try it free at toolk1t.com.",
+      "duration": 5,
+      "visualNote": "talking-head"
     }
   ],
   "hashtags": ["#aitools", "#logodesign"],
@@ -59,113 +70,102 @@ Gemini writes the script from tool metadata.
 }
 ```
 
-Two script styles:
-- **Feature Walkthrough**: structured (what it does, 3-5 features, step-by-step, CTA)
-- **Problem-Solution**: narrative ("Have you ever struggled with X? Meet [Tool]...")
+Two script styles: Feature Walkthrough (structured) and Problem-Solution (narrative).
 
 ## Step 2: Screen Recording
 
-Playwright launches 1920x1080 browser, navigates to tool, executes `actions` from script.
+Playwright launches 1920x1080, navigates to tool, executes `actions` from script.
 
 - Built-in Playwright video recording
 - Natural timing: 500ms pauses, 80ms/char typing, smooth scrolls
 - Custom CSS cursor overlay for visibility
-- Each demo section recorded separately, trimmed to match duration
-- Output: `.webm` files per section → R2
+- Each demo section recorded separately
+- Output: `.webm` per section → R2
 
 ## Step 3: Voice Generation
 
-Runs in parallel with Step 2 (no dependency).
+Runs in parallel with Step 2.
 
-- Cloned voice: uses Story Studio TTS infrastructure with user's voice profile
+- Cloned voice: Story Studio TTS infrastructure
 - AI voice: TTS API with selected voice from library
-- Full audio file generated, split by section timestamps for sync
-- Output: `voiceover.mp3` + per-section clips → R2
+- Full audio + per-section splits for sync
+- Output: `voiceover.mp3` → R2
 
 ## Step 4: Asset Preparation
 
-- **Title card**: Tool name + tagline on branded `#090f16` background, 3s
+- **Title card**: Tool name + tagline on `#090f16` background, 3s
 - **Lower third**: Name/title overlay for talking-head sections
-- **End card**: "Try it free at toolk1t.com" + URL + QR code, 5s
-- **Intro/outro clips**: Pre-recorded face clips from R2 (`vblog/templates/intro.mp4`, `outro.mp4`)
-- **Background music**: Royalty-free track at low volume (`vblog/templates/bgm.mp3`)
+- **End card**: "Try it free at toolk1t.com" + URL, 5s
+- **Intro/outro clips**: Pre-recorded, from `vblog/templates/`
+- **Background music**: Royalty-free at low volume
 
 ## Step 5: Video Assembly
 
-FFmpeg combines all assets:
-
+FFmpeg combines:
 ```
-[Intro clip 3-5s] → [Title card 3s] → [Demo 1 + voice] → [Demo 2 + voice] → ... → [End card 5s] → [Outro clip 3-5s]
+[Intro 3-5s] → [Title 3s] → [Demo sections + voice] → [End card 5s] → [Outro 3-5s]
 ```
-
-- Voiceover overlaid on screen recordings
-- Crossfade transitions (0.5s dissolve)
-- Lower-third overlay during talking-head sections
-- Background music under voiceover
-- Output: `master.mp4` at 1920x1080, H.264, AAC
+- Crossfade transitions (0.5s)
+- Lower-third during talking-head
+- Background music under voice
+- Output: `master.mp4` 1920x1080, H.264
 
 ## Step 6: Platform Adaptation
 
-FFmpeg generates variants from master:
+| Platform | Aspect | Resolution | Max Duration |
+|----------|--------|-----------|-------------|
+| YouTube | 16:9 | 1920x1080 | Full (master) |
+| TikTok | 9:16 | 1080x1920 | 60s (highlight trim) |
+| Instagram Reels | 9:16 | 1080x1920 | 90s |
+| Twitter/X | 1:1 | 1080x1080 | 140s |
 
-| Platform | Aspect | Resolution | Max Duration | Crop |
-|----------|--------|-----------|-------------|------|
-| YouTube | 16:9 | 1920x1080 | Full | None (master) |
-| TikTok | 9:16 | 1080x1920 | 60s | Center-crop + trim highlights |
-| Instagram Reels | 9:16 | 1080x1920 | 90s | Center-crop + trim |
-| Twitter/X | 1:1 | 1080x1080 | 140s | Center-crop |
-
-Short-form variants extract "highlight" sections from script (hook + 1-2 features + CTA).
-
-## Step 7: Publishing
-
-| Platform | API | Upload |
-|----------|-----|--------|
-| YouTube | YouTube Data API v3 | Video + title + description + tags + thumbnail |
-| TikTok | TikTok Content Posting API | Video + caption + hashtags |
-| Instagram | Instagram Graph API | Reels video + caption |
-| Twitter/X | Twitter API v2 | Video + tweet text |
-| Toolk1t Blog | Internal API | Blog post with embedded video |
-
-Each platform independent — failures don't block others.
+Short-form: extract highlight sections (hook + 1-2 features + CTA).
 
 ## Dashboard UI
 
-Admin-only page at `/tools/vblog`.
+Admin page at `/tools/vblog`.
 
 ```
 ┌─────────────────────────────────────────────────┐
 │  VBlog Studio                    [+ New Video]   │
 ├─────────────────────────────────────────────────┤
-│  Job cards with:                                 │
-│  - Tool name + timestamp                         │
-│  - Progress bar (Step N/7)                       │
-│  - Step status icons (✅⏳❌)                     │
-│  - Platform publish status                       │
-│  - Preview / Stats / Regenerate buttons          │
+│  ┌─────────────────────────────────────────┐    │
+│  │ Logo Generator Demo          2 min ago   │    │
+│  │ ████████████░░░░  Step 5/6: Assembly     │    │
+│  │ ✅Script ✅Record ✅Voice ✅Assets ⏳Asm  │    │
+│  └─────────────────────────────────────────┘    │
+│                                                  │
+│  ┌─────────────────────────────────────────┐    │
+│  │ Font Generator Demo          1 day ago   │    │
+│  │ ✅ Complete · 4 files ready              │    │
+│  │ [▶ Preview] [⬇ Download All]            │    │
+│  │ master.mp4 · tiktok.mp4 · reels · x     │    │
+│  └─────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────┘
 ```
 
-**New Video form:** Tool dropdown, script style, voice choice, duration, Generate button.
+Download options:
+- **Download All** — ZIP of master + all platform variants + script + description text
+- **Individual downloads** — click each variant filename
 
 ## Infrastructure
 
-### Processing Server
+### Processing Server (Fly.io)
 
-Vercel serverless cannot run FFmpeg or headed Playwright. A dedicated processing server handles Steps 2, 5, 6:
-
-- Small Fly.io or Railway instance with Chrome + FFmpeg installed
-- Receives jobs via REST API from Vercel cron worker
+FFmpeg + Playwright need real runtime. A small Fly.io app:
+- Node.js 20 + Chrome + FFmpeg
+- Receives jobs via REST API
 - Returns artifacts to R2
-- Always-on, minimal resources (1 vCPU, 1GB RAM, scales to 0 when idle)
+- Scales to 0 when idle (~$3-5/month active)
+- I'll provide the Dockerfile
 
 ### Cron Worker
 
-Vercel cron (`/api/cron/vblog-worker`) runs every 30s:
-- Picks up jobs with `status = 'processing'`
-- Executes next pending step (or dispatches to processing server)
-- Updates job status
-- One step per invocation to stay within timeout
+Vercel cron (`/api/cron/vblog-worker`) every 30s:
+- Picks up pending jobs
+- Executes next step (or dispatches to Fly.io for heavy steps)
+- Updates status
+- One step per invocation
 
 ## File Structure
 
@@ -173,21 +173,16 @@ Vercel cron (`/api/cron/vblog-worker`) runs every 30s:
 |------|---------|
 | `app/tools/vblog/page.tsx` | Dashboard page |
 | `tools/vblog/types.ts` | Types, pipeline steps, job state |
-| `tools/vblog/vblog-dashboard.tsx` | Main dashboard with job list |
-| `tools/vblog/new-video-form.tsx` | Tool selector + options form |
-| `tools/vblog/job-progress.tsx` | Individual job progress card |
-| `tools/vblog/video-preview.tsx` | Video player + platform status |
+| `tools/vblog/vblog-dashboard.tsx` | Dashboard with job list |
+| `tools/vblog/new-video-form.tsx` | Tool selector + options |
+| `tools/vblog/job-progress.tsx` | Job progress card |
+| `tools/vblog/video-preview.tsx` | Video player + download links |
 | `lib/vblog/pipeline.ts` | Pipeline orchestrator |
 | `lib/vblog/script-generator.ts` | Gemini script generation |
 | `lib/vblog/screen-recorder.ts` | Playwright recording |
 | `lib/vblog/voice-generator.ts` | TTS integration |
 | `lib/vblog/video-assembler.ts` | FFmpeg assembly |
 | `lib/vblog/platform-adapter.ts` | FFmpeg crop/resize |
-| `lib/vblog/publishers/youtube.ts` | YouTube upload |
-| `lib/vblog/publishers/tiktok.ts` | TikTok upload |
-| `lib/vblog/publishers/instagram.ts` | Instagram upload |
-| `lib/vblog/publishers/twitter.ts` | Twitter upload |
-| `lib/vblog/publishers/blog.ts` | Blog post creation |
 | `app/api/v1/vblog/create/route.ts` | Create job |
 | `app/api/v1/vblog/jobs/route.ts` | List jobs |
 | `app/api/v1/vblog/jobs/[id]/route.ts` | Get/update job |
@@ -212,7 +207,6 @@ status          TEXT NOT NULL DEFAULT 'pending'
 current_step    TEXT
 steps           JSONB NOT NULL DEFAULT '{}'
 artifacts       JSONB NOT NULL DEFAULT '{}'
-platforms       JSONB NOT NULL DEFAULT '{}'
 script_data     JSONB
 error           TEXT
 created_at      TIMESTAMPTZ DEFAULT now()
@@ -222,60 +216,59 @@ updated_at      TIMESTAMPTZ DEFAULT now()
 ## R2 Storage
 
 ```
-vblog/templates/intro.mp4        — your face intro (uploaded once)
-vblog/templates/outro.mp4        — your face outro (uploaded once)
-vblog/templates/bgm.mp3          — background music (uploaded once)
-vblog/{jobId}/script.json        — generated script
-vblog/{jobId}/screen-*.webm      — screen recordings per section
-vblog/{jobId}/voiceover.mp3      — TTS audio
-vblog/{jobId}/title-card.png     — title graphic
-vblog/{jobId}/lower-third.png    — overlay graphic
-vblog/{jobId}/end-card.png       — end graphic
-vblog/{jobId}/master.mp4         — final 16:9 video
-vblog/{jobId}/tiktok.mp4         — 9:16 variant
-vblog/{jobId}/reels.mp4          — 9:16 variant
-vblog/{jobId}/twitter.mp4        — 1:1 variant
+vblog/templates/intro.mp4        — face intro (uploaded once)
+vblog/templates/outro.mp4        — face outro (uploaded once)
+vblog/templates/bgm.mp3          — background music
+vblog/{jobId}/script.json
+vblog/{jobId}/screen-*.webm
+vblog/{jobId}/voiceover.mp3
+vblog/{jobId}/title-card.png
+vblog/{jobId}/lower-third.png
+vblog/{jobId}/end-card.png
+vblog/{jobId}/master.mp4
+vblog/{jobId}/tiktok.mp4
+vblog/{jobId}/reels.mp4
+vblog/{jobId}/twitter.mp4
 ```
 
 ## One-Time Setup
 
-1. Record intro clip (3-5s face to camera) → upload via dashboard
+1. Record intro clip (3-5s) → upload via dashboard
 2. Record outro clip (3-5s) → upload via dashboard
-3. Record voice sample (30-60s) → clone via Story Studio voice flow
+3. Record voice sample (30-60s) → clone via Story Studio
 4. Upload royalty-free background music
-5. Set up OAuth tokens for YouTube, TikTok, Instagram, Twitter (settings page)
+5. Deploy Fly.io processing server
 
 ## Edge Cases
 
-- **FFmpeg/Playwright on serverless**: Handled by dedicated processing server
-- **Platform API rate limits**: YouTube ~6 uploads/day. Retry with exponential backoff.
-- **Screen recording failure**: Tool page broken → job fails with error screenshot
-- **Platform publish partial failure**: Others proceed. Retry individually.
+- **No intro/outro uploaded**: Skip those sections, start with title card
+- **Screen recording failure**: Job fails with error screenshot, retryable
+- **Voice generation failure**: Fall back to AI voice if clone fails
+- **FFmpeg failure**: Retry from assembly step (recordings preserved)
 - **Job expiry**: Artifacts deleted from R2 after 30 days
-- **No intro/outro uploaded**: Skip those sections, video starts with title card
 
 ## Non-Goals (v1)
 
+- Auto-upload to platforms (manual upload by user)
+- Platform OAuth integration
 - Live streaming
 - Manual video editing timeline
+- A/B testing video versions
+- Analytics dashboard
 - User-facing video creation (admin-only)
-- Real-time preview during generation
-- A/B testing different video versions
-- Analytics dashboard (use native platform analytics)
 
 ## Decision Log
 
 | # | Decision | Alternatives | Reason |
 |---|----------|-------------|--------|
-| 1 | Fully automated one-click | Manual, semi-automated | Maximum efficiency |
-| 2 | Talking head + demo clips | Avatar, slides, graphics | Personal, authentic |
+| 1 | Fully automated generation | Manual, semi-automated | Maximum efficiency |
+| 2 | Talking head + demo | Avatar, slides, graphics | Personal, authentic |
 | 3 | Voice clone + AI fallback | AI only, record each time | Personal + flexible |
 | 4 | Playwright screen recording | Screenshots, AI mockups | Real interactions |
 | 5 | Two script styles | Single, template | Variety |
 | 6 | One master, auto-adapt | Per-platform | Efficient |
-| 7 | Multi-platform distribution | Single, download | Maximum reach |
-| 8 | Pipeline job system | Monolithic, external | Proven, resilient |
-| 9 | Dedicated processing server | Serverless WASM | FFmpeg + Playwright need real runtime |
+| 7 | Manual upload v1 | Auto-publish | Simpler, no OAuth setup needed |
+| 8 | Pipeline job system | Monolithic | Proven, resilient |
+| 9 | Fly.io processing server | Serverless WASM | FFmpeg + Playwright need runtime |
 | 10 | Cron worker (30s) | WebSocket | Simple, fits Vercel |
-| 11 | Per-step retry | All-or-nothing | Resilient |
-| 12 | Admin-only dashboard | Separate admin app | Stays in main app |
+| 11 | Download ZIP with all variants | Individual only | Convenient for manual upload |
