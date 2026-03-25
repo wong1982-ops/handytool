@@ -492,6 +492,26 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'VBlog Studio',
+    description: 'Generate AI marketing videos',
+    href: '/tools/vblog',
+    gridClass: '',
+    glowClass: 'from-red-500/10',
+    preview: (
+      <div className="w-full h-full flex items-center justify-center gap-2">
+        <div className="w-10 h-10 rounded-lg border border-red-500/30 bg-red-500/5 flex items-center justify-center">
+          <svg className="w-5 h-5 text-red-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="h-1.5 rounded-full bg-gradient-to-r from-red-500/40 to-pink-500/40 w-12" />
+          <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 w-8" />
+        </div>
+      </div>
+    ),
+  },
 ]
 
 export function BentoShowcase() {
