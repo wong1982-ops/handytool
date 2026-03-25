@@ -125,6 +125,9 @@ See [.claude/tool-pattern.md](.claude/tool-pattern.md) for full details.
 See [.claude/ui-ux-guideline.md](.claude/ui-ux-guideline.md) — MUST follow for all UI work.
 Key rules: WCAG 2.1 AA, 4.5:1 contrast for text, 44px touch targets, mobile-first, semantic HTML, Core Web Vitals 90+.
 
+## Tool Design System (MANDATORY for all tools)
+See [.claude/tool-design-system.md](.claude/tool-design-system.md) — Foundation tokens (colors, typography, spacing), shared components (AILoadingSpinner, ToolBreadcrumb, error banners, credit badges), layout patterns (Wizard vs Studio), interaction rules (buttons, inputs, selection states), persistence pattern (auto-save + history tabs), credit model, mobile rules, API patterns, and new tool checklist.
+
 ## Development Lifecycle (MANDATORY)
 All features MUST follow the 3-phase lifecycle defined in [.claude/dev-lifecycle.md](.claude/dev-lifecycle.md):
 - **Phase 1 — Discovery**: PO + BA + UX + UI + Architect + QA Lead collaborate on PRD
