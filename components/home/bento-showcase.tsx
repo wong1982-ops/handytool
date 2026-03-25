@@ -458,6 +458,26 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'Music Studio',
+    description: 'Create AI music in real-time',
+    href: '/tools/music-studio',
+    gridClass: '',
+    glowClass: 'from-purple-500/10',
+    preview: (
+      <div className="w-full h-full flex items-center justify-center gap-2">
+        {['🎧', '🎹', '🎸'].map((emoji, i) => (
+          <div key={i} className="w-8 h-8 rounded-lg border border-purple-500/30 bg-purple-500/5 flex items-center justify-center text-sm">
+            {emoji}
+          </div>
+        ))}
+        <div className="flex flex-col gap-1 ml-1">
+          <div className="h-1.5 rounded-full bg-gradient-to-r from-purple-500/40 to-pink-500/40 w-10" />
+          <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 w-6" />
+        </div>
+      </div>
+    ),
+  },
 ]
 
 export function BentoShowcase() {

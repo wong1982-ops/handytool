@@ -13,7 +13,7 @@ import { ProfileTab } from '@/components/mobile/profile-tab'
 import { ToolsTab } from '@/components/mobile/tools-tab'
 
 /** Routes that opt out of MobileShell wrapping (custom full-screen layout) */
-const FULL_SCREEN_PATHS = ['/tools/story-studio', '/tools/id-photo']
+const FULL_SCREEN_PATHS = ['/tools/story-studio', '/tools/id-photo', '/tools/music-studio']
 
 interface MobileShellProps {
   children: React.ReactNode // the tools content (existing page)
