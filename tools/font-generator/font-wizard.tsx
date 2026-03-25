@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import { FontProject, DEFAULT_FONT_PROJECT, WizardStep, FontCharacter } from '@/tools/font-generator/types'
 import { DescribeStep } from './describe-step'
+import { PreviewStep } from './preview-step'
 
 type Tab = 'create' | 'history'
 
@@ -369,24 +370,14 @@ export default function FontWizard() {
             )}
 
             {project.step === 2 && (
-              <div className="text-white text-center py-20">
-                <p className="text-lg font-bold mb-2">Preview Step</p>
-                <p className="text-sm text-[#70767f]">Coming in Task 7</p>
-                <div className="flex justify-center gap-3 mt-4">
-                  <button
-                    onClick={handleBack}
-                    className="px-4 py-2 bg-[#1e2631] rounded-lg text-sm cursor-pointer"
-                  >
-                    Back (temp)
-                  </button>
-                  <button
-                    onClick={() => setProject((p) => ({ ...p, step: 3 }))}
-                    className="px-4 py-2 bg-[#3D6AF2] rounded-lg text-sm cursor-pointer"
-                  >
-                    Next (temp)
-                  </button>
-                </div>
-              </div>
+              <PreviewStep
+                characters={project.characters}
+                loading={project.loading}
+                error={project.error}
+                onConfirm={handleGenerateFull}
+                onRetry={() => handlePreview(project)}
+                onBack={handleBack}
+              />
             )}
 
             {project.step === 3 && (
