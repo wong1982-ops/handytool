@@ -6,6 +6,8 @@ import { DescribeStep } from './describe-step'
 import { PreviewStep } from './preview-step'
 import { AlphabetGrid } from './alphabet-grid'
 import { RefineStep } from './refine-step'
+import { DownloadStep } from './download-step'
+import { MyFonts } from './my-fonts'
 
 type Tab = 'create' | 'history'
 
@@ -188,9 +190,6 @@ export default function FontWizard() {
     setActiveTab('create')
   }, [])
 
-  // Suppress unused variable warnings — handlers will be wired to real step components in later tasks
-  void handleLoadFromHistory
-
   return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Title */}
@@ -231,16 +230,7 @@ export default function FontWizard() {
       </div>
 
       {activeTab === 'history' ? (
-        <div className="text-white text-center py-20">
-          <p className="text-lg font-bold mb-2">My Fonts</p>
-          <p className="text-sm text-[#70767f]">History panel coming soon</p>
-          <button
-            onClick={handleStartOver}
-            className="mt-4 px-4 py-2 bg-[#3D6AF2] rounded-lg text-sm cursor-pointer"
-          >
-            Create New Font
-          </button>
-        </div>
+        <MyFonts onLoadProject={handleLoadFromHistory} />
       ) : (
         <>
           {/* Step indicator */}
@@ -403,24 +393,12 @@ export default function FontWizard() {
             )}
 
             {project.step === 5 && (
-              <div className="text-white text-center py-20">
-                <p className="text-lg font-bold mb-2">Download Step</p>
-                <p className="text-sm text-[#70767f]">Coming in Task 9</p>
-                <div className="flex justify-center gap-3 mt-4">
-                  <button
-                    onClick={handleBack}
-                    className="px-4 py-2 bg-[#1e2631] rounded-lg text-sm cursor-pointer"
-                  >
-                    Back (temp)
-                  </button>
-                  <button
-                    onClick={handleStartOver}
-                    className="px-4 py-2 bg-[#3D6AF2] rounded-lg text-sm cursor-pointer"
-                  >
-                    Start Over (temp)
-                  </button>
-                </div>
-              </div>
+              <DownloadStep
+                characters={project.characters}
+                projectId={project.projectId || ''}
+                stylePreset={project.stylePreset || ''}
+                onStartOver={handleStartOver}
+              />
             )}
           </div>
         </>
