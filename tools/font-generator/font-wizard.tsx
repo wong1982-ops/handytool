@@ -4,6 +4,8 @@ import { useState, useCallback } from 'react'
 import { FontProject, DEFAULT_FONT_PROJECT, WizardStep, FontCharacter } from '@/tools/font-generator/types'
 import { DescribeStep } from './describe-step'
 import { PreviewStep } from './preview-step'
+import { AlphabetGrid } from './alphabet-grid'
+import { RefineStep } from './refine-step'
 
 type Tab = 'create' | 'history'
 
@@ -21,6 +23,7 @@ const STEP_SUBTITLES: Record<WizardStep, string> = {
 export default function FontWizard() {
   const [project, setProject] = useState<FontProject>(DEFAULT_FONT_PROJECT)
   const [activeTab, setActiveTab] = useState<Tab>('create')
+  const [regeneratingChar, setRegeneratingChar] = useState<string | null>(null)
 
   // --- Preview (step 1 → 2) ---
   const handlePreview = useCallback(async (proj: FontProject) => {
@@ -121,6 +124,7 @@ export default function FontWizard() {
 
   // --- Regenerate single character ---
   const handleRegenerate = useCallback(async (char: string) => {
+    setRegeneratingChar(char)
     try {
       const res = await fetch('/api/v1/font-generator/regenerate', {
         method: 'POST',
@@ -149,6 +153,8 @@ export default function FontWizard() {
         ...p,
         error: err instanceof Error ? err.message : 'Network error',
       }))
+    } finally {
+      setRegeneratingChar(null)
     }
   }, [project.projectId])
 
@@ -182,11 +188,7 @@ export default function FontWizard() {
     setActiveTab('create')
   }, [])
 
-  // Suppress unused variable warnings — handlers will be wired to real step components in Tasks 6-9
-  void handlePreview
-  void handleGenerateFull
-  void handleRegenerate
-  void handleBack
+  // Suppress unused variable warnings — handlers will be wired to real step components in later tasks
   void handleLoadFromHistory
 
   return (
@@ -381,45 +383,23 @@ export default function FontWizard() {
             )}
 
             {project.step === 3 && (
-              <div className="text-white text-center py-20">
-                <p className="text-lg font-bold mb-2">Generate Step</p>
-                <p className="text-sm text-[#70767f]">Coming in Task 8</p>
-                <div className="flex justify-center gap-3 mt-4">
-                  <button
-                    onClick={handleBack}
-                    className="px-4 py-2 bg-[#1e2631] rounded-lg text-sm cursor-pointer"
-                  >
-                    Back (temp)
-                  </button>
-                  <button
-                    onClick={() => setProject((p) => ({ ...p, step: 4 }))}
-                    className="px-4 py-2 bg-[#3D6AF2] rounded-lg text-sm cursor-pointer"
-                  >
-                    Next (temp)
-                  </button>
-                </div>
-              </div>
+              <AlphabetGrid
+                characters={project.characters}
+                loading={project.loading}
+                totalExpected={36}
+                onNext={() => setProject((p) => ({ ...p, step: 4 }))}
+                onBack={handleBack}
+              />
             )}
 
             {project.step === 4 && (
-              <div className="text-white text-center py-20">
-                <p className="text-lg font-bold mb-2">Refine Step</p>
-                <p className="text-sm text-[#70767f]">Coming in Task 9</p>
-                <div className="flex justify-center gap-3 mt-4">
-                  <button
-                    onClick={handleBack}
-                    className="px-4 py-2 bg-[#1e2631] rounded-lg text-sm cursor-pointer"
-                  >
-                    Back (temp)
-                  </button>
-                  <button
-                    onClick={() => setProject((p) => ({ ...p, step: 5 }))}
-                    className="px-4 py-2 bg-[#3D6AF2] rounded-lg text-sm cursor-pointer"
-                  >
-                    Next (temp)
-                  </button>
-                </div>
-              </div>
+              <RefineStep
+                characters={project.characters}
+                regeneratingChar={regeneratingChar}
+                onRegenerate={handleRegenerate}
+                onNext={() => setProject((p) => ({ ...p, step: 5 }))}
+                onBack={handleBack}
+              />
             )}
 
             {project.step === 5 && (
