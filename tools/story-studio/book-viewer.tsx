@@ -207,9 +207,8 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
           <img src={src} alt={`${book.title} cover`} className="w-full h-full object-cover object-center" />
           <button
             onClick={() => setZoomImage({ src, alt: `${book.title} cover` })}
-            className="absolute bottom-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white transition-colors cursor-pointer"
+            className="absolute bottom-3 right-3 w-11 h-11 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white transition-colors cursor-pointer"
             aria-label="Zoom image"
-            style={{ minWidth: '44px', minHeight: '44px' }}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6" />
@@ -267,9 +266,8 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
         <img src={p.imageUrl} alt={p.sceneDescription} className="w-full object-cover object-center" />
         <button
           onClick={() => setZoomImage({ src: p.imageUrl!, alt: p.sceneDescription })}
-          className="absolute bottom-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white transition-colors cursor-pointer"
+          className="absolute bottom-3 right-3 w-11 h-11 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white transition-colors cursor-pointer"
           aria-label="Zoom image"
-          style={{ minWidth: '44px', minHeight: '44px' }}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6" />
@@ -282,7 +280,7 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
   // --- Controls bar (shared between mobile & desktop) ---
 
   const renderControls = () => (
-    <div className={`flex items-center justify-between ${isMobile ? 'sticky bottom-0 z-20 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 px-4 py-3 -mx-4' : 'mt-4'}`}>
+    <div className={`flex items-center justify-between ${isMobile ? 'sticky bottom-0 z-20 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-[#1e2631] px-4 py-3 -mx-4' : 'mt-4'}`}>
       <span className="text-sm text-slate-400 dark:text-slate-500">
         {isMobile
           ? (isSpeaking ? `Playing page ${currentPage} of ${totalPages}` : `${totalPages} pages`)
@@ -295,7 +293,7 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
             <button
               onClick={goPrev}
               disabled={currentPage === 0}
-              className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-default"
+              className="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#1e2631] text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-default"
               style={{ minHeight: '44px' }}
               aria-label="Previous page"
             >
@@ -307,7 +305,7 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
             <button
               onClick={goNext}
               disabled={currentPage >= totalPages}
-              className="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-semibold bg-amber-500 hover:bg-amber-600 text-white transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-default"
+              className="inline-flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] hover:opacity-90 text-white transition-opacity cursor-pointer disabled:opacity-30 disabled:cursor-default"
               style={{ minHeight: '44px' }}
               aria-label="Next page"
             >
@@ -324,10 +322,10 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
         <button
           onClick={toggleAutoPlay}
           disabled={!hasAudio}
-          className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-default ${
+          className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-default ${
             autoPlay
-              ? 'bg-amber-500 text-white'
-              : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+              ? 'bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white'
+              : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#1e2631] text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
           style={{ minHeight: '44px' }}
           aria-label={autoPlay ? 'Stop auto-play' : 'Start auto-play'}
@@ -345,7 +343,7 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
         {/* Share / copy link */}
         <button
           onClick={handleShare}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#1e2631] text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           style={{ minHeight: '44px' }}
           aria-label="Copy share link"
         >
@@ -378,15 +376,15 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
         {/* Top toolbar */}
         {!readOnly && (
           <div className="flex items-center justify-end gap-2 mb-4">
-            <button onClick={onEdit} className="px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer" style={{ minHeight: '44px' }}>Edit</button>
-            <button onClick={onStartOver} className="px-3 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer" style={{ minHeight: '44px' }}>Start Over</button>
+            <button onClick={onEdit} className="px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#1e2631] text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer" style={{ minHeight: '44px' }}>Edit</button>
+            <button onClick={onStartOver} className="px-3 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#1e2631] hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer" style={{ minHeight: '44px' }}>Start Over</button>
           </div>
         )}
 
         {/* Scrollable pages */}
         <div className="space-y-5 pb-20">
           {/* Cover */}
-          <div ref={el => { pageRefs.current[0] = el }} className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden">
+          <div ref={el => { pageRefs.current[0] = el }} className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#1e2631] shadow-lg overflow-hidden">
             <div className="relative bg-slate-100 dark:bg-slate-800/50">
               {renderCoverImage()}
             </div>
@@ -409,7 +407,7 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
               {/* Page card */}
               <div
                 ref={el => { pageRefs.current[i + 1] = el }}
-                className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden scroll-mt-16"
+                className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#1e2631] shadow-lg overflow-hidden scroll-mt-16"
               >
                 {renderPageImage(p)}
                 <div className="p-5 md:p-6">
@@ -450,14 +448,14 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
       {/* Top toolbar */}
       {!readOnly && (
         <div className="flex items-center justify-end gap-2 mb-4">
-          <button onClick={onEdit} className="px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer" style={{ minHeight: '44px' }}>Edit</button>
-          <button onClick={onStartOver} className="px-3 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer" style={{ minHeight: '44px' }}>Start Over</button>
+          <button onClick={onEdit} className="px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#1e2631] text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer" style={{ minHeight: '44px' }}>Edit</button>
+          <button onClick={onStartOver} className="px-3 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#1e2631] hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer" style={{ minHeight: '44px' }}>Start Over</button>
         </div>
       )}
 
       {/* Book container */}
       <div
-        className="relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg overflow-hidden aspect-[16/9] flex flex-col"
+        className="relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#1e2631] shadow-lg overflow-hidden aspect-[16/9] flex flex-col"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -476,9 +474,8 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
                   <img src={page.imageUrl} alt={page.sceneDescription} className="w-full h-full object-cover object-center" />
                   <button
                     onClick={() => setZoomImage({ src: page.imageUrl!, alt: page.sceneDescription })}
-                    className="absolute bottom-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white transition-colors cursor-pointer"
+                    className="absolute bottom-3 right-3 w-11 h-11 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white transition-colors cursor-pointer"
                     aria-label="Zoom image"
-                    style={{ minWidth: '44px', minHeight: '44px' }}
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6" />

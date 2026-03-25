@@ -173,10 +173,10 @@ export default function DrawingCanvas({ onExport, mode }: DrawingCanvasProps) {
   }, [onExport])
 
   const toolBtnClass = (active: boolean) =>
-    `min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg font-medium text-sm transition-colors ${
+    `min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg font-medium text-sm transition-colors cursor-pointer ${
       active
-        ? 'bg-[var(--tk-color-primary-500)] text-white'
-        : 'bg-[var(--tk-color-surface-200)] dark:bg-[var(--tk-color-surface-700)] text-[var(--tk-color-text-primary)] hover:bg-[var(--tk-color-surface-300)] dark:hover:bg-[var(--tk-color-surface-600)]'
+        ? 'bg-[#3D6AF2] text-white'
+        : 'bg-[#131a23] text-white hover:bg-[#1e2631]'
     }`
 
   return (
@@ -186,7 +186,7 @@ export default function DrawingCanvas({ onExport, mode }: DrawingCanvasProps) {
         className={`flex flex-wrap items-center gap-2 rounded-xl p-3 ${
           isFun
             ? 'bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30'
-            : 'bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-800)]'
+            : 'bg-[#131a23]'
         }`}
       >
         {/* Tool toggle */}
@@ -212,7 +212,7 @@ export default function DrawingCanvas({ onExport, mode }: DrawingCanvasProps) {
         </div>
 
         {/* Separator */}
-        <div className="h-6 w-px bg-[var(--tk-color-surface-300)] dark:bg-[var(--tk-color-surface-600)]" />
+        <div className="h-6 w-px bg-[#1e2631]" />
 
         {/* Pen sizes */}
         <div className="flex gap-1">
@@ -234,7 +234,7 @@ export default function DrawingCanvas({ onExport, mode }: DrawingCanvasProps) {
         </div>
 
         {/* Separator */}
-        <div className="h-6 w-px bg-[var(--tk-color-surface-300)] dark:bg-[var(--tk-color-surface-600)]" />
+        <div className="h-6 w-px bg-[#1e2631]" />
 
         {/* Color swatches */}
         <div className="flex flex-wrap gap-1">
@@ -242,9 +242,9 @@ export default function DrawingCanvas({ onExport, mode }: DrawingCanvasProps) {
             <button
               key={c}
               type="button"
-              className={`min-h-[44px] min-w-[44px] rounded-lg border-2 transition-transform ${
+              className={`min-h-[44px] min-w-[44px] rounded-lg border-2 transition-transform cursor-pointer ${
                 color === c && tool === 'pen'
-                  ? 'border-[var(--tk-color-primary-500)] scale-110'
+                  ? 'border-[#3D6AF2] scale-110'
                   : 'border-transparent'
               }`}
               onClick={() => {
@@ -263,7 +263,7 @@ export default function DrawingCanvas({ onExport, mode }: DrawingCanvasProps) {
         </div>
 
         {/* Separator */}
-        <div className="h-6 w-px bg-[var(--tk-color-surface-300)] dark:bg-[var(--tk-color-surface-600)]" />
+        <div className="h-6 w-px bg-[#1e2631]" />
 
         {/* Undo / Redo / Clear */}
         <div className="flex gap-1">
@@ -305,7 +305,7 @@ export default function DrawingCanvas({ onExport, mode }: DrawingCanvasProps) {
           ref={canvasRef}
           width={512}
           height={512}
-          className="w-full aspect-square rounded-xl border-2 border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] cursor-crosshair"
+          className="w-full aspect-square rounded-xl border-2 border-[#1e2631] cursor-crosshair"
           style={{ touchAction: 'none' }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -318,10 +318,10 @@ export default function DrawingCanvas({ onExport, mode }: DrawingCanvasProps) {
       <button
         type="button"
         onClick={handleExport}
-        className={`min-h-[44px] w-full rounded-xl font-semibold text-white transition-all ${
+        className={`min-h-[44px] w-full rounded-xl font-semibold text-white transition-all cursor-pointer ${
           isFun
             ? 'bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-lg'
-            : 'bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600)]'
+            : 'bg-[#3D6AF2] hover:bg-[#3564d8]'
         }`}
       >
         {isFun ? '🎉 Done Drawing!' : 'Done Drawing'}

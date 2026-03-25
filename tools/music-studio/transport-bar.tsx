@@ -167,7 +167,7 @@ export function TransportBar({
         {/* Stop / Disconnect */}
         <button
           onClick={onDisconnect}
-          className="flex h-12 w-12 min-h-[44px] cursor-pointer items-center justify-center rounded-full bg-white/10 text-[#a6abb5] transition-colors hover:bg-white/20 hover:text-white"
+          className="flex h-12 w-12 min-h-[44px] cursor-pointer items-center justify-center rounded-full bg-[#131a23] text-[#a6abb5] transition-colors hover:bg-[#1e2631] hover:text-white"
           aria-label="Stop session"
         >
           <StopIcon />

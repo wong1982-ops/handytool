@@ -84,7 +84,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
               value={contentPage.narrativeText}
               onChange={(e) => handleNarrativeChange(e.target.value)}
               rows={5}
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-600
+              className="w-full rounded-xl border border-slate-200 dark:border-[#1e2631]
                 bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                 px-3 py-2.5 text-sm resize-y
                 focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/50 focus:border-[#3D6AF2]
@@ -113,7 +113,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
                 {contentPage.dialogue.map((d, i) => (
                   <div
                     key={i}
-                    className="rounded-xl border border-gray-200 dark:border-gray-700 p-3 space-y-2"
+                    className="rounded-xl border border-slate-200 dark:border-[#1e2631] p-3 space-y-2"
                   >
                     <div className="flex items-center gap-2">
                       <input
@@ -121,7 +121,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
                         value={d.speaker}
                         onChange={(e) => handleDialogueChange(i, 'speaker', e.target.value)}
                         placeholder="Speaker"
-                        className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600
+                        className="flex-1 rounded-lg border border-slate-200 dark:border-[#1e2631]
                           bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                           px-2.5 py-2 text-sm min-h-[44px]
                           focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/50 focus:border-[#3D6AF2]
@@ -145,7 +145,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
                       onChange={(e) => handleDialogueChange(i, 'line', e.target.value)}
                       placeholder="Dialogue line..."
                       rows={2}
-                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                      className="w-full rounded-lg border border-slate-200 dark:border-[#1e2631]
                         bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                         px-2.5 py-2 text-sm resize-y
                         focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/50 focus:border-[#3D6AF2]
@@ -164,11 +164,11 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
       ) : null}
 
       {/* Action buttons */}
-      <div className="pt-4 mt-auto border-t border-gray-200 dark:border-gray-700 space-y-2">
+      <div className="pt-4 mt-auto border-t border-slate-200 dark:border-[#1e2631] space-y-2">
         <button
           type="button"
           onClick={onPreview}
-          className="w-full min-h-[44px] rounded-xl bg-[var(--tk-color-primary-500,#3D6AF2)] text-white text-sm font-medium
+          className="w-full min-h-[44px] rounded-xl bg-[#3D6AF2] text-white text-sm font-medium
             hover:opacity-90 transition-opacity cursor-pointer"
         >
           Preview Book
@@ -191,7 +191,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
               <button
                 type="button"
                 onClick={() => setShowResetConfirm(false)}
-                className="flex-1 min-h-[44px] rounded-xl border border-gray-300 dark:border-gray-600
+                className="flex-1 min-h-[44px] rounded-xl border border-slate-200 dark:border-[#1e2631]
                   text-gray-700 dark:text-gray-300 text-sm font-medium
                   hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
               >
@@ -203,7 +203,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
           <button
             type="button"
             onClick={() => setShowResetConfirm(true)}
-            className="w-full min-h-[44px] rounded-xl border border-gray-300 dark:border-gray-600
+            className="w-full min-h-[44px] rounded-xl border border-slate-200 dark:border-[#1e2631]
               text-red-600 dark:text-red-400 text-sm font-medium
               hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
           >
@@ -217,13 +217,13 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
   return (
     <div className="flex flex-col h-full">
       {/* Title bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-[#1e2631]">
         <h2 className="text-lg font-bold text-gray-900 dark:text-white truncate">
           {book.title}
         </h2>
 
         {/* Mobile view toggle */}
-        <div className="flex sm:hidden rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className="flex sm:hidden rounded-xl overflow-hidden border border-slate-200 dark:border-[#1e2631]">
           <button
             type="button"
             onClick={() => setMobileView('reader')}
@@ -252,7 +252,7 @@ export function BookEditor({ book, onUpdateBook: _onUpdateBook, onUpdatePage, on
       {/* Desktop: split layout */}
       <div className="flex-1 min-h-0 hidden sm:flex">
         {/* Reader - 60% */}
-        <div className="w-[60%] border-r border-gray-200 dark:border-gray-700">
+        <div className="w-[60%] border-r border-slate-200 dark:border-[#1e2631]">
           <BookReader
             pages={book.pages}
             title={book.title}

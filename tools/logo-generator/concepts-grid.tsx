@@ -117,7 +117,7 @@ export default function ConceptsGrid({
         <button
           type="button"
           onClick={onRegenerate}
-          className="inline-flex items-center gap-2 rounded-xl border border-[#2a3344] bg-transparent px-5 py-2.5 text-sm font-medium text-[#a6abb5] hover:border-[#3D6AF2] hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] focus:ring-offset-2 focus:ring-offset-[#090f16] cursor-pointer"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#1e2631] bg-transparent px-5 py-2.5 text-sm font-medium text-[#a6abb5] hover:border-[#3D6AF2] hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] focus:ring-offset-2 focus:ring-offset-[#090f16] cursor-pointer"
           aria-label="Regenerate logo concepts"
         >
           {/* Refresh icon */}

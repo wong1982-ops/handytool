@@ -59,14 +59,14 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
       {/* Heading */}
       <div className="text-center">
         <h2 className="text-3xl font-bold text-white mb-2">Your logo is ready!</h2>
-        <p className="text-slate-400 text-sm">
+        <p className="text-[#a6abb5] text-sm">
           Preview your logo at different sizes and download in the format you need.
         </p>
       </div>
 
       {/* Size Previews */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+        <h3 className="text-sm font-semibold text-[#a6abb5] uppercase tracking-wider mb-4">
           Size Previews
         </h3>
         <div className="grid grid-cols-3 gap-4">
@@ -90,7 +90,7 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
               </div>
               <div className="text-center">
                 <p className="text-xs font-semibold text-slate-700">{description}</p>
-                <p className="text-xs text-slate-400">{label}</p>
+                <p className="text-xs text-[#a6abb5]">{label}</p>
               </div>
             </div>
           ))}
@@ -99,26 +99,26 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
 
       {/* Background Toggle */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">
+        <h3 className="text-sm font-semibold text-[#a6abb5] uppercase tracking-wider mb-3">
           Preview Background
         </h3>
         <div className="flex gap-2">
           <button
             onClick={() => setBgMode('dark')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border cursor-pointer min-h-[44px] ${
               bgMode === 'dark'
                 ? 'bg-[#3D6AF2] border-[#3D6AF2] text-white'
-                : 'bg-transparent border-slate-600 text-slate-400 hover:border-slate-400'
+                : 'bg-transparent border-[#1e2631] text-[#a6abb5] hover:border-[#3D6AF2]'
             }`}
           >
             Dark
           </button>
           <button
             onClick={() => setBgMode('light')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border cursor-pointer min-h-[44px] ${
               bgMode === 'light'
                 ? 'bg-white border-white text-slate-900'
-                : 'bg-transparent border-slate-600 text-slate-400 hover:border-slate-400'
+                : 'bg-transparent border-[#1e2631] text-[#a6abb5] hover:border-[#3D6AF2]'
             }`}
           >
             Light
@@ -127,7 +127,7 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
 
         {/* Live Preview */}
         <div
-          className={`mt-3 rounded-xl flex items-center justify-center p-8 ${previewBg} border border-slate-700/40`}
+          className={`mt-3 rounded-xl flex items-center justify-center p-8 ${previewBg} border border-[#1e2631]`}
           style={{ minHeight: 140 }}
         >
           <Image
@@ -143,13 +143,13 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
 
       {/* Mockup Previews */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+        <h3 className="text-sm font-semibold text-[#a6abb5] uppercase tracking-wider mb-4">
           Mockup Previews
         </h3>
         <div className="grid grid-cols-3 gap-4">
           {/* Business Card */}
           <div className="flex flex-col items-center gap-2">
-            <div className="bg-slate-800 rounded-lg w-full flex items-center justify-center border border-slate-700/60"
+            <div className="bg-slate-800 rounded-lg w-full flex items-center justify-center border border-[#1e2631]"
               style={{ height: 72 }}>
               <Image
                 src={concept.imageUrl}
@@ -160,12 +160,12 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
                 unoptimized
               />
             </div>
-            <span className="text-xs text-slate-400">Business Card</span>
+            <span className="text-xs text-[#a6abb5]">Business Card</span>
           </div>
 
           {/* Website Header */}
           <div className="flex flex-col items-center gap-2">
-            <div className="bg-slate-800 rounded-lg w-full flex items-start px-3 py-2 border border-slate-700/60"
+            <div className="bg-slate-800 rounded-lg w-full flex items-start px-3 py-2 border border-[#1e2631]"
               style={{ height: 72 }}>
               <Image
                 src={concept.imageUrl}
@@ -176,7 +176,7 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
                 unoptimized
               />
             </div>
-            <span className="text-xs text-slate-400">Website Header</span>
+            <span className="text-xs text-[#a6abb5]">Website Header</span>
           </div>
 
           {/* App Icon */}
@@ -185,7 +185,7 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
               className="flex items-center justify-center"
               style={{ height: 72 }}
             >
-              <div className="bg-slate-800 rounded-2xl flex items-center justify-center border border-slate-700/60"
+              <div className="bg-slate-800 rounded-2xl flex items-center justify-center border border-[#1e2631]"
                 style={{ width: 56, height: 56 }}>
                 <Image
                   src={concept.imageUrl}
@@ -197,14 +197,14 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
                 />
               </div>
             </div>
-            <span className="text-xs text-slate-400">App Icon</span>
+            <span className="text-xs text-[#a6abb5]">App Icon</span>
           </div>
         </div>
       </div>
 
       {/* Download Buttons */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+        <h3 className="text-sm font-semibold text-[#a6abb5] uppercase tracking-wider mb-4">
           Download
         </h3>
         <div className="flex flex-col gap-3">
@@ -212,7 +212,7 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
           <button
             onClick={() => handleFreeDownload('512px')}
             disabled={downloading === '512px'}
-            className="w-full flex items-center justify-between px-5 py-3 rounded-xl font-semibold text-white text-sm transition-all
+            className="w-full flex items-center justify-between px-5 py-3 rounded-xl font-semibold text-white text-sm transition-all min-h-[44px] cursor-pointer
               bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <span>{downloading === '512px' ? 'Downloading…' : 'Download PNG (512px)'}</span>
@@ -223,18 +223,18 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
           <button
             onClick={() => handleFreeDownload('1024px')}
             disabled={downloading === '1024px'}
-            className="w-full flex items-center justify-between px-5 py-3 rounded-xl font-semibold text-white text-sm transition-all
-              border border-slate-600 hover:border-slate-400 hover:bg-slate-700/40 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-between px-5 py-3 rounded-xl font-semibold text-white text-sm transition-all min-h-[44px] cursor-pointer
+              bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <span>{downloading === '1024px' ? 'Downloading…' : 'Download PNG (1024px)'}</span>
-            <span className="text-xs font-normal bg-slate-700 px-2 py-0.5 rounded-full">Free</span>
+            <span className="text-xs font-normal bg-emerald-500/50 px-2 py-0.5 rounded-full">Free</span>
           </button>
 
           {/* Credit: PNG 2048px */}
           <button
             onClick={() => handleCreditDownload('PNG 2048px')}
-            className="w-full flex items-center justify-between px-5 py-3 rounded-xl font-semibold text-slate-300 text-sm transition-all
-              border border-slate-600 hover:border-[#7C3AED] hover:text-white hover:bg-[#7C3AED]/10"
+            className="w-full flex items-center justify-between px-5 py-3 rounded-xl font-semibold text-white text-sm transition-all min-h-[44px] cursor-pointer
+              bg-[#7C3AED]/80 hover:bg-[#7C3AED]"
           >
             <span>Download PNG (2048px)</span>
             <span className="text-xs font-medium bg-[#7C3AED]/30 text-[#c084fc] px-2 py-0.5 rounded-full border border-[#7C3AED]/40">
@@ -245,8 +245,8 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
           {/* Credit: SVG */}
           <button
             onClick={() => handleCreditDownload('SVG')}
-            className="w-full flex items-center justify-between px-5 py-3 rounded-xl font-semibold text-slate-300 text-sm transition-all
-              border border-slate-600 hover:border-[#7C3AED] hover:text-white hover:bg-[#7C3AED]/10"
+            className="w-full flex items-center justify-between px-5 py-3 rounded-xl font-semibold text-white text-sm transition-all min-h-[44px] cursor-pointer
+              bg-[#7C3AED]/80 hover:bg-[#7C3AED]"
           >
             <span>Download SVG</span>
             <span className="text-xs font-medium bg-[#7C3AED]/30 text-[#c084fc] px-2 py-0.5 rounded-full border border-[#7C3AED]/40">
@@ -257,7 +257,7 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
           {/* Credit: Brand Kit */}
           <button
             onClick={() => handleCreditDownload('Brand Kit')}
-            className="w-full flex items-center justify-between px-5 py-3 rounded-xl font-semibold text-white text-sm transition-all
+            className="w-full flex items-center justify-between px-5 py-3 rounded-xl font-semibold text-white text-sm transition-all min-h-[44px] cursor-pointer
               bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] hover:opacity-90"
           >
             <span>Download Brand Kit</span>
@@ -269,11 +269,11 @@ export function DownloadStep({ concept, businessName, onStartOver }: DownloadSte
       </div>
 
       {/* Start Over */}
-      <div className="pt-2 border-t border-slate-700/50">
+      <div className="pt-2 border-t border-[#1e2631]">
         <button
           onClick={onStartOver}
-          className="w-full px-5 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-white transition-colors
-            border border-slate-700/50 hover:border-slate-500"
+          className="w-full px-5 py-3 rounded-xl text-sm font-semibold text-[#3D6AF2] hover:bg-[#3D6AF2]/10 transition-colors min-h-[44px] cursor-pointer
+            border border-[#3D6AF2]"
         >
           Create Another Logo
         </button>

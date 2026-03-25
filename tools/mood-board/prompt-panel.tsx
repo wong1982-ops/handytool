@@ -75,12 +75,12 @@ export function PromptPanel({
           }}
           placeholder="Describe your mood..."
           disabled={generating}
-          className="w-full min-h-[44px] rounded-lg bg-[#131a23] border border-[#1e2631] px-3 py-2 text-sm text-white placeholder-[#70767f] outline-none focus:border-[#3D6AF2] transition-colors disabled:opacity-50"
+          className="w-full min-h-[44px] rounded-xl bg-[#131a23] border border-[#1e2631] px-3 py-2 text-sm text-white placeholder-[#70767f] outline-none focus:border-[#3D6AF2] transition-colors disabled:opacity-50"
         />
         <button
           onClick={handleGenerate}
           disabled={generating || !themeInput.trim()}
-          className="mt-2 w-full min-h-[44px] rounded-lg bg-gradient-to-r from-[#3D6AF2] to-[#3D9DF2] text-white text-sm font-medium hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="mt-2 w-full min-h-[44px] rounded-xl bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white text-sm font-semibold cursor-pointer hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {generating ? (
             <>
@@ -141,12 +141,12 @@ export function PromptPanel({
             placeholder="Add more elements..."
             disabled={addingMore}
             rows={3}
-            className="w-full rounded-lg bg-[#131a23] border border-[#1e2631] px-3 py-2 text-sm text-white placeholder-[#70767f] outline-none focus:border-[#3D6AF2] transition-colors resize-none disabled:opacity-50"
+            className="w-full rounded-xl bg-[#131a23] border border-[#1e2631] px-3 py-2 text-sm text-white placeholder-[#70767f] outline-none focus:border-[#3D6AF2] transition-colors resize-none disabled:opacity-50"
           />
           <button
             onClick={handleAddMore}
             disabled={addingMore || !addMoreInput.trim()}
-            className="mt-2 w-full min-h-[44px] rounded-lg bg-[#131a23] border border-[#1e2631] hover:bg-[#1e2631] text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="mt-2 w-full min-h-[44px] rounded-xl bg-[#7C3AED]/80 hover:bg-[#7C3AED] text-white text-sm font-semibold cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {addingMore ? (
               <>
