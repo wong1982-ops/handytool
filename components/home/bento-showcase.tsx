@@ -478,6 +478,20 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'Mood Board',
+    description: 'AI visual brainstorming canvas',
+    href: '/tools/mood-board',
+    gridClass: '',
+    glowClass: 'from-teal-500/10',
+    preview: (
+      <div className="w-full h-full flex items-center justify-center gap-2">
+        {[1,2,3].map(i => (
+          <div key={i} className="w-8 h-10 rounded-md border border-teal-500/30 bg-teal-500/5" style={{ transform: `rotate(${(i-2)*5}deg)` }} />
+        ))}
+      </div>
+    ),
+  },
 ]
 
 export function BentoShowcase() {
