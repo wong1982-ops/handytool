@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import { FUN_LOADING_MESSAGES } from './types'
+import { AILoadingSpinner } from '@/components/ui/ai-loading-spinner'
 import type { GeneratedVariation, SketchMode } from './types'
 
 interface GenerationResultsProps {
@@ -21,19 +22,9 @@ export default function GenerationResults({
   mode,
 }: GenerationResultsProps) {
   const isFun = mode === 'fun'
-  const [funMessageIndex, setFunMessageIndex] = useState(0)
   const [activeIndex, setActiveIndex] = useState(0)
   const touchStartX = useRef<number>(0)
   const touchStartY = useRef<number>(0)
-
-  // Rotate fun loading messages every 2 seconds
-  useEffect(() => {
-    if (!loading || !isFun) return
-    const interval = setInterval(() => {
-      setFunMessageIndex((prev) => (prev + 1) % FUN_LOADING_MESSAGES.length)
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [loading, isFun])
 
   // Reset active index when variations change
   useEffect(() => {
@@ -83,59 +74,16 @@ export default function GenerationResults({
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center gap-6 py-12 px-4">
-        {/* Progress ring */}
-        <div className="relative w-24 h-24">
-          <svg className="w-24 h-24 -rotate-90" viewBox="0 0 96 96">
-            <circle cx="48" cy="48" r="40" fill="none" stroke="#1e2631" strokeWidth="4" />
-            <circle
-              cx="48" cy="48" r="40" fill="none"
-              stroke="url(#progress-gradient)" strokeWidth="4"
-              strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 40}`}
-              strokeDashoffset={`${2 * Math.PI * 40 * 0.18}`}
-              className="animate-spin"
-              style={{ animationDuration: '3s' }}
-            />
-            <defs>
-              <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#3D6AF2" />
-                <stop offset="100%" stopColor="#af88ff" />
-              </linearGradient>
-            </defs>
+      <AILoadingSpinner
+        messages={isFun ? FUN_LOADING_MESSAGES : ['Processing your sketch...']}
+        subtitle={isFun ? 'Weaving your brushstrokes into art' : 'Generating variations'}
+        icon={
+          <svg className="w-8 h-8 text-[#93aaff]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5z" />
           </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <svg className="w-8 h-8 text-[#93aaff]" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Heading */}
-        <div className="text-center">
-          <h2 className="text-xl sm:text-2xl font-extrabold text-white mb-2">
-            {isFun ? 'Weaving your ' : 'Generating '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#af88ff]">
-              {isFun ? 'brushstrokes' : 'variations'}
-            </span>
-            {isFun ? ' into art.' : '...'}
-          </h2>
-          <p className="text-sm text-[#a6abb5] animate-pulse">
-            {isFun ? FUN_LOADING_MESSAGES[funMessageIndex] : 'Processing your sketch...'}
-          </p>
-        </div>
-
-        {/* Synthesis phase bar */}
-        <div className="w-full max-w-xs">
-          <div className="flex justify-between text-[10px] uppercase tracking-wider text-[#70767f] mb-1.5">
-            <span>Synthesis Phase</span>
-            <span className="text-[#93aaff]">In Progress</span>
-          </div>
-          <div className="h-1.5 rounded-full bg-[#1e2631] overflow-hidden">
-            <div className="h-full rounded-full bg-gradient-to-r from-[#3D6AF2] to-[#af88ff] animate-pulse" style={{ width: '65%' }} />
-          </div>
-        </div>
-      </div>
+        }
+        interval={2000}
+      />
     )
   }
 
