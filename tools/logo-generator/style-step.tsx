@@ -1,15 +1,18 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { LogoStyle, LOGO_STYLES, COLOR_PALETTES } from './types'
+import { getSavedPalettes } from '@/tools/color-palette/palette-storage'
 
 interface StyleStepProps {
   style: LogoStyle | null
   colors: string[]
   colorMode: 'custom' | 'ai-suggested'
+  customPrompt: string
   onStyleChange: (s: LogoStyle) => void
   onColorsChange: (c: string[]) => void
   onColorModeChange: (m: 'custom' | 'ai-suggested') => void
+  onCustomPromptChange: (v: string) => void
   onNext: () => void
   onBack: () => void
 }
@@ -18,13 +21,22 @@ export function StyleStep({
   style,
   colors,
   colorMode,
+  customPrompt,
   onStyleChange,
   onColorsChange,
   onColorModeChange,
+  onCustomPromptChange,
   onNext,
   onBack,
 }: StyleStepProps) {
   const colorInputRefs = useRef<(HTMLInputElement | null)[]>([])
+  const [savedPalettes, setSavedPalettes] = useState<{ name: string; colors: string[] }[]>([])
+
+  useEffect(() => {
+    const palettes = getSavedPalettes()
+    // Only show palettes with 3-5 colors (usable for logos)
+    setSavedPalettes(palettes.filter((p) => p.colors.length >= 3 && p.colors.length <= 5))
+  }, [])
 
   const isNextEnabled = style !== null
 
@@ -147,6 +159,45 @@ export function StyleStep({
               )
             })}
 
+            {/* Saved palettes from Color Palette tool */}
+            {savedPalettes.length > 0 && (
+              <div className="mt-3">
+                <p className="text-xs text-[#70767f] mb-2">From your Color Palette tool:</p>
+                {savedPalettes.map((palette) => {
+                  const paletteColors = palette.colors.slice(0, 5)
+                  const isSelected =
+                    paletteColors.length === colors.length &&
+                    paletteColors.every((c, i) => c.toLowerCase() === (colors[i] ?? '').toLowerCase())
+                  return (
+                    <button
+                      key={palette.name + paletteColors.join()}
+                      type="button"
+                      onClick={() => handlePaletteSelect(paletteColors)}
+                      className={[
+                        'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 cursor-pointer transition-all mb-1.5',
+                        isSelected
+                          ? 'shadow-[0_0_0_3px_#3D6AF2,0_0_20px_rgba(61,106,242,0.4)] bg-[#131a23]'
+                          : 'bg-[#131a23] hover:bg-[#1e2631]',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs font-medium text-[#a6abb5] w-20 text-left shrink-0 truncate">
+                        {palette.name}
+                      </span>
+                      <div className="flex gap-1.5">
+                        {paletteColors.map((color, i) => (
+                          <span
+                            key={i}
+                            className="w-7 h-7 rounded-md shrink-0"
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
             {/* Custom color pickers */}
             <div className="mt-3">
               <p className="text-xs text-[#70767f] mb-2">Or pick custom colors:</p>
@@ -180,6 +231,20 @@ export function StyleStep({
             </div>
           </div>
         )}
+      </div>
+
+      {/* Creative Direction (free-text prompt) */}
+      <div>
+        <p className="text-sm font-medium text-[#a6abb5] mb-3">Creative Direction <span className="text-[#70767f] font-normal">(optional)</span></p>
+        <textarea
+          value={customPrompt}
+          onChange={(e) => onCustomPromptChange(e.target.value)}
+          placeholder="Describe your vision... e.g. &quot;Include a mountain icon, tech-forward look, gradient effect&quot;"
+          rows={3}
+          maxLength={500}
+          className="w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-sm px-4 py-3 placeholder:text-[#4a5060] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none resize-none transition-colors"
+        />
+        <p className="text-[10px] text-[#4a5060] mt-1 text-right">{customPrompt.length}/500</p>
       </div>
 
       {/* Navigation Buttons */}

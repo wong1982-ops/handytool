@@ -7,6 +7,9 @@ import { StyleStep } from '@/tools/logo-generator/style-step'
 import ConceptsGrid from '@/tools/logo-generator/concepts-grid'
 import { LogoEditor } from '@/tools/logo-generator/logo-editor'
 import { DownloadStep } from '@/tools/logo-generator/download-step'
+import { MyLogos } from '@/tools/logo-generator/my-logos'
+
+type Tab = 'create' | 'history'
 
 const STEPS: WizardStep[] = [1, 2, 3, 4, 5]
 const STEP_LABELS = ['Info', 'Style', 'Generate', 'Edit', 'Download']
@@ -21,6 +24,7 @@ const STEP_SUBTITLES: Record<WizardStep, string> = {
 
 export default function LogoWizard() {
   const [project, setProject] = useState<LogoProject>(DEFAULT_PROJECT)
+  const [activeTab, setActiveTab] = useState<Tab>('create')
 
   // --- Generation ---
   const handleGenerate = useCallback(async (proj: LogoProject) => {
@@ -36,6 +40,7 @@ export default function LogoWizard() {
           industry: proj.industry,
           style: proj.style,
           colors: proj.colors,
+          customPrompt: proj.customPrompt || undefined,
         }),
       })
 
@@ -45,11 +50,29 @@ export default function LogoWizard() {
         return
       }
 
+      const concepts = json.data?.concepts ?? []
       setProject((p) => ({
         ...p,
         loading: false,
-        concepts: json.data?.concepts ?? [],
+        concepts,
       }))
+
+      // Auto-save generation to history (fire-and-forget)
+      if (concepts.length > 0) {
+        fetch('/api/v1/logo-generator/history', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            businessName: proj.businessName,
+            tagline: proj.tagline,
+            industry: proj.industry,
+            style: proj.style,
+            colors: proj.colors,
+            customPrompt: proj.customPrompt || undefined,
+            concepts,
+          }),
+        }).catch(() => {}) // silent — don't block UX if save fails
+      }
     } catch (err) {
       setProject((p) => ({
         ...p,
@@ -60,19 +83,6 @@ export default function LogoWizard() {
   }, [])
 
   // --- Step transitions ---
-  const handleNext = useCallback(() => {
-    setProject((p) => {
-      if (p.step === 2) {
-        // Trigger generation — call handleGenerate with current snapshot after state flush
-        return p
-      }
-      if (p.step < 5) {
-        return { ...p, step: (p.step + 1) as WizardStep, error: null }
-      }
-      return p
-    })
-  }, [])
-
   // Separate handler for step 2 → 3 to avoid stale closure issues
   const handleNextFromStyle = useCallback((currentProject: LogoProject) => {
     handleGenerate(currentProject)
@@ -91,6 +101,26 @@ export default function LogoWizard() {
 
   const handleStartOver = useCallback(() => {
     setProject(DEFAULT_PROJECT)
+    setActiveTab('create')
+  }, [])
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleLoadFromHistory = useCallback((entry: any) => {
+    setProject({
+      businessName: entry.business_name,
+      tagline: entry.tagline || '',
+      industry: entry.industry || '',
+      style: entry.style || 'modern',
+      colors: entry.colors || [],
+      colorMode: 'palette',
+      customPrompt: entry.custom_prompt || '',
+      concepts: entry.concepts || [],
+      selectedIndex: entry.selected_index ?? null,
+      step: 3, // Jump to concepts grid
+      loading: false,
+      error: null,
+    })
+    setActiveTab('create')
   }, [])
 
   const handleSelectConcept = useCallback((index: number) => {
@@ -114,10 +144,40 @@ export default function LogoWizard() {
           Generator
         </span>
       </h1>
-      <p className="text-sm text-[#a6abb5] text-center mb-8">
-        {STEP_SUBTITLES[project.step]}
+      <p className="text-sm text-[#a6abb5] text-center mb-6">
+        {activeTab === 'history' ? 'Your generated logos' : STEP_SUBTITLES[project.step]}
       </p>
 
+      {/* Tab toggle */}
+      <div className="flex justify-center gap-1 mb-6 bg-[#131a23] rounded-xl p-1 max-w-xs mx-auto">
+        <button
+          type="button"
+          onClick={() => setActiveTab('create')}
+          className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
+            activeTab === 'create'
+              ? 'bg-[#3D6AF2] text-white shadow-lg'
+              : 'text-[#70767f] hover:text-white'
+          }`}
+        >
+          Create
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('history')}
+          className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
+            activeTab === 'history'
+              ? 'bg-[#3D6AF2] text-white shadow-lg'
+              : 'text-[#70767f] hover:text-white'
+          }`}
+        >
+          My Logos
+        </button>
+      </div>
+
+      {activeTab === 'history' ? (
+        <MyLogos onLoadProject={handleLoadFromHistory} />
+      ) : (
+      <>
       {/* Step indicator */}
       <nav aria-label="Wizard progress" className="mb-8">
         {/* Desktop */}
@@ -247,11 +307,13 @@ export default function LogoWizard() {
             style={project.style}
             colors={project.colors}
             colorMode={project.colorMode === 'palette' ? 'custom' : 'ai-suggested'}
+            customPrompt={project.customPrompt}
             onStyleChange={(s) => setProject((p) => ({ ...p, style: s }))}
             onColorsChange={(c) => setProject((p) => ({ ...p, colors: c }))}
             onColorModeChange={(m) =>
               setProject((p) => ({ ...p, colorMode: m === 'custom' ? 'palette' : 'custom' }))
             }
+            onCustomPromptChange={(v) => setProject((p) => ({ ...p, customPrompt: v }))}
             onNext={() => handleNextFromStyle(project)}
             onBack={handleBack}
           />
@@ -291,6 +353,8 @@ export default function LogoWizard() {
           />
         )}
       </div>
+      </>
+      )}
     </div>
   )
 }

@@ -20,6 +20,7 @@ export interface LogoProject {
   style: LogoStyle
   colors: string[]
   colorMode: 'palette' | 'custom'
+  customPrompt: string
   concepts: LogoConcept[]
   selectedIndex: number | null
   step: WizardStep
@@ -143,6 +144,7 @@ export const DEFAULT_PROJECT: LogoProject = {
   style: 'modern',
   colors: COLOR_PALETTES[0].colors,
   colorMode: 'palette',
+  customPrompt: '',
   concepts: [],
   selectedIndex: null,
   step: 1,

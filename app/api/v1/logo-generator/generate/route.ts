@@ -51,6 +51,7 @@ export async function POST(request: Request) {
     industry: string
     style: string
     colors: string[]
+    customPrompt?: string
   }
 
   try {
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
     return apiError('Invalid JSON body', 'VALIDATION_ERROR', 400)
   }
 
-  const { businessName, tagline, industry, style, colors } = body
+  const { businessName, tagline, industry, style, colors, customPrompt } = body
 
   if (!businessName?.trim()) {
     return apiError('businessName is required', 'VALIDATION_ERROR', 400)
@@ -74,6 +75,7 @@ export async function POST(request: Request) {
     industry?.trim() ?? '',
     style as LogoStyle,
     colors ?? [],
+    customPrompt?.trim(),
   )
 
   const projectUuid = crypto.randomUUID()

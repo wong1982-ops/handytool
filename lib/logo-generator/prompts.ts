@@ -40,11 +40,15 @@ export function buildPrompts(
   industry: string,
   style: LogoStyle,
   colors: string[],
+  customPrompt?: string,
 ): string[] {
   const styleDescription = STYLE_DESCRIPTIONS[style]
   const colorList = colors.join(', ')
   const taglineClause = tagline
     ? ` with tagline "${tagline}"`
+    : ''
+  const customClause = customPrompt?.trim()
+    ? ` Additional creative direction: ${customPrompt.trim()}.`
     : ''
 
   return VARIATIONS.map((variation) => {
@@ -52,7 +56,7 @@ export function buildPrompts(
       `Design a professional logo for "${businessName}"${taglineClause}, a ${industry} brand. ` +
       `Style: ${styleDescription}. ` +
       `Color palette: ${colorList}. ` +
-      `Layout: ${variation}. ` +
+      `Layout: ${variation}.${customClause} ` +
       `The logo must be on a pure white background, square format, clean vector-style rendering, high quality. ` +
       `Do NOT include any mockups, devices, or context — ONLY the logo itself.`
     )
