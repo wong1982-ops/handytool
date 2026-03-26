@@ -1,21 +1,21 @@
 import type { RawJob } from './types'
-import { scrapeViaScrapling } from './scrapling'
+import { directScrapeSeek } from './direct-scraper'
 import { scrapeAdzuna } from './adzuna'
 
 /**
  * Scrape IT and French language jobs from Seek (AU).
- * Primary: Scrapling microservice (direct scraping).
- * Fallback: Adzuna API (aggregator).
+ * Cascade: Direct HTTP scraping → Adzuna API fallback.
+ * Runs entirely on Vercel serverless — no external service needed.
  */
 export async function scrapeSeek(): Promise<RawJob[]> {
-  // Try Scrapling first (direct Seek scraping)
-  const scraplingJobs = await scrapeViaScrapling('seek', 'au')
-  if (scraplingJobs.length > 0) {
-    console.log(`[job-radar] Seek AU via Scrapling: ${scraplingJobs.length} jobs`)
-    return scraplingJobs
+  // Try direct scraping first (free, no API key)
+  const directJobs = await directScrapeSeek('au')
+  if (directJobs.length > 0) {
+    console.log(`[job-radar] Seek AU via direct scraping: ${directJobs.length} jobs`)
+    return directJobs
   }
 
-  // Fallback to Adzuna API
-  console.log('[job-radar] Seek AU: Scrapling unavailable, falling back to Adzuna')
+  // Fallback to Adzuna API (needs ADZUNA_APP_ID + ADZUNA_APP_KEY)
+  console.log('[job-radar] Seek AU: direct scraping returned 0, trying Adzuna')
   return scrapeAdzuna('au')
 }

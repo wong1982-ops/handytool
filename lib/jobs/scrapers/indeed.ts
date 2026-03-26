@@ -1,18 +1,15 @@
 import type { RawJob } from './types'
-import { scrapeViaScrapling } from './scrapling'
+import { directScrapeIndeed } from './direct-scraper'
 
 /**
- * Scrape Indeed AU/NZ via Scrapling microservice.
- * Indeed provides additional coverage beyond Seek/Trade Me.
+ * Scrape Indeed AU/NZ via direct HTTP scraping.
+ * Runs on Vercel serverless — no external service needed.
  */
 export async function scrapeIndeed(): Promise<RawJob[]> {
-  const auJobs = await scrapeViaScrapling('indeed', 'au')
-  const nzJobs = await scrapeViaScrapling('indeed', 'nz')
+  const auJobs = await directScrapeIndeed('au')
+  const nzJobs = await directScrapeIndeed('nz')
   const all = [...auJobs, ...nzJobs]
-  if (all.length > 0) {
-    console.log(`[job-radar] Indeed via Scrapling: ${all.length} jobs (AU: ${auJobs.length}, NZ: ${nzJobs.length})`)
-  } else {
-    console.log('[job-radar] Indeed: Scrapling unavailable or no results')
-  }
+
+  console.log(`[job-radar] Indeed via direct: ${all.length} jobs (AU: ${auJobs.length}, NZ: ${nzJobs.length})`)
   return all
 }

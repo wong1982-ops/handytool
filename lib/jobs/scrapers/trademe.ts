@@ -1,21 +1,28 @@
 import type { RawJob } from './types'
-import { scrapeViaScrapling } from './scrapling'
+import { directScrapeTrademe, directScrapeSeek } from './direct-scraper'
 import { scrapeAdzuna } from './adzuna'
 
 /**
- * Scrape IT and French language jobs from Trade Me (NZ).
- * Primary: Scrapling microservice (direct scraping).
- * Fallback: Adzuna API NZ (aggregator).
+ * Scrape IT and French language jobs from Trade Me + Seek NZ.
+ * Cascade: Direct scraping (Trade Me + Seek NZ) → Adzuna NZ fallback.
  */
 export async function scrapeTrademe(): Promise<RawJob[]> {
-  // Try Scrapling first (direct Trade Me scraping)
-  const scraplingJobs = await scrapeViaScrapling('trademe', 'nz')
-  if (scraplingJobs.length > 0) {
-    console.log(`[job-radar] Trade Me via Scrapling: ${scraplingJobs.length} jobs`)
-    return scraplingJobs
+  const jobs: RawJob[] = []
+
+  // Trade Me direct
+  const tmJobs = await directScrapeTrademe()
+  jobs.push(...tmJobs)
+
+  // Seek NZ direct
+  const seekNzJobs = await directScrapeSeek('nz')
+  jobs.push(...seekNzJobs)
+
+  if (jobs.length > 0) {
+    console.log(`[job-radar] NZ via direct: ${jobs.length} jobs (TM: ${tmJobs.length}, Seek NZ: ${seekNzJobs.length})`)
+    return jobs
   }
 
-  // Fallback to Adzuna NZ
-  console.log('[job-radar] Trade Me: Scrapling unavailable, falling back to Adzuna NZ')
+  // Fallback
+  console.log('[job-radar] NZ: direct scraping returned 0, trying Adzuna NZ')
   return scrapeAdzuna('nz')
 }
