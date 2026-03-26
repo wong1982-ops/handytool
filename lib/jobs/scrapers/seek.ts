@@ -1,12 +1,11 @@
 import type { RawJob } from './types'
-import { SEARCH_KEYWORDS } from '../keywords'
+import { scrapeAdzuna } from './adzuna'
 
 /**
- * Scrape IT and French language jobs from Seek (AU + NZ).
- * TODO: Implement with Seek API or conservative scraping.
+ * Scrape IT and French language jobs from Seek (AU).
+ * Uses Adzuna API as data source (Adzuna aggregates from Seek and other AU boards).
  */
 export async function scrapeSeek(): Promise<RawJob[]> {
-  console.log('[job-radar] Seek scraper: not yet implemented. Keywords:', SEARCH_KEYWORDS.it.length + SEARCH_KEYWORDS.french.length)
-  // TODO: Implement Seek scraping
-  return []
+  console.log('[job-radar] Seek: delegating to Adzuna AU aggregator')
+  return scrapeAdzuna('au')
 }

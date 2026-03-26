@@ -1,4 +1,5 @@
 import type { RawNewsItem } from './types'
+import { fetchWithRetry } from './fetch-utils'
 
 const HN_SEARCH_URL = 'https://hn.algolia.com/api/v1/search_by_date'
 
@@ -12,20 +13,20 @@ export async function collectFromHackerNews(): Promise<RawNewsItem[]> {
   const seenIds = new Set<string>()
 
   for (const query of queries) {
+    const params = new URLSearchParams({
+      query,
+      tags: 'story',
+      numericFilters: `created_at_i>${Math.floor(Date.now() / 1000) - 48 * 3600}`,
+      hitsPerPage: '20',
+    })
+
+    const response = await fetchWithRetry(`${HN_SEARCH_URL}?${params}`, {
+      label: `hackernews (${query})`,
+    })
+
+    if (!response) continue
+
     try {
-      const params = new URLSearchParams({
-        query,
-        tags: 'story',
-        numericFilters: `created_at_i>${Math.floor(Date.now() / 1000) - 48 * 3600}`,
-        hitsPerPage: '20',
-      })
-
-      const response = await fetch(`${HN_SEARCH_URL}?${params}`, {
-        signal: AbortSignal.timeout(10000),
-      })
-
-      if (!response.ok) continue
-
       const data = await response.json()
 
       for (const hit of data.hits ?? []) {
@@ -44,7 +45,7 @@ export async function collectFromHackerNews(): Promise<RawNewsItem[]> {
         })
       }
     } catch (error) {
-      console.error('[ai-radar] HN search error:', error instanceof Error ? error.message : error)
+      console.error('[ai-radar] HN parse error:', error instanceof Error ? error.message : error)
     }
   }
 

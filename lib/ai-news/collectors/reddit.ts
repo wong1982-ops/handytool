@@ -1,24 +1,22 @@
 import type { RawNewsItem } from './types'
+import { fetchWithRetry } from './fetch-utils'
 
 /**
  * Collect AI model-related posts from Reddit r/MachineLearning.
  * Uses Reddit's public JSON API (no auth required for public subreddits).
  */
 export async function collectFromReddit(): Promise<RawNewsItem[]> {
+  const response = await fetchWithRetry(
+    'https://www.reddit.com/r/MachineLearning/search.json?q=flair%3AResearch+OR+flair%3ANews&sort=new&restrict_sr=on&t=day&limit=25',
+    {
+      label: 'reddit',
+      init: { headers: { 'User-Agent': 'Toolk1t-AI-Radar/1.0' } },
+    },
+  )
+
+  if (!response) return []
+
   try {
-    const response = await fetch(
-      'https://www.reddit.com/r/MachineLearning/search.json?q=flair%3AResearch+OR+flair%3ANews&sort=new&restrict_sr=on&t=day&limit=25',
-      {
-        headers: { 'User-Agent': 'Toolk1t-AI-Radar/1.0' },
-        signal: AbortSignal.timeout(10000),
-      },
-    )
-
-    if (!response.ok) {
-      console.error(`[ai-radar] Reddit fetch failed: ${response.status}`)
-      return []
-    }
-
     const data = await response.json()
     const posts = data?.data?.children ?? []
 
@@ -34,7 +32,7 @@ export async function collectFromReddit(): Promise<RawNewsItem[]> {
       }
     })
   } catch (error) {
-    console.error('[ai-radar] Reddit error:', error instanceof Error ? error.message : error)
+    console.error('[ai-radar] Reddit parse error:', error instanceof Error ? error.message : error)
     return []
   }
 }

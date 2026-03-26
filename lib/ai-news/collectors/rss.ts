@@ -1,6 +1,8 @@
+import { XMLParser } from 'fast-xml-parser'
 import type { RawNewsItem, NewsSource } from './types'
 import type { RssSourceConfig } from '../sources'
 import { createHash } from 'crypto'
+import { fetchWithRetry } from './fetch-utils'
 
 /**
  * Strip HTML tags from a string.
@@ -16,55 +18,87 @@ function urlToId(url: string): string {
   return createHash('md5').update(url).digest('hex').slice(0, 16)
 }
 
+/** Ensure a value is always an array */
+function toArray<T>(val: T | T[] | undefined | null): T[] {
+  if (val == null) return []
+  return Array.isArray(val) ? val : [val]
+}
+
 /**
  * Parse an RSS/Atom feed XML string into RawNewsItem[].
  * Handles both RSS 2.0 (<item>) and Atom (<entry>) formats.
  */
 function parseRssFeed(xml: string, source: NewsSource): RawNewsItem[] {
+  const parser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: '@_',
+  })
+
+  const parsed = parser.parse(xml)
   const items: RawNewsItem[] = []
+  const cutoff = new Date()
+  cutoff.setHours(cutoff.getHours() - 48)
 
-  // Extract items (RSS 2.0) or entries (Atom)
-  const itemPattern = /<(?:item|entry)>([\s\S]*?)<\/(?:item|entry)>/gi
-  let match: RegExpExecArray | null
+  // Determine if RSS 2.0 or Atom
+  const isAtom = !!parsed.feed
+  const rawItems = isAtom
+    ? toArray(parsed.feed?.entry)
+    : toArray(parsed.rss?.channel?.item)
 
-  while ((match = itemPattern.exec(xml)) !== null) {
-    const block = match[1]
-
-    // Extract title
-    const titleMatch = block.match(/<title[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/i)
-    const title = titleMatch ? stripHtml(titleMatch[1]).trim() : ''
+  for (const entry of rawItems) {
+    // --- Title ---
+    const rawTitle = typeof entry.title === 'object' ? entry.title['#text'] : entry.title
+    const title = rawTitle ? stripHtml(String(rawTitle)).trim() : ''
     if (!title) continue
 
-    // Extract link
-    const linkMatch =
-      block.match(/<link[^>]*href="([^"]*)"[^>]*\/?>/i) ||
-      block.match(/<link[^>]*>([\s\S]*?)<\/link>/i) ||
-      block.match(/<guid[^>]*>(https?:\/\/[^<]*)<\/guid>/i)
-    const sourceUrl = linkMatch ? linkMatch[1].trim() : ''
+    // --- Link / sourceUrl ---
+    let sourceUrl = ''
+    if (isAtom) {
+      // Atom: <link href="..."/> or array of links
+      const links = toArray(entry.link)
+      const altLink = links.find(
+        (l: any) => l['@_rel'] === 'alternate' || !l['@_rel'],
+      )
+      sourceUrl = altLink?.['@_href'] ?? links[0]?.['@_href'] ?? ''
+    } else {
+      // RSS 2.0: <link>...</link> or <guid>
+      sourceUrl =
+        (typeof entry.link === 'string' ? entry.link : entry.link?.['#text']) ||
+        (typeof entry.guid === 'string' ? entry.guid : entry.guid?.['#text']) ||
+        ''
+    }
+    sourceUrl = sourceUrl.trim()
     if (!sourceUrl) continue
 
-    // Extract description/summary
-    const descMatch =
-      block.match(/<(?:description|summary|content)[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/(?:description|summary|content)>/i)
-    const summary = descMatch ? stripHtml(descMatch[1]).slice(0, 500).trim() : ''
+    // --- Summary / description ---
+    const rawDesc =
+      entry.description ?? entry.summary ?? entry.content ?? entry['content:encoded'] ?? ''
+    const descText = typeof rawDesc === 'object' ? rawDesc['#text'] ?? '' : String(rawDesc)
+    const summary = stripHtml(descText).slice(0, 500).trim()
 
-    // Extract published date
-    const dateMatch = block.match(/<(?:pubDate|published|updated|dc:date)[^>]*>([\s\S]*?)<\/(?:pubDate|published|updated|dc:date)>/i)
-    const postedAt = dateMatch ? new Date(dateMatch[1].trim()).toISOString() : undefined
-
-    // Extract image (media:content or enclosure)
-    const imageMatch =
-      block.match(/<media:content[^>]*url="([^"]*)"[^>]*\/?>/i) ||
-      block.match(/<enclosure[^>]*url="([^"]*)"[^>]*type="image[^"]*"[^>]*\/?>/i) ||
-      block.match(/<media:thumbnail[^>]*url="([^"]*)"[^>]*\/?>/i)
-    const imageUrl = imageMatch ? imageMatch[1] : undefined
+    // --- Date ---
+    const rawDate =
+      entry.pubDate ?? entry.published ?? entry.updated ?? entry['dc:date'] ?? undefined
+    const postedAt = rawDate ? new Date(String(rawDate)).toISOString() : undefined
 
     // Filter: only items from the last 48 hours
     if (postedAt) {
       const postedDate = new Date(postedAt)
-      const cutoff = new Date()
-      cutoff.setHours(cutoff.getHours() - 48)
       if (postedDate < cutoff) continue
+    }
+
+    // --- Image ---
+    let imageUrl: string | undefined
+    const mediaContent = entry['media:content']
+    const enclosure = entry.enclosure
+    const mediaThumbnail = entry['media:thumbnail']
+
+    if (mediaContent?.['@_url']) {
+      imageUrl = mediaContent['@_url']
+    } else if (enclosure?.['@_url'] && enclosure['@_type']?.startsWith('image')) {
+      imageUrl = enclosure['@_url']
+    } else if (mediaThumbnail?.['@_url']) {
+      imageUrl = mediaThumbnail['@_url']
     }
 
     items.push({
@@ -81,24 +115,24 @@ function parseRssFeed(xml: string, source: NewsSource): RawNewsItem[] {
 }
 
 /**
- * Fetch and parse a single RSS feed.
+ * Fetch and parse a single RSS feed with retry.
  */
 async function fetchFeed(config: RssSourceConfig): Promise<RawNewsItem[]> {
+  const response = await fetchWithRetry(config.feedUrl, {
+    label: config.source,
+    init: { headers: { 'User-Agent': 'Toolk1t-AI-Radar/1.0' } },
+  })
+
+  if (!response) return []
+
   try {
-    const response = await fetch(config.feedUrl, {
-      headers: { 'User-Agent': 'Toolk1t-AI-Radar/1.0' },
-      signal: AbortSignal.timeout(10000),
-    })
-
-    if (!response.ok) {
-      console.error(`[ai-radar] RSS fetch failed for ${config.source}: ${response.status}`)
-      return []
-    }
-
     const xml = await response.text()
     return parseRssFeed(xml, config.source)
   } catch (error) {
-    console.error(`[ai-radar] RSS error for ${config.source}:`, error instanceof Error ? error.message : error)
+    console.error(
+      `[ai-radar] RSS parse error for ${config.source}:`,
+      error instanceof Error ? error.message : error,
+    )
     return []
   }
 }
