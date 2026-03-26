@@ -1,0 +1,23 @@
+# Fly.io deployment config for the Job + AI News scraper service
+# Deploy: cd scripts/job-scraper && fly deploy
+
+app = "toolk1t-scraper"
+primary_region = "syd"  # Sydney — close to AU/NZ job boards
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "4001"
+
+[http_service]
+  internal_port = 4001
+  force_https = true
+  auto_stop_machines = "suspend"   # suspend when idle (save costs)
+  auto_start_machines = true       # wake on request
+  min_machines_running = 1         # keep 1 alive for scheduler
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1

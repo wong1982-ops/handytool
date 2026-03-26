@@ -13,7 +13,7 @@ Usage:
 import os
 import json
 import hashlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -402,7 +402,131 @@ def scrape_all():
     return jsonify({"jobs": unique_jobs, "count": len(unique_jobs), "counts": counts})
 
 
+# ── Scheduled Tasks ──────────────────────────────────────
+
+SEARCH_KEYWORDS_IT = [
+    "software engineer", "software developer", "web developer", "frontend developer",
+    "backend developer", "fullstack developer", "devops engineer", "cloud engineer",
+    "data engineer", "data scientist", "machine learning engineer", "QA engineer",
+    "solutions architect", "technical lead", "platform engineer",
+]
+
+SEARCH_KEYWORDS_FRENCH = [
+    "french speaking", "french language", "bilingual french", "french english",
+    "french teacher", "french translator", "francophone",
+]
+
+
+def run_job_scrape():
+    """Scheduled task: scrape all job sources and push to Supabase."""
+    from db import upsert_jobs
+
+    print(f"\n{'='*60}")
+    print(f"[scheduler] Starting job scrape at {datetime.now(timezone.utc).isoformat()}")
+    all_keywords = SEARCH_KEYWORDS_IT + SEARCH_KEYWORDS_FRENCH
+    total = 0
+
+    # Seek AU
+    try:
+        jobs = scrape_seek_au(all_keywords)
+        if jobs:
+            total += upsert_jobs(jobs, "seek")
+    except Exception as e:
+        print(f"[scheduler] Seek AU error: {e}")
+
+    # Seek NZ
+    try:
+        jobs = scrape_seek_nz(all_keywords)
+        if jobs:
+            total += upsert_jobs(jobs, "seek")
+    except Exception as e:
+        print(f"[scheduler] Seek NZ error: {e}")
+
+    # Indeed AU
+    try:
+        jobs = scrape_indeed(all_keywords, "au")
+        if jobs:
+            total += upsert_jobs(jobs, "indeed")
+    except Exception as e:
+        print(f"[scheduler] Indeed AU error: {e}")
+
+    # Trade Me NZ
+    try:
+        jobs = scrape_trademe(all_keywords)
+        if jobs:
+            total += upsert_jobs(jobs, "trademe")
+    except Exception as e:
+        print(f"[scheduler] Trade Me error: {e}")
+
+    print(f"[scheduler] Job scrape complete: {total} new jobs inserted")
+    print(f"{'='*60}\n")
+
+
+def run_ai_news_scrape():
+    """Scheduled task: collect AI news and push to Supabase."""
+    from ai_news_scraper import collect_all_ai_news
+    from db import upsert_ai_news
+
+    print(f"\n{'='*60}")
+    print(f"[scheduler] Starting AI news scrape at {datetime.now(timezone.utc).isoformat()}")
+
+    try:
+        items = collect_all_ai_news()
+        count = upsert_ai_news(items)
+        print(f"[scheduler] AI news scrape complete: {count} new items")
+    except Exception as e:
+        print(f"[scheduler] AI news scrape error: {e}")
+
+    print(f"{'='*60}\n")
+
+
+def start_scheduler():
+    """Start APScheduler with cron-like schedules."""
+    from apscheduler.schedulers.background import BackgroundScheduler
+
+    scheduler = BackgroundScheduler()
+
+    # Jobs: scrape every 6 hours (4x per day)
+    scheduler.add_job(run_job_scrape, "interval", hours=6, id="job_scrape",
+                      next_run_time=datetime.now(timezone.utc))
+
+    # AI News: scrape every 4 hours (6x per day)
+    scheduler.add_job(run_ai_news_scrape, "interval", hours=4, id="ai_news_scrape",
+                      next_run_time=datetime.now(timezone.utc))
+
+    scheduler.start()
+    print("[scheduler] Started — Jobs every 6h, AI News every 4h")
+    print("[scheduler] First run starting now...")
+
+
+# ── Manual trigger routes ──────────────────────────────────
+
+@app.route("/trigger/jobs", methods=["POST"])
+@require_auth
+def trigger_jobs():
+    """Manually trigger a job scrape."""
+    run_job_scrape()
+    return jsonify({"ok": True, "message": "Job scrape completed"})
+
+
+@app.route("/trigger/ai-news", methods=["POST"])
+@require_auth
+def trigger_ai_news():
+    """Manually trigger AI news collection."""
+    run_ai_news_scrape()
+    return jsonify({"ok": True, "message": "AI news scrape completed"})
+
+
+# ── Entry Point ──────────────────────────────────────────
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 4001))
+
+    # Start scheduler if SUPABASE_URL is set (production mode)
+    if os.environ.get("SUPABASE_URL"):
+        start_scheduler()
+    else:
+        print("[scheduler] SUPABASE_URL not set — scheduler disabled (API-only mode)")
+
     print(f"[job-scraper] Starting on port {port}")
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)
