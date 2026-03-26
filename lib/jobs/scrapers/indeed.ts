@@ -1,10 +1,18 @@
 import type { RawJob } from './types'
+import { scrapeViaScrapling } from './scrapling'
 
 /**
- * Indeed scraper — returns empty as Indeed jobs are already covered
- * by the Adzuna aggregator (Seek scraper for AU, Trade Me scraper for NZ).
+ * Scrape Indeed AU/NZ via Scrapling microservice.
+ * Indeed provides additional coverage beyond Seek/Trade Me.
  */
 export async function scrapeIndeed(): Promise<RawJob[]> {
-  console.log('[job-radar] Indeed: covered by Adzuna aggregator')
-  return []
+  const auJobs = await scrapeViaScrapling('indeed', 'au')
+  const nzJobs = await scrapeViaScrapling('indeed', 'nz')
+  const all = [...auJobs, ...nzJobs]
+  if (all.length > 0) {
+    console.log(`[job-radar] Indeed via Scrapling: ${all.length} jobs (AU: ${auJobs.length}, NZ: ${nzJobs.length})`)
+  } else {
+    console.log('[job-radar] Indeed: Scrapling unavailable or no results')
+  }
+  return all
 }
