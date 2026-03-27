@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import type { TaxEntity, EntityType, GstBasis, GstPeriod } from './types'
 
 // ─── Props ─────────────────────────────────────────────────────────
@@ -43,6 +43,7 @@ export default function SettingsPanel({
   const [name, setName] = useState('')
   const [entityType, setEntityType] = useState<EntityType>('sole-trader')
   const [irdNumber, setIrdNumber] = useState('')
+  const irdInputRef = useRef<HTMLInputElement>(null)
   const [gstRegistered, setGstRegistered] = useState(false)
   const [gstBasis, setGstBasis] = useState<GstBasis>('invoice')
   const [gstPeriod, setGstPeriod] = useState<GstPeriod>('2-monthly')
@@ -273,14 +274,24 @@ export default function SettingsPanel({
           </label>
           <input
             id="ird-number"
+            ref={irdInputRef}
             type="text"
             value={irdNumber}
             onChange={(e) => {
-              // Allow raw typing — only strip non-digit/dash chars, limit length
-              const val = e.target.value.replace(/[^0-9-]/g, '').slice(0, 11) // 9 digits + 2 dashes max
-              setIrdNumber(val)
+              const digits = e.target.value.replace(/\D/g, '').slice(0, 9)
+              // Auto-format when all 9 digits entered, otherwise show raw digits
+              if (digits.length === 9) {
+                setIrdNumber(formatIrdNumber(digits))
+              } else {
+                setIrdNumber(digits)
+              }
             }}
-            onBlur={() => setIrdNumber(formatIrdNumber(irdNumber))}
+            onBlur={() => {
+              // Format on blur for partial inputs too
+              if (irdNumber.replace(/\D/g, '').length > 0) {
+                setIrdNumber(formatIrdNumber(irdNumber))
+              }
+            }}
             placeholder="XXX-XXX-XXX"
             maxLength={10}
             className="w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-sm px-4 py-3 placeholder:text-[#4a5060] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors"
