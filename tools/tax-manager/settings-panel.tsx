@@ -275,7 +275,12 @@ export default function SettingsPanel({
             id="ird-number"
             type="text"
             value={irdNumber}
-            onChange={(e) => setIrdNumber(formatIrdNumber(e.target.value))}
+            onChange={(e) => {
+              // Allow raw typing — only strip non-digit/dash chars, limit length
+              const val = e.target.value.replace(/[^0-9-]/g, '').slice(0, 11) // 9 digits + 2 dashes max
+              setIrdNumber(val)
+            }}
+            onBlur={() => setIrdNumber(formatIrdNumber(irdNumber))}
             placeholder="XXX-XXX-XXX"
             maxLength={10}
             className="w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-sm px-4 py-3 placeholder:text-[#4a5060] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors"

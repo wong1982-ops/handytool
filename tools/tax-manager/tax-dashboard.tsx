@@ -55,8 +55,8 @@ export default function TaxDashboard() {
       try {
         const res = await fetch('/api/v1/tax-manager/entities')
         if (!res.ok) throw new Error('Failed to load entities')
-        const { data } = await res.json()
-        const list = (data ?? []) as TaxEntity[]
+        const json = await res.json()
+        const list = (json.data?.entities ?? []) as TaxEntity[]
         setEntities(list)
         if (list.length > 0) {
           setSelectedEntityId(list[0].id)
@@ -84,23 +84,23 @@ export default function TaxDashboard() {
       ])
 
       if (txRes.ok) {
-        const { data } = await txRes.json()
-        setTransactions((data ?? []) as TaxTransaction[])
+        const txJson = await txRes.json()
+        setTransactions((txJson.data?.transactions ?? []) as TaxTransaction[])
       }
 
       if (docRes.ok) {
-        const { data } = await docRes.json()
-        setDocuments((data ?? []) as TaxDocument[])
+        const docJson = await docRes.json()
+        setDocuments((docJson.data?.documents ?? []) as TaxDocument[])
       }
 
       if (rulesRes.ok) {
-        const { data } = await rulesRes.json()
-        // Rules may come as part of entity response or separately
-        if (Array.isArray(data?.rules)) {
-          setCategoryRules(data.rules as CategoryRule[])
-        } else if (Array.isArray(data)) {
-          // If it's a rules array directly
-          setCategoryRules(data as CategoryRule[])
+        const rulesJson = await rulesRes.json()
+        const rulesData = rulesJson.data
+        if (Array.isArray(rulesData?.rules)) {
+          setCategoryRules(rulesData.rules as CategoryRule[])
+        } else if (Array.isArray(rulesData?.entities)) {
+          // Rules may come from entity response
+          setCategoryRules([])
         }
       }
     } catch {
@@ -225,11 +225,12 @@ export default function TaxDashboard() {
       })
 
       if (res.ok) {
-        const { data } = await res.json()
-        if (Array.isArray(data)) {
+        const catJson = await res.json()
+        const catData = catJson.data?.categories ?? catJson.data
+        if (Array.isArray(catData)) {
           setTransactions((prev) =>
             prev.map((tx) => {
-              const updated = data.find(
+              const updated = catData.find(
                 (d: { id: string; category: string; confidence: string }) => d.id === tx.id,
               )
               if (updated) {
