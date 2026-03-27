@@ -47,11 +47,19 @@ function parseDdMmYyyy(raw: string): string {
 }
 
 /**
+ * Parses YYYY/MM/DD → YYYY-MM-DD ISO string.
+ */
+function parseYyyySlash(raw: string): string {
+  return raw.replace(/\//g, '-')
+}
+
+/**
  * Normalises a date string to ISO YYYY-MM-DD based on the bank format.
  */
 function normaliseDate(raw: string, format: BankFormat['dateFormat']): string {
   const trimmed = raw.trim()
   if (format === 'YYYY-MM-DD') return trimmed
+  if (format === 'YYYY/MM/DD') return parseYyyySlash(trimmed)
   return parseDdMmYyyy(trimmed)
 }
 
@@ -98,8 +106,21 @@ export function parseBankCsv(
 
   if (lines.length < 2) return []
 
-  // Detect or look up bank format
-  const detectedId = bankId ?? detectBank(lines[0])
+  // Find the header row — may not be the first line (metadata lines above)
+  let headerIndex = 0
+  let detectedId = bankId ?? null
+
+  if (!detectedId) {
+    for (let i = 0; i < Math.min(lines.length, 10); i++) {
+      const detected = detectBank(lines[i])
+      if (detected) {
+        headerIndex = i
+        detectedId = detected
+        break
+      }
+    }
+  }
+
   if (!detectedId) return []
 
   const bank = NZ_BANKS.find((b) => b.id === detectedId)
@@ -108,8 +129,8 @@ export function parseBankCsv(
   const { columnMap, dateFormat } = bank
   const transactions: ParsedTransaction[] = []
 
-  // Skip the header row (index 0), process remaining lines
-  for (let i = 1; i < lines.length; i++) {
+  // Start from the row after the header
+  for (let i = headerIndex + 1; i < lines.length; i++) {
     const fields = splitCsvLine(lines[i])
 
     // Skip rows that don't have enough columns
@@ -142,6 +163,12 @@ export function parseBankCsv(
     }
 
     if (isNaN(amount)) continue
+
+    // ASB Visa: amounts are always positive, use Tran Type (DEBIT/CREDIT) to determine sign
+    if (detectedId === 'asb-visa') {
+      const tranType = (fields[3] ?? '').toUpperCase()
+      if (tranType === 'DEBIT' && amount > 0) amount = -amount
+    }
 
     const balance =
       columnMap.balance !== undefined

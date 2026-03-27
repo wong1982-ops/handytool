@@ -164,7 +164,7 @@ export interface BankFormat {
     credit?: number
     balance?: number
   }
-  dateFormat: 'DD/MM/YYYY' | 'YYYY-MM-DD'
+  dateFormat: 'DD/MM/YYYY' | 'YYYY-MM-DD' | 'YYYY/MM/DD'
 }
 
 export const NZ_BANKS: BankFormat[] = [
@@ -181,6 +181,13 @@ export const NZ_BANKS: BankFormat[] = [
     detectHeaders: ['Date', 'Unique Id', 'Tran Type', 'Cheque Number', 'Payee', 'Memo', 'Amount'],
     columnMap: { date: 0, description: 4, amount: 6, balance: undefined },
     dateFormat: 'YYYY-MM-DD',
+  },
+  {
+    id: 'asb-visa',
+    name: 'ASB Visa/Credit Card',
+    detectHeaders: ['Date Processed', 'Date of Transaction', 'Unique Id', 'Tran Type', 'Reference', 'Description', 'Amount'],
+    columnMap: { date: 1, description: 5, amount: 6, balance: undefined },
+    dateFormat: 'YYYY/MM/DD',
   },
   {
     id: 'bnz',
