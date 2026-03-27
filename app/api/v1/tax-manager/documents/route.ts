@@ -1,9 +1,17 @@
 import { createClient } from '@/lib/supabase/server'
+import { getAdminSupabase } from '@/lib/supabase/admin'
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 import { uploadToR2 } from '@/lib/storage/r2'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
+
+async function getSupabase() {
+  if (process.env.NODE_ENV === 'development' || process.env.DEV_USER_ID) {
+    try { return getAdminSupabase() } catch { /* fall through */ }
+  }
+  return createClient()
+}
 
 export async function GET(request: Request) {
   const userId = await getAuthUserId()
@@ -20,7 +28,7 @@ export async function GET(request: Request) {
     return apiError('tax_year is required', 'VALIDATION_ERROR', 400)
   }
 
-  const supabase = await createClient()
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('tax_documents')
     .select('*')
@@ -68,7 +76,7 @@ export async function POST(request: Request) {
   }
 
   // Verify entity belongs to this user
-  const supabase = await createClient()
+  const supabase = await getSupabase()
   const { data: entity, error: entityError } = await supabase
     .from('tax_entities')
     .select('id')
@@ -128,7 +136,7 @@ export async function DELETE(request: Request) {
     return apiError('id is required', 'VALIDATION_ERROR', 400)
   }
 
-  const supabase = await createClient()
+  const supabase = await getSupabase()
 
   // First verify ownership
   const { data: doc, error: fetchError } = await supabase

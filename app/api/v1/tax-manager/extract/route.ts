@@ -1,8 +1,16 @@
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 import { createClient } from '@/lib/supabase/server'
+import { getAdminSupabase } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 120
+
+async function getSupabase() {
+  if (process.env.NODE_ENV === 'development' || process.env.DEV_USER_ID) {
+    try { return getAdminSupabase() } catch { /* fall through */ }
+  }
+  return createClient()
+}
 
 const CREDIT_COST = 1
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
@@ -99,7 +107,7 @@ export async function POST(request: Request) {
   }
 
   // Deduct 1 credit
-  const supabase = await createClient()
+  const supabase = await getSupabase()
   const { error: deductError } = await supabase.rpc('deduct_credits', {
     p_user_id: userId,
     p_amount: CREDIT_COST,

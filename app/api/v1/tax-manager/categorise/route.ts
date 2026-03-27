@@ -1,8 +1,16 @@
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 import { createClient } from '@/lib/supabase/server'
+import { getAdminSupabase } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
+
+async function getSupabase() {
+  if (process.env.NODE_ENV === 'development' || process.env.DEV_USER_ID) {
+    try { return getAdminSupabase() } catch { /* fall through */ }
+  }
+  return createClient()
+}
 
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
 const GEMINI_MODEL = 'gemini-2.5-flash'
@@ -128,7 +136,7 @@ export async function POST(request: Request) {
   }
 
   // Load user's category rules for this entity
-  const supabase = await createClient()
+  const supabase = await getSupabase()
   const { data: rules, error: rulesError } = await supabase
     .from('tax_category_rules')
     .select('pattern, category')

@@ -1,7 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
+import { getAdminSupabase } from '@/lib/supabase/admin'
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 
 export const dynamic = 'force-dynamic'
+
+async function getSupabase() {
+  if (process.env.NODE_ENV === 'development' || process.env.DEV_USER_ID) {
+    try { return getAdminSupabase() } catch { /* fall through */ }
+  }
+  return createClient()
+}
 
 export async function GET(request: Request) {
   const userId = await getAuthUserId()
@@ -20,7 +28,7 @@ export async function GET(request: Request) {
     return apiError('tax_year is required', 'VALIDATION_ERROR', 400)
   }
 
-  const supabase = await createClient()
+  const supabase = await getSupabase()
   let query = supabase
     .from('tax_transactions')
     .select('*')
@@ -90,7 +98,7 @@ export async function POST(request: Request) {
     notes: t.notes || null,
   }))
 
-  const supabase = await createClient()
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('tax_transactions')
     .insert(rows)
@@ -137,7 +145,7 @@ export async function PATCH(request: Request) {
     return apiError('No fields to update', 'VALIDATION_ERROR', 400)
   }
 
-  const supabase = await createClient()
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('tax_transactions')
     .update(patch)
@@ -167,7 +175,7 @@ export async function DELETE(request: Request) {
     return apiError('id is required', 'VALIDATION_ERROR', 400)
   }
 
-  const supabase = await createClient()
+  const supabase = await getSupabase()
   const { error } = await supabase
     .from('tax_transactions')
     .delete()

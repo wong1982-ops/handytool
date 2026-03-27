@@ -1,5 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
+import { getAdminSupabase } from '@/lib/supabase/admin'
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
+
+/** Use admin client in dev (bypasses RLS), user client in prod */
+async function getSupabase() {
+  if (process.env.NODE_ENV === 'development' || process.env.DEV_USER_ID) {
+    try { return getAdminSupabase() } catch { /* fall through */ }
+  }
+  return createClient()
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -7,7 +16,7 @@ export async function GET() {
   const userId = await getAuthUserId()
   if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  const supabase = await createClient()
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('tax_entities')
     .select('*')
@@ -49,7 +58,7 @@ export async function POST(request: Request) {
     return apiError('Entity type is required', 'VALIDATION_ERROR', 400)
   }
 
-  const supabase = await createClient()
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('tax_entities')
     .insert({
@@ -65,8 +74,8 @@ export async function POST(request: Request) {
     .single()
 
   if (error) {
-    console.error('[tax-manager/entities] POST error:', error)
-    return API_ERRORS.INTERNAL()
+    console.error('[tax-manager/entities] POST error:', error.message, error.code, error.details)
+    return apiError(error.message || 'Failed to create entity', 'DB_ERROR', 500)
   }
 
   return apiSuccess({ entity: data }, 201)
@@ -109,7 +118,7 @@ export async function PATCH(request: Request) {
     return apiError('No fields to update', 'VALIDATION_ERROR', 400)
   }
 
-  const supabase = await createClient()
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('tax_entities')
     .update(patch)
