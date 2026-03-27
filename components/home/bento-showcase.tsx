@@ -532,6 +532,26 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'NZ Tax Manager',
+    description: 'GST returns & income tax for NZ',
+    href: '/tools/tax-manager',
+    gridClass: '',
+    glowClass: 'from-green-600/10',
+    preview: (
+      <div className="w-full h-full flex items-center justify-center gap-2">
+        <div className="w-10 h-10 rounded-lg border border-green-500/30 bg-green-500/5 flex items-center justify-center">
+          <svg className="w-5 h-5 text-green-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="h-1.5 rounded-full bg-gradient-to-r from-green-600/40 to-emerald-500/40 w-12" />
+          <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 w-8" />
+        </div>
+      </div>
+    ),
+  },
 ]
 
 export function BentoShowcase() {
