@@ -66,7 +66,9 @@ export default function SettingsPanel({
   function populateForm(entity: TaxEntity) {
     setName(entity.name)
     setEntityType(entity.type)
-    setIrdNumber(entity.ird_number ?? '')
+    const ird = entity.ird_number ?? ''
+    setIrdNumber(ird)
+    if (irdInputRef.current) irdInputRef.current.value = ird
     setGstRegistered(entity.gst_registered)
     setGstBasis(entity.gst_basis)
     setGstPeriod(entity.gst_period)
@@ -276,24 +278,34 @@ export default function SettingsPanel({
             id="ird-number"
             ref={irdInputRef}
             type="text"
-            value={irdNumber}
+            defaultValue={irdNumber}
             onChange={(e) => {
-              const digits = e.target.value.replace(/\D/g, '').slice(0, 9)
-              // Auto-format when all 9 digits entered, otherwise show raw digits
-              if (digits.length === 9) {
-                setIrdNumber(formatIrdNumber(digits))
-              } else {
-                setIrdNumber(digits)
+              const input = e.target
+              const cursorPos = input.selectionStart ?? 0
+
+              // Count digits before cursor in the raw input
+              const digitsBefore = input.value.slice(0, cursorPos).replace(/\D/g, '').length
+
+              // Format
+              const formatted = formatIrdNumber(input.value)
+
+              // Find new cursor position: skip to where the same number of digits are
+              let newCursor = 0
+              let counted = 0
+              for (let i = 0; i < formatted.length && counted < digitsBefore; i++) {
+                newCursor = i + 1
+                if (/\d/.test(formatted[i])) counted++
               }
-            }}
-            onBlur={() => {
-              // Format on blur for partial inputs too
-              if (irdNumber.replace(/\D/g, '').length > 0) {
-                setIrdNumber(formatIrdNumber(irdNumber))
-              }
+
+              // Set value directly on the DOM element (bypass React controlled input)
+              input.value = formatted
+              input.setSelectionRange(newCursor, newCursor)
+
+              // Sync to React state (for form submission)
+              setIrdNumber(formatted)
             }}
             placeholder="XXX-XXX-XXX"
-            maxLength={10}
+            maxLength={11}
             className="w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-sm px-4 py-3 placeholder:text-[#4a5060] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors"
           />
         </div>
