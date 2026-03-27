@@ -16,14 +16,14 @@ interface SettingsPanelProps {
 // ─── IRD Number Formatting ─────────────────────────────────────────
 
 function formatIrdNumber(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 8)
-  if (digits.length <= 2) return digits
-  if (digits.length <= 5) return `${digits.slice(0, 2)}-${digits.slice(2)}`
-  return `${digits.slice(0, 2)}-${digits.slice(2, 5)}-${digits.slice(5)}`
+  const digits = raw.replace(/\D/g, '').slice(0, 9)
+  if (digits.length <= 3) return digits
+  if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`
+  return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`
 }
 
 function isValidIrdNumber(value: string): boolean {
-  return /^\d{2}-\d{3}-\d{3}$/.test(value)
+  return /^\d{3}-\d{3}-\d{3}$/.test(value)
 }
 
 // ─── Component ─────────────────────────────────────────────────────
@@ -94,7 +94,7 @@ export default function SettingsPanel({
     }
 
     if (irdNumber && !isValidIrdNumber(irdNumber)) {
-      setError('IRD number must be in format XX-XXX-XXX')
+      setError('IRD number must be in format XXX-XXX-XXX')
       return
     }
 
@@ -276,7 +276,7 @@ export default function SettingsPanel({
             type="text"
             value={irdNumber}
             onChange={(e) => setIrdNumber(formatIrdNumber(e.target.value))}
-            placeholder="XX-XXX-XXX"
+            placeholder="XXX-XXX-XXX"
             maxLength={10}
             className="w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-sm px-4 py-3 placeholder:text-[#4a5060] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors"
           />
