@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
 import TaxDashboard from '@/tools/tax-manager/tax-dashboard'
 
@@ -15,7 +16,9 @@ export default function TaxManagerPage() {
         <div className="mb-6">
           <ToolBreadcrumb toolName="NZ Tax Manager" toolSlug="tax-manager" />
         </div>
-        <TaxDashboard />
+        <Suspense fallback={<div className="text-center py-20 text-[#70767f]">Loading...</div>}>
+          <TaxDashboard />
+        </Suspense>
       </div>
     </main>
   )

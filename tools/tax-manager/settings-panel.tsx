@@ -129,8 +129,8 @@ export default function SettingsPanel({
         throw new Error(data?.error ?? `Failed to ${isEdit ? 'update' : 'create'} entity`)
       }
 
-      const { data } = await res.json()
-      const entity = data as TaxEntity
+      const json = await res.json()
+      const entity = (json.data?.entity ?? json.data) as TaxEntity
 
       if (isEdit) {
         onEntityUpdated(entity)

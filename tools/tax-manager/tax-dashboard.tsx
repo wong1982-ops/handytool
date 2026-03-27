@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { getCurrentTaxYear, TAX_CATEGORIES } from './types'
 import type {
   TaxEntity,
@@ -34,7 +35,20 @@ function getTaxYearOptions(): string[] {
 
 // ─── Component ──────────────────────────────────────────────────────
 
+type Tab = 'overview' | 'upload' | 'transactions' | 'gst' | 'tax' | 'settings'
+
+const TABS: { id: Tab; label: string; icon: string }[] = [
+  { id: 'overview', label: 'Overview', icon: '📊' },
+  { id: 'upload', label: 'Upload', icon: '📄' },
+  { id: 'transactions', label: 'Transactions', icon: '📋' },
+  { id: 'gst', label: 'GST Return', icon: '🧾' },
+  { id: 'tax', label: 'Income Tax', icon: '💰' },
+  { id: 'settings', label: 'Settings', icon: '⚙️' },
+]
+
 export default function TaxDashboard() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [entities, setEntities] = useState<TaxEntity[]>([])
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null)
   const [taxYear, setTaxYear] = useState(getCurrentTaxYear)
@@ -43,6 +57,17 @@ export default function TaxDashboard() {
   const [categoryRules, setCategoryRules] = useState<CategoryRule[]>([])
   const [loading, setLoading] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
+
+  // Tab from URL: /tools/tax-manager?tab=transactions
+  const activeTab: Tab = useMemo(() => {
+    const param = searchParams.get('tab') as Tab | null
+    if (param && TABS.some((t) => t.id === param)) return param
+    return 'overview'
+  }, [searchParams])
+
+  const setActiveTab = useCallback((tab: Tab) => {
+    router.push(`/tools/tax-manager?tab=${tab}`, { scroll: false })
+  }, [router])
 
   const selectedEntity = entities.find((e) => e.id === selectedEntityId) ?? null
   const taxYearOptions = getTaxYearOptions()
@@ -381,54 +406,84 @@ export default function TaxDashboard() {
         </div>
       )}
 
-      {/* ── Settings Panel ──────────────────────────────────────────── */}
-      {(showSettings || entities.length === 0) && (
+      {/* ── Tab Navigation ──────────────────────────────────────────── */}
+      {entities.length > 0 && (
+        <nav className="flex gap-1 overflow-x-auto pb-1 mb-6 -mx-1 px-1">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer min-h-[44px] ${
+                activeTab === tab.id
+                  ? 'bg-[#3D6AF2] text-white'
+                  : 'bg-[#131a23] text-[#70767f] hover:text-white hover:bg-[#1e2631]'
+              }`}
+            >
+              <span>{tab.icon}</span>
+              <span className="hidden sm:inline">{tab.label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
+
+      {/* ── Settings Tab / First-time Setup ──────────────────────── */}
+      {(activeTab === 'settings' || entities.length === 0) && (
         <SettingsPanel
           entities={entities}
           selectedEntityId={selectedEntityId}
-          onEntityCreated={handleEntityCreated}
+          onEntityCreated={(entity) => { handleEntityCreated(entity); setActiveTab('overview') }}
           onEntityUpdated={handleEntityUpdated}
           onEntitySelect={handleEntitySelect}
         />
       )}
 
-      {/* ── Main Content (only when entity is selected) ──────────── */}
-      {selectedEntity && !showSettings && (
+      {/* ── Tab Content (only when entity is selected) ────────────── */}
+      {selectedEntity && activeTab !== 'settings' && (
         <>
-          {/* Period Summary */}
-          <PeriodSummary transactions={transactions} />
+          {/* Overview Tab */}
+          {activeTab === 'overview' && (
+            <PeriodSummary transactions={transactions} />
+          )}
 
-          {/* Document Upload */}
-          <DocumentUpload
-            entityId={selectedEntity.id}
-            taxYear={taxYear}
-            onDocumentUploaded={handleDocumentUploaded}
-          />
+          {/* Upload Tab */}
+          {activeTab === 'upload' && (
+            <DocumentUpload
+              entityId={selectedEntity.id}
+              taxYear={taxYear}
+              onDocumentUploaded={handleDocumentUploaded}
+            />
+          )}
 
-          {/* Transaction Table */}
-          <TransactionTable
-            transactions={transactions}
-            categories={TAX_CATEGORIES}
-            onUpdate={handleTransactionUpdate}
-            onDelete={handleTransactionDelete}
-            onApproveAll={handleApproveAll}
-            onRecategorise={handleRecategorise}
-          />
+          {/* Transactions Tab */}
+          {activeTab === 'transactions' && (
+            <TransactionTable
+              transactions={transactions}
+              categories={TAX_CATEGORIES}
+              onUpdate={handleTransactionUpdate}
+              onDelete={handleTransactionDelete}
+              onApproveAll={handleApproveAll}
+              onRecategorise={handleRecategorise}
+            />
+          )}
 
-          {/* GST Summary (expandable) */}
-          <GstSummaryPanel
-            transactions={transactions}
-            entity={selectedEntity}
-            onGenerateForm={handleGenerateGst}
-          />
+          {/* GST Tab */}
+          {activeTab === 'gst' && (
+            <GstSummaryPanel
+              transactions={transactions}
+              entity={selectedEntity}
+              onGenerateForm={handleGenerateGst}
+            />
+          )}
 
-          {/* Income Tax Summary (expandable) */}
-          <IncomeTaxSummaryPanel
-            transactions={transactions}
-            entity={selectedEntity}
-            taxYear={taxYear}
-            onGenerateForm={handleGenerateIR}
-          />
+          {/* Income Tax Tab */}
+          {activeTab === 'tax' && (
+            <IncomeTaxSummaryPanel
+              transactions={transactions}
+              entity={selectedEntity}
+              taxYear={taxYear}
+              onGenerateForm={handleGenerateIR}
+            />
+          )}
         </>
       )}
     </div>
