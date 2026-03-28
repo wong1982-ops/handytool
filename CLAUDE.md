@@ -6,6 +6,7 @@
 - **Remote URL format**: `git@github-handytool:wong1982-ops/<repo>.git`
 - **Repos**: toolk1t-client, toolk1t-admin, toolk1t-api, toolk1t-ui — all under `wong1982-ops`
 - **Note**: local `gh` CLI is logged in as `coolloic`, cannot create repos in `wong1982-ops` org — create repos manually on GitHub if needed
+- **DEPLOYMENT RULE**: Do NOT auto-deploy on git push. Only deploy when the user explicitly asks for it (e.g., "deploy", "push to prod"). Use `vercel --prod --yes` to deploy. Git push is for code backup only — deployment is a separate, user-initiated action.
 
 ## Project Stack
 - **Package manager**: pnpm (NOT npm) — always use `pnpm` for scripts, installs, etc.
