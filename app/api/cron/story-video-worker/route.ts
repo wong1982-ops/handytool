@@ -173,6 +173,20 @@ async function processJob(supabase: any, job: StoryVideoJobRow) {
   if (allPreAssemblyDone && freshSteps.assembly === 'pending') {
     await executeAssembly(supabase, job.id, freshJob.scene_status, freshJob.artifacts)
   }
+
+  // Safety: if all steps are done but status is still processing, mark complete
+  const allStepsDone = PIPELINE_STEPS.every((s) => freshSteps[s] === 'done')
+  if (allStepsDone) {
+    const { data: currentJob } = await supabase
+      .from('story_video_jobs')
+      .select('status')
+      .eq('id', job.id)
+      .single()
+    if (currentJob && currentJob.status !== 'complete') {
+      await updateJob(supabase, job.id, { status: 'complete', current_step: null })
+      console.log(`[story-video-worker] Job ${job.id} — all steps done, marked complete`)
+    }
+  }
 }
 
 // ---------- Step: Script ----------
