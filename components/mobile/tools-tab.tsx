@@ -66,6 +66,13 @@ export function ToolsTab({ children }: ToolsTabProps) {
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
       if (isRoot) return
+
+      // Don't intercept touches on interactive elements like drawing canvases, sliders, editors
+      const target = e.target as HTMLElement
+      if (target.closest('canvas, [data-no-swipe], [style*="touch-action: none"], [style*="touch-action:none"]')) {
+        return
+      }
+
       const touch = e.touches[0]
       touchRef.current = {
         startX: touch.clientX,

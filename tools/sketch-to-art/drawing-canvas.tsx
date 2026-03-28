@@ -307,6 +307,7 @@ export default function DrawingCanvas({ onExport, mode }: DrawingCanvasProps) {
           height={512}
           className="w-full aspect-square rounded-xl border-2 border-[#1e2631] cursor-crosshair"
           style={{ touchAction: 'none' }}
+          data-no-swipe
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
