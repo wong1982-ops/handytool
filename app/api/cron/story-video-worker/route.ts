@@ -187,18 +187,18 @@ async function executeScript(supabase: any, job: StoryVideoJobRow) {
   })
 
   try {
-    // Fetch book data from book_jobs table
+    // Fetch book data from books table
     const { data: bookRow, error: bookError } = await supabase
-      .from('book_jobs')
-      .select('result')
+      .from('books')
+      .select('data, title, page_count')
       .eq('id', job.book_id)
       .single()
 
-    if (bookError || !bookRow?.result) {
-      throw new Error(`Failed to fetch book data: ${bookError?.message || 'No result found'}`)
+    if (bookError || !bookRow?.data) {
+      throw new Error(`Failed to fetch book data: ${bookError?.message || 'No data found'}`)
     }
 
-    const book = bookRow.result
+    const book = bookRow.data as any
 
     // Generate screenplay
     const screenplay = await generateScreenplay(book, job.art_style, job.target_duration)
@@ -271,14 +271,15 @@ async function executeScenes(supabase: any, job: StoryVideoJobRow) {
 
     // Fetch character portraits from book data
     let characterPortraits: { name: string; imageUrl: string }[] = []
-    const { data: bookRow } = await supabase
-      .from('book_jobs')
-      .select('result')
+    const { data: bookDataRow } = await supabase
+      .from('books')
+      .select('data')
       .eq('id', job.book_id)
       .single()
 
-    if (bookRow?.result?.characters) {
-      characterPortraits = bookRow.result.characters
+    const bookData = bookDataRow?.data as Record<string, unknown> | null
+    if (bookData?.characters) {
+      characterPortraits = (bookData.characters as any[])
         .filter((c: { name: string; portraitUrl?: string }) => c.portraitUrl)
         .map((c: { name: string; portraitUrl: string }) => ({
           name: c.name,
@@ -373,13 +374,14 @@ async function executeAudioStep(supabase: any, job: StoryVideoJobRow, step: Pipe
     switch (step) {
       case 'voices': {
         // Get voice map from book data
-        const { data: bookRow } = await supabase
-          .from('book_jobs')
-          .select('result')
+        const { data: voiceBookRow } = await supabase
+          .from('books')
+          .select('data')
           .eq('id', job.book_id)
           .single()
 
-        const voiceMap: Record<string, string> = bookRow?.result?.voiceMap || {}
+        const voiceBookData = voiceBookRow?.data as Record<string, unknown> | null
+        const voiceMap: Record<string, string> = (voiceBookData?.voiceMap as Record<string, string>) || {}
         const voices = await generateVoices(job.id, job.screenplay.scenes, voiceMap)
         updatedArtifacts = { ...updatedArtifacts, voices }
         break
