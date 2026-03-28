@@ -176,7 +176,25 @@ Generate the screenplay JSON now. Ensure totalDuration is close to ${targetSecon
     throw new Error('No JSON found in screenplay response')
   }
 
-  const screenplay: Screenplay = JSON.parse(jsonMatch[0])
+  // Repair common JSON issues from LLM output
+  let jsonStr = jsonMatch[0]
+    .replace(/,\s*}/g, '}')       // trailing commas before }
+    .replace(/,\s*\]/g, ']')      // trailing commas before ]
+    .replace(/[\x00-\x1F]/g, ' ') // control characters
+    .replace(/\n/g, '\\n')        // unescaped newlines in strings
+
+  let screenplay: Screenplay
+  try {
+    screenplay = JSON.parse(jsonStr)
+  } catch {
+    // Second attempt: try to fix unescaped quotes in strings
+    jsonStr = jsonStr.replace(/(?<=:\s*"[^"]*)"(?=[^"]*"[,}\]])/g, '\\"')
+    try {
+      screenplay = JSON.parse(jsonStr)
+    } catch (e2) {
+      throw new Error(`Failed to parse screenplay JSON: ${e2 instanceof Error ? e2.message : 'Invalid JSON'}. Raw (first 500): ${jsonStr.slice(0, 500)}`)
+    }
+  }
 
   // Validate structure
   if (!screenplay.scenes?.length) {
