@@ -11,6 +11,7 @@ import {
 interface JobProgressProps {
   job: StoryVideoJob
   onRetry: (jobId: string, step?: PipelineStep, sceneIndex?: number) => void
+  onDelete?: (jobId: string) => void
 }
 
 function timeAgo(dateStr: string): string {
@@ -24,7 +25,7 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`
 }
 
-export default function JobProgress({ job, onRetry }: JobProgressProps) {
+export default function JobProgress({ job, onRetry, onDelete }: JobProgressProps) {
   const [failedScene, setFailedScene] = useState<number | null>(null)
 
   const isComplete = job.status === 'complete'
@@ -193,16 +194,24 @@ export default function JobProgress({ job, onRetry }: JobProgressProps) {
         )}
 
         {isFailed && (
-          <button
-            type="button"
-            onClick={() => onRetry(job.id)}
-            className="
-              bg-red-500 text-white font-semibold rounded-xl
-              min-h-[44px] px-4 py-2 text-sm cursor-pointer hover:bg-red-400
-            "
-          >
-            Retry Job
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => onRetry(job.id)}
+              className="bg-[#3D6AF2] text-white font-semibold rounded-xl min-h-[44px] px-4 py-2 text-sm cursor-pointer hover:opacity-90"
+            >
+              Retry Job
+            </button>
+            {onDelete && (
+              <button
+                type="button"
+                onClick={() => onDelete(job.id)}
+                className="border border-red-500/30 text-red-400 font-semibold rounded-xl min-h-[44px] px-4 py-2 text-sm cursor-pointer hover:bg-red-500/10"
+              >
+                Delete
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>

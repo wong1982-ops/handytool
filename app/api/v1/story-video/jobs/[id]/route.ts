@@ -43,3 +43,29 @@ export async function GET(
 
   return apiSuccess({ job })
 }
+
+/**
+ * DELETE /api/v1/story-video/jobs/[id] — Delete a video job.
+ */
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
+  const { id } = await params
+  const supabase = await getSupabase()
+
+  const { error } = await supabase
+    .from('story_video_jobs')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    console.error('[story-video] Delete error:', error)
+    return API_ERRORS.INTERNAL()
+  }
+
+  return apiSuccess({ deleted: true })
+}

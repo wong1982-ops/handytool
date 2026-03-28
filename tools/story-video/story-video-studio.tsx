@@ -131,6 +131,16 @@ export default function StoryVideoStudio() {
     }
   }
 
+  // Delete job
+  async function handleDelete(jobId: string) {
+    try {
+      await fetch(`/api/v1/story-video/jobs/${jobId}`, { method: 'DELETE' })
+      setJobs((prev) => prev.filter((j) => j.id !== jobId))
+    } catch {
+      // Silently fail
+    }
+  }
+
   const completedJobs = jobs.filter((j) => j.status === 'complete')
   const activeJobs = jobs.filter((j) => j.status !== 'complete')
 
@@ -193,7 +203,7 @@ export default function StoryVideoStudio() {
             <section className="space-y-3">
               <h2 className="text-sm font-medium text-[#a6abb5]">In Progress</h2>
               {activeJobs.map((job) => (
-                <JobProgress key={job.id} job={job} onRetry={handleRetry} />
+                <JobProgress key={job.id} job={job} onRetry={handleRetry} onDelete={handleDelete} />
               ))}
             </section>
           )}
@@ -214,7 +224,7 @@ export default function StoryVideoStudio() {
             <section className="space-y-3">
               {jobs.map((job) => (
                 <div key={job.id} className="space-y-3">
-                  <JobProgress job={job} onRetry={handleRetry} />
+                  <JobProgress job={job} onRetry={handleRetry} onDelete={handleDelete} />
                   {job.status === 'complete' && <VideoPlayer job={job} />}
                 </div>
               ))}
