@@ -6,8 +6,8 @@ import type { ArtStyle, ScreenplayScene, VideoProvider } from '../types'
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
 const genAI = new GoogleGenAI({ apiKey: GEMINI_API_KEY })
 
-/** Gemini model for high-quality scene image generation */
-const IMAGE_MODEL = 'gemini-2.5-flash'
+/** Gemini model for image generation (must support responseModalities: IMAGE) */
+const IMAGE_MODEL = 'gemini-3.1-flash-image-preview'
 
 /**
  * Art style prefixes injected at the start of every scene prompt
@@ -172,13 +172,18 @@ export class GeminiVideoProvider implements VideoProvider {
     const parts = response.candidates?.[0]?.content?.parts
     if (!parts) throw new Error('No content in Gemini scene generation response')
 
+    // Handle both camelCase (SDK) and snake_case (REST) field names
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const imagePart = parts.find((p: any) => p.inlineData?.mimeType?.startsWith('image/'))
+    const imagePart = parts.find((p: any) => {
+      const data = p.inlineData || p.inline_data
+      return data?.mimeType?.startsWith('image/') || data?.mime_type?.startsWith('image/')
+    })
 
-    if (!imagePart?.inlineData?.data) {
+    const imageData = imagePart?.inlineData || imagePart?.inline_data
+    if (!imageData?.data) {
       throw new Error('No image returned from Gemini scene generation')
     }
 
-    return Buffer.from(imagePart.inlineData.data, 'base64')
+    return Buffer.from(imageData.data, 'base64')
   }
 }
