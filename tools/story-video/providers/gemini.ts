@@ -68,7 +68,7 @@ export class GeminiVideoProvider implements VideoProvider {
         }],
         parameters: {
           aspectRatio: '16:9',
-          durationSeconds: String(Math.min(Math.max(durationSeconds, 4), 8)),
+          durationSeconds: Math.min(Math.max(durationSeconds, 4), 8),
           resolution: '720p',
         },
       }),
@@ -101,20 +101,32 @@ export class GeminiVideoProvider implements VideoProvider {
       const pollData = await pollRes.json()
 
       if (pollData.done) {
-        // Extract video data
-        const videoData = pollData.response?.generatedVideos?.[0]?.video
+        // Extract video — handle both response formats
+        const videoData =
+          pollData.response?.generateVideoResponse?.generatedSamples?.[0]?.video
+          ?? pollData.response?.generatedVideos?.[0]?.video
+
         if (!videoData) {
-          throw new Error('No video in Veo 3.1 response')
+          throw new Error(`No video in Veo 3.1 response. Keys: ${JSON.stringify(Object.keys(pollData.response || {}))}`)
         }
 
-        // Download the video file
+        // Download the video file (follow redirects)
         if (videoData.uri) {
-          const videoRes = await fetch(`${videoData.uri}?key=${GEMINI_API_KEY}`)
+          const downloadUrl = videoData.uri.includes('?')
+            ? `${videoData.uri}&key=${GEMINI_API_KEY}`
+            : `${videoData.uri}?key=${GEMINI_API_KEY}`
+
+          // Veo returns a 302 redirect — need to follow it
+          const videoRes = await fetch(downloadUrl, { redirect: 'follow' })
           if (!videoRes.ok) throw new Error(`Failed to download video: ${videoRes.status}`)
-          return Buffer.from(await videoRes.arrayBuffer())
+          const buffer = Buffer.from(await videoRes.arrayBuffer())
+          if (buffer.length < 1000) {
+            throw new Error(`Video download too small (${buffer.length} bytes) — likely an error response`)
+          }
+          return buffer
         }
 
-        // Or inline data
+        // Or inline base64 data
         if (videoData.data) {
           return Buffer.from(videoData.data, 'base64')
         }
