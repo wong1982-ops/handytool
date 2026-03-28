@@ -63,6 +63,16 @@ export function useStoriesList() {
     setStories(prev => prev.map(s => s.id === id ? { ...s, isPublic } : s))
   }, [])
 
+  const markComplete = useCallback(async (id: string) => {
+    const res = await fetch(`/api/v1/story/books/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'complete' }),
+    })
+    if (!res.ok) throw new Error('Failed to mark as complete')
+    setStories(prev => prev.map(s => s.id === id ? { ...s, status: 'complete' as const } : s))
+  }, [])
+
   // Client-side filtering & sorting
   const filtered = stories
     .filter(s => {
@@ -87,7 +97,7 @@ export function useStoriesList() {
     search, setSearch,
     sortBy, setSortBy,
     filterSeries, setFilterSeries,
-    deleteStory, toggleShare,
+    deleteStory, toggleShare, markComplete,
     refresh: fetchStories,
   }
 }

@@ -18,12 +18,13 @@ interface StoryListProps {
   onEdit: (id: string) => void
   onDelete: (id: string) => void
   onToggleShare: (id: string, isPublic: boolean) => void
+  onMarkComplete?: (id: string) => void
 }
 
 export function StoryList({
   stories, loading, search, onSearchChange, sortBy, onSortChange,
   filterSeries, onFilterSeriesChange, onCreateNew,
-  onEdit, onDelete, onToggleShare,
+  onEdit, onDelete, onToggleShare, onMarkComplete,
 }: StoryListProps) {
   const { series } = useSeriesList()
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
@@ -120,6 +121,7 @@ export function StoryList({
               onEdit={onEdit}
               onDelete={(id) => setDeleteConfirm(id)}
               onToggleShare={onToggleShare}
+              onMarkComplete={onMarkComplete}
             />
           ))}
         </div>

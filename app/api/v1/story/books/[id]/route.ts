@@ -31,12 +31,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const supabase = await createClient()
 
-  let body: { pageSequence: number; narrativeText?: string; sceneDescription?: string; dialogue?: { speaker: string; line: string }[]; mood?: string; imagePrompt?: string; imageUrl?: string }
+  let body: { pageSequence?: number; narrativeText?: string; sceneDescription?: string; dialogue?: { speaker: string; line: string }[]; mood?: string; imagePrompt?: string; imageUrl?: string; status?: string }
   try { body = await request.json() } catch { return API_ERRORS.VALIDATION({ message: 'Invalid JSON' }) }
-
-  if (!body.pageSequence || body.pageSequence < 1) {
-    return apiError('pageSequence is required', 'VALIDATION_ERROR', 400)
-  }
 
   // Load current book
   const { data: books } = await supabase.rpc('get_book_by_id', {
@@ -45,6 +41,25 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   })
   const book = (books || [])[0]
   if (!book) return API_ERRORS.NOT_FOUND('Book')
+
+  // Handle status update (e.g., mark as complete)
+  if (body.status && !body.pageSequence) {
+    const { error: statusError } = await supabase
+      .from('book_jobs')
+      .update({ status: body.status === 'complete' ? 'completed' : body.status, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', effectiveUserId)
+
+    if (statusError) {
+      console.error('[story/books] Status update error:', statusError)
+      return API_ERRORS.INTERNAL()
+    }
+    return apiSuccess({ updated: true })
+  }
+
+  if (!body.pageSequence || body.pageSequence < 1) {
+    return apiError('pageSequence is required', 'VALIDATION_ERROR', 400)
+  }
 
   const bookData = book.data as Record<string, unknown>
   const pages = bookData.pages as Record<string, unknown>[]

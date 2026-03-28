@@ -34,15 +34,16 @@ export default function StoryVideoStudio() {
         const json = await res.json()
         // story/jobs returns { jobs: [...] }, extract the array
         const items = json.data?.jobs ?? json.jobs ?? json.data ?? []
-        const completed: BookOption[] = (Array.isArray(items) ? items : [])
-          .filter((j: Record<string, unknown>) => j.status === 'complete')
+        const allBooks: BookOption[] = (Array.isArray(items) ? items : [])
+          .filter((j: Record<string, unknown>) => j.status === 'complete' || j.status === 'completed' || j.status === 'draft')
           .map((j: Record<string, unknown>) => ({
             id: j.id as string,
             title: (j.title ?? j.book_title ?? 'Untitled') as string,
             pageCount: (j.page_count ?? j.pageCount ?? 0) as number,
             coverUrl: (j.cover_url ?? j.coverUrl) as string | undefined,
+            status: (j.status as string) === 'complete' || (j.status as string) === 'completed' ? 'complete' : 'draft',
           }))
-        setBooks(completed)
+        setBooks(allBooks)
       } catch {
         // Silently fail — books list will be empty
       }

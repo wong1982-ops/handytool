@@ -7,6 +7,7 @@ export interface BookOption {
   title: string
   pageCount: number
   coverUrl?: string
+  status?: 'complete' | 'draft'
 }
 
 interface BookSelectorProps {
@@ -69,7 +70,12 @@ export default function BookSelector({ books, selectedId, onSelect }: BookSelect
                 )}
               </div>
               <div className="p-2">
-                <p className="text-white text-xs font-semibold truncate">{book.title}</p>
+                <div className="flex items-center gap-1">
+                  <p className="text-white text-xs font-semibold truncate flex-1">{book.title}</p>
+                  {book.status === 'draft' && (
+                    <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-amber-500/20 text-amber-400 shrink-0">Draft</span>
+                  )}
+                </div>
                 <p className="text-[#70767f] text-[10px] mt-0.5">{book.pageCount} pages</p>
               </div>
             </button>

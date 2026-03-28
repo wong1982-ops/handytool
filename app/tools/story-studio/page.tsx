@@ -93,6 +93,7 @@ function StoriesContent() {
         onEdit={handleEdit}
         onDelete={storiesList.deleteStory}
         onToggleShare={storiesList.toggleShare}
+        onMarkComplete={storiesList.markComplete}
       />
     </div>
   )

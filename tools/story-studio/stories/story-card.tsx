@@ -9,9 +9,10 @@ interface StoryCardProps {
   onEdit: (id: string) => void
   onDelete: (id: string) => void
   onToggleShare: (id: string, isPublic: boolean) => void
+  onMarkComplete?: (id: string) => void
 }
 
-export function StoryCard({ story, onEdit, onDelete, onToggleShare }: StoryCardProps) {
+export function StoryCard({ story, onEdit, onDelete, onToggleShare, onMarkComplete }: StoryCardProps) {
   const dateStr = new Date(story.createdAt).toLocaleDateString(undefined, {
     month: 'short', day: 'numeric', year: 'numeric',
   })
@@ -57,6 +58,17 @@ export function StoryCard({ story, onEdit, onDelete, onToggleShare }: StoryCardP
             }`}>
               {story.status === 'complete' ? 'Complete' : 'Draft'}
             </span>
+            {story.status !== 'complete' && onMarkComplete && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onMarkComplete(story.id) }}
+                className="text-[10px] font-medium px-1.5 py-0.5 rounded-full cursor-pointer
+                  bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400
+                  hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors"
+                title="Mark this story as complete"
+              >
+                ✓ Complete
+              </button>
+            )}
           </div>
         </div>
 
