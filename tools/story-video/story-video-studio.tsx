@@ -31,8 +31,9 @@ export default function StoryVideoStudio() {
       try {
         const res = await fetch('/api/v1/story/jobs')
         if (!res.ok) return
-        const data = await res.json()
-        const items = data.data ?? data.jobs ?? data ?? []
+        const json = await res.json()
+        // story/jobs returns { jobs: [...] }, extract the array
+        const items = json.data?.jobs ?? json.jobs ?? json.data ?? []
         const completed: BookOption[] = (Array.isArray(items) ? items : [])
           .filter((j: Record<string, unknown>) => j.status === 'complete')
           .map((j: Record<string, unknown>) => ({
@@ -54,8 +55,9 @@ export default function StoryVideoStudio() {
     try {
       const res = await fetch('/api/v1/story-video/jobs')
       if (!res.ok) return
-      const data = await res.json()
-      setJobs(data.data ?? data.jobs ?? [])
+      const json = await res.json()
+      const jobList = json.data?.jobs ?? json.jobs ?? json.data ?? []
+      setJobs(Array.isArray(jobList) ? jobList : [])
     } catch {
       // Silently fail
     }
