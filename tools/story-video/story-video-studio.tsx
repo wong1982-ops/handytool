@@ -29,19 +29,18 @@ export default function StoryVideoStudio() {
   useEffect(() => {
     async function fetchBooks() {
       try {
-        const res = await fetch('/api/v1/story/jobs')
+        const res = await fetch('/api/v1/story/books')
         if (!res.ok) return
         const json = await res.json()
-        // story/jobs returns { jobs: [...] }, extract the array
-        const items = json.data?.jobs ?? json.jobs ?? json.data ?? []
+        // story/books returns { data: [...] }
+        const items = json.data ?? json.books ?? []
         const allBooks: BookOption[] = (Array.isArray(items) ? items : [])
-          .filter((j: Record<string, unknown>) => j.status === 'complete' || j.status === 'completed' || j.status === 'draft')
           .map((j: Record<string, unknown>) => ({
             id: j.id as string,
-            title: (j.title ?? j.book_title ?? 'Untitled') as string,
-            pageCount: (j.page_count ?? j.pageCount ?? 0) as number,
-            coverUrl: (j.cover_url ?? j.coverUrl) as string | undefined,
-            status: (j.status as string) === 'complete' || (j.status as string) === 'completed' ? 'complete' : 'draft',
+            title: (j.title ?? 'Untitled') as string,
+            pageCount: (j.pageCount ?? j.page_count ?? 0) as number,
+            coverUrl: (j.coverImageUrl ?? j.cover_image_url) as string | undefined,
+            status: 'complete' as const,
           }))
         setBooks(allBooks)
       } catch {
