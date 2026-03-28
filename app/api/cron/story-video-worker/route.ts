@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+// Veo 3.1 video generation can take up to 120s per scene
+export const maxDuration = 300
 import type {
   PipelineStep,
   StoryVideoJob,
@@ -323,11 +326,9 @@ async function executeScenes(supabase: any, job: StoryVideoJobRow) {
       previousSceneUrl,
     })
 
-    // Upload to R2
-    const isVideo = buffer.length > 500_000 // rough heuristic: videos are larger
-    const ext = isVideo ? 'mp4' : 'png'
-    const contentType = isVideo ? 'video/mp4' : 'image/png'
-    const r2Path = `story-video/${job.id}/scene-${pendingScene.index}.${ext}`
+    // Upload video clip to R2
+    const r2Path = `story-video/${job.id}/scene-${pendingScene.index}.mp4`
+    const contentType = 'video/mp4'
     const clipUrl = await uploadToR2(r2Path, buffer, contentType, { upsert: true })
 
     // Update scene status
