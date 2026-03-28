@@ -241,12 +241,22 @@ async function executeScenes(supabase: any, job: StoryVideoJobRow) {
 
   const sceneStatus = [...job.scene_status]
   const pendingScene = sceneStatus.find((s) => s.status === 'pending')
+  const failedScene = sceneStatus.find((s) => s.status === 'failed')
 
-  if (!pendingScene) {
-    // All scenes done — mark step complete
+  if (!pendingScene && !failedScene) {
+    // ALL scenes truly done — mark step complete
     await updateJob(supabase, job.id, {
       steps: { ...job.steps, scenes: 'done' },
     })
+    return
+  }
+
+  if (!pendingScene && failedScene) {
+    // No pending but some failed — retry failed scenes automatically
+    const retryScene = sceneStatus.find((s) => s.status === 'failed')!
+    retryScene.status = 'pending'
+    retryScene.error = undefined
+    await updateJob(supabase, job.id, { scene_status: sceneStatus })
     return
   }
 
@@ -259,6 +269,7 @@ async function executeScenes(supabase: any, job: StoryVideoJobRow) {
     })
   }
 
+  if (!pendingScene) return // safety — should not reach here
   const sceneData = job.screenplay.scenes[pendingScene.index]
   if (!sceneData) return
 
