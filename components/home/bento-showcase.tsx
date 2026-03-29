@@ -602,7 +602,39 @@ const bentoItems = [
   },
 ]
 
+function BentoGrid({ items }: { items: typeof bentoItems }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {items.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={`group relative bg-white dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-5 overflow-hidden hover:scale-[1.02] hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300 cursor-pointer shadow-sm dark:shadow-none ${item.gridClass}`}
+        >
+          {/* Hover glow */}
+          <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br ${item.glowClass} to-transparent rounded-2xl`} />
+
+          {/* Mini preview */}
+          <div className="relative mb-3 h-24 lg:h-32 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden flex items-center justify-center">
+            {item.preview}
+          </div>
+
+          {/* Label */}
+          <h3 className="relative font-bold text-slate-900 dark:text-white text-sm">{item.name}</h3>
+          <p className="relative text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">{item.description}</p>
+          <span className="relative text-xs text-[var(--tk-color-primary-400)] mt-2 inline-block group-hover:translate-x-1 transition-transform">
+            Try it →
+          </span>
+        </Link>
+      ))}
+    </div>
+  )
+}
+
 export function BentoShowcase() {
+  const aiTools = bentoItems.filter(item => item.category === 'ai')
+  const utilityTools = bentoItems.filter(item => item.category === 'utility')
+
   return (
     <section className="py-20 px-4 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-[#101922] dark:to-[#0c1219]">
       <div className="max-w-6xl mx-auto">
@@ -616,29 +648,26 @@ export function BentoShowcase() {
           All your tools — right in your browser.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {bentoItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`group relative bg-white dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-5 overflow-hidden hover:scale-[1.02] hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300 cursor-pointer shadow-sm dark:shadow-none ${item.gridClass}`}
-            >
-              {/* Hover glow */}
-              <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br ${item.glowClass} to-transparent rounded-2xl`} />
+        {/* AI-Powered Tools */}
+        <div className="mb-12">
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+            <svg className="w-5 h-5 text-[var(--tk-color-primary-400)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12" />
+            </svg>
+            AI-Powered Tools
+          </h3>
+          <BentoGrid items={aiTools} />
+        </div>
 
-              {/* Mini preview */}
-              <div className="relative mb-3 h-24 lg:h-32 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden flex items-center justify-center">
-                {item.preview}
-              </div>
-
-              {/* Label */}
-              <h3 className="relative font-bold text-slate-900 dark:text-white text-sm">{item.name}</h3>
-              <p className="relative text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">{item.description}</p>
-              <span className="relative text-xs text-[var(--tk-color-primary-400)] mt-2 inline-block group-hover:translate-x-1 transition-transform">
-                Try it →
-              </span>
-            </Link>
-          ))}
+        {/* Utility Tools */}
+        <div>
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+            <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.1-5.1a1.5 1.5 0 010-2.12l.88-.88a1.5 1.5 0 012.12 0L12 9.75l2.68-2.68a1.5 1.5 0 012.12 0l.88.88a1.5 1.5 0 010 2.12l-5.1 5.1a1.5 1.5 0 01-2.18 0z" />
+            </svg>
+            Utility Tools
+          </h3>
+          <BentoGrid items={utilityTools} />
         </div>
       </div>
     </section>
