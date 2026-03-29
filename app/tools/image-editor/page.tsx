@@ -162,15 +162,23 @@ export default function ImageEditorPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.imageSize, fabric.isReady])
 
-  // Sync zoom slider with hook's fit-to-viewport calculation
+  // Sync zoom slider with hook's fit-to-viewport calculation (one-time on image load)
+  const prevInitialZoom = useRef(fabric.initialZoom)
   useEffect(() => {
-    if (fabric.initialZoom !== zoom) setZoom(fabric.initialZoom)
+    if (fabric.initialZoom !== prevInitialZoom.current) {
+      prevInitialZoom.current = fabric.initialZoom
+      setZoom(fabric.initialZoom)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.initialZoom])
 
-  // Sync zoom from wheel zoom (hook → page state)
+  // Sync zoom from wheel zoom (hook → page state) — only when canvas zoom actually changes
+  const prevZoomPercent = useRef(fabric.zoomPercent)
   useEffect(() => {
-    if (fabric.zoomPercent !== zoom) setZoom(fabric.zoomPercent)
+    if (fabric.zoomPercent !== prevZoomPercent.current) {
+      prevZoomPercent.current = fabric.zoomPercent
+      setZoom(fabric.zoomPercent)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.zoomPercent])
 
