@@ -2,6 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ToolType } from './editor-toolbar'
+import {
+  type ShapeType,
+  type ShapeStyle,
+  DEFAULT_SHAPE_STYLE,
+  SHAPE_LABELS,
+  generateStarPoints,
+  generatePolygonPoints,
+  generateArrowheadPoints,
+  constrainProportions,
+  snapAngle,
+} from './shape-tools'
 import type { Adjustments } from './adjustments-panel'
 import type { FilterPresetConfig } from './filter-presets'
 import type { HistoryEntry } from './history-strip'
@@ -75,6 +86,14 @@ export interface FabricCanvasAPI {
   moveLayerBackward: (id: string) => void
   moveLayerToFront: (id: string) => void
   moveLayerToBack: (id: string) => void
+  // Shape operations
+  setActiveShape: (shape: ShapeType) => void
+  setShapeStyle: (updates: Partial<ShapeStyle>) => void
+  getSelectedShapeProperties: () => {
+    x: number; y: number; width: number; height: number;
+    angle: number; scaleX: number; scaleY: number; pointCount?: number;
+  } | null
+  updateSelectedShapeProperties: (updates: Record<string, any>) => void
   // AI mode operations
   aiMode: 'none' | 'segment-click' | 'brush-mask'
   setAiMode: (mode: 'none' | 'segment-click' | 'brush-mask') => void
@@ -161,6 +180,19 @@ export function useFabricCanvas(): FabricCanvasAPI {
     isDrawingMode: boolean
   } | null>(null)
 
+  // Shape drawing state
+  const activeShapeRef = useRef<ShapeType>('rectangle')
+  const shapeStyleRef = useRef<ShapeStyle>({ ...DEFAULT_SHAPE_STYLE })
+  const drawingShapeRef = useRef<any>(null)
+  const drawStartRef = useRef<{ x: number; y: number } | null>(null)
+  const customPolyPointsRef = useRef<{ x: number; y: number }[]>([])
+  const customPolyPreviewRef = useRef<any[]>([])
+  const isDrawingShapeRef = useRef(false)
+  const shapeCounterRef = useRef<Record<string, number>>({})
+  const shapeHandlersRef = useRef<{ down: any; move: any; up: any } | null>(null)
+  // Ref-based access to syncLayersFromCanvas (defined later) for use in shape helpers
+  const syncLayersRef = useRef<() => void>(() => {})
+
   // ------------------------------------------------------------------
   // History helpers
   // ------------------------------------------------------------------
@@ -178,7 +210,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
   const pushHistory = useCallback((label: string = 'Edit') => {
     const canvas = fabricRef.current
     if (!canvas || isRestoringRef.current) return
-    const json = JSON.stringify(canvas.toJSON(['__isBgImage', '__isCropRect', '__layerId', '__layerName']))
+    const json = JSON.stringify(canvas.toJSON(['__isBgImage', '__isCropRect', '__layerId', '__layerName', '__isShape', '__shapeType', '__pointCount']))
     const stack = historyRef.current
     const labels = historyLabelsRef.current
     stack.push(json)
@@ -466,6 +498,21 @@ export function useFabricCanvas(): FabricCanvasAPI {
     panHandlersRef.current = null
   }, [])
 
+  const removeShapeHandlers = useCallback(() => {
+    const canvas = fabricRef.current
+    const h = shapeHandlersRef.current
+    if (!canvas || !h) return
+    canvas.off('mouse:down', h.down)
+    canvas.off('mouse:move', h.move)
+    canvas.off('mouse:up', h.up)
+    customPolyPreviewRef.current.forEach((obj) => canvas.remove(obj))
+    customPolyPreviewRef.current = []
+    customPolyPointsRef.current = []
+    isDrawingShapeRef.current = false
+    drawingShapeRef.current = null
+    shapeHandlersRef.current = null
+  }, [])
+
   const removeCropRect = useCallback(() => {
     const canvas = fabricRef.current
     if (!canvas) return
@@ -475,6 +522,230 @@ export function useFabricCanvas(): FabricCanvasAPI {
     })
     canvas.renderAll()
   }, [])
+
+  // ------------------------------------------------------------------
+  // Shape drawing helpers
+  // ------------------------------------------------------------------
+
+  const createInitialShape = (x: number, y: number) => {
+    const fabric = fabricModuleRef.current
+    if (!fabric) return null
+
+    const style = shapeStyleRef.current
+    const commonProps: any = {
+      left: x,
+      top: y,
+      strokeWidth: style.strokeWidth,
+      stroke: style.strokeWidth > 0 ? style.stroke : undefined,
+      strokeDashArray: style.strokeDashArray.length > 0 ? [...style.strokeDashArray] : undefined,
+      opacity: style.opacity / 100,
+      selectable: false,
+      evented: false,
+      originX: 'left',
+      originY: 'top',
+    }
+
+    if (style.shadowEnabled) {
+      commonProps.shadow = new fabric.Shadow({
+        color: style.shadowColor,
+        offsetX: style.shadowOffsetX,
+        offsetY: style.shadowOffsetY,
+        blur: style.shadowBlur,
+      })
+    }
+
+    const fill = style.fillType === 'none' ? 'transparent' : style.fill
+
+    switch (activeShapeRef.current) {
+      case 'rectangle':
+        return new fabric.Rect({ ...commonProps, fill, width: 0, height: 0 })
+      case 'rounded-rectangle':
+        return new fabric.Rect({ ...commonProps, fill, width: 0, height: 0, rx: style.cornerRadius, ry: style.cornerRadius })
+      case 'ellipse':
+        return new fabric.Ellipse({ ...commonProps, fill, rx: 0, ry: 0 })
+      case 'triangle':
+        return new fabric.Triangle({ ...commonProps, fill, width: 0, height: 0 })
+      case 'line':
+        return new fabric.Line([x, y, x, y], { ...commonProps, stroke: style.stroke || '#ffffff' })
+      case 'arrow':
+        return new fabric.Line([x, y, x, y], { ...commonProps, stroke: style.stroke || '#ffffff' })
+      case 'polygon': {
+        const poly = new fabric.Polygon(generatePolygonPoints(0, 0, 0, 6), { ...commonProps, fill })
+        ;(poly as any).__pointCount = 6
+        return poly
+      }
+      case 'star': {
+        const star = new fabric.Polygon(generateStarPoints(0, 0, 0, 0, 5), { ...commonProps, fill })
+        ;(star as any).__pointCount = 5
+        return star
+      }
+      default:
+        return null
+    }
+  }
+
+  const updateShapeDuringDraw = (
+    shape: any,
+    start: { x: number; y: number },
+    current: { x: number; y: number },
+    shift: boolean,
+    alt: boolean,
+  ) => {
+    let dx = current.x - start.x
+    let dy = current.y - start.y
+
+    const shapeType = activeShapeRef.current
+
+    if (shapeType === 'line' || shapeType === 'arrow') {
+      let endX = current.x
+      let endY = current.y
+      if (shift) {
+        const snapped = snapAngle(start.x, start.y, current.x, current.y)
+        endX = snapped.x
+        endY = snapped.y
+      }
+      shape.set({ x2: endX, y2: endY })
+      return
+    }
+
+    if (shift) {
+      const constrained = constrainProportions(dx, dy)
+      dx = constrained.width
+      dy = constrained.height
+    }
+
+    let left = start.x
+    let top = start.y
+    let width = Math.abs(dx)
+    let height = Math.abs(dy)
+
+    if (alt) {
+      left = start.x - width
+      top = start.y - height
+      width *= 2
+      height *= 2
+    } else {
+      if (dx < 0) left = start.x + dx
+      if (dy < 0) top = start.y + dy
+    }
+
+    switch (shapeType) {
+      case 'rectangle':
+      case 'rounded-rectangle':
+      case 'triangle':
+        shape.set({ left, top, width, height })
+        break
+      case 'ellipse':
+        shape.set({ left, top, rx: width / 2, ry: height / 2 })
+        break
+      case 'polygon': {
+        const r = Math.min(width, height) / 2
+        const sides = shape.__pointCount ?? 6
+        shape.set({ points: generatePolygonPoints(0, 0, r, sides), left: left + width / 2 - r, top: top + height / 2 - r })
+        break
+      }
+      case 'star': {
+        const outerR = Math.min(width, height) / 2
+        const innerR = outerR * 0.5
+        const pts = shape.__pointCount ?? 5
+        shape.set({ points: generateStarPoints(0, 0, outerR, innerR, pts), left: left + width / 2 - outerR, top: top + height / 2 - outerR })
+        break
+      }
+    }
+  }
+
+  const handleCustomPolyClick = (opt: any) => {
+    const canvas = fabricRef.current
+    const fabric = fabricModuleRef.current
+    if (!canvas || !fabric) return
+
+    const pointer = canvas.getViewportPoint(opt.e)
+    const points = customPolyPointsRef.current
+
+    if (points.length >= 3) {
+      const first = points[0]
+      const dist = Math.sqrt((pointer.x - first.x) ** 2 + (pointer.y - first.y) ** 2)
+      if (dist < 8 || opt.e.detail === 2) {
+        finalizeCustomPolygon()
+        return
+      }
+    }
+
+    points.push({ x: pointer.x, y: pointer.y })
+
+    const circle = new fabric.Circle({
+      left: pointer.x - 4,
+      top: pointer.y - 4,
+      radius: 4,
+      fill: '#3D6AF2',
+      stroke: '#ffffff',
+      strokeWidth: 1,
+      selectable: false,
+      evented: false,
+    })
+    canvas.add(circle)
+    customPolyPreviewRef.current.push(circle)
+
+    if (points.length > 1) {
+      const prev = points[points.length - 2]
+      const line = new fabric.Line([prev.x, prev.y, pointer.x, pointer.y], {
+        stroke: '#3D6AF2',
+        strokeWidth: 1,
+        strokeDashArray: [4, 4],
+        selectable: false,
+        evented: false,
+      })
+      canvas.add(line)
+      customPolyPreviewRef.current.push(line)
+    }
+
+    canvas.requestRenderAll()
+  }
+
+  const finalizeCustomPolygon = () => {
+    const canvas = fabricRef.current
+    const fabric = fabricModuleRef.current
+    if (!canvas || !fabric) return
+
+    const points = [...customPolyPointsRef.current]
+    if (points.length < 3) return
+
+    customPolyPreviewRef.current.forEach((obj) => canvas.remove(obj))
+    customPolyPreviewRef.current = []
+    customPolyPointsRef.current = []
+
+    const minX = Math.min(...points.map((p) => p.x))
+    const minY = Math.min(...points.map((p) => p.y))
+    const normalizedPoints = points.map((p) => ({ x: p.x - minX, y: p.y - minY }))
+
+    const style = shapeStyleRef.current
+    const fill = style.fillType === 'none' ? 'transparent' : style.fill
+
+    const polygon = new fabric.Polygon(normalizedPoints, {
+      left: minX,
+      top: minY,
+      fill,
+      strokeWidth: style.strokeWidth,
+      stroke: style.strokeWidth > 0 ? style.stroke : undefined,
+      opacity: style.opacity / 100,
+      selectable: true,
+      evented: true,
+    })
+
+    const count = (shapeCounterRef.current['custom-polygon'] ?? 0) + 1
+    shapeCounterRef.current['custom-polygon'] = count
+    ;(polygon as any).__layerId = crypto.randomUUID().slice(0, 8)
+    ;(polygon as any).__layerName = `Custom Polygon ${count}`
+    ;(polygon as any).__isShape = true
+    ;(polygon as any).__shapeType = 'custom-polygon'
+
+    canvas.add(polygon)
+    canvas.setActiveObject(polygon)
+    canvas.requestRenderAll()
+
+    syncLayersRef.current()
+    pushHistory('Add Custom Polygon')
+  }
 
   const setTool = useCallback((tool: ToolType) => {
     const canvas = fabricRef.current
@@ -486,6 +757,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     // Clean up previous tool state
     removeTextHandler()
     removePanHandlers()
+    removeShapeHandlers()
     canvas.isDrawingMode = false
     canvas.selection = false
     canvas.defaultCursor = 'default'
@@ -626,8 +898,85 @@ export function useFabricCanvas(): FabricCanvasAPI {
         canvas.renderAll()
         break
       }
+
+      case 'shape': {
+        canvas.defaultCursor = 'crosshair'
+        canvas.selection = false
+
+        allObjects.forEach((obj: any) => {
+          if (obj.__isShape && !obj.__isBgImage) {
+            obj.selectable = true
+            obj.evented = true
+          }
+        })
+
+        const shapeMouseDown = (opt: any) => {
+          // Skip if clicking on an existing object
+          if (opt.target) return
+
+          if (activeShapeRef.current === 'custom-polygon') {
+            handleCustomPolyClick(opt)
+            return
+          }
+          const pointer = canvas.getViewportPoint(opt.e)
+          drawStartRef.current = { x: pointer.x, y: pointer.y }
+          isDrawingShapeRef.current = true
+
+          const shape = createInitialShape(pointer.x, pointer.y)
+          if (shape) {
+            drawingShapeRef.current = shape
+            canvas.add(shape)
+            canvas.requestRenderAll()
+          }
+        }
+
+        const shapeMouseMove = (opt: any) => {
+          if (!isDrawingShapeRef.current || !drawingShapeRef.current || !drawStartRef.current) return
+          const pointer = canvas.getViewportPoint(opt.e)
+
+          updateShapeDuringDraw(
+            drawingShapeRef.current,
+            drawStartRef.current,
+            pointer,
+            opt.e.shiftKey,
+            opt.e.altKey,
+          )
+          canvas.requestRenderAll()
+        }
+
+        const shapeMouseUp = () => {
+          if (!isDrawingShapeRef.current || !drawingShapeRef.current) return
+          isDrawingShapeRef.current = false
+
+          const shape = drawingShapeRef.current
+          const shapeType = activeShapeRef.current
+          const count = (shapeCounterRef.current[shapeType] ?? 0) + 1
+          shapeCounterRef.current[shapeType] = count
+          const label = SHAPE_LABELS[shapeType]
+
+          shape.__layerId = crypto.randomUUID().slice(0, 8)
+          shape.__layerName = `${label} ${count}`
+          shape.__isShape = true
+          shape.__shapeType = shapeType
+          shape.selectable = true
+          shape.evented = true
+
+          drawingShapeRef.current = null
+          drawStartRef.current = null
+
+          syncLayersRef.current()
+          pushHistory(`Add ${label}`)
+        }
+
+        canvas.on('mouse:down', shapeMouseDown)
+        canvas.on('mouse:move', shapeMouseMove)
+        canvas.on('mouse:up', shapeMouseUp)
+
+        shapeHandlersRef.current = { down: shapeMouseDown, move: shapeMouseMove, up: shapeMouseUp }
+        break
+      }
     }
-  }, [pushHistory, removeTextHandler, removePanHandlers, removeCropRect])
+  }, [pushHistory, removeTextHandler, removePanHandlers, removeShapeHandlers, removeCropRect])
 
   // ------------------------------------------------------------------
   // Brush helpers
@@ -864,6 +1213,9 @@ export function useFabricCanvas(): FabricCanvasAPI {
 
     setLayers(layerList)
   }, [])
+
+  // Keep syncLayersRef in sync so shape helpers can call it
+  syncLayersRef.current = syncLayersFromCanvas
 
   // ------------------------------------------------------------------
   // Layer operations
@@ -1602,6 +1954,110 @@ export function useFabricCanvas(): FabricCanvasAPI {
   }, [syncLayersFromCanvas, pushHistory])
 
   // ------------------------------------------------------------------
+  // ------------------------------------------------------------------
+  // Shape public methods
+  // ------------------------------------------------------------------
+
+  const setActiveShape = useCallback((shape: ShapeType) => {
+    activeShapeRef.current = shape
+  }, [])
+
+  const setShapeStyle = useCallback((updates: Partial<ShapeStyle>) => {
+    shapeStyleRef.current = { ...shapeStyleRef.current, ...updates }
+
+    const canvas = fabricRef.current
+    const fabric = fabricModuleRef.current
+    if (!canvas || !fabric) return
+
+    const active = canvas.getActiveObject() as any
+    if (!active || !active.__isShape) return
+
+    const style = shapeStyleRef.current
+    const props: any = {}
+
+    // Fill
+    props.fill = style.fillType === 'none' ? 'transparent' : style.fill
+
+    // Stroke
+    props.stroke = style.strokeWidth > 0 ? style.stroke : undefined
+    props.strokeWidth = style.strokeWidth
+    props.strokeDashArray = style.strokeDashArray.length > 0 ? [...style.strokeDashArray] : undefined
+
+    // Opacity & blend
+    props.opacity = style.opacity / 100
+    props.globalCompositeOperation = style.blendMode
+
+    // Shadow
+    if (style.shadowEnabled) {
+      props.shadow = new fabric.Shadow({
+        color: style.shadowColor,
+        offsetX: style.shadowOffsetX,
+        offsetY: style.shadowOffsetY,
+        blur: style.shadowBlur,
+      })
+    } else {
+      props.shadow = null
+    }
+
+    // Corner radius
+    if (active.__shapeType === 'rectangle' || active.__shapeType === 'rounded-rectangle') {
+      props.rx = style.cornerRadius
+      props.ry = style.cornerRadius
+    }
+
+    active.set(props)
+    canvas.requestRenderAll()
+    pushHistory('Edit Shape')
+  }, [pushHistory])
+
+  const getSelectedShapeProperties = useCallback(() => {
+    const canvas = fabricRef.current
+    if (!canvas) return null
+
+    const active = canvas.getActiveObject() as any
+    if (!active || !active.__isShape) return null
+
+    return {
+      x: active.left ?? 0,
+      y: active.top ?? 0,
+      width: active.width ?? 0,
+      height: active.height ?? 0,
+      angle: active.angle ?? 0,
+      scaleX: active.scaleX ?? 1,
+      scaleY: active.scaleY ?? 1,
+      pointCount: active.__pointCount,
+    }
+  }, [])
+
+  const updateSelectedShapeProperties = useCallback((updates: Record<string, any>) => {
+    const canvas = fabricRef.current
+    if (!canvas) return
+
+    const active = canvas.getActiveObject() as any
+    if (!active || !active.__isShape) return
+
+    if (updates.x !== undefined) active.set('left', updates.x)
+    if (updates.y !== undefined) active.set('top', updates.y)
+    if (updates.width !== undefined) active.set('width', updates.width)
+    if (updates.height !== undefined) active.set('height', updates.height)
+    if (updates.angle !== undefined) active.set('angle', updates.angle)
+    if (updates.pointCount !== undefined) {
+      active.__pointCount = updates.pointCount
+      const shapeType = active.__shapeType as ShapeType
+      const r = Math.min(active.width ?? 50, active.height ?? 50) / 2
+      if (shapeType === 'polygon') {
+        active.set('points', generatePolygonPoints(0, 0, r, updates.pointCount))
+      } else if (shapeType === 'star') {
+        active.set('points', generateStarPoints(0, 0, r, r * 0.5, updates.pointCount))
+      }
+    }
+
+    active.setCoords()
+    canvas.requestRenderAll()
+    pushHistory('Edit Shape')
+  }, [pushHistory])
+
+  // ------------------------------------------------------------------
   // Return public API
   // ------------------------------------------------------------------
 
@@ -1654,6 +2110,11 @@ export function useFabricCanvas(): FabricCanvasAPI {
     moveLayerBackward,
     moveLayerToFront,
     moveLayerToBack,
+    // Shape operations
+    setActiveShape,
+    setShapeStyle,
+    getSelectedShapeProperties,
+    updateSelectedShapeProperties,
     // AI mode operations
     aiMode,
     setAiMode,
