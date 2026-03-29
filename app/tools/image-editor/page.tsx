@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useEffect, useRef, type DragEvent, type ChangeEvent } from 'react'
 import { EditorToolbar, type ToolType } from '@/tools/image-editor/editor-toolbar'
+import { PropertiesBar } from '@/tools/image-editor/properties-bar'
+import { type ShapeType, type ShapeStyle, DEFAULT_SHAPE_STYLE, SHAPE_TYPES } from '@/tools/image-editor/shape-tools'
 import { AdjustmentsPanel, type Adjustments } from '@/tools/image-editor/adjustments-panel'
 import { AiToolsPanel } from '@/tools/image-editor/ai-tools-panel'
 import { FILTER_PRESETS } from '@/tools/image-editor/filter-presets'
@@ -33,6 +35,13 @@ export default function ImageEditorPage() {
   const [showMobileAdjustments, setShowMobileAdjustments] = useState(false)
   const [showExport, setShowExport] = useState(false)
   const [mobileTab, setMobileTab] = useState<'adjustments' | 'layers'>('adjustments')
+
+  // Shape state
+  const [activeShape, setActiveShape] = useState<ShapeType>('rectangle')
+  const [shapeStyle, setShapeStyle] = useState<ShapeStyle>({ ...DEFAULT_SHAPE_STYLE })
+  const [selectedShapeProps, setSelectedShapeProps] = useState<{
+    x: number; y: number; width: number; height: number; angle: number; scaleX: number; scaleY: number; pointCount?: number;
+  } | null>(null)
 
   // AI state
   const [aiProcessing, setAiProcessing] = useState(false)
@@ -117,6 +126,19 @@ export default function ImageEditorPage() {
         if (fabric.activeLayerId) fabric.moveLayerToBack(fabric.activeLayerId)
         return
       }
+
+      // Shape tool shortcut (U)
+      if (!isInput && e.key.toLowerCase() === 'u' && !meta) {
+        e.preventDefault()
+        if (e.shiftKey) {
+          setActiveShape((prev) => {
+            const idx = SHAPE_TYPES.indexOf(prev)
+            return SHAPE_TYPES[(idx + 1) % SHAPE_TYPES.length]
+          })
+        }
+        setActiveTool('shape')
+        return
+      }
     }
     const keyupHandler = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
@@ -152,6 +174,24 @@ export default function ImageEditorPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.zoomPercent])
 
+  // Sync active shape to canvas hook
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { fabric.setActiveShape(activeShape) }, [activeShape, fabric.setActiveShape])
+
+  // Poll selected shape properties when shape tool is active
+  useEffect(() => {
+    if (activeTool !== 'shape') {
+      setSelectedShapeProps(null)
+      return
+    }
+    const interval = setInterval(() => {
+      const props = fabric.getSelectedShapeProperties()
+      setSelectedShapeProps(props)
+    }, 100)
+    return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTool, fabric.getSelectedShapeProperties])
+
   const loadImage = useCallback((file: File) => {
     fabric.loadImage(file)
     setAdjustments(DEFAULT_ADJUSTMENTS)
@@ -179,6 +219,20 @@ export default function ImageEditorPage() {
       return bgColor
     })
   }, [bgColor])
+
+  const handleShapeStyleChange = useCallback((updates: Partial<ShapeStyle>) => {
+    setShapeStyle((prev) => {
+      const next = { ...prev, ...updates }
+      fabric.setShapeStyle(updates)
+      return next
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.setShapeStyle])
+
+  const handleShapePropertiesChange = useCallback((updates: Record<string, number>) => {
+    fabric.updateSelectedShapeProperties(updates)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.updateSelectedShapeProperties])
 
   const handleExport = useCallback(() => {
     fabric.exportPNG()
@@ -590,6 +644,21 @@ export default function ImageEditorPage() {
         </div>
       </header>
 
+      {/* Properties bar — visible when shape tool active or shape selected */}
+      {(activeTool === 'shape' || selectedShapeProps) && (
+        <PropertiesBar
+          shapeType={activeShape}
+          style={shapeStyle}
+          properties={selectedShapeProps}
+          onStyleChange={handleShapeStyleChange}
+          onPropertiesChange={handleShapePropertiesChange}
+          onShapeTypeChange={(type) => {
+            setActiveShape(type)
+            setActiveTool('shape')
+          }}
+        />
+      )}
+
       {/* Main editor area */}
       <main className="flex flex-1 overflow-hidden">
         {/* Left toolbar */}
@@ -601,6 +670,8 @@ export default function ImageEditorPage() {
           onSwapColors={handleSwapColors}
           onFgColorChange={setFgColor}
           onBgColorChange={setBgColor}
+          activeShape={activeShape}
+          onShapeChange={setActiveShape}
         />
 
         {/* Center canvas */}
