@@ -707,7 +707,7 @@ export function BentoShowcase() {
   }
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-[#101922] dark:to-[#0c1219]">
+    <section id="all-tools" className="py-20 px-4 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-[#101922] dark:to-[#0c1219]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
