@@ -659,7 +659,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     const fabric = fabricModuleRef.current
     if (!canvas || !fabric) return
 
-    const pointer = canvas.getViewportPoint(opt.e)
+    const pointer = canvas.getScenePoint(opt.e)
     const points = customPolyPointsRef.current
 
     if (points.length >= 3) {
@@ -918,7 +918,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
             handleCustomPolyClick(opt)
             return
           }
-          const pointer = canvas.getViewportPoint(opt.e)
+          const pointer = canvas.getScenePoint(opt.e)
           drawStartRef.current = { x: pointer.x, y: pointer.y }
           isDrawingShapeRef.current = true
 
@@ -932,7 +932,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
 
         const shapeMouseMove = (opt: any) => {
           if (!isDrawingShapeRef.current || !drawingShapeRef.current || !drawStartRef.current) return
-          const pointer = canvas.getViewportPoint(opt.e)
+          const pointer = canvas.getScenePoint(opt.e)
 
           updateShapeDuringDraw(
             drawingShapeRef.current,
