@@ -673,8 +673,45 @@ export function BentoShowcase() {
   const aiTools = bentoItems.filter(item => item.category === 'ai')
   const utilityTools = bentoItems.filter(item => item.category === 'utility')
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://toolk1t.com'
+
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    mainEntity: [
+      {
+        '@type': 'ItemList',
+        name: 'AI-Powered Tools',
+        numberOfItems: aiTools.length,
+        itemListElement: aiTools.map((item, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: item.name,
+          url: `${siteUrl}${item.href}`,
+          description: item.description,
+        })),
+      },
+      {
+        '@type': 'ItemList',
+        name: 'Utility Tools',
+        numberOfItems: utilityTools.length,
+        itemListElement: utilityTools.map((item, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: item.name,
+          url: `${siteUrl}${item.href}`,
+          description: item.description,
+        })),
+      },
+    ],
+  }
+
   return (
     <section className="py-20 px-4 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-[#101922] dark:to-[#0c1219]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <div className="max-w-6xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-900 dark:text-white mb-2">
           Powerful Tools,{' '}
