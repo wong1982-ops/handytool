@@ -1,4 +1,10 @@
-export type ToolType = 'move' | 'hand' | 'crop' | 'brush' | 'eraser' | 'text'
+'use client'
+
+import { useState } from 'react'
+import { ShapeFlyout, SHAPE_ICONS } from './shape-flyout'
+import type { ShapeType } from './shape-tools'
+
+export type ToolType = 'move' | 'hand' | 'crop' | 'brush' | 'eraser' | 'text' | 'shape'
 
 interface EditorToolbarProps {
   activeTool: ToolType
@@ -8,6 +14,8 @@ interface EditorToolbarProps {
   onSwapColors: () => void
   onFgColorChange: (color: string) => void
   onBgColorChange: (color: string) => void
+  activeShape: ShapeType
+  onShapeChange: (shape: ShapeType) => void
 }
 
 const TOOLS: { id: ToolType; label: string; icon: React.ReactNode }[] = [
@@ -67,7 +75,19 @@ const TOOLS: { id: ToolType; label: string; icon: React.ReactNode }[] = [
   },
 ]
 
-export function EditorToolbar({ activeTool, onToolChange, fgColor, bgColor, onSwapColors, onFgColorChange, onBgColorChange }: EditorToolbarProps) {
+export function EditorToolbar({
+  activeTool,
+  onToolChange,
+  fgColor,
+  bgColor,
+  onSwapColors,
+  onFgColorChange,
+  onBgColorChange,
+  activeShape,
+  onShapeChange,
+}: EditorToolbarProps) {
+  const [showFlyout, setShowFlyout] = useState(false)
+
   return (
     <aside className="w-14 border-r border-slate-700 dark:border-slate-700 bg-[#101622] flex flex-col items-center py-4 gap-3 shrink-0">
       {TOOLS.map((tool) => (
@@ -86,10 +106,46 @@ export function EditorToolbar({ activeTool, onToolChange, fgColor, bgColor, onSw
         </button>
       ))}
 
+      {/* Shape tool with flyout */}
+      <div className="relative">
+        <button
+          onClick={() => {
+            onToolChange('shape')
+            setShowFlyout((prev) => !prev)
+          }}
+          onContextMenu={(e) => {
+            e.preventDefault()
+            setShowFlyout(true)
+          }}
+          title={`Shape Tool (${activeShape})`}
+          aria-label="Shape Tool"
+          className={`p-2 rounded-lg transition-colors cursor-pointer ${
+            activeTool === 'shape'
+              ? 'bg-[var(--tk-color-primary-500)] text-white'
+              : 'text-slate-400 hover:bg-slate-800'
+          }`}
+        >
+          {SHAPE_ICONS[activeShape]}
+          {/* Small triangle indicator */}
+          <svg className="absolute bottom-1.5 right-1.5 w-2 h-2 text-slate-500" viewBox="0 0 8 8" fill="currentColor">
+            <polygon points="0,0 8,8 8,0" />
+          </svg>
+        </button>
+        {showFlyout && (
+          <ShapeFlyout
+            activeShape={activeShape}
+            onSelect={(shape) => {
+              onShapeChange(shape)
+              onToolChange('shape')
+            }}
+            onClose={() => setShowFlyout(false)}
+          />
+        )}
+      </div>
+
       {/* Foreground / background colors */}
       <div className="mt-auto flex flex-col items-center gap-1">
         <div className="relative w-11 h-11">
-          {/* Foreground color */}
           <label
             className="absolute top-0 left-0 w-6 h-6 rounded-sm border-2 border-slate-500 z-10 cursor-pointer"
             style={{ backgroundColor: fgColor }}
@@ -103,7 +159,6 @@ export function EditorToolbar({ activeTool, onToolChange, fgColor, bgColor, onSw
               aria-label="Foreground color"
             />
           </label>
-          {/* Background color */}
           <label
             className="absolute bottom-0 right-0 w-6 h-6 rounded-sm border-2 border-slate-500 cursor-pointer"
             style={{ backgroundColor: bgColor }}
@@ -118,7 +173,6 @@ export function EditorToolbar({ activeTool, onToolChange, fgColor, bgColor, onSw
             />
           </label>
         </div>
-        {/* Swap button */}
         <button
           type="button"
           className="p-1 text-slate-500 hover:text-white transition-colors cursor-pointer"
