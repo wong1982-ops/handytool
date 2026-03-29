@@ -1400,6 +1400,13 @@ export function useFabricCanvas(): FabricCanvasAPI {
     const vpt = canvas.viewportTransform!
     const oldZoom = vpt[0]
 
+    // Skip if canvas is already at the requested zoom (prevents overwriting
+    // cursor-based viewport positioning from wheel zoom)
+    if (Math.abs(oldZoom - newZoom) < 0.001) {
+      setZoomPercent(percent)
+      return
+    }
+
     // Zoom toward viewport center (preserves pan position relative to center)
     const viewW = canvas.width ?? 0
     const viewH = canvas.height ?? 0
