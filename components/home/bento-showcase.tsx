@@ -8,7 +8,7 @@ const bentoItems = [
     name: 'Image Editor',
     description: 'Edit, adjust & apply filters to images',
     href: '/tools/image-editor',
-    gridClass: 'lg:col-span-2 lg:row-span-2',
+    gridClass: '',
     glowClass: 'from-amber-500/10',
     category: 'ai' as const,
     preview: (
@@ -82,7 +82,7 @@ const bentoItems = [
     name: 'Color Palette',
     description: 'Generate palettes with harmony rules & accessibility',
     href: '/tools/color-palette',
-    gridClass: 'lg:col-span-2',
+    gridClass: '',
     glowClass: 'from-pink-500/10',
     category: 'ai' as const,
     preview: (
@@ -140,7 +140,7 @@ const bentoItems = [
     name: 'Story Studio',
     description: 'Create AI-illustrated picture books',
     href: '/tools/story-studio',
-    gridClass: 'lg:col-span-2',
+    gridClass: '',
     glowClass: 'from-purple-500/10',
     category: 'ai' as const,
     preview: (
