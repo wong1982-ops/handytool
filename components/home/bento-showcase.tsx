@@ -9,6 +9,7 @@ const bentoItems = [
     href: '/tools/image-editor',
     gridClass: 'lg:col-span-2 lg:row-span-2',
     glowClass: 'from-amber-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex flex-col gap-2 p-3">
         <div className="flex gap-1.5">
@@ -45,6 +46,7 @@ const bentoItems = [
     href: '/tools/regex-tester',
     gridClass: '',
     glowClass: 'from-lime-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex flex-col justify-center px-3 gap-1.5">
         <div className="font-mono text-[10px] text-slate-400">
@@ -63,6 +65,7 @@ const bentoItems = [
     href: '/tools/favicon-generator',
     gridClass: '',
     glowClass: 'from-fuchsia-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center">
         <div className="grid grid-cols-2 gap-1.5">
@@ -80,6 +83,7 @@ const bentoItems = [
     href: '/tools/color-palette',
     gridClass: 'lg:col-span-2',
     glowClass: 'from-pink-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex flex-col justify-center gap-1 px-2">
         <div className="h-3 rounded-full bg-rose-400 w-full" />
@@ -96,6 +100,7 @@ const bentoItems = [
     href: '/tools/json-converter',
     gridClass: '',
     glowClass: 'from-emerald-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex flex-col justify-center px-3 gap-1 font-mono text-[10px]">
         <div><span className="text-slate-500">{'{'}</span></div>
@@ -111,6 +116,7 @@ const bentoItems = [
     href: '/tools/speedtest',
     gridClass: '',
     glowClass: 'from-cyan-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex flex-col items-center justify-center">
         <svg width="64" height="40" viewBox="0 0 64 40" fill="none">
@@ -135,6 +141,7 @@ const bentoItems = [
     href: '/tools/story-studio',
     gridClass: 'lg:col-span-2',
     glowClass: 'from-purple-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center gap-3 px-3">
         <div className="w-14 h-[52px] rounded-lg border border-purple-400/30 bg-purple-400/5 flex items-center justify-center">
@@ -156,6 +163,7 @@ const bentoItems = [
     href: '/tools/ipcheck',
     gridClass: '',
     glowClass: 'from-blue-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
         <svg className="w-5 h-5 text-blue-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -178,6 +186,7 @@ const bentoItems = [
     href: '/tools/myip',
     gridClass: '',
     glowClass: 'from-indigo-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
         <svg className="w-5 h-5 text-indigo-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -197,6 +206,7 @@ const bentoItems = [
     href: '/tools/swagger-editor',
     gridClass: '',
     glowClass: 'from-violet-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex flex-col justify-center px-3 gap-1.5">
         <div className="flex items-center gap-1.5">
@@ -220,6 +230,7 @@ const bentoItems = [
     href: '/tools/jwt-decoder',
     gridClass: '',
     glowClass: 'from-orange-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex flex-col justify-center px-3 gap-1">
         <div className="flex items-center gap-1">
@@ -243,6 +254,7 @@ const bentoItems = [
     href: '/tools/id-photo',
     gridClass: '',
     glowClass: 'from-rose-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center">
         <div className="w-14 h-[52px] rounded border-2 border-dashed border-rose-400/30 flex flex-col items-center justify-center gap-0.5">
@@ -258,6 +270,7 @@ const bentoItems = [
     href: '/tools/pdf-converter',
     gridClass: '',
     glowClass: 'from-red-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center gap-2">
         <div className="w-8 h-10 rounded border border-red-400/30 bg-red-400/5 flex items-center justify-center">
@@ -278,6 +291,7 @@ const bentoItems = [
     href: '/tools/svg-converter',
     gridClass: '',
     glowClass: 'from-teal-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center gap-2">
         <div className="w-8 h-8 bg-teal-400/10 rounded border border-teal-400/20 grid grid-cols-3 grid-rows-3 gap-px p-0.5">
@@ -302,6 +316,7 @@ const bentoItems = [
     href: '/tools/currency-exchange',
     gridClass: '',
     glowClass: 'from-green-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
         <span className="text-[11px] font-mono text-emerald-400">100 USD</span>
@@ -320,6 +335,7 @@ const bentoItems = [
     href: '/tools/ecard-studio',
     gridClass: '',
     glowClass: 'from-yellow-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center">
         <div className="w-16 h-12 rounded-lg border border-yellow-400/30 bg-yellow-400/5 p-1.5 flex flex-col justify-between">
@@ -343,6 +359,7 @@ const bentoItems = [
     href: '/tools/human-benchmark',
     gridClass: '',
     glowClass: 'from-rose-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
         <svg className="w-5 h-5 text-rose-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -365,6 +382,7 @@ const bentoItems = [
     href: '/tools/job-radar',
     gridClass: '',
     glowClass: 'from-sky-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex flex-col justify-center px-3 gap-1.5">
         {[0, 1, 2].map((i) => (
@@ -382,6 +400,7 @@ const bentoItems = [
     href: '/tools/ai-radar',
     gridClass: '',
     glowClass: 'from-violet-500/10',
+    category: 'utility' as const,
     preview: (
       <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
         <svg className="w-5 h-5 text-violet-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -400,6 +419,7 @@ const bentoItems = [
     href: '/tools/sketch-to-art',
     gridClass: '',
     glowClass: 'from-pink-500/10',
+    category: 'ai' as const,
     preview: (() => {
       const styles = ['watercolor', 'anime', 'ghibli', 'cyberpunk', 'van-gogh', 'cartoon']
       const base = 'https://pub-8feef024ac6a4d26b109ddfe22f033c1.r2.dev/sketch-art/showcase'
@@ -421,6 +441,7 @@ const bentoItems = [
     href: '/tools/logo-generator',
     gridClass: '',
     glowClass: 'from-blue-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center gap-3">
         <div className="w-10 h-10 rounded-xl border border-[#3D6AF2]/30 bg-[#3D6AF2]/5 flex items-center justify-center">
@@ -442,6 +463,7 @@ const bentoItems = [
     href: '/tools/font-generator',
     gridClass: '',
     glowClass: 'from-pink-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center gap-3">
         <div className="flex gap-1.5">
@@ -464,6 +486,7 @@ const bentoItems = [
     href: '/tools/music-studio',
     gridClass: '',
     glowClass: 'from-purple-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center gap-2">
         {['🎧', '🎹', '🎸'].map((emoji, i) => (
@@ -484,6 +507,7 @@ const bentoItems = [
     href: '/tools/mood-board',
     gridClass: '',
     glowClass: 'from-teal-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center gap-2">
         {[1,2,3].map(i => (
@@ -498,6 +522,7 @@ const bentoItems = [
     href: '/tools/vblog',
     gridClass: '',
     glowClass: 'from-red-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center gap-2">
         <div className="w-10 h-10 rounded-lg border border-red-500/30 bg-red-500/5 flex items-center justify-center">
@@ -518,6 +543,7 @@ const bentoItems = [
     href: '/tools/component-lab',
     gridClass: '',
     glowClass: 'from-emerald-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center gap-2">
         <div className="w-10 h-10 rounded-lg border border-emerald-500/30 bg-emerald-500/5 flex items-center justify-center">
@@ -538,6 +564,7 @@ const bentoItems = [
     href: '/tools/tax-manager',
     gridClass: '',
     glowClass: 'from-green-600/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center gap-2">
         <div className="w-10 h-10 rounded-lg border border-green-500/30 bg-green-500/5 flex items-center justify-center">
@@ -558,6 +585,7 @@ const bentoItems = [
     href: '/tools/story-video',
     gridClass: '',
     glowClass: 'from-violet-500/10',
+    category: 'ai' as const,
     preview: (
       <div className="w-full h-full flex items-center justify-center gap-2">
         <div className="w-10 h-10 rounded-lg border border-violet-500/30 bg-violet-500/5 flex items-center justify-center">
