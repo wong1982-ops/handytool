@@ -179,3 +179,29 @@ body {
     font-size: inherit;
   }
 }
+
+/* Resume Builder — print styles */
+@media print {
+  /* Hide everything except the resume preview */
+  body > * { display: none !important; }
+
+  /* Show only the resume print target */
+  #resume-print-target {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0;
+    padding: 0;
+    background: white;
+    color: black;
+  }
+
+  /* Reset page margins */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+}
