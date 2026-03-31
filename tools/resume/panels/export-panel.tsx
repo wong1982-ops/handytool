@@ -157,19 +157,25 @@ export function ExportPanel() {
                     className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden"
                     style={{ width: PREVIEW_WIDTH, height: previewPageHeight }}
                   >
-                    <div
-                      style={{
-                        ...fontStyle,
-                        width: A4_WIDTH,
-                        position: 'relative',
-                        top: idx === 0
-                          ? 0
-                          : -(getPageOffset(idx) * PREVIEW_SCALE) + (PAGE_MARGIN * PREVIEW_SCALE),
-                        transform: `scale(${PREVIEW_SCALE})`,
-                        transformOrigin: 'top left',
-                      }}
-                    >
-                      <Layout resume={resume} t={t} />
+                    {/* Scaled wrapper */}
+                    <div style={{ transform: `scale(${PREVIEW_SCALE})`, transformOrigin: 'top left', width: A4_WIDTH, height: A4_HEIGHT }}>
+                      {/* Top margin for page 2+ */}
+                      {idx > 0 && (
+                        <div style={{ height: PAGE_MARGIN, backgroundColor: '#ffffff' }} />
+                      )}
+                      {/* Clipped content area */}
+                      <div style={{ overflow: 'hidden', height: idx === 0 ? A4_HEIGHT : A4_HEIGHT - PAGE_MARGIN * 2 }}>
+                        <div
+                          style={{
+                            ...fontStyle,
+                            position: 'relative',
+                            top: -getPageOffset(idx),
+                            width: '100%',
+                          }}
+                        >
+                          <Layout resume={resume} t={t} />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
