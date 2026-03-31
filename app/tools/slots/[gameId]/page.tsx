@@ -24,8 +24,24 @@ const BONUS_COMPONENTS: Record<BonusType, React.ComponentType<BonusProps>> = {
   expanding_wilds: ExpandingWildsBonus,
 }
 
+function GameNotFound() {
+  return (
+    <div className="flex flex-col items-center justify-center h-[100dvh] bg-gray-950 text-white">
+      <p className="text-lg mb-4">Game not found</p>
+      <Link href="/tools/slots" className="text-blue-400 hover:underline">Back to Lobby</Link>
+    </div>
+  )
+}
+
 function GameInner({ gameId }: { gameId: string }) {
   const config = getGameById(gameId)
+
+  if (!config) return <GameNotFound />
+
+  return <GamePlayer config={config} />
+}
+
+function GamePlayer({ config }: { config: import('@/tools/slots/slots-types').SlotGameConfig }) {
   const { t } = useSlots()
   const [betPerLine, setBetPerLine] = useState(10)
   const [showPaytable, setShowPaytable] = useState(false)
@@ -35,16 +51,7 @@ function GameInner({ gameId }: { gameId: string }) {
   const {
     spinning, result, showWin, bonusActive, totalBet,
     doSpin, onAllReelsStopped, onBonusComplete,
-  } = useSpin({ config: config!, betPerLine })
-
-  if (!config) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[100dvh] bg-gray-950 text-white">
-        <p className="text-lg mb-4">Game not found</p>
-        <Link href="/tools/slots" className="text-blue-400 hover:underline">Back to Lobby</Link>
-      </div>
-    )
-  }
+  } = useSpin({ config, betPerLine })
 
   const handleAllReelsStopped = () => {
     onAllReelsStopped()
