@@ -71,7 +71,7 @@ export function ResumeSidebar() {
         {/* Save to cloud */}
         <button
           onClick={() => saveToCloudManual()}
-          className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
             cloudSaveStatus === 'saved'
               ? 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400'
               : cloudSaveStatus === 'error'

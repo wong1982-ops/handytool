@@ -70,7 +70,12 @@ export function ToolboxPanel() {
       {previewing && (
         <div className="sticky top-0 z-20 bg-blue-600 text-white px-4 py-3 flex items-center justify-between shadow-lg">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-lg">{previewing.icon}</span>
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0"
+              style={{ backgroundColor: previewing.icon }}
+            >
+              {previewing.title.charAt(0)}
+            </div>
             <div className="min-w-0">
               <p className="text-sm font-medium truncate">Previewing: {previewing.title}</p>
               <p className="text-[10px] text-blue-200">Check the preview on the right</p>
@@ -120,7 +125,12 @@ export function ToolboxPanel() {
                       : 'border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10'
                   }`}
                 >
-                  <span className="text-2xl shrink-0 mt-0.5">{sample.icon}</span>
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0"
+                    style={{ backgroundColor: sample.icon }}
+                  >
+                    {sample.title.charAt(0)}
+                  </div>
                   <div className="min-w-0">
                     <p className={`text-sm font-medium transition-colors ${
                       isActive

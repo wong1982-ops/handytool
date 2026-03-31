@@ -36,7 +36,7 @@ export const RESUME_SAMPLES: ResumeSample[] = [
     title: 'Software Engineer',
     category: 'Technology',
     description: 'Full-stack developer with 5 years of experience',
-    icon: '💻',
+    icon: '#3D6AF2',
     resume: {
       title: 'Software Engineer Resume',
       locale: 'en',
@@ -120,7 +120,7 @@ export const RESUME_SAMPLES: ResumeSample[] = [
     title: 'Product Manager',
     category: 'Business',
     description: 'Tech PM with data-driven approach and 4 years experience',
-    icon: '📊',
+    icon: '#D4A052',
     resume: {
       title: 'Product Manager Resume',
       locale: 'en',
@@ -195,7 +195,7 @@ export const RESUME_SAMPLES: ResumeSample[] = [
     title: 'UX Designer',
     category: 'Design',
     description: 'Creative designer focused on user-centered design',
-    icon: '🎨',
+    icon: '#F2C94C',
     resume: {
       title: 'UX Designer Resume',
       locale: 'en',
@@ -276,7 +276,7 @@ export const RESUME_SAMPLES: ResumeSample[] = [
     title: 'Data Scientist',
     category: 'Technology',
     description: 'ML engineer with research background',
-    icon: '🧠',
+    icon: '#6366F1',
     resume: {
       title: 'Data Scientist Resume',
       locale: 'en',
@@ -362,7 +362,7 @@ export const RESUME_SAMPLES: ResumeSample[] = [
     title: 'Marketing Manager',
     category: 'Marketing',
     description: 'Digital marketing specialist with growth focus',
-    icon: '📈',
+    icon: '#E84393',
     resume: {
       title: 'Marketing Manager Resume',
       locale: 'en',
