@@ -13,6 +13,7 @@ const THEME_LAYOUTS = {
 } as const
 
 const A4_HEIGHT = 842
+const PAGE_MARGIN = 40 // top/bottom margin for page 2+
 
 export function ResumePreview() {
   const { state, t } = useResume()
@@ -34,7 +35,6 @@ export function ResumePreview() {
     fontSize: theme.fontSize === 'sm' ? '12px' : theme.fontSize === 'lg' ? '16px' : '14px',
   }
 
-  // Measure the full content height from the hidden render
   useEffect(() => {
     const measure = () => {
       if (measureRef.current) {
@@ -42,13 +42,22 @@ export function ResumePreview() {
         if (h > 0) setContentHeight(h)
       }
     }
-    // Measure after render
     const t1 = setTimeout(measure, 100)
     const t2 = setTimeout(measure, 500)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [resume.updatedAt, resume.enabledModules.length, resume.theme.templateId, resume.theme.primaryColor])
 
-  const pageCount = Math.max(1, Math.ceil(contentHeight / A4_HEIGHT))
+  // Page 1 uses full A4 height, page 2+ has margins
+  const usablePageHeight = A4_HEIGHT - PAGE_MARGIN * 2
+  const remainingAfterPage1 = Math.max(0, contentHeight - A4_HEIGHT)
+  const extraPages = remainingAfterPage1 > 0 ? Math.ceil(remainingAfterPage1 / usablePageHeight) : 0
+  const pageCount = 1 + extraPages
+
+  // Content offset for each page
+  const getPageOffset = (pageIdx: number) => {
+    if (pageIdx === 0) return 0
+    return A4_HEIGHT + (pageIdx - 1) * usablePageHeight
+  }
 
   return (
     <div className="flex-1 bg-gray-100 dark:bg-gray-950 overflow-y-auto p-4 flex flex-col items-center print:p-0 print:bg-white">
@@ -56,7 +65,7 @@ export function ResumePreview() {
       {hasContent && (
         <div className="w-full max-w-[595px] mb-2 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 print:hidden">
           <span>{pageCount} {pageCount === 1 ? 'page' : 'pages'}</span>
-          <span>A4 (210 × 297mm)</span>
+          <span>A4 (210 x 297mm)</span>
         </div>
       )}
 
@@ -76,16 +85,14 @@ export function ResumePreview() {
                 </div>
               )}
 
-              {/*
-                Render the FULL layout once per page, offset by translateY.
-                The container clips to exactly one A4 page height.
-                Each page shows a different 842px slice of the same content.
-              */}
+              {/* Content: page 1 starts at top, page 2+ has top margin */}
               <div
                 style={{
                   ...fontStyle,
                   position: 'relative',
-                  top: -pageIdx * A4_HEIGHT,
+                  top: pageIdx === 0
+                    ? 0
+                    : -getPageOffset(pageIdx) + PAGE_MARGIN,
                   width: '100%',
                 }}
               >
@@ -106,7 +113,7 @@ export function ResumePreview() {
         )}
       </div>
 
-      {/* Hidden measurer — rendered offscreen to get true content height */}
+      {/* Hidden measurer for content height + PDF export */}
       <div
         ref={measureRef}
         id="resume-print-target"

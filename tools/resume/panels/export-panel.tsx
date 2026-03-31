@@ -12,9 +12,11 @@ const THEME_LAYOUTS = {
   'yellow-minimal': YellowMinimalLayout,
 } as const
 
+const A4_WIDTH = 595
 const A4_HEIGHT = 842
+const PAGE_MARGIN = 40 // top/bottom margin in px for page 2+
 const PREVIEW_WIDTH = 240
-const PREVIEW_SCALE = PREVIEW_WIDTH / 595
+const PREVIEW_SCALE = PREVIEW_WIDTH / A4_WIDTH
 
 export function ExportPanel() {
   const { state, t } = useResume()
@@ -35,19 +37,19 @@ export function ExportPanel() {
     fontSize: theme.fontSize === 'sm' ? '12px' : theme.fontSize === 'lg' ? '16px' : '14px',
   }
 
-  // Estimate page count (same logic as preview)
   const el = typeof document !== 'undefined' ? document.getElementById('resume-print-target') : null
   const contentHeight = el?.scrollHeight || A4_HEIGHT
-  const pageCount = Math.max(1, Math.ceil(contentHeight / A4_HEIGHT))
+  const usablePageHeight = A4_HEIGHT - PAGE_MARGIN * 2 // usable height per page after margins
+  // Page 1 uses full height, page 2+ has margins
+  const page1Height = A4_HEIGHT
+  const remainingAfterPage1 = Math.max(0, contentHeight - page1Height)
+  const extraPages = remainingAfterPage1 > 0 ? Math.ceil(remainingAfterPage1 / usablePageHeight) : 0
+  const pageCount = 1 + extraPages
 
   const generateFileName = () => {
     const name = resume.baseInfo.name || 'resume'
     const date = new Date().toISOString().slice(0, 10)
     return `${name}_${resume.title}_${date}`
-  }
-
-  const handlePrintPdf = () => {
-    window.print()
   }
 
   const handleDownloadPdf = async () => {
@@ -56,7 +58,6 @@ export function ExportPanel() {
       const target = document.getElementById('resume-print-target')
       if (!target) return
 
-      // Temporarily make it visible for capture
       const prevVis = target.style.visibility
       const prevLeft = target.style.left
       target.style.visibility = 'visible'
@@ -68,53 +69,63 @@ export function ExportPanel() {
       const fullCanvas = await toCanvas(target, {
         backgroundColor: '#ffffff',
         pixelRatio: 2,
-        width: 595,
+        width: A4_WIDTH,
       })
 
-      // Restore hidden
       target.style.visibility = prevVis
       target.style.left = prevLeft
 
       const pdf = new jsPDF('p', 'mm', 'a4')
       const pdfWidth = 210
       const pdfPageHeight = 297
-      const scaledHeight = (fullCanvas.height * pdfWidth) / fullCanvas.width
+      const pr = 2 // pixelRatio
 
-      if (scaledHeight <= pdfPageHeight) {
-        pdf.addImage(fullCanvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, scaledHeight)
-      } else {
-        let yOffset = 0
-        let pageNum = 0
-        while (yOffset < scaledHeight) {
-          if (pageNum > 0) pdf.addPage()
+      for (let i = 0; i < pageCount; i++) {
+        if (i > 0) pdf.addPage()
 
-          const pageCanvas = document.createElement('canvas')
-          pageCanvas.width = fullCanvas.width
-          pageCanvas.height = (pdfPageHeight / pdfWidth) * fullCanvas.width
-          const ctx = pageCanvas.getContext('2d')
-          if (ctx) {
-            ctx.fillStyle = '#ffffff'
-            ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
-            const srcY = pageNum * pageCanvas.height
-            const srcH = Math.min(pageCanvas.height, fullCanvas.height - srcY)
-            if (srcH > 0) {
-              ctx.drawImage(fullCanvas, 0, srcY, fullCanvas.width, srcH, 0, 0, fullCanvas.width, srcH)
-            }
-            pdf.addImage(pageCanvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfPageHeight)
-          }
+        const pageCanvas = document.createElement('canvas')
+        pageCanvas.width = A4_WIDTH * pr
+        pageCanvas.height = A4_HEIGHT * pr
+        const ctx = pageCanvas.getContext('2d')
+        if (!ctx) continue
 
-          yOffset += pdfPageHeight
-          pageNum++
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
+
+        // Page 1: no margin offset. Page 2+: offset by page1 + (i-1)*usable, draw at margin top
+        let srcY: number
+        let destY: number
+        let drawHeight: number
+
+        if (i === 0) {
+          srcY = 0
+          destY = 0
+          drawHeight = Math.min(A4_HEIGHT * pr, fullCanvas.height)
+        } else {
+          srcY = (page1Height + (i - 1) * usablePageHeight) * pr
+          destY = PAGE_MARGIN * pr
+          drawHeight = Math.min(usablePageHeight * pr, fullCanvas.height - srcY)
         }
+
+        if (drawHeight > 0) {
+          ctx.drawImage(fullCanvas, 0, srcY, A4_WIDTH * pr, drawHeight, 0, destY, A4_WIDTH * pr, drawHeight)
+        }
+
+        pdf.addImage(pageCanvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfPageHeight)
       }
 
       pdf.save(`${generateFileName()}.pdf`)
     } catch (e) {
       console.error('PDF export error:', e)
-      window.print()
     } finally {
       setExporting(false)
     }
+  }
+
+  // Calculate page offset for preview thumbnails
+  const getPageOffset = (pageIdx: number) => {
+    if (pageIdx === 0) return 0
+    return page1Height + (pageIdx - 1) * usablePageHeight
   }
 
   const previewPageHeight = Math.round(A4_HEIGHT * PREVIEW_SCALE)
@@ -126,7 +137,7 @@ export function ExportPanel() {
           {t.export.title}
         </h2>
 
-        {/* Page Previews — miniature versions of the actual pages */}
+        {/* Page Previews */}
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-50 dark:bg-gray-800/50 p-3">
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Preview</p>
@@ -146,13 +157,14 @@ export function ExportPanel() {
                     className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden"
                     style={{ width: PREVIEW_WIDTH, height: previewPageHeight }}
                   >
-                    {/* Scale down the full-width layout to fit the thumbnail */}
                     <div
                       style={{
                         ...fontStyle,
-                        width: 595,
+                        width: A4_WIDTH,
                         position: 'relative',
-                        top: -idx * A4_HEIGHT * PREVIEW_SCALE,
+                        top: idx === 0
+                          ? 0
+                          : -(getPageOffset(idx) * PREVIEW_SCALE) + (PAGE_MARGIN * PREVIEW_SCALE),
                         transform: `scale(${PREVIEW_SCALE})`,
                         transformOrigin: 'top left',
                       }}
@@ -178,31 +190,14 @@ export function ExportPanel() {
           </div>
         </div>
 
-        {/* Export buttons */}
-        <div className="space-y-2">
-          <button
-            onClick={handlePrintPdf}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-          >
-            Print / Save as PDF
-          </button>
-
-          <button
-            onClick={handleDownloadPdf}
-            disabled={exporting}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {exporting ? t.export.exporting : `Download PDF (${pageCount} page${pageCount > 1 ? 's' : ''})`}
-          </button>
-        </div>
-
-        <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3">
-          <p className="text-xs text-amber-800 dark:text-amber-300">
-            <strong>Print / Save as PDF</strong> — best quality (vector text). Set margins to &ldquo;None&rdquo;.
-            <br />
-            <strong>Download PDF</strong> — one-click image-based export with automatic page splitting.
-          </p>
-        </div>
+        {/* Download PDF button */}
+        <button
+          onClick={handleDownloadPdf}
+          disabled={exporting}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {exporting ? t.export.exporting : `Download PDF (${pageCount} page${pageCount > 1 ? 's' : ''})`}
+        </button>
       </div>
     </div>
   )
