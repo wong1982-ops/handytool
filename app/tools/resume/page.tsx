@@ -46,7 +46,7 @@ export default function ResumePage() {
           </div>
 
           {/* Preview — hidden on mobile by default, shown on desktop always */}
-          <div className={`flex-1 overflow-hidden border-l border-gray-200 dark:border-gray-700 ${showPreview ? '' : 'max-lg:hidden'}`}>
+          <div className={`flex-1 min-h-0 border-l border-gray-200 dark:border-gray-700 ${showPreview ? '' : 'max-lg:hidden'}`}>
             <ResumePreview />
           </div>
         </div>
