@@ -2,6 +2,7 @@
 
 import { useCallback, useRef } from 'react'
 import { ReelStrip } from './reel-strip'
+import { PaylineOverlay } from './payline-overlay'
 import type { SlotGameConfig, SpinResult } from '../../slots-types'
 
 interface ReelBoardProps {
@@ -78,25 +79,35 @@ export function ReelBoard({ config, result, spinning, onAllReelsStopped }: ReelB
           }}
         />
 
-        <div
-          className="grid gap-1 relative z-10"
-          style={{
-            gridTemplateColumns: `repeat(${config.reels}, 1fr)`,
-          }}
-          role="img"
-          aria-label="Slot machine reels"
-        >
-          {Array.from({ length: config.reels }, (_, reelIdx) => (
-            <ReelStrip
-              key={reelIdx}
-              symbols={config.symbols}
-              visibleSymbolIds={getVisibleIds(reelIdx)}
-              spinning={spinning}
-              stopDelay={800 + reelIdx * 200}
-              highlightedPositions={winPositions[reelIdx]}
-              onStop={handleReelStop}
-            />
-          ))}
+        <div className="relative">
+          <div
+            className="grid gap-1 relative z-10"
+            style={{
+              gridTemplateColumns: `repeat(${config.reels}, 1fr)`,
+            }}
+            role="img"
+            aria-label="Slot machine reels"
+          >
+            {Array.from({ length: config.reels }, (_, reelIdx) => (
+              <ReelStrip
+                key={reelIdx}
+                symbols={config.symbols}
+                visibleSymbolIds={getVisibleIds(reelIdx)}
+                spinning={spinning}
+                stopDelay={800 + reelIdx * 200}
+                highlightedPositions={winPositions[reelIdx]}
+                onStop={handleReelStop}
+              />
+            ))}
+          </div>
+
+          {/* Win lines overlay */}
+          <PaylineOverlay
+            wins={result?.wins || []}
+            reels={config.reels}
+            rows={config.rows}
+            visible={!spinning && !!result && result.wins.length > 0}
+          />
         </div>
       </div>
     </div>
