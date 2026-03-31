@@ -18,11 +18,11 @@ export function ReelStrip({ symbols, visibleSymbolIds, spinning, stopDelay, high
   const [showResult, setShowResult] = useState(true)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Pre-pick 6 random emoji for the spin blur strip (lightweight, no Images)
-  const spinEmoji = useMemo(() => {
-    const picks: string[] = []
+  // Pre-pick 6 random symbols for the spin strip (uses same images, already browser-cached)
+  const spinSymbols = useMemo(() => {
+    const picks: SymbolConfig[] = []
     for (let i = 0; i < 6; i++) {
-      picks.push(symbols[Math.floor(Math.random() * symbols.length)].icon)
+      picks.push(symbols[Math.floor(Math.random() * symbols.length)])
     }
     return picks
   }, [symbols])
@@ -40,7 +40,6 @@ export function ReelStrip({ symbols, visibleSymbolIds, spinning, stopDelay, high
     }
 
     if (!spinning && isSpinning) {
-      // Force stop
       setIsSpinning(false)
       setShowResult(true)
     }
@@ -53,36 +52,47 @@ export function ReelStrip({ symbols, visibleSymbolIds, spinning, stopDelay, high
   const displaySymbols = visibleSymbolIds.map(id => symbols.find(s => s.id === id) || symbols[0])
 
   if (isSpinning) {
-    // Lightweight spin: just emoji in a CSS-animated strip, no Image components
+    // Spin strip: use native <img> (browser-cached, no Next.js Image overhead)
+    // 6 symbols looping with CSS keyframe = smooth, fast, uses actual game artwork
     return (
       <div className="overflow-hidden relative" style={{ height: `${3 * 80}px` }}>
         <div
-          className="absolute w-full"
+          className="absolute w-full flex flex-col gap-1"
           style={{
-            animation: `reelSpin 0.15s linear infinite`,
+            animation: 'reelSpin 0.2s linear infinite',
           }}
         >
-          {spinEmoji.map((emoji, i) => (
+          {spinSymbols.map((sym, i) => (
             <div
               key={i}
-              className="h-[78px] flex items-center justify-center text-3xl rounded-lg"
-              style={{ backgroundColor: '#1a0a2e', filter: 'blur(0.5px)' }}
+              className="h-[78px] shrink-0 flex items-center justify-center rounded-lg overflow-hidden"
+              style={{ backgroundColor: '#1a0a2e' }}
             >
-              {emoji}
+              {sym.imagePath ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={sym.imagePath}
+                  alt=""
+                  className="w-full h-full object-contain p-1"
+                  style={{ filter: 'blur(0.5px)' }}
+                />
+              ) : (
+                <span className="text-3xl" style={{ filter: 'blur(0.5px)' }}>{sym.icon}</span>
+              )}
             </div>
           ))}
         </div>
         <style jsx>{`
           @keyframes reelSpin {
             0% { transform: translateY(0); }
-            100% { transform: translateY(-${3 * 78}px); }
+            100% { transform: translateY(-${3 * 79}px); }
           }
         `}</style>
       </div>
     )
   }
 
-  // Stopped: show actual result with images
+  // Stopped: show actual result with Next.js Image for quality
   return (
     <div className="flex flex-col gap-1">
       {displaySymbols.map((sym, row) => (
