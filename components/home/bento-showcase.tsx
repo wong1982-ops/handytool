@@ -601,6 +601,66 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'Resume Builder',
+    description: 'AI-powered resume with live preview',
+    href: '/tools/resume',
+    gridClass: '',
+    glowClass: 'from-amber-500/10',
+    category: 'ai' as const,
+    preview: (
+      <div className="w-full h-full flex items-center justify-center gap-3">
+        <div className="w-10 h-14 rounded border border-amber-500/30 bg-amber-500/5 p-1.5 flex flex-col gap-1">
+          <div className="h-1.5 rounded-full bg-amber-400/40 w-full" />
+          <div className="h-1 rounded-full bg-slate-200 dark:bg-white/10 w-3/4" />
+          <div className="h-1 rounded-full bg-slate-200 dark:bg-white/10 w-full" />
+          <div className="h-1 rounded-full bg-slate-200 dark:bg-white/10 w-2/3" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="h-1.5 rounded-full bg-gradient-to-r from-amber-500/40 to-orange-400/40 w-12" />
+          <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 w-8" />
+        </div>
+      </div>
+    ),
+  },
+  {
+    name: 'OpenClaw Chat',
+    description: 'Chat with your OpenClaw AI agent',
+    href: '/tools/openclaw',
+    gridClass: '',
+    glowClass: 'from-emerald-500/10',
+    category: 'utility' as const,
+    preview: (
+      <div className="w-full h-full flex flex-col justify-center gap-1.5 px-3">
+        <div className="flex justify-end">
+          <div className="px-2.5 py-1 rounded-xl rounded-br-sm bg-blue-500/20 text-[10px] text-blue-300/70">Hello</div>
+        </div>
+        <div className="flex justify-start">
+          <div className="px-2.5 py-1 rounded-xl rounded-bl-sm bg-emerald-500/10 text-[10px] text-emerald-300/70">Hi! How can I help?</div>
+        </div>
+        <div className="flex justify-end">
+          <div className="px-2.5 py-1 rounded-xl rounded-br-sm bg-blue-500/20 text-[10px] text-blue-300/70">List my files</div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    name: 'Casino Slots',
+    description: 'Free slot machines with 10 themed games',
+    href: '/tools/slots',
+    gridClass: '',
+    glowClass: 'from-red-500/10',
+    category: 'ai' as const,
+    preview: (
+      <div className="w-full h-full flex items-center justify-center gap-1.5">
+        {['🦬', '⭐', '🦅'].map((icon, i) => (
+          <div key={i} className="w-9 h-9 rounded-lg border border-red-500/30 bg-red-500/5 flex items-center justify-center text-lg">
+            {icon}
+          </div>
+        ))}
+      </div>
+    ),
+  },
 ]
 
 function BentoGrid({ items }: { items: typeof bentoItems }) {
