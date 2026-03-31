@@ -124,7 +124,7 @@ export function ClassicLayout({ resume, t }: ThemeLayoutProps) {
             const sectionContent = renderSection(mod, resume, t, color)
             if (sectionContent === null) return null
             return (
-              <div key={mod}>
+              <div key={mod} style={{ breakInside: 'avoid' }}>
                 {/* Section header with left accent border */}
                 <div className="flex items-center gap-2 mb-3">
                   <div
@@ -183,7 +183,7 @@ function renderSection(
       return (
         <div className="space-y-3">
           {resume.education.map((entry, idx) => (
-            <div key={entry.id}>
+            <div key={entry.id} style={{ breakInside: 'avoid' }}>
               {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
               <div className="flex justify-between items-baseline gap-2">
                 <div className="flex items-baseline gap-2 min-w-0">
@@ -220,7 +220,7 @@ function renderSection(
       return (
         <div className="space-y-3">
           {resume.workExperience.map((entry, idx) => (
-            <div key={entry.id}>
+            <div key={entry.id} style={{ breakInside: 'avoid' }}>
               {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
               <div className="flex justify-between items-baseline gap-2">
                 <div className="flex items-baseline gap-2 min-w-0">
@@ -256,7 +256,7 @@ function renderSection(
       return (
         <div className="space-y-3">
           {resume.projects.map((entry, idx) => (
-            <div key={entry.id}>
+            <div key={entry.id} style={{ breakInside: 'avoid' }}>
               {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
               <div className="flex justify-between items-baseline gap-2">
                 <div className="flex items-baseline gap-2 min-w-0">
@@ -303,7 +303,7 @@ function renderSection(
       return (
         <div className="space-y-3">
           {resume.training.map((entry, idx) => (
-            <div key={entry.id}>
+            <div key={entry.id} style={{ breakInside: 'avoid' }}>
               {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
               <div className="flex justify-between items-baseline gap-2">
                 <div className="flex items-baseline gap-2 min-w-0">
@@ -332,7 +332,7 @@ function renderSection(
       return (
         <div className="space-y-3">
           {resume.awards.map((entry, idx) => (
-            <div key={entry.id}>
+            <div key={entry.id} style={{ breakInside: 'avoid' }}>
               {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
               <div className="flex justify-between items-baseline gap-2">
                 <div className="flex items-baseline gap-2 min-w-0">
@@ -361,7 +361,7 @@ function renderSection(
       return (
         <div className="space-y-3">
           {resume.internships.map((entry, idx) => (
-            <div key={entry.id}>
+            <div key={entry.id} style={{ breakInside: 'avoid' }}>
               {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
               <div className="flex justify-between items-baseline gap-2">
                 <div className="flex items-baseline gap-2 min-w-0">
@@ -392,7 +392,7 @@ function renderSection(
       return (
         <div className="space-y-3">
           {resume.customSections.map((section) => (
-            <div key={section.id}>
+            <div key={section.id} style={{ breakInside: 'avoid' }}>
               <h3 className="font-bold text-xs mb-1.5" style={{ color: '#1a1a2e' }}>{section.title}</h3>
               {section.type === 'richtext' && section.richTextContent && (
                 <div className="text-[11px] leading-relaxed" style={{ color: '#4b5563' }}>
