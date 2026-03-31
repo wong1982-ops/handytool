@@ -141,6 +141,7 @@ function GamePlayer({ config }: { config: import('@/tools/slots/slots-types').Sl
         <BetControls
           config={config}
           betPerLine={betPerLine}
+          lastWin={lastWinAmount}
           onBetChange={setBetPerLine}
           onSpin={doSpin}
           onAutoSpin={() => setShowAutoSpin(true)}
