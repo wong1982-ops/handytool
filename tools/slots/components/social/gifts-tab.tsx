@@ -29,11 +29,11 @@ export function GiftsTab() {
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">{t.social.gifts}</h2>
+        <h2 className="text-lg font-bold text-[#f0d080]">{t.social.gifts}</h2>
         {gifts.length > 0 && (
           <button
             onClick={handleClaimAll}
-            className="px-4 py-1.5 rounded-lg text-sm font-medium bg-yellow-500 text-black hover:bg-yellow-400 transition-colors"
+            className="px-4 py-1.5 rounded-lg text-sm font-medium bg-[#d4a052] text-black hover:bg-[#f0d080] transition-colors"
           >
             {t.social.claimAll} ({gifts.length})
           </button>
@@ -50,12 +50,12 @@ export function GiftsTab() {
       ) : (
         <div className="space-y-2">
           {gifts.map(g => (
-            <div key={g.id} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-gray-800">
+            <div key={g.id} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-[#0d0519] border border-[#d4a052]/20">
               <div>
                 <span className="text-sm text-white">From: {g.sender_id?.slice(0, 8)}...</span>
-                <span className="text-xs text-gray-400 ml-2">{t.social.giftAmount}</span>
+                <span className="text-xs text-[#d4a052]/50 ml-2">{t.social.giftAmount}</span>
               </div>
-              <span className="text-sm font-bold text-yellow-300">{g.amount?.toLocaleString()}</span>
+              <span className="text-sm font-bold text-[#f0d080]">{g.amount?.toLocaleString()}</span>
             </div>
           ))}
         </div>

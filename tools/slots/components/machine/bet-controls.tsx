@@ -34,10 +34,41 @@ export function BetControls({
 
   return (
     <div className="space-y-3 px-2">
-      {/* Info row */}
-      <div className="flex items-center justify-between text-xs text-gray-400">
-        <span>{config.useWays ? t.machine.ways : t.machine.lines}: {lines}</span>
-        <span>{t.machine.totalBet}: {totalBet.toLocaleString()}</span>
+      {/* Info counters row */}
+      <div className="grid grid-cols-3 gap-2">
+        <div
+          className="rounded-lg px-3 py-2 text-center border border-[#d4a052]/40"
+          style={{ backgroundColor: '#0d0519' }}
+        >
+          <div className="text-[10px] uppercase tracking-wider text-[#d4a052]/70 font-medium">
+            Credit
+          </div>
+          <div className="text-sm font-bold text-[#f0d080]">
+            {player.coins.toLocaleString()}
+          </div>
+        </div>
+        <div
+          className="rounded-lg px-3 py-2 text-center border border-[#d4a052]/40"
+          style={{ backgroundColor: '#0d0519' }}
+        >
+          <div className="text-[10px] uppercase tracking-wider text-[#d4a052]/70 font-medium">
+            {t.machine.totalBet}
+          </div>
+          <div className="text-sm font-bold text-[#f0d080]">
+            {totalBet.toLocaleString()}
+          </div>
+        </div>
+        <div
+          className="rounded-lg px-3 py-2 text-center border border-[#d4a052]/40"
+          style={{ backgroundColor: '#0d0519' }}
+        >
+          <div className="text-[10px] uppercase tracking-wider text-[#d4a052]/70 font-medium">
+            {t.machine.win || 'Win'}
+          </div>
+          <div className="text-sm font-bold text-[#f0d080]">
+            0
+          </div>
+        </div>
       </div>
 
       {/* Bet adjuster */}
@@ -45,19 +76,25 @@ export function BetControls({
         <button
           onClick={decreaseBet}
           disabled={betIndex <= 0 || spinning}
-          className="w-8 h-8 rounded-full bg-gray-700 text-white text-lg flex items-center justify-center hover:bg-gray-600 disabled:opacity-30 transition-colors"
+          className="w-9 h-9 rounded-full flex items-center justify-center text-lg font-bold transition-colors disabled:opacity-30 border border-[#d4a052]/50 text-[#d4a052] hover:text-[#f0d080] hover:border-[#f0d080]/60"
+          style={{ backgroundColor: '#2d1052' }}
           aria-label="Decrease bet"
         >
           ◄
         </button>
         <div className="text-center min-w-[100px]">
-          <div className="text-xs text-gray-400">{t.machine.betPerLine}</div>
-          <div className="text-lg font-bold text-white">{betPerLine.toLocaleString()}</div>
+          <div className="text-[10px] uppercase tracking-wider text-[#d4a052]/70">
+            {t.machine.betPerLine}
+          </div>
+          <div className="text-lg font-bold text-[#f0d080]">
+            {betPerLine.toLocaleString()}
+          </div>
         </div>
         <button
           onClick={increaseBet}
           disabled={betIndex >= config.betSteps.length - 1 || spinning}
-          className="w-8 h-8 rounded-full bg-gray-700 text-white text-lg flex items-center justify-center hover:bg-gray-600 disabled:opacity-30 transition-colors"
+          className="w-9 h-9 rounded-full flex items-center justify-center text-lg font-bold transition-colors disabled:opacity-30 border border-[#d4a052]/50 text-[#d4a052] hover:text-[#f0d080] hover:border-[#f0d080]/60"
+          style={{ backgroundColor: '#2d1052' }}
           aria-label="Increase bet"
         >
           ►
@@ -69,11 +106,12 @@ export function BetControls({
         <button
           onClick={onAutoSpin}
           disabled={!canSpin}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-30 border ${
             autoSpinning
-              ? 'bg-yellow-600 text-white'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          } disabled:opacity-30`}
+              ? 'bg-[#d4a052] text-[#0d0519] border-[#f0d080]'
+              : 'border-[#d4a052]/40 text-[#d4a052] hover:text-[#f0d080] hover:border-[#f0d080]/60'
+          }`}
+          style={!autoSpinning ? { backgroundColor: '#2d1052' } : undefined}
         >
           {autoSpinning ? t.machine.stop : t.machine.auto}
         </button>
@@ -81,7 +119,15 @@ export function BetControls({
         <button
           onClick={onSpin}
           disabled={!canSpin}
-          className="flex-[2] py-3 rounded-xl text-lg font-bold bg-red-600 text-white hover:bg-red-500 active:bg-red-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-red-600/30"
+          className={`flex-[2] py-3.5 rounded-full text-lg font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed text-white ${
+            !spinning && canSpin ? 'animate-pulse' : ''
+          }`}
+          style={{
+            backgroundColor: '#22c55e',
+            boxShadow: canSpin ? '0 0 20px rgba(34, 197, 94, 0.4), 0 4px 12px rgba(0,0,0,0.3)' : undefined,
+          }}
+          onMouseEnter={(e) => { if (canSpin) e.currentTarget.style.backgroundColor = '#16a34a' }}
+          onMouseLeave={(e) => { if (canSpin) e.currentTarget.style.backgroundColor = '#22c55e' }}
           aria-label={spinning ? t.machine.stop : t.machine.spin}
         >
           {spinning ? t.machine.stop : t.machine.spin}
@@ -90,7 +136,8 @@ export function BetControls({
         <button
           onClick={onMaxBet}
           disabled={spinning}
-          className="flex-1 py-2 rounded-lg text-sm font-medium bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-30 transition-colors"
+          className="flex-1 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-30 border border-[#d4a052]/40 text-[#d4a052] hover:text-[#f0d080] hover:border-[#f0d080]/60"
+          style={{ backgroundColor: '#2d1052' }}
         >
           {t.machine.maxBet}
         </button>

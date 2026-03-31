@@ -18,9 +18,9 @@ export function EventsBanner() {
   if (!event) return null
 
   const typeColors: Record<string, string> = {
-    tournament: 'from-purple-900/40 to-blue-900/40 border-purple-700/50',
-    challenge: 'from-green-900/40 to-teal-900/40 border-green-700/50',
-    happy_hour: 'from-yellow-900/40 to-orange-900/40 border-yellow-700/50',
+    tournament: 'from-[#2d1052] to-[#1a0a2e] border-[#d4a052]/40',
+    challenge: 'from-[#2d1052] to-[#0d0519] border-[#d4a052]/30',
+    happy_hour: 'from-[#2d1052] via-[#1a0a2e] to-[#0d0519] border-[#f0d080]/40',
   }
 
   const typeIcons: Record<string, string> = {
@@ -34,8 +34,8 @@ export function EventsBanner() {
       <div className="flex items-center gap-2">
         <span className="text-lg">{typeIcons[event.type] || '🎉'}</span>
         <div>
-          <p className="text-sm font-medium text-white">{event.name}</p>
-          <p className="text-xs text-gray-400">
+          <p className="text-sm font-medium text-[#f0d080]">{event.name}</p>
+          <p className="text-xs text-[#d4a052]/50">
             Ends: {new Date(event.endsAt).toLocaleDateString()}
           </p>
         </div>

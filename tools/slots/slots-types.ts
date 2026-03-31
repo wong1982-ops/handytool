@@ -5,12 +5,15 @@ export interface ThemeConfig {
   accentColor: string
   reelBackground: string
   headerGradient: string
+  lobbyImage?: string       // e.g. '/images/slots/lobby/wild-stampede.webp'
+  backgroundImage?: string  // e.g. '/images/slots/backgrounds/wild-stampede-bg.webp'
 }
 
 export interface SymbolConfig {
   id: string
   name: string
   icon: string              // emoji
+  imagePath?: string        // e.g. '/images/slots/symbols/wild-stampede/bison.webp'
   payouts: Record<number, number>  // match count → bet multiplier (e.g., {3: 5, 4: 20, 5: 100})
   isWild?: boolean
   isScatter?: boolean

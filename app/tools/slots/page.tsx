@@ -13,17 +13,25 @@ import { CoinShop } from '@/tools/slots/components/shop/coin-shop'
 import { BackButton } from '@/components/ui/back-button'
 
 function LobbyInner() {
-  const { activeTab, t } = useSlots()
+  const { activeTab } = useSlots()
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-gray-950">
+    <div className="flex flex-col h-[100dvh] bg-[#0d0519]">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-2 border-b border-gray-800 bg-gray-900 shrink-0">
+      <header className="flex items-center justify-between px-4 py-2 border-b border-[#d4a052]/30 bg-[#1a0a2e] shrink-0">
         <div className="flex items-center gap-3">
           <BackButton />
-          <h1 className="text-lg font-bold text-white">{t.lobby.title}</h1>
+          <h1 className="text-lg font-bold text-[#f0d080] tracking-wide">TOOLK1T CASINO</h1>
         </div>
-        <CoinDisplay />
+        <div className="flex items-center gap-2">
+          <CoinDisplay />
+          <button
+            onClick={() => {}}
+            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#22c55e] text-white hover:bg-[#16a34a] transition-colors"
+          >
+            Store
+          </button>
+        </div>
       </header>
 
       {/* Content */}
@@ -32,9 +40,11 @@ function LobbyInner() {
           <>
             <EventsBanner />
             <DailyBonus />
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 p-4">
+            <div className="overflow-x-auto flex gap-4 snap-x snap-mandatory px-4 py-6">
               {ALL_GAMES.map((game) => (
-                <GameCard key={game.id} game={game} />
+                <div key={game.id} className="snap-center shrink-0 w-[200px] sm:w-[220px]">
+                  <GameCard game={game} />
+                </div>
               ))}
             </div>
           </>

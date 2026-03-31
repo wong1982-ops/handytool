@@ -46,27 +46,59 @@ export function ReelBoard({ config, result, spinning, onAllReelsStopped }: ReelB
     })
   }
 
+  const backgroundImage = config.theme.backgroundImage
+
   return (
     <div
-      className="grid gap-1 p-3 rounded-xl"
+      className="rounded-2xl p-[2px]"
       style={{
-        gridTemplateColumns: `repeat(${config.reels}, 1fr)`,
-        backgroundColor: config.theme.reelBackground,
+        background: 'linear-gradient(180deg, #d4a052 0%, #f0d080 40%, #d4a052 60%, #a07030 100%)',
+        boxShadow: '0 0 20px rgba(212, 160, 82, 0.3), inset 0 0 10px rgba(240, 208, 128, 0.2)',
       }}
-      role="img"
-      aria-label="Slot machine reels"
     >
-      {Array.from({ length: config.reels }, (_, reelIdx) => (
-        <ReelStrip
-          key={reelIdx}
-          symbols={config.symbols}
-          visibleSymbolIds={getVisibleIds(reelIdx)}
-          spinning={spinning}
-          stopDelay={800 + reelIdx * 200}
-          highlightedPositions={winPositions[reelIdx]}
-          onStop={handleReelStop}
+      <div
+        className="rounded-[14px] p-3 relative overflow-hidden"
+        style={{
+          backgroundColor: config.theme.reelBackground || '#0d0519',
+        }}
+      >
+        {/* Background image overlay */}
+        {backgroundImage && (
+          <div
+            className="absolute inset-0 opacity-20 bg-cover bg-center"
+            style={{ backgroundImage: `url(${backgroundImage})` }}
+          />
+        )}
+
+        {/* Inner shadow for depth */}
+        <div
+          className="absolute inset-0 pointer-events-none rounded-[14px]"
+          style={{
+            boxShadow: 'inset 0 4px 12px rgba(0,0,0,0.5), inset 0 -2px 8px rgba(0,0,0,0.3)',
+          }}
         />
-      ))}
+
+        <div
+          className="grid gap-1 relative z-10"
+          style={{
+            gridTemplateColumns: `repeat(${config.reels}, 1fr)`,
+          }}
+          role="img"
+          aria-label="Slot machine reels"
+        >
+          {Array.from({ length: config.reels }, (_, reelIdx) => (
+            <ReelStrip
+              key={reelIdx}
+              symbols={config.symbols}
+              visibleSymbolIds={getVisibleIds(reelIdx)}
+              spinning={spinning}
+              stopDelay={800 + reelIdx * 200}
+              highlightedPositions={winPositions[reelIdx]}
+              onStop={handleReelStop}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

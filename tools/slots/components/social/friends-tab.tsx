@@ -31,7 +31,7 @@ export function FriendsTab() {
 
   return (
     <div className="p-4 space-y-6">
-      <h2 className="text-lg font-bold text-white">{t.social.friends}</h2>
+      <h2 className="text-lg font-bold text-[#f0d080]">{t.social.friends}</h2>
 
       {/* Add friend */}
       <div className="flex gap-2">
@@ -39,9 +39,9 @@ export function FriendsTab() {
           value={username}
           onChange={e => setUsername(e.target.value)}
           placeholder={t.social.usernamePlaceholder}
-          className="flex-1 px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-sm text-white placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-3 py-2 rounded-lg bg-[#0d0519] border border-[#d4a052]/30 text-sm text-white placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-[#d4a052]/50"
         />
-        <button className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+        <button className="px-4 py-2 rounded-lg text-sm font-medium bg-[#22c55e] text-white hover:bg-[#16a34a] transition-colors">
           {t.social.sendRequest}
         </button>
       </div>
@@ -49,13 +49,13 @@ export function FriendsTab() {
       {/* Pending requests */}
       {pending.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-yellow-400">{t.social.pending}</h3>
+          <h3 className="text-sm font-medium text-[#d4a052]">{t.social.pending}</h3>
           {pending.map(p => (
-            <div key={p.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-800">
+            <div key={p.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#0d0519] border border-[#d4a052]/20">
               <span className="text-sm text-gray-300">User {p.user_id?.slice(0, 8)}...</span>
               <div className="flex gap-2">
-                <button onClick={() => handleAccept(p.id)} className="px-3 py-1 text-xs rounded-lg bg-green-600 text-white hover:bg-green-500">{t.social.accept}</button>
-                <button className="px-3 py-1 text-xs rounded-lg bg-gray-600 text-white hover:bg-gray-500">{t.social.decline}</button>
+                <button onClick={() => handleAccept(p.id)} className="px-3 py-1 text-xs rounded-lg bg-[#22c55e] text-white hover:bg-[#16a34a]">{t.social.accept}</button>
+                <button className="px-3 py-1 text-xs rounded-lg bg-[#2d1052] text-[#d4a052] hover:bg-[#3d1872]">{t.social.decline}</button>
               </div>
             </div>
           ))}
@@ -70,9 +70,9 @@ export function FriendsTab() {
       ) : (
         <div className="space-y-2">
           {friends.map(f => (
-            <div key={f.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-800">
+            <div key={f.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#0d0519] border border-[#d4a052]/20">
               <span className="text-sm text-white">User {f.friend_id?.slice(0, 8)}...</span>
-              <span className="text-xs text-green-400">{t.social.online}</span>
+              <span className="text-xs text-[#22c55e]">{t.social.online}</span>
             </div>
           ))}
         </div>
