@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useResume } from '../resume-provider'
 import { RESUME_SAMPLES, type ResumeSample } from '../resume-samples'
 import type { AIAnalysisResponse, ResumeState } from '../resume-types'
@@ -9,7 +9,8 @@ export function ToolboxPanel() {
   const { state, dispatch, t } = useResume()
   const [analysis, setAnalysis] = useState<AIAnalysisResponse | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
-  const [selectedSample, setSelectedSample] = useState<ResumeSample | null>(null)
+  const [previewing, setPreviewing] = useState<ResumeSample | null>(null)
+  const savedResumeRef = useRef<ResumeState | null>(null)
 
   const handleAnalyze = async () => {
     setAnalyzing(true)
@@ -29,21 +30,69 @@ export function ToolboxPanel() {
     }
   }
 
-  const handleLoadSample = (sample: ResumeSample) => {
-    const newResume: ResumeState = {
+  // Preview a sample: save current resume, load sample into preview
+  const handlePreviewSample = (sample: ResumeSample) => {
+    // Save current resume so we can restore on cancel
+    if (!previewing) {
+      savedResumeRef.current = { ...state.resume }
+    }
+
+    const previewResume: ResumeState = {
       ...sample.resume,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
+      id: state.resume.id, // keep the same id
+      createdAt: state.resume.createdAt,
       updatedAt: new Date().toISOString(),
     }
-    dispatch({ type: 'LOAD_STATE', payload: newResume })
+    dispatch({ type: 'LOAD_STATE', payload: previewResume })
+    setPreviewing(sample)
+  }
+
+  // Confirm: keep the sample, switch to edit mode
+  const handleConfirmSample = () => {
+    savedResumeRef.current = null
+    setPreviewing(null)
     dispatch({ type: 'SET_SIDEBAR_MODE', payload: 'edit' })
     dispatch({ type: 'SET_ACTIVE_MODULE', payload: 'baseInfo' })
-    setSelectedSample(null)
+  }
+
+  // Cancel: restore the saved resume
+  const handleCancelPreview = () => {
+    if (savedResumeRef.current) {
+      dispatch({ type: 'LOAD_STATE', payload: savedResumeRef.current })
+      savedResumeRef.current = null
+    }
+    setPreviewing(null)
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto relative">
+      {/* Floating confirm/cancel bar when previewing a sample */}
+      {previewing && (
+        <div className="sticky top-0 z-20 bg-blue-600 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-lg">{previewing.icon}</span>
+            <div className="min-w-0">
+              <p className="text-sm font-medium truncate">Previewing: {previewing.title}</p>
+              <p className="text-[10px] text-blue-200">Check the preview on the right</p>
+            </div>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <button
+              onClick={handleCancelPreview}
+              className="px-3 py-1.5 text-xs font-medium bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmSample}
+              className="px-3 py-1.5 text-xs font-medium bg-white text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            >
+              Use Template
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="p-6 max-w-2xl mx-auto space-y-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           {t.toolbox.title}
@@ -59,93 +108,39 @@ export function ToolboxPanel() {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {RESUME_SAMPLES.map((sample) => (
-              <button
-                key={sample.id}
-                onClick={() => setSelectedSample(sample)}
-                className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all text-left group"
-              >
-                <span className="text-2xl shrink-0 mt-0.5">{sample.icon}</span>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {sample.title}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                    {sample.description}
-                  </p>
-                  <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                    {sample.category}
-                  </span>
-                </div>
-              </button>
-            ))}
+            {RESUME_SAMPLES.map((sample) => {
+              const isActive = previewing?.id === sample.id
+              return (
+                <button
+                  key={sample.id}
+                  onClick={() => handlePreviewSample(sample)}
+                  className={`flex items-start gap-3 p-3 rounded-lg border transition-all text-left group ${
+                    isActive
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-500/30'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10'
+                  }`}
+                >
+                  <span className="text-2xl shrink-0 mt-0.5">{sample.icon}</span>
+                  <div className="min-w-0">
+                    <p className={`text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                    }`}>
+                      {sample.title}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                      {sample.description}
+                    </p>
+                    <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                      {sample.category}
+                    </span>
+                  </div>
+                </button>
+              )
+            })}
           </div>
         </section>
-
-        {/* Sample Preview Modal */}
-        {selectedSample && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setSelectedSample(null)}>
-            <div
-              className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md mx-4 p-6 space-y-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">{selectedSample.icon}</span>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {selectedSample.title}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {selectedSample.description}
-                  </p>
-                </div>
-              </div>
-
-              {/* Preview info */}
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
-                  <span className="text-gray-500">Name</span>
-                  <span className="text-gray-900 dark:text-gray-100 font-medium">{selectedSample.resume.baseInfo.name}</span>
-                </div>
-                <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
-                  <span className="text-gray-500">Position</span>
-                  <span className="text-gray-900 dark:text-gray-100 font-medium">{selectedSample.resume.jobIntention.position}</span>
-                </div>
-                <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
-                  <span className="text-gray-500">Sections</span>
-                  <span className="text-gray-900 dark:text-gray-100 font-medium">{selectedSample.resume.enabledModules.length}</span>
-                </div>
-                <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
-                  <span className="text-gray-500">Theme</span>
-                  <span className="text-gray-900 dark:text-gray-100 font-medium capitalize">{selectedSample.resume.theme.templateId.replace('-', ' ')}</span>
-                </div>
-                <div className="flex justify-between py-1.5">
-                  <span className="text-gray-500">Language</span>
-                  <span className="text-gray-900 dark:text-gray-100 font-medium">{selectedSample.resume.locale === 'zh' ? '中文' : 'English'}</span>
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setSelectedSample(null)}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => handleLoadSample(selectedSample)}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Use This Template
-                </button>
-              </div>
-
-              <p className="text-[10px] text-center text-gray-400">
-                This will replace your current resume content
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* AI Resume Analysis */}
         <section className="rounded-xl border border-gray-200 dark:border-gray-700 p-5">
