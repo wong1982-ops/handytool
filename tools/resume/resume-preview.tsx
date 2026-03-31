@@ -75,8 +75,8 @@ export function ResumePreview() {
           Array.from({ length: pageCount }, (_, pageIdx) => (
             <div
               key={pageIdx}
-              className="relative bg-white shadow-lg rounded-sm print:shadow-none print:rounded-none"
-              style={{ height: A4_HEIGHT, overflow: 'hidden' }}
+              className="relative bg-white shadow-lg rounded-sm overflow-hidden print:shadow-none print:rounded-none"
+              style={{ height: A4_HEIGHT }}
             >
               {/* Page number */}
               {pageCount > 1 && (
@@ -85,18 +85,21 @@ export function ResumePreview() {
                 </div>
               )}
 
-              {/* Content: page 1 starts at top, page 2+ has top margin */}
-              <div
-                style={{
-                  ...fontStyle,
-                  position: 'relative',
-                  top: pageIdx === 0
-                    ? 0
-                    : -getPageOffset(pageIdx) + PAGE_MARGIN,
-                  width: '100%',
-                }}
-              >
-                <Layout resume={resume} t={t} />
+              {/* Page 1: full content from top. Page 2+: margin + offset content */}
+              {pageIdx > 0 && (
+                <div style={{ height: PAGE_MARGIN, backgroundColor: '#ffffff' }} />
+              )}
+              <div style={{ overflow: 'hidden', height: pageIdx === 0 ? A4_HEIGHT : A4_HEIGHT - PAGE_MARGIN * 2 }}>
+                <div
+                  style={{
+                    ...fontStyle,
+                    position: 'relative',
+                    top: -getPageOffset(pageIdx),
+                    width: '100%',
+                  }}
+                >
+                  <Layout resume={resume} t={t} />
+                </div>
               </div>
             </div>
           ))
