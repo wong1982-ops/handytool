@@ -89,7 +89,8 @@ export function ResumeSidebar() {
           </span>
         </button>
 
-        {/* Locale toggle */}
+        {/* Locale toggle — hidden for now (English only) */}
+        {/* TODO: re-enable when Chinese i18n is needed
         <button
           onClick={() =>
             dispatch({ type: 'SET_LOCALE', payload: resume.locale === 'en' ? 'zh' : 'en' })
@@ -100,6 +101,7 @@ export function ResumeSidebar() {
           <span aria-hidden="true">🌐</span>
           <span className="max-lg:hidden">{resume.locale === 'en' ? 'English' : '中文'}</span>
         </button>
+        */}
       </div>
     </aside>
   )
