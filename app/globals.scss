@@ -205,3 +205,10 @@ body {
     margin: 0;
   }
 }
+
+/* Casino Slots — reel animations */
+@keyframes reelLand {
+  0% { transform: translateY(-20px); opacity: 0.5; }
+  60% { transform: translateY(4px); }
+  100% { transform: translateY(0); opacity: 1; }
+}
