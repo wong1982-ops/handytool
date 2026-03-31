@@ -26,7 +26,6 @@ export function ResumePreview() {
         id="resume-print-target"
         className="bg-white shadow-lg rounded-sm w-full max-w-[595px] min-h-[842px] relative print:shadow-none print:rounded-none print:max-w-none"
         style={{
-          aspectRatio: '210 / 297',
           fontFamily:
             theme.fontFamily === 'serif'
               ? 'Georgia, "Times New Roman", serif'
@@ -39,7 +38,7 @@ export function ResumePreview() {
         {hasContent ? (
           <Layout resume={resume} t={t} />
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-400">
+          <div className="flex items-center justify-center min-h-[842px] text-gray-400">
             <div className="text-center">
               <p className="text-4xl mb-4" aria-hidden="true">📄</p>
               <p className="text-sm">{t.preview.noContent}</p>

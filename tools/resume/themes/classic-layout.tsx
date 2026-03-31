@@ -24,16 +24,15 @@ function renderRichText(content: JSONContent | null): React.ReactNode {
         }
         return <span key={j}>{el}</span>
       })
-      return <p key={i} className="mb-1">{text}</p>
+      return <p key={i} className="mb-1 leading-relaxed">{text}</p>
     }
     if (node.type === 'bulletList') {
       return (
-        <ul key={i} className="list-disc pl-4 mb-1">
+        <ul key={i} className="pl-4 mb-1 space-y-0.5">
           {node.content?.map((li, k) => (
-            <li key={k}>
-              {li.content?.map((p, m) =>
-                p.content?.map((c, n) => <span key={`${m}-${n}`}>{c.text}</span>)
-              )}
+            <li key={k} className="flex gap-1.5">
+              <span className="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: 'currentColor', opacity: 0.4 }} />
+              <span>{li.content?.map((p, m) => p.content?.map((c, n) => <span key={`${m}-${n}`}>{c.text}</span>))}</span>
             </li>
           ))}
         </ul>
@@ -41,13 +40,9 @@ function renderRichText(content: JSONContent | null): React.ReactNode {
     }
     if (node.type === 'orderedList') {
       return (
-        <ol key={i} className="list-decimal pl-4 mb-1">
+        <ol key={i} className="list-decimal pl-4 mb-1 space-y-0.5">
           {node.content?.map((li, k) => (
-            <li key={k}>
-              {li.content?.map((p, m) =>
-                p.content?.map((c, n) => <span key={`${m}-${n}`}>{c.text}</span>)
-              )}
-            </li>
+            <li key={k}>{li.content?.map((p, m) => p.content?.map((c, n) => <span key={`${m}-${n}`}>{c.text}</span>))}</li>
           ))}
         </ol>
       )
@@ -66,32 +61,63 @@ export function ClassicLayout({ resume, t }: ThemeLayoutProps) {
   const color = theme.primaryColor
 
   return (
-    <div className="p-8">
+    <div className="min-h-full" style={{ color: '#1a1a2e' }}>
+      {/* ── Thin accent top border ──────────────────────────── */}
+      <div style={{ height: 4, backgroundColor: color }} />
+
       {/* ── Header ──────────────────────────────────────────── */}
-      <div className="pb-4 mb-5" style={{ borderBottom: `2px solid ${color}` }}>
-        <div className="flex items-start gap-4">
+      <div className="px-8 pt-6 pb-5">
+        <div className="flex items-start gap-5">
+          {/* Photo */}
           {baseInfo.photo && (
             <img
               src={baseInfo.photo}
               alt={baseInfo.name}
-              className="object-cover rounded"
-              style={{ width: 80, height: 100 }}
+              className="object-cover rounded-lg shadow-sm"
+              style={{ width: 80, height: 100, flexShrink: 0 }}
             />
           )}
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900">{baseInfo.name}</h1>
-            <div className="mt-2 text-xs text-gray-600 flex flex-wrap gap-x-4 gap-y-1">
-              {baseInfo.phone && <span>{baseInfo.phone}</span>}
-              {baseInfo.email && <span>{baseInfo.email}</span>}
-              {baseInfo.wechat && <span>{baseInfo.wechat}</span>}
-              {baseInfo.dateOfBirth && <span>{baseInfo.dateOfBirth}</span>}
+
+          {/* Name & contact */}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-[22px] font-bold tracking-tight" style={{ color: '#1a1a2e' }}>
+              {baseInfo.name}
+            </h1>
+            <div className="mt-2.5 flex flex-wrap gap-x-5 gap-y-1 text-[11px]" style={{ color: '#6b7280' }}>
+              {baseInfo.phone && (
+                <span className="flex items-center gap-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  {baseInfo.phone}
+                </span>
+              )}
+              {baseInfo.email && (
+                <span className="flex items-center gap-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  {baseInfo.email}
+                </span>
+              )}
+              {baseInfo.wechat && (
+                <span className="flex items-center gap-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  {baseInfo.wechat}
+                </span>
+              )}
+              {baseInfo.dateOfBirth && (
+                <span className="flex items-center gap-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+                  {baseInfo.dateOfBirth}
+                </span>
+              )}
             </div>
           </div>
         </div>
       </div>
 
+      {/* ── Divider ─────────────────────────────────────────── */}
+      <div className="mx-8" style={{ height: 1, backgroundColor: `${color}20` }} />
+
       {/* ── Sections ────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="px-8 py-5 space-y-5">
         {resume.enabledModules
           .filter((m) => m !== 'baseInfo')
           .map((mod) => {
@@ -99,15 +125,20 @@ export function ClassicLayout({ resume, t }: ThemeLayoutProps) {
             if (sectionContent === null) return null
             return (
               <div key={mod}>
-                <h2
-                  className="text-sm font-bold tracking-wide mb-2 pb-1"
-                  style={{
-                    color,
-                    borderBottom: `1px solid ${color}33`,
-                  }}
-                >
-                  {t.modules[mod as keyof typeof t.modules] ?? mod}
-                </h2>
+                {/* Section header with left accent border */}
+                <div className="flex items-center gap-2 mb-3">
+                  <div
+                    className="rounded-sm"
+                    style={{ width: 3, height: 16, backgroundColor: color, flexShrink: 0 }}
+                  />
+                  <h2
+                    className="text-[13px] font-bold tracking-wide"
+                    style={{ color: '#1a1a2e' }}
+                  >
+                    {t.modules[mod as keyof typeof t.modules] ?? mod}
+                  </h2>
+                  <div className="flex-1 ml-2" style={{ height: 1, backgroundColor: `${color}18` }} />
+                </div>
                 {sectionContent}
               </div>
             )
@@ -117,11 +148,13 @@ export function ClassicLayout({ resume, t }: ThemeLayoutProps) {
   )
 }
 
+/* ── Section renderers ──────────────────────────────────────── */
+
 function renderSection(
   mod: string,
   resume: ResumeState,
   t: any,
-  _color: string
+  color: string
 ): React.ReactNode | null {
   switch (mod) {
     case 'jobIntention': {
@@ -134,11 +167,11 @@ function renderSection(
         ji.targetCity && [t.fields?.targetCity ?? 'Target City', ji.targetCity],
       ].filter(Boolean) as [string, string][]
       return (
-        <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-gray-700">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-1.5 text-[11px]">
           {pairs.map(([label, value]) => (
-            <div key={label}>
-              <span className="font-semibold">{label}: </span>
-              <span>{value}</span>
+            <div key={label} className="flex gap-1">
+              <span style={{ color: '#9ca3af' }}>{label}:</span>
+              <span className="font-medium" style={{ color: '#374151' }}>{value}</span>
             </div>
           ))}
         </div>
@@ -149,24 +182,32 @@ function renderSection(
       if (!resume.education.length) return null
       return (
         <div className="space-y-3">
-          {resume.education.map((entry) => (
+          {resume.education.map((entry, idx) => (
             <div key={entry.id}>
-              <div className="flex justify-between items-baseline">
-                <div>
-                  <span className="font-semibold text-xs text-gray-900">{entry.school}</span>
+              {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
+              <div className="flex justify-between items-baseline gap-2">
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <span className="font-bold text-xs" style={{ color: '#1a1a2e' }}>{entry.school}</span>
                   {entry.major && (
-                    <span className="text-xs text-gray-600 ml-2">{entry.major}</span>
+                    <span className="text-[11px]" style={{ color: '#6b7280' }}>{entry.major}</span>
                   )}
                   {entry.degree && (
-                    <span className="text-xs text-gray-500 ml-2">({entry.degree})</span>
+                    <span
+                      className="text-[10px] px-1.5 py-0.5 rounded"
+                      style={{ backgroundColor: `${color}10`, color }}
+                    >
+                      {entry.degree}
+                    </span>
                   )}
                 </div>
-                <span className="text-xs text-gray-400 whitespace-nowrap">
+                <span className="text-[10px] whitespace-nowrap" style={{ color: '#9ca3af' }}>
                   {formatDates(entry.startDate, entry.endDate)}
                 </span>
               </div>
               {entry.description && (
-                <div className="text-xs text-gray-600 mt-1">{renderRichText(entry.description)}</div>
+                <div className="text-[11px] mt-1.5 leading-relaxed" style={{ color: '#4b5563' }}>
+                  {renderRichText(entry.description)}
+                </div>
               )}
             </div>
           ))}
@@ -178,24 +219,31 @@ function renderSection(
       if (!resume.workExperience.length) return null
       return (
         <div className="space-y-3">
-          {resume.workExperience.map((entry) => (
+          {resume.workExperience.map((entry, idx) => (
             <div key={entry.id}>
-              <div className="flex justify-between items-baseline">
-                <div>
-                  <span className="font-semibold text-xs text-gray-900">{entry.company}</span>
+              {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
+              <div className="flex justify-between items-baseline gap-2">
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <span className="font-bold text-xs" style={{ color: '#1a1a2e' }}>{entry.company}</span>
                   {entry.position && (
-                    <span className="text-xs text-gray-600 ml-2">{entry.position}</span>
+                    <span className="text-[11px] font-medium" style={{ color: '#374151' }}>
+                      {entry.position}
+                    </span>
                   )}
                   {entry.industry && (
-                    <span className="text-xs text-gray-500 ml-2">({entry.industry})</span>
+                    <span className="text-[10px]" style={{ color: '#9ca3af' }}>
+                      {entry.industry}
+                    </span>
                   )}
                 </div>
-                <span className="text-xs text-gray-400 whitespace-nowrap">
+                <span className="text-[10px] whitespace-nowrap" style={{ color: '#9ca3af' }}>
                   {formatDates(entry.startDate, entry.endDate)}
                 </span>
               </div>
               {entry.description && (
-                <div className="text-xs text-gray-600 mt-1">{renderRichText(entry.description)}</div>
+                <div className="text-[11px] mt-1.5 leading-relaxed" style={{ color: '#4b5563' }}>
+                  {renderRichText(entry.description)}
+                </div>
               )}
             </div>
           ))}
@@ -207,21 +255,24 @@ function renderSection(
       if (!resume.projects.length) return null
       return (
         <div className="space-y-3">
-          {resume.projects.map((entry) => (
+          {resume.projects.map((entry, idx) => (
             <div key={entry.id}>
-              <div className="flex justify-between items-baseline">
-                <div>
-                  <span className="font-semibold text-xs text-gray-900">{entry.projectName}</span>
+              {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
+              <div className="flex justify-between items-baseline gap-2">
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <span className="font-bold text-xs" style={{ color: '#1a1a2e' }}>{entry.projectName}</span>
                   {entry.role && (
-                    <span className="text-xs text-gray-600 ml-2">{entry.role}</span>
+                    <span className="text-[11px]" style={{ color: '#6b7280' }}>{entry.role}</span>
                   )}
                 </div>
-                <span className="text-xs text-gray-400 whitespace-nowrap">
+                <span className="text-[10px] whitespace-nowrap" style={{ color: '#9ca3af' }}>
                   {formatDates(entry.startDate, entry.endDate)}
                 </span>
               </div>
               {entry.description && (
-                <div className="text-xs text-gray-600 mt-1">{renderRichText(entry.description)}</div>
+                <div className="text-[11px] mt-1.5 leading-relaxed" style={{ color: '#4b5563' }}>
+                  {renderRichText(entry.description)}
+                </div>
               )}
             </div>
           ))}
@@ -231,33 +282,44 @@ function renderSection(
 
     case 'skillsCertificates': {
       if (!resume.skillsCertificates) return null
-      return <div className="text-xs text-gray-700">{renderRichText(resume.skillsCertificates)}</div>
+      return (
+        <div className="text-[11px] leading-relaxed" style={{ color: '#4b5563' }}>
+          {renderRichText(resume.skillsCertificates)}
+        </div>
+      )
     }
 
     case 'selfEvaluation': {
       if (!resume.selfEvaluation) return null
-      return <div className="text-xs text-gray-700">{renderRichText(resume.selfEvaluation)}</div>
+      return (
+        <div className="text-[11px] leading-relaxed" style={{ color: '#4b5563' }}>
+          {renderRichText(resume.selfEvaluation)}
+        </div>
+      )
     }
 
     case 'training': {
       if (!resume.training.length) return null
       return (
         <div className="space-y-3">
-          {resume.training.map((entry) => (
+          {resume.training.map((entry, idx) => (
             <div key={entry.id}>
-              <div className="flex justify-between items-baseline">
-                <div>
-                  <span className="font-semibold text-xs text-gray-900">{entry.institution}</span>
+              {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
+              <div className="flex justify-between items-baseline gap-2">
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <span className="font-bold text-xs" style={{ color: '#1a1a2e' }}>{entry.institution}</span>
                   {entry.course && (
-                    <span className="text-xs text-gray-600 ml-2">{entry.course}</span>
+                    <span className="text-[11px]" style={{ color: '#6b7280' }}>{entry.course}</span>
                   )}
                 </div>
-                <span className="text-xs text-gray-400 whitespace-nowrap">
+                <span className="text-[10px] whitespace-nowrap" style={{ color: '#9ca3af' }}>
                   {formatDates(entry.startDate, entry.endDate)}
                 </span>
               </div>
               {entry.description && (
-                <div className="text-xs text-gray-600 mt-1">{renderRichText(entry.description)}</div>
+                <div className="text-[11px] mt-1.5 leading-relaxed" style={{ color: '#4b5563' }}>
+                  {renderRichText(entry.description)}
+                </div>
               )}
             </div>
           ))}
@@ -269,21 +331,24 @@ function renderSection(
       if (!resume.awards.length) return null
       return (
         <div className="space-y-3">
-          {resume.awards.map((entry) => (
+          {resume.awards.map((entry, idx) => (
             <div key={entry.id}>
-              <div className="flex justify-between items-baseline">
-                <div>
-                  <span className="font-semibold text-xs text-gray-900">{entry.name}</span>
+              {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
+              <div className="flex justify-between items-baseline gap-2">
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <span className="font-bold text-xs" style={{ color: '#1a1a2e' }}>{entry.name}</span>
                   {entry.issuer && (
-                    <span className="text-xs text-gray-600 ml-2">{entry.issuer}</span>
+                    <span className="text-[11px]" style={{ color: '#6b7280' }}>{entry.issuer}</span>
                   )}
                 </div>
                 {entry.date && (
-                  <span className="text-xs text-gray-400 whitespace-nowrap">{entry.date}</span>
+                  <span className="text-[10px] whitespace-nowrap" style={{ color: '#9ca3af' }}>{entry.date}</span>
                 )}
               </div>
               {entry.description && (
-                <div className="text-xs text-gray-600 mt-1">{renderRichText(entry.description)}</div>
+                <div className="text-[11px] mt-1.5 leading-relaxed" style={{ color: '#4b5563' }}>
+                  {renderRichText(entry.description)}
+                </div>
               )}
             </div>
           ))}
@@ -295,21 +360,26 @@ function renderSection(
       if (!resume.internships.length) return null
       return (
         <div className="space-y-3">
-          {resume.internships.map((entry) => (
+          {resume.internships.map((entry, idx) => (
             <div key={entry.id}>
-              <div className="flex justify-between items-baseline">
-                <div>
-                  <span className="font-semibold text-xs text-gray-900">{entry.company}</span>
+              {idx > 0 && <div className="mb-3" style={{ height: 1, backgroundColor: '#f3f4f6' }} />}
+              <div className="flex justify-between items-baseline gap-2">
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <span className="font-bold text-xs" style={{ color: '#1a1a2e' }}>{entry.company}</span>
                   {entry.position && (
-                    <span className="text-xs text-gray-600 ml-2">{entry.position}</span>
+                    <span className="text-[11px] font-medium" style={{ color: '#374151' }}>
+                      {entry.position}
+                    </span>
                   )}
                 </div>
-                <span className="text-xs text-gray-400 whitespace-nowrap">
+                <span className="text-[10px] whitespace-nowrap" style={{ color: '#9ca3af' }}>
                   {formatDates(entry.startDate, entry.endDate)}
                 </span>
               </div>
               {entry.description && (
-                <div className="text-xs text-gray-600 mt-1">{renderRichText(entry.description)}</div>
+                <div className="text-[11px] mt-1.5 leading-relaxed" style={{ color: '#4b5563' }}>
+                  {renderRichText(entry.description)}
+                </div>
               )}
             </div>
           ))}
@@ -323,18 +393,18 @@ function renderSection(
         <div className="space-y-3">
           {resume.customSections.map((section) => (
             <div key={section.id}>
-              <h3 className="font-semibold text-xs text-gray-900 mb-1">{section.title}</h3>
+              <h3 className="font-bold text-xs mb-1.5" style={{ color: '#1a1a2e' }}>{section.title}</h3>
               {section.type === 'richtext' && section.richTextContent && (
-                <div className="text-xs text-gray-700">
+                <div className="text-[11px] leading-relaxed" style={{ color: '#4b5563' }}>
                   {renderRichText(section.richTextContent)}
                 </div>
               )}
               {section.type === 'structured' && section.structuredFields.length > 0 && (
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-700">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-[11px]">
                   {section.structuredFields.map((f, idx) => (
-                    <div key={idx}>
-                      <span className="font-semibold">{f.label}: </span>
-                      <span>{f.value}</span>
+                    <div key={idx} className="flex gap-1">
+                      <span style={{ color: '#9ca3af' }}>{f.label}:</span>
+                      <span style={{ color: '#374151' }}>{f.value}</span>
                     </div>
                   ))}
                 </div>
