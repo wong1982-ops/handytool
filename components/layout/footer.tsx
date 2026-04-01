@@ -43,6 +43,31 @@ export function Footer({
           ))}
         </div>
       </div>
+
+      {/* Shielded Site — family violence support widget */}
+      <script
+        src="https://staticcdn.co.nz/embed/embed.js"
+        async
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function () {
+              window.addEventListener('load', function(){
+                if (typeof ds07o6pcmkorn !== 'undefined') {
+                  var frameName = new ds07o6pcmkorn({
+                    left: 300,
+                    top: 0,
+                    iconSize: "big",
+                    modalID: "modal",
+                  });
+                  frameName.init();
+                }
+              });
+            })();
+          `,
+        }}
+      />
     </footer>
   )
 }
