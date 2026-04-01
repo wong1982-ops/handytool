@@ -108,81 +108,243 @@ async function fetchCommunityProviders(
   }
 }
 
-/** Fetch Google Places results */
+// Refresh threshold: data older than 30 days will be re-fetched on next access
+const REFRESH_DAYS = 30
+
+/**
+ * Smart Google Places fetch: check local DB first, only call Google API
+ * for searches we've never done before. Stores results permanently.
+ */
 async function fetchGooglePlaces(
   category: string,
   lat: number,
   lng: number,
   radius: number,
 ): Promise<MergedResult[]> {
-  if (!GOOGLE_PLACES_API_KEY) {
-    return getMockResults(lat, lng, category, radius)
-  }
+  const latR = lat.toFixed(3)
+  const lngR = lng.toFixed(3)
+  const searchKey = `${latR},${lngR}:${mapCategoryToGoogleType(category)}:${radius}`
 
-  const url = 'https://places.googleapis.com/v1/places:searchNearby'
+  try {
+    const supabase = await createClient()
 
-  const requestBody = {
-    includedTypes: [mapCategoryToGoogleType(category)],
-    maxResultCount: 20,
-    locationRestriction: {
-      circle: {
-        center: { latitude: lat, longitude: lng },
-        radius,
-      },
-    },
-  }
+    // 1. Check if we've done this exact search before
+    const { data: searchLog } = await supabase
+      .from('google_places_search_log')
+      .select('searched_at, refreshed_at')
+      .eq('cache_key', searchKey)
+      .single()
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
-      'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.internationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.currentOpeningHours,places.regularOpeningHours,places.businessStatus,places.primaryType,places.photos',
-    },
-    body: JSON.stringify(requestBody),
-  })
+    if (searchLog) {
+      const age = (Date.now() - new Date(searchLog.refreshed_at).getTime()) / (1000 * 60 * 60 * 24)
+      const needsRefresh = age > REFRESH_DAYS
 
-  if (!res.ok) {
-    const errText = await res.text()
-    console.error('Google Places error:', errText)
-    throw new Error('Google Places API error')
-  }
+      if (!needsRefresh) {
+        // Serve from local DB — zero Google API cost
+        const { data: searchResults } = await supabase
+          .from('google_places_search_results')
+          .select('place_id, distance')
+          .eq('search_key', searchKey)
 
-  const data = await res.json()
-  return (data.places || []).map((place: any) => {
-    const distance = haversineMeters(lat, lng, place.location?.latitude ?? lat, place.location?.longitude ?? lng)
+        if (searchResults && searchResults.length > 0) {
+          const placeIds = searchResults.map((r: any) => r.place_id)
+          const distanceMap = new Map(searchResults.map((r: any) => [r.place_id, r.distance]))
 
-    let hours = null
-    if (place.regularOpeningHours?.weekdayDescriptions) {
-      hours = {
-        display: place.regularOpeningHours.weekdayDescriptions,
-        isOpenNow: place.currentOpeningHours?.openNow ?? false,
+          const { data: places } = await supabase
+            .from('google_places_local')
+            .select('*')
+            .in('id', placeIds)
+
+          if (places && places.length > 0) {
+            return places.map((p: any) => ({
+              id: p.id,
+              source: 'google' as const,
+              name: p.name,
+              address: p.address || '',
+              lat: p.lat,
+              lng: p.lng,
+              distance: distanceMap.get(p.id) ?? null,
+              phone: p.phone,
+              website: p.website,
+              rating: p.rating,
+              reviewCount: p.rating_count || 0,
+              hours: p.hours,
+              isOpenNow: p.hours?.isOpenNow ?? false,
+              category: p.category || category,
+              photoUrl: p.photo_url,
+            })).sort((a: MergedResult, b: MergedResult) => (a.distance ?? 99999) - (b.distance ?? 99999))
+          }
+        }
       }
+      // If needs refresh, fall through to fetch from Google
     }
 
-    let photoUrl = null
-    if (place.photos?.[0]?.name) {
-      photoUrl = `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxHeightPx=200&maxWidthPx=200&key=${GOOGLE_PLACES_API_KEY}`
+    // 2. Not in local DB (or needs refresh) — fetch from Google API
+    if (!GOOGLE_PLACES_API_KEY) {
+      return getMockResults(lat, lng, category, radius)
     }
 
-    return {
-      id: place.id || '',
+    const url = 'https://places.googleapis.com/v1/places:searchNearby'
+    const requestBody = {
+      includedTypes: [mapCategoryToGoogleType(category)],
+      maxResultCount: 20,
+      locationRestriction: {
+        circle: {
+          center: { latitude: lat, longitude: lng },
+          radius,
+        },
+      },
+    }
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.internationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.currentOpeningHours,places.regularOpeningHours,places.businessStatus,places.primaryType,places.photos',
+      },
+      body: JSON.stringify(requestBody),
+    })
+
+    if (!res.ok) {
+      const errText = await res.text()
+      console.error('Google Places error:', errText)
+      // Fallback: try local DB even if stale
+      return fetchFromLocalDbFallback(supabase, searchKey, category)
+    }
+
+    const data = await res.json()
+    const results: MergedResult[] = (data.places || []).map((place: any) => {
+      const distance = haversineMeters(lat, lng, place.location?.latitude ?? lat, place.location?.longitude ?? lng)
+
+      let hours = null
+      if (place.regularOpeningHours?.weekdayDescriptions) {
+        hours = {
+          display: place.regularOpeningHours.weekdayDescriptions,
+          isOpenNow: place.currentOpeningHours?.openNow ?? false,
+        }
+      }
+
+      let photoUrl = null
+      if (place.photos?.[0]?.name) {
+        photoUrl = `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxHeightPx=200&maxWidthPx=200&key=${GOOGLE_PLACES_API_KEY}`
+      }
+
+      return {
+        id: place.id || '',
+        source: 'google' as const,
+        name: place.displayName?.text || '',
+        address: place.formattedAddress || '',
+        lat: place.location?.latitude || lat,
+        lng: place.location?.longitude || lng,
+        distance,
+        phone: place.internationalPhoneNumber || null,
+        website: place.websiteUri || null,
+        rating: place.rating || null,
+        reviewCount: place.userRatingCount || 0,
+        hours,
+        isOpenNow: place.currentOpeningHours?.openNow ?? false,
+        category: place.primaryType || category,
+        photoUrl,
+      }
+    })
+
+    // 3. Store in local DB (permanent — no TTL)
+    try {
+      // Upsert each place
+      for (const r of results) {
+        await supabase.from('google_places_local').upsert({
+          id: r.id,
+          name: r.name,
+          address: r.address,
+          lat: r.lat,
+          lng: r.lng,
+          phone: r.phone,
+          website: r.website,
+          rating: r.rating,
+          rating_count: r.reviewCount,
+          category: r.category,
+          google_type: mapCategoryToGoogleType(category),
+          photo_url: r.photoUrl,
+          hours: r.hours,
+          business_status: 'OPERATIONAL',
+          refreshed_at: new Date().toISOString(),
+        })
+      }
+
+      // Log this search
+      await supabase.from('google_places_search_log').upsert({
+        cache_key: searchKey,
+        result_count: results.length,
+        searched_at: searchLog ? searchLog.searched_at : new Date().toISOString(),
+        refreshed_at: new Date().toISOString(),
+      })
+
+      // Link places to this search
+      for (const r of results) {
+        await supabase.from('google_places_search_results').upsert({
+          search_key: searchKey,
+          place_id: r.id,
+          distance: r.distance,
+        })
+      }
+    } catch (e) {
+      console.error('Failed to store in local DB:', e)
+      // Non-fatal — results still returned to user
+    }
+
+    return results
+  } catch (e) {
+    console.error('Google Places fetch error:', e)
+    if (!GOOGLE_PLACES_API_KEY) return getMockResults(lat, lng, category, radius)
+    return []
+  }
+}
+
+/** Fallback: serve stale data from local DB when Google API fails */
+async function fetchFromLocalDbFallback(
+  supabase: any,
+  searchKey: string,
+  category: string,
+): Promise<MergedResult[]> {
+  try {
+    const { data: searchResults } = await supabase
+      .from('google_places_search_results')
+      .select('place_id, distance')
+      .eq('search_key', searchKey)
+
+    if (!searchResults?.length) return []
+
+    const placeIds = searchResults.map((r: any) => r.place_id)
+    const distanceMap = new Map(searchResults.map((r: any) => [r.place_id, r.distance]))
+
+    const { data: places } = await supabase
+      .from('google_places_local')
+      .select('*')
+      .in('id', placeIds)
+
+    if (!places?.length) return []
+
+    return places.map((p: any) => ({
+      id: p.id,
       source: 'google' as const,
-      name: place.displayName?.text || '',
-      address: place.formattedAddress || '',
-      lat: place.location?.latitude || lat,
-      lng: place.location?.longitude || lng,
-      distance,
-      phone: place.internationalPhoneNumber || null,
-      website: place.websiteUri || null,
-      rating: place.rating || null,
-      reviewCount: place.userRatingCount || 0,
-      hours,
-      isOpenNow: place.currentOpeningHours?.openNow ?? false,
-      category: place.primaryType || category,
-      photoUrl,
-    }
-  })
+      name: p.name,
+      address: p.address || '',
+      lat: p.lat,
+      lng: p.lng,
+      distance: distanceMap.get(p.id) ?? null,
+      phone: p.phone,
+      website: p.website,
+      rating: p.rating,
+      reviewCount: p.rating_count || 0,
+      hours: p.hours,
+      isOpenNow: p.hours?.isOpenNow ?? false,
+      category: p.category || category,
+      photoUrl: p.photo_url,
+    }))
+  } catch {
+    return []
+  }
 }
 
 export async function POST(request: NextRequest) {
