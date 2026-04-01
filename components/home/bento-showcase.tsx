@@ -661,6 +661,30 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'Local Services',
+    description: 'Find nearby plumber, doctor & more',
+    href: '/tools/local-services',
+    gridClass: '',
+    glowClass: 'from-teal-500/10',
+    category: 'utility' as const,
+    preview: (
+      <div className="w-full h-full flex flex-col justify-center gap-1.5 px-3">
+        <div className="flex items-center gap-1.5">
+          <div className="w-5 h-5 rounded bg-teal-500/20 flex items-center justify-center text-[8px]">📍</div>
+          <div className="h-1.5 rounded-full bg-teal-400/30 flex-1" />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-5 h-5 rounded bg-teal-500/20 flex items-center justify-center text-[8px]">🔧</div>
+          <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 flex-1" />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-5 h-5 rounded bg-teal-500/20 flex items-center justify-center text-[8px]">🏥</div>
+          <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 w-3/4" />
+        </div>
+      </div>
+    ),
+  },
 ]
 
 function BentoGrid({ items }: { items: typeof bentoItems }) {
