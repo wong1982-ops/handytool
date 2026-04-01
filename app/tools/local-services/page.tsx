@@ -8,7 +8,7 @@ import { RadiusPills } from '@/tools/local-services/components/radius-pills'
 import { ResultsList } from '@/tools/local-services/components/results-list'
 import { ResultDetail } from '@/tools/local-services/components/result-detail'
 import { ResultsMap } from '@/tools/local-services/components/results-map'
-import { BottomTabs } from '@/tools/local-services/components/bottom-tabs'
+import { BottomTabs, DesktopTabs } from '@/tools/local-services/components/bottom-tabs'
 import { FavouritesTab } from '@/tools/local-services/components/favourites-tab'
 import { RecentTab } from '@/tools/local-services/components/recent-tab'
 import { LocationModal } from '@/tools/local-services/components/location-modal'
@@ -32,6 +32,8 @@ function LocalServicesInner() {
           <BackButton />
           <h1 className="text-base font-semibold text-slate-900 dark:text-white">Local Services</h1>
           <LocationBar />
+          <div className="hidden lg:block h-5 w-px bg-slate-200 dark:bg-slate-700" />
+          <DesktopTabs />
         </div>
         <FavoriteButton slug="local-services" name="Local Services" />
       </div>
