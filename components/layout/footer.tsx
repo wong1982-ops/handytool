@@ -44,30 +44,23 @@ export function Footer({
         </div>
       </div>
 
-      {/* Shielded Site — family violence support widget */}
-      <script
-        src="https://staticcdn.co.nz/embed/embed.js"
-        async
-      />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            (function () {
-              window.addEventListener('load', function(){
-                if (typeof ds07o6pcmkorn !== 'undefined') {
-                  var frameName = new ds07o6pcmkorn({
-                    left: 300,
-                    top: 0,
-                    iconSize: "big",
-                    modalID: "modal",
-                  });
-                  frameName.init();
-                }
-              });
-            })();
-          `,
-        }}
-      />
+      {/* Shielded Site — family violence support */}
+      <div className="mt-4 flex justify-center">
+        <a
+          href="https://shielded.co.nz/"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Shielded Site — support for those experiencing family violence"
+        >
+          <img
+            src="/images/shielded-logo.png"
+            alt="Shielded Site"
+            width={48}
+            height={48}
+            className="opacity-60 hover:opacity-100 transition-opacity"
+          />
+        </a>
+      </div>
     </footer>
   )
 }
