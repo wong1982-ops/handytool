@@ -48,15 +48,39 @@ export function PaylineOverlay({ wins, reels, rows, visible }: PaylineOverlayPro
   const cellH = 100 / rows
 
   // Build SVG path through winning positions
-  const points = activeWin.positions
-    .sort((a, b) => a[0] - b[0]) // sort by reel index (left to right)
-    .map(([reel, row]) => ({
-      x: cellW * reel + cellW / 2,
-      y: cellH * row + cellH / 2,
-    }))
+  // For ways wins (paylineIndex === -1 but not scatter), pick one position per reel
+  const allPoints = activeWin.positions
+    .sort((a, b) => a[0] - b[0])
 
-  // For scatter wins (no specific line), highlight each position individually
-  const isScatter = activeWin.paylineIndex === -1
+  // Determine if this is a scatter win (scatter symbol) vs ways/payline win
+  const isScatterSymbol = activeWin.symbolId && activeWin.positions.length > 0 &&
+    activeWin.paylineIndex === -1 &&
+    // If positions span multiple rows on the same reel, it's likely a ways win with multiple matches
+    // Scatter wins typically have exactly 1 position per reel
+    allPoints.filter((p, i, arr) => i === 0 || arr[i - 1][0] !== p[0]).length === allPoints.length
+
+  // For line drawing: pick one position per reel (first match)
+  const linePoints: { x: number; y: number }[] = []
+  const seenReels = new Set<number>()
+  for (const [reel, row] of allPoints) {
+    if (!seenReels.has(reel)) {
+      seenReels.add(reel)
+      linePoints.push({
+        x: cellW * reel + cellW / 2,
+        y: cellH * row + cellH / 2,
+      })
+    }
+  }
+
+  const allPointsMapped = allPoints.map(([reel, row]) => ({
+    x: cellW * reel + cellW / 2,
+    y: cellH * row + cellH / 2,
+  }))
+
+  // Use scatter circles only for actual scatter symbol wins with 3+ positions
+  // Everything else (paylines AND ways) draws connecting lines
+  const isScatter = isScatterSymbol && activeWin.paylineIndex === -1 && linePoints.length >= 3 &&
+    activeWin.symbolId?.includes('scatter')
 
   return (
     <div className="absolute inset-0 pointer-events-none z-10">
@@ -68,7 +92,7 @@ export function PaylineOverlay({ wins, reels, rows, visible }: PaylineOverlayPro
       >
         {isScatter ? (
           // Scatter: draw circles at each position
-          points.map((p, i) => (
+          allPointsMapped.map((p, i) => (
             <circle
               key={i}
               cx={p.x}
@@ -84,11 +108,11 @@ export function PaylineOverlay({ wins, reels, rows, visible }: PaylineOverlayPro
             </circle>
           ))
         ) : (
-          // Payline: draw a line through positions
+          // Payline / Ways: draw a line through one position per reel
           <>
             {/* Thick glow line */}
             <polyline
-              points={points.map(p => `${p.x},${p.y}`).join(' ')}
+              points={linePoints.map(p => `${p.x},${p.y}`).join(' ')}
               fill="none"
               stroke={color}
               strokeWidth="2"
@@ -98,7 +122,7 @@ export function PaylineOverlay({ wins, reels, rows, visible }: PaylineOverlayPro
             />
             {/* Main line */}
             <polyline
-              points={points.map(p => `${p.x},${p.y}`).join(' ')}
+              points={linePoints.map(p => `${p.x},${p.y}`).join(' ')}
               fill="none"
               stroke={color}
               strokeWidth="0.8"
@@ -109,7 +133,7 @@ export function PaylineOverlay({ wins, reels, rows, visible }: PaylineOverlayPro
               <animate attributeName="opacity" values="0.9;0.5;0.9" dur="1s" repeatCount="indefinite" />
             </polyline>
             {/* Dots at each winning position */}
-            {points.map((p, i) => (
+            {allPointsMapped.map((p, i) => (
               <circle
                 key={i}
                 cx={p.x}
