@@ -17,7 +17,7 @@ export function RadiusPills() {
 
   return (
     <div className="space-y-1.5">
-      <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+      <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
         {t.radius.label}
       </span>
       <div className="flex flex-wrap gap-2">
@@ -31,8 +31,8 @@ export function RadiusPills() {
               onClick={() => handleSelect(r)}
               className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
                 isActive
-                  ? 'bg-blue-500 text-white shadow-sm'
-                  : 'border border-gray-300 text-gray-600 hover:border-blue-400 hover:text-blue-600 dark:border-white/20 dark:text-gray-400 dark:hover:border-blue-400 dark:hover:text-blue-400'
+                  ? 'bg-[var(--tk-color-primary-500)] text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
               }`}
             >
               {RADIUS_LABELS[r]}

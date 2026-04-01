@@ -13,7 +13,7 @@ export function LocationBar() {
     <div className="flex items-center justify-between gap-3 rounded-xl bg-white/80 px-4 py-3 shadow-sm backdrop-blur dark:bg-white/5 dark:shadow-none">
       <div className="flex min-w-0 items-center gap-2">
         <svg
-          className="h-5 w-5 shrink-0 text-blue-500"
+          className="h-5 w-5 shrink-0 text-[var(--tk-color-primary-500)]"
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -23,18 +23,18 @@ export function LocationBar() {
             clipRule="evenodd"
           />
         </svg>
-        <span className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">
+        <span className="truncate text-sm text-slate-600 dark:text-slate-400">
           {label}
         </span>
         {state.locationLoading && (
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--tk-color-primary-500)] border-t-transparent" />
         )}
       </div>
 
       <button
         type="button"
         onClick={() => dispatch({ type: 'TOGGLE_LOCATION_MODAL' })}
-        className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30"
+        className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--tk-color-primary-500)] transition-colors hover:text-[var(--tk-color-primary-400)]"
       >
         {t.locationBar.change}
       </button>

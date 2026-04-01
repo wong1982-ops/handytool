@@ -8,7 +8,7 @@ export function CategoryGrid() {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+      <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
         {t.categories.title}
       </h2>
 
@@ -21,10 +21,10 @@ export function CategoryGrid() {
               key={cat.id}
               type="button"
               onClick={() => searchServices(cat.foursquareId)}
-              className={`flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 transition-all ${
+              className={`flex min-h-[80px] flex-col items-center gap-1.5 rounded-xl border px-2 py-3 transition-all ${
                 isActive
-                  ? 'bg-blue-50 ring-2 ring-blue-500 dark:bg-blue-900/30 dark:ring-blue-400'
-                  : 'bg-white/80 hover:bg-gray-50 dark:bg-white/5 dark:hover:bg-white/10'
+                  ? 'border-[var(--tk-color-primary-500)] bg-[var(--tk-color-primary-500)]/10 ring-2 ring-[var(--tk-color-primary-500)]/30'
+                  : 'border-slate-200 bg-white hover:border-[var(--tk-color-primary-400)] hover:bg-[var(--tk-color-primary-500)]/5 dark:border-slate-800 dark:bg-white/5'
               }`}
             >
               <span className="text-2xl" role="img" aria-label={cat.name}>
@@ -33,8 +33,8 @@ export function CategoryGrid() {
               <span
                 className={`text-center text-xs font-medium leading-tight ${
                   isActive
-                    ? 'text-blue-700 dark:text-blue-300'
-                    : 'text-gray-600 dark:text-gray-400'
+                    ? 'text-[var(--tk-color-primary-500)]'
+                    : 'text-slate-700 dark:text-slate-300'
                 }`}
               >
                 {cat.name}

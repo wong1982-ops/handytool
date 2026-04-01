@@ -30,7 +30,7 @@ function RatingStars({ rating }: { rating: number | null }) {
               ? 'text-amber-400'
               : i === full && half
                 ? 'text-amber-400'
-                : 'text-gray-300 dark:text-gray-600'
+                : 'text-slate-300 dark:text-slate-600'
           }`}
           fill="currentColor"
           viewBox="0 0 20 20"
@@ -52,7 +52,7 @@ function RatingStars({ rating }: { rating: number | null }) {
           )}
         </svg>
       ))}
-      <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">
+      <span className="ml-1 text-xs text-slate-500 dark:text-slate-400">
         {rating.toFixed(1)}
       </span>
     </div>
@@ -70,10 +70,10 @@ export function ResultCard({
     <button
       type="button"
       onClick={onSelect}
-      className={`group relative w-full rounded-xl p-3 text-left transition-all ${
+      className={`group relative w-full p-4 text-left transition-colors border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer ${
         isSelected
-          ? 'border-l-4 border-l-blue-500 bg-blue-50/60 dark:bg-blue-900/20'
-          : 'bg-white/80 hover:bg-gray-50 dark:bg-white/5 dark:hover:bg-white/10'
+          ? 'bg-[var(--tk-color-primary-500)]/5 border-l-2 border-l-[var(--tk-color-primary-500)]'
+          : ''
       }`}
     >
       {/* Favourite button */}
@@ -83,14 +83,14 @@ export function ResultCard({
           e.stopPropagation()
           onToggleFavourite()
         }}
-        className="absolute right-2 top-2 rounded-full p-1.5 transition-colors hover:bg-gray-100 dark:hover:bg-white/10"
+        className="absolute right-2 top-2 rounded-full p-1.5 transition-colors hover:bg-slate-100 dark:hover:bg-white/10"
         aria-label={isFavourite ? 'Remove from favourites' : 'Add to favourites'}
       >
         <svg
           className={`h-4 w-4 ${
             isFavourite
-              ? 'fill-red-500 text-red-500'
-              : 'fill-none text-gray-400 group-hover:text-gray-500 dark:text-gray-500'
+              ? 'fill-red-400 text-red-400'
+              : 'fill-none text-slate-300 group-hover:text-slate-400 dark:text-slate-600'
           }`}
           stroke="currentColor"
           strokeWidth={2}
@@ -102,15 +102,15 @@ export function ResultCard({
 
       {/* Content */}
       <div className="pr-8">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
           {result.name}
         </h3>
 
         <RatingStars rating={result.rating} />
 
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500 dark:text-gray-400">
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400">
           {/* Distance */}
-          <span className="font-medium text-blue-600 dark:text-blue-400">
+          <span className="font-medium text-[var(--tk-color-primary-500)]">
             {formatDistance(result.distance)}
           </span>
 
@@ -118,7 +118,7 @@ export function ResultCard({
           <span className="flex items-center gap-1">
             <span
               className={`inline-block h-1.5 w-1.5 rounded-full ${
-                result.isOpenNow ? 'bg-green-500' : 'bg-red-500'
+                result.isOpenNow ? 'bg-emerald-500' : 'bg-red-500'
               }`}
             />
             {result.isOpenNow ? 'Open' : 'Closed'}
@@ -126,13 +126,13 @@ export function ResultCard({
         </div>
 
         {/* Address */}
-        <p className="mt-1 truncate text-xs text-gray-500 dark:text-gray-400">
+        <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400">
           {result.address}
         </p>
 
         {/* Phone */}
         {result.phone && (
-          <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
             {result.phone}
           </p>
         )}

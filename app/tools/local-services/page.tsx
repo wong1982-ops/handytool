@@ -25,57 +25,69 @@ function LocalServicesInner() {
   const isFavourite = (id: string) => state.favourites.some(f => f.id === id)
 
   return (
-    <div className="flex flex-col h-[100dvh]">
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
+    <div className="flex-1 flex flex-col min-h-0">
+      {/* Header — matches Toolk1t tool pattern */}
+      <div className="px-4 md:px-6 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <BackButton />
+          <h1 className="text-base font-semibold text-slate-900 dark:text-white">Local Services</h1>
           <LocationBar />
         </div>
         <FavoriteButton slug="local-services" name="Local Services" />
-      </header>
+      </div>
 
-      {/* Search bar */}
-      <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
-        <SearchBar />
+      {/* Search + radius bar */}
+      <div className="px-4 md:px-6 py-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <SearchBar />
+          </div>
+          {hasResults && (
+            <>
+              <div className="hidden sm:block h-5 w-px bg-slate-200 dark:bg-slate-700" />
+              <div className="hidden sm:flex">
+                <RadiusPills />
+              </div>
+            </>
+          )}
+        </div>
+        {/* Mobile: radius pills + map/list toggle */}
+        {hasResults && (
+          <div className="sm:hidden mt-2 flex items-center justify-between">
+            <RadiusPills />
+            <button
+              onClick={() => setShowMap(!showMap)}
+              className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium"
+            >
+              {showMap ? '☰ List' : '🗺 Map'}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Main content */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         {state.activeTab === 'home' && (
           <>
             {!hasResults ? (
-              /* Category grid (home state) */
-              <div className="h-full overflow-y-auto px-4 py-4">
-                <CategoryGrid />
+              /* Category grid */
+              <div className="flex-1 overflow-y-auto">
+                <div className="max-w-4xl mx-auto px-4 md:px-6 py-6">
+                  <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
+                    What do you need?
+                  </h2>
+                  <CategoryGrid />
+                </div>
               </div>
             ) : (
-              /* Results state: radius + split view */
-              <div className="flex flex-col h-full">
-                <div className="px-4 py-2 shrink-0 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center justify-between">
-                  <RadiusPills />
-                  {/* Mobile map/list toggle */}
-                  <button
-                    onClick={() => setShowMap(!showMap)}
-                    className="lg:hidden text-xs px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
-                  >
-                    {showMap ? 'List' : 'Map'}
-                  </button>
+              /* Split view: list + map */
+              <div className="flex-1 flex min-h-0 overflow-hidden">
+                <div className={`w-full lg:w-[40%] xl:w-[35%] overflow-y-auto border-r border-slate-200 dark:border-slate-800 ${showMap ? 'max-lg:hidden' : ''}`}>
+                  <ResultsList />
                 </div>
-
-                <div className="flex-1 flex overflow-hidden">
-                  {/* List panel */}
-                  <div className={`w-full lg:w-[40%] overflow-y-auto border-r border-gray-200 dark:border-gray-700 ${showMap ? 'max-lg:hidden' : ''}`}>
-                    <ResultsList />
-                  </div>
-
-                  {/* Map panel */}
-                  <div className={`w-full lg:w-[60%] ${!showMap ? 'max-lg:hidden' : ''}`}>
-                    <ResultsMap />
-                  </div>
+                <div className={`w-full lg:w-[60%] xl:w-[65%] min-h-0 ${!showMap ? 'max-lg:hidden' : ''}`}>
+                  <ResultsMap />
                 </div>
-
-                {/* Detail panel (slides in when a result is selected) */}
                 {selectedResult && (
                   <ResultDetail
                     result={selectedResult}
@@ -96,14 +108,18 @@ function LocalServicesInner() {
         )}
 
         {state.activeTab === 'favourites' && (
-          <div className="h-full overflow-y-auto">
-            <FavouritesTab />
+          <div className="flex-1 overflow-y-auto">
+            <div className="max-w-4xl mx-auto px-4 md:px-6 py-6">
+              <FavouritesTab />
+            </div>
           </div>
         )}
 
         {state.activeTab === 'recent' && (
-          <div className="h-full overflow-y-auto">
-            <RecentTab />
+          <div className="flex-1 overflow-y-auto">
+            <div className="max-w-4xl mx-auto px-4 md:px-6 py-6">
+              <RecentTab />
+            </div>
           </div>
         )}
       </div>
