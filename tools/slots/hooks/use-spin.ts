@@ -5,12 +5,15 @@ import { spin as engineSpin } from '../engine/slot-engine'
 import { useSlots } from '../slots-provider'
 import { useSound } from './use-sound'
 import type { SlotGameConfig, SpinResult } from '../slots-types'
-import { getWinTier } from '../slots-types'
+import { getWinTier, JACKPOT_CONFIG } from '../slots-types'
+import type { JackpotTier } from '../slots-types'
 
 interface UseSpinOptions {
   config: SlotGameConfig
   betPerLine: number
 }
+
+const JACKPOT_TIERS: JackpotTier[] = ['grand', 'major', 'minor']
 
 export function useSpin({ config, betPerLine }: UseSpinOptions) {
   const { player, dispatch } = useSlots()
@@ -19,6 +22,7 @@ export function useSpin({ config, betPerLine }: UseSpinOptions) {
   const [result, setResult] = useState<SpinResult | null>(null)
   const [showWin, setShowWin] = useState(false)
   const [bonusActive, setBonusActive] = useState(false)
+  const [jackpotWin, setJackpotWin] = useState<{ tier: JackpotTier; amount: number } | null>(null)
 
   const totalBet = config.useWays ? betPerLine * 25 : betPerLine * config.paylines.length
 
@@ -30,6 +34,7 @@ export function useSpin({ config, betPerLine }: UseSpinOptions) {
     dispatch({ type: 'ADD_XP', payload: Math.floor(totalBet * 0.1) })
 
     setShowWin(false)
+    setJackpotWin(null)
     setSpinning(true)
     play('spin')
 
@@ -57,11 +62,31 @@ export function useSpin({ config, betPerLine }: UseSpinOptions) {
       play('coinCredit')
     }
 
+    // 2. Jackpot contribution — add to all 3 tiers
+    for (const tier of JACKPOT_TIERS) {
+      const contribution = Math.floor(totalBet * JACKPOT_CONFIG[tier].contribution)
+      if (contribution > 0) {
+        dispatch({ type: 'ADD_JACKPOT', payload: { tier, amount: contribution } })
+      }
+    }
+
+    // 3. Jackpot trigger check — highest tier first, only one can trigger
+    for (const tier of JACKPOT_TIERS) {
+      if (Math.floor(Math.random() * JACKPOT_CONFIG[tier].odds) === 0) {
+        const jackpotAmount = player.jackpots[tier]
+
+        dispatch({ type: 'ADD_COINS', payload: jackpotAmount })
+        dispatch({ type: 'RESET_JACKPOT', payload: { tier } })
+        setJackpotWin({ tier, amount: jackpotAmount })
+        break // only one jackpot per spin
+      }
+    }
+
     if (result.bonusTriggered) {
       play('bonusTrigger')
       setTimeout(() => setBonusActive(true), 1500)
     }
-  }, [result, totalBet, dispatch, play])
+  }, [result, totalBet, dispatch, play, player.jackpots])
 
   const onBonusComplete = useCallback((bonusWin: number) => {
     dispatch({ type: 'ADD_COINS', payload: bonusWin })
@@ -78,5 +103,6 @@ export function useSpin({ config, betPerLine }: UseSpinOptions) {
     doSpin,
     onAllReelsStopped,
     onBonusComplete,
+    jackpotWin,
   }
 }

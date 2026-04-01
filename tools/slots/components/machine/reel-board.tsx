@@ -47,57 +47,50 @@ export function ReelBoard({ config, result, spinning, onAllReelsStopped }: ReelB
     })
   }
 
-  const backgroundImage = config.theme.backgroundImage
+  const { cabinetFrame, cabinetAccent, reelBackground } = config.theme
 
   return (
     <div
-      className="rounded-2xl p-[2px]"
+      className="p-[6px] rounded-2xl"
       style={{
-        background: 'linear-gradient(180deg, #d4a052 0%, #f0d080 40%, #d4a052 60%, #a07030 100%)',
-        boxShadow: '0 0 20px rgba(212, 160, 82, 0.3), inset 0 0 10px rgba(240, 208, 128, 0.2)',
+        background: cabinetFrame || 'linear-gradient(180deg, #d4a052 0%, #f0d080 40%, #d4a052 60%, #a07030 100%)',
+        boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -2px 4px rgba(0,0,0,0.5)',
       }}
     >
       <div
-        className="rounded-[14px] p-3 relative overflow-hidden"
+        className="rounded-[10px] overflow-hidden relative"
         style={{
-          backgroundColor: config.theme.reelBackground || '#0d0519',
+          backgroundColor: reelBackground || '#0d0519',
         }}
       >
-        {/* Background image overlay */}
-        {backgroundImage && (
-          <div
-            className="absolute inset-0 opacity-20 bg-cover bg-center"
-            style={{ backgroundImage: `url(${backgroundImage})` }}
-          />
-        )}
-
-        {/* Inner shadow for depth */}
-        <div
-          className="absolute inset-0 pointer-events-none rounded-[14px]"
-          style={{
-            boxShadow: 'inset 0 4px 12px rgba(0,0,0,0.5), inset 0 -2px 8px rgba(0,0,0,0.3)',
-          }}
-        />
-
         <div className="relative">
           <div
-            className="grid gap-1 relative z-10"
+            className="grid relative z-10"
             style={{
               gridTemplateColumns: `repeat(${config.reels}, 1fr)`,
+              gap: 0,
             }}
             role="img"
             aria-label="Slot machine reels"
           >
             {Array.from({ length: config.reels }, (_, reelIdx) => (
-              <ReelStrip
+              <div
                 key={reelIdx}
-                symbols={config.symbols}
-                visibleSymbolIds={getVisibleIds(reelIdx)}
-                spinning={spinning}
-                stopDelay={800 + reelIdx * 200}
-                highlightedPositions={winPositions[reelIdx]}
-                onStop={handleReelStop}
-              />
+                style={reelIdx < config.reels - 1 ? {
+                  borderRight: `1px solid ${cabinetAccent || '#d4a052'}15`,
+                } : undefined}
+              >
+                <ReelStrip
+                  symbols={config.symbols}
+                  visibleSymbolIds={getVisibleIds(reelIdx)}
+                  spinning={spinning}
+                  stopDelay={800 + reelIdx * 200}
+                  highlightedPositions={winPositions[reelIdx]}
+                  onStop={handleReelStop}
+                  reelBackground={reelBackground}
+                  accentColor={cabinetAccent}
+                />
+              </div>
             ))}
           </div>
 

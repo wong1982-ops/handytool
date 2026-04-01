@@ -11,9 +11,11 @@ interface ReelStripProps {
   stopDelay: number
   highlightedPositions: number[]
   onStop?: () => void
+  reelBackground?: string
+  accentColor?: string
 }
 
-export function ReelStrip({ symbols, visibleSymbolIds, spinning, stopDelay, highlightedPositions, onStop }: ReelStripProps) {
+export function ReelStrip({ symbols, visibleSymbolIds, spinning, stopDelay, highlightedPositions, onStop, reelBackground, accentColor }: ReelStripProps) {
   const [phase, setPhase] = useState<'idle' | 'spinning' | 'landing'>('idle')
   const containerRef = useRef<HTMLDivElement>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -59,18 +61,19 @@ export function ReelStrip({ symbols, visibleSymbolIds, spinning, stopDelay, high
     }
   }, [spinning]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const stripStyle = reelBackground ? { backgroundColor: reelBackground } : undefined
+
   // Idle: show 3 result symbols
   if (phase === 'idle') {
     return (
-      <div ref={containerRef} className="flex flex-col gap-1">
+      <div ref={containerRef} className="flex flex-col" style={stripStyle}>
         {finalSymbols.map((sym, row) => (
           <SymbolCell
             key={`${row}-${sym.id}`}
             icon={sym.icon}
             imagePath={sym.imagePath}
             highlighted={highlightedPositions.includes(row)}
-            isWild={sym.isWild}
-            isScatter={sym.isScatter}
+            accentColor={accentColor}
           />
         ))}
       </div>
@@ -87,7 +90,7 @@ export function ReelStrip({ symbols, visibleSymbolIds, spinning, stopDelay, high
 
   if (phase === 'landing') {
     return (
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col" style={stripStyle}>
         {stripSymbols.map((sym, i) => (
           <div
             key={i}
@@ -102,11 +105,11 @@ export function ReelStrip({ symbols, visibleSymbolIds, spinning, stopDelay, high
 
   // Spinning: overflow-hidden viewport, CSS keyframe scrolls the strip
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col" style={stripStyle}>
       {/* Invisible sizer to keep container height = 3 cells */}
       <div className="relative overflow-hidden">
         {/* Sizer */}
-        <div className="invisible flex flex-col gap-1">
+        <div className="invisible flex flex-col">
           {[0, 1, 2].map(i => (
             <div key={i} className="w-full aspect-square" />
           ))}
@@ -114,7 +117,7 @@ export function ReelStrip({ symbols, visibleSymbolIds, spinning, stopDelay, high
 
         {/* Scrolling strip — CSS animation on GPU */}
         <div
-          className="absolute inset-x-0 top-0 flex flex-col gap-1"
+          className="absolute inset-x-0 top-0 flex flex-col"
           style={{
             animation: `slotScroll 0.3s linear infinite`,
             willChange: 'transform',
@@ -140,21 +143,17 @@ export function ReelStrip({ symbols, visibleSymbolIds, spinning, stopDelay, high
 function SpinCell({ sym }: { sym: SymbolConfig }) {
   return (
     <div
-      className="w-full aspect-square flex items-center justify-center rounded-lg relative overflow-hidden shrink-0"
-      style={{
-        backgroundColor: '#1a0a2e',
-        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)',
-      }}
+      className="w-full aspect-square relative overflow-hidden shrink-0"
     >
       {sym.imagePath ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={sym.imagePath}
           alt=""
-          className="absolute inset-0 w-full h-full object-contain p-1"
+          className="absolute inset-0 w-full h-full object-cover"
         />
       ) : (
-        <span className="text-3xl sm:text-4xl">{sym.icon}</span>
+        <span className="absolute inset-0 flex items-center justify-center text-3xl sm:text-4xl">{sym.icon}</span>
       )}
     </div>
   )
