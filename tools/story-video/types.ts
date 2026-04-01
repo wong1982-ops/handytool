@@ -11,6 +11,7 @@ export type ArtStyle = 'cartoon' | 'anime' | 'pixar' | 'watercolor'
 export type DurationPreset = 'auto' | 'short' | 'medium' | 'long'
 
 export type PipelineStep =
+  | 'characterLock'
   | 'script'
   | 'scenes'
   | 'voices'
@@ -58,6 +59,7 @@ export interface VideoProvider {
   generateScene(params: {
     scene: ScreenplayScene
     artStyle: ArtStyle
+    characterBible?: CharacterBible
     characterPortraits?: { name: string; imageUrl: string }[]
     previousSceneUrl?: string
   }): Promise<Buffer>
@@ -90,6 +92,8 @@ export interface StoryVideoJob {
     finalVideo?: string
     thumbnail?: string
   }
+  character_bible?: CharacterBible
+  video_strategy?: 'full-story' | 'scene-by-scene'
   credits_charged: number
   error: string | null
   created_at: string
@@ -101,6 +105,7 @@ export interface StoryVideoJob {
 // ──────────────────────────────────────────────────────────────
 
 export const PIPELINE_STEPS: PipelineStep[] = [
+  'characterLock',
   'script',
   'scenes',
   'voices',
@@ -111,6 +116,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
 ]
 
 export const STEP_LABELS: Record<PipelineStep, string> = {
+  characterLock: 'Character Lock',
   script: 'Screenplay',
   scenes: 'Scene Generation',
   voices: 'Character Voices',
@@ -164,6 +170,25 @@ export const CREDIT_TIERS: Record<Exclude<DurationPreset, 'auto'>, number> = {
  * Estimate credits for a story video job.
  * 'auto' resolves to short/medium/long based on page count.
  */
+// ──────────────────────────────────────────────────────────────
+// Character Bible (for consistency across scenes)
+// ──────────────────────────────────────────────────────────────
+
+export interface CharacterRef {
+  name: string
+  portraitUrl: string       // guaranteed image reference
+  appearancePrompt: string  // detailed text description of appearance
+  role: string
+}
+
+export interface CharacterBible {
+  characters: CharacterRef[]
+}
+
+// ──────────────────────────────────────────────────────────────
+// Helpers
+// ──────────────────────────────────────────────────────────────
+
 export function estimateCredits(pageCount: number, duration: DurationPreset): number {
   if (duration === 'auto') {
     if (pageCount <= 8) return CREDIT_TIERS.short
@@ -177,6 +202,7 @@ export function estimateCredits(pageCount: number, duration: DurationPreset): nu
  * Default step statuses for a new job.
  */
 export const DEFAULT_STEPS: Record<PipelineStep, StepStatus> = {
+  characterLock: 'pending',
   script: 'pending',
   scenes: 'pending',
   voices: 'pending',

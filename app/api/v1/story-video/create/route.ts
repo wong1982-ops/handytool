@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       provider: resolvedProvider,
       target_duration: resolvedDuration,
       status: 'pending',
-      current_step: 'script',
+      current_step: 'characterLock',
       steps: defaultSteps,
       scene_status: [],
       artifacts: {},

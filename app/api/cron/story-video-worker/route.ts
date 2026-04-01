@@ -10,10 +10,12 @@ import type {
   ArtStyle,
   DurationPreset,
   VideoProviderType,
+  CharacterBible,
 } from '@/tools/story-video/types'
 import { PIPELINE_STEPS } from '@/tools/story-video/types'
 import { generateScreenplay } from '@/tools/story-video/screenplay-generator'
 import { getProvider } from '@/tools/story-video/providers'
+import { GeminiVideoProvider, generateCharacterPortrait, describeCharacterAppearance } from '@/tools/story-video/providers/gemini'
 import {
   generateVoices,
   generateNarration,
@@ -55,6 +57,8 @@ interface StoryVideoJobRow {
   screenplay: Screenplay | null
   scene_status: SceneStatus[]
   artifacts: StoryVideoJob['artifacts']
+  character_bible?: CharacterBible
+  video_strategy?: 'full-story' | 'scene-by-scene'
   error: string | null
 }
 
@@ -96,7 +100,7 @@ export async function GET(request: NextRequest) {
   const { data: jobs, error } = await supabase
     .from('story_video_jobs')
     .select(
-      'id, user_id, book_id, book_title, art_style, provider, target_duration, status, current_step, steps, screenplay, scene_status, artifacts, error',
+      'id, user_id, book_id, book_title, art_style, provider, target_duration, status, current_step, steps, screenplay, scene_status, artifacts, character_bible, video_strategy, error',
     )
     .in('status', ['pending', 'processing'])
     .order('created_at', { ascending: true })
@@ -131,6 +135,14 @@ export async function GET(request: NextRequest) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function processJob(supabase: any, job: StoryVideoJobRow) {
   const steps = { ...job.steps }
+
+  // 0. Character Lock step must complete first
+  if (steps.characterLock === 'pending') {
+    await executeCharacterLock(supabase, job)
+    return
+  }
+
+  if (steps.characterLock !== 'done') return // characterLock still running or failed
 
   // 1. Script step must complete first
   if (steps.script === 'pending') {
@@ -170,7 +182,7 @@ async function processJob(supabase: any, job: StoryVideoJobRow) {
   if (!freshJob) return
 
   const freshSteps = freshJob.steps as Record<PipelineStep, string>
-  const preAssemblySteps: PipelineStep[] = ['script', 'scenes', 'voices', 'narration', 'sfx', 'music']
+  const preAssemblySteps: PipelineStep[] = ['characterLock', 'script', 'scenes', 'voices', 'narration', 'sfx', 'music']
   const allPreAssemblyDone = preAssemblySteps.every((s) => freshSteps[s] === 'done')
 
   if (allPreAssemblyDone && freshSteps.assembly === 'pending') {
@@ -189,6 +201,88 @@ async function processJob(supabase: any, job: StoryVideoJobRow) {
       await updateJob(supabase, job.id, { status: 'complete', current_step: null })
       console.log(`[story-video-worker] Job ${job.id} — all steps done, marked complete`)
     }
+  }
+}
+
+// ---------- Step: Character Lock ----------
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function executeCharacterLock(supabase: any, job: StoryVideoJobRow) {
+  await updateJob(supabase, job.id, {
+    status: 'processing',
+    current_step: 'characterLock',
+    steps: { ...job.steps, characterLock: 'processing' },
+  })
+
+  try {
+    // Fetch book data for character info
+    const { data: bookRow, error: bookError } = await supabase
+      .from('books')
+      .select('data')
+      .eq('id', job.book_id)
+      .single()
+
+    if (bookError || !bookRow?.data) {
+      throw new Error(`Failed to fetch book data: ${bookError?.message || 'No data found'}`)
+    }
+
+    const book = bookRow.data as any
+    const characterBible: CharacterBible = { characters: [] }
+
+    for (const char of (book.characters || [])) {
+      let portraitUrl = char.portraitUrl || ''
+
+      // Generate portrait if missing
+      if (!portraitUrl) {
+        try {
+          const portraitBuffer = await generateCharacterPortrait(
+            char.name,
+            char.description || char.role || 'character',
+            job.art_style
+          )
+          // Upload to R2 storage
+          portraitUrl = await uploadToR2(
+            `story-video/${job.id}/characters/${char.name.replace(/\s+/g, '-')}.png`,
+            portraitBuffer,
+            'image/png'
+          )
+        } catch (e: any) {
+          console.warn(`[story-video] Failed to generate portrait for ${char.name}: ${e.message}`)
+        }
+      }
+
+      // Generate detailed appearance description
+      const appearancePrompt = await describeCharacterAppearance(
+        char.description || '',
+        char.name,
+        char.role || 'character',
+        job.art_style
+      )
+
+      characterBible.characters.push({
+        name: char.name,
+        portraitUrl,
+        appearancePrompt,
+        role: char.role || 'character',
+      })
+    }
+
+    // Store character bible in job and advance to script step
+    await updateJob(supabase, job.id, {
+      character_bible: characterBible,
+      current_step: 'script',
+      steps: { ...job.steps, characterLock: 'done' },
+    })
+
+    console.log(`[story-video-worker] Job ${job.id} characterLock done — ${characterBible.characters.length} characters`)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    await updateJob(supabase, job.id, {
+      status: 'failed',
+      steps: { ...job.steps, characterLock: 'failed' },
+      error: message,
+    })
+    console.error(`[story-video-worker] Job ${job.id} characterLock failed:`, message)
   }
 }
 
@@ -256,6 +350,54 @@ async function executeScript(supabase: any, job: StoryVideoJobRow) {
 async function executeScenes(supabase: any, job: StoryVideoJobRow) {
   if (!job.screenplay) return
 
+  // Try full-story generation first (only on first invocation, before any scenes are processed)
+  if (job.video_strategy !== 'scene-by-scene') {
+    const allPending = job.scene_status.every((s) => s.status === 'pending')
+    if (allPending) {
+      const geminiProvider = new GeminiVideoProvider()
+      const fullVideo = await geminiProvider.generateFullStoryVideo({
+        screenplay: job.screenplay,
+        characterBible: job.character_bible || { characters: [] },
+        artStyle: job.art_style,
+      })
+
+      if (fullVideo) {
+        // Upload and use as the single video
+        const videoUrl = await uploadToR2(
+          `story-video/${job.id}/full-story.mp4`,
+          fullVideo,
+          'video/mp4'
+        )
+        // Mark all scenes as done with the full video URL
+        const fullSceneStatus: SceneStatus[] = job.screenplay.scenes.map((_, i) => ({
+          index: i,
+          status: 'done' as const,
+          clipUrl: videoUrl,
+        }))
+
+        // Re-read latest steps
+        const { data: latestJob } = await supabase
+          .from('story_video_jobs')
+          .select('steps')
+          .eq('id', job.id)
+          .single()
+        const latestSteps = latestJob?.steps || job.steps
+
+        await updateJob(supabase, job.id, {
+          scene_status: fullSceneStatus,
+          video_strategy: 'full-story',
+          current_step: 'voices',
+          steps: { ...latestSteps, scenes: 'done' },
+        })
+        console.log(`[story-video-worker] Job ${job.id} full-story video generated successfully`)
+        return
+      } else {
+        // Mark as scene-by-scene and continue with existing logic
+        await updateJob(supabase, job.id, { video_strategy: 'scene-by-scene' })
+      }
+    }
+  }
+
   const sceneStatus = [...job.scene_status]
   const pendingScene = sceneStatus.find((s) => s.status === 'pending')
   const failedScene = sceneStatus.find((s) => s.status === 'failed')
@@ -322,6 +464,7 @@ async function executeScenes(supabase: any, job: StoryVideoJobRow) {
     const buffer = await provider.generateScene({
       scene: sceneData,
       artStyle: job.art_style,
+      characterBible: job.character_bible,
       characterPortraits,
       previousSceneUrl,
     })
@@ -478,6 +621,7 @@ async function executeAssembly(
   await updateJob(supabase, jobId, {
     current_step: 'assembly',
     steps: {
+      characterLock: 'done',
       script: 'done',
       scenes: 'done',
       voices: 'done',
@@ -500,6 +644,7 @@ async function executeAssembly(
       status: 'complete',
       current_step: null,
       steps: {
+        characterLock: 'done',
         script: 'done',
         scenes: 'done',
         voices: 'done',
@@ -521,6 +666,7 @@ async function executeAssembly(
     await updateJob(supabase, jobId, {
       status: 'failed',
       steps: {
+        characterLock: 'done',
         script: 'done',
         scenes: 'done',
         voices: 'done',
