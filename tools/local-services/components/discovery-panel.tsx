@@ -9,10 +9,10 @@ import { SearchBar } from './search-bar'
 import { FavouritesTab } from './favourites-tab'
 import { RecentTab } from './recent-tab'
 import { CategoryGrid } from './category-grid'
-import type { ServiceResult } from '../local-services-types'
+import type { MergedResult } from '../local-services-types'
 
 /** Professional compact detail card (Google Maps / Yelp style) */
-function CompactDetail({ result, onClose }: { result: ServiceResult; onClose: () => void }) {
+function CompactDetail({ result, onClose }: { result: MergedResult; onClose: () => void }) {
   const { state, dispatch } = useLocalServices()
   const [details, setDetails] = useState<{ hours: any; reviews: any[]; photos?: string[] } | null>(null)
   const isFavourite = state.favourites.some(f => f.id === result.id)

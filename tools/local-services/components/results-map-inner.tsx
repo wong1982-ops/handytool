@@ -1,14 +1,14 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import type { ServiceResult } from '../local-services-types'
+import type { MergedResult } from '../local-services-types'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 interface ResultsMapInnerProps {
   userLat: number
   userLng: number
-  results: ServiceResult[]
+  results: MergedResult[]
   selectedPlaceId: string | null
   radius: number
   onSelectPlace: (id: string) => void
@@ -140,6 +140,9 @@ export default function ResultsMapInner({
     const markerLatLngs: L.LatLngExpression[] = [[userLat, userLng]]
 
     results.forEach((r) => {
+      // Skip results with null coordinates
+      if (r.lat == null || r.lng == null) return
+
       const isSelected = r.id === selectedPlaceId
       const color = isSelected ? '#EF4444' : '#3D6AF2'
       const size = isSelected ? 32 : 24
@@ -178,8 +181,10 @@ export default function ResultsMapInner({
   useEffect(() => {
     if (!mapRef.current || !selectedPlaceId) return
     const result = results.find(r => r.id === selectedPlaceId)
-    if (result) {
-      mapRef.current.flyTo([result.lat, result.lng], 16, { duration: 0.6 })
+    const lat = result?.lat
+    const lng = result?.lng
+    if (lat != null && lng != null) {
+      mapRef.current.flyTo([lat, lng], 16, { duration: 0.6 })
     }
   }, [selectedPlaceId, results])
 

@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { apiSuccess, apiError } from '@/lib/api/response'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import type { MergedResult } from '@/tools/local-services/local-services-types'
 
 const GOOGLE_PLACES_API_KEY = (process.env.GOOGLE_PLACES_API_KEY || '').trim()
 
@@ -11,6 +12,178 @@ const schema = z.object({
   category: z.string().min(1),
   radius: z.number().min(100).max(50000),
 })
+
+/** Compute distance in meters between two lat/lng points */
+function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const dLat = (lat2 - lat1) * 111320
+  const dLng = (lng2 - lng1) * 111320 * Math.cos(lat1 * Math.PI / 180)
+  return Math.round(Math.sqrt(dLat * dLat + dLng * dLng))
+}
+
+/** Fetch community providers from Supabase and compute ratings */
+async function fetchCommunityProviders(
+  category: string,
+  lat: number,
+  lng: number,
+  radius: number,
+): Promise<MergedResult[]> {
+  try {
+    const supabase = await createClient()
+
+    // Fetch providers matching category
+    const { data: providers, error } = await supabase
+      .from('community_providers')
+      .select('*')
+      .eq('category_id', category)
+      .eq('status', 'active')
+      .eq('is_approved', true)
+
+    if (error || !providers?.length) return []
+
+    // Fetch aggregated ratings for all matched providers
+    const providerIds = providers.map((p: any) => p.id)
+    const { data: reviews } = await supabase
+      .from('community_reviews')
+      .select('provider_id, rating')
+      .in('provider_id', providerIds)
+      .eq('is_flagged', false)
+
+    // Build rating map
+    const ratingMap: Record<string, { sum: number; count: number }> = {}
+    for (const r of reviews || []) {
+      if (!ratingMap[r.provider_id]) ratingMap[r.provider_id] = { sum: 0, count: 0 }
+      ratingMap[r.provider_id].sum += r.rating
+      ratingMap[r.provider_id].count += 1
+    }
+
+    // Map to MergedResult, filtering by distance or including if service_area only
+    const results: MergedResult[] = []
+
+    for (const p of providers) {
+      let distance: number | null = null
+
+      if (p.lat != null && p.lng != null) {
+        distance = haversineMeters(lat, lng, p.lat, p.lng)
+        // Skip if provider has location but is outside radius
+        if (distance > radius) continue
+      }
+      // If provider has no lat/lng, include based on service_area (v1: include all for the category)
+
+      const rm = ratingMap[p.id]
+      const avgRating = rm ? Math.round((rm.sum / rm.count) * 10) / 10 : null
+      const reviewCount = rm?.count ?? 0
+
+      results.push({
+        id: p.id,
+        source: 'community',
+        name: p.name,
+        address: p.address || '',
+        lat: p.lat,
+        lng: p.lng,
+        distance,
+        phone: p.phone,
+        website: p.website,
+        rating: avgRating,
+        reviewCount,
+        hours: null,
+        isOpenNow: false,
+        category: p.category_id,
+        photoUrl: p.profile_photo,
+        // Community-only fields
+        isVerified: p.is_verified,
+        description: p.description,
+        pricingInfo: p.pricing_info,
+        availability: p.availability,
+        serviceArea: p.service_area,
+        socialLinks: p.social_links,
+        portfolioPhotos: p.portfolio_photos,
+        profilePhoto: p.profile_photo,
+      })
+    }
+
+    return results
+  } catch (e) {
+    console.error('Community provider fetch error:', e)
+    return []
+  }
+}
+
+/** Fetch Google Places results */
+async function fetchGooglePlaces(
+  category: string,
+  lat: number,
+  lng: number,
+  radius: number,
+): Promise<MergedResult[]> {
+  if (!GOOGLE_PLACES_API_KEY) {
+    return getMockResults(lat, lng, category, radius)
+  }
+
+  const url = 'https://places.googleapis.com/v1/places:searchNearby'
+
+  const requestBody = {
+    includedTypes: [mapCategoryToGoogleType(category)],
+    maxResultCount: 20,
+    locationRestriction: {
+      circle: {
+        center: { latitude: lat, longitude: lng },
+        radius,
+      },
+    },
+  }
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+      'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.internationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.currentOpeningHours,places.regularOpeningHours,places.businessStatus,places.primaryType,places.photos',
+    },
+    body: JSON.stringify(requestBody),
+  })
+
+  if (!res.ok) {
+    const errText = await res.text()
+    console.error('Google Places error:', errText)
+    throw new Error('Google Places API error')
+  }
+
+  const data = await res.json()
+  return (data.places || []).map((place: any) => {
+    const distance = haversineMeters(lat, lng, place.location?.latitude ?? lat, place.location?.longitude ?? lng)
+
+    let hours = null
+    if (place.regularOpeningHours?.weekdayDescriptions) {
+      hours = {
+        display: place.regularOpeningHours.weekdayDescriptions,
+        isOpenNow: place.currentOpeningHours?.openNow ?? false,
+      }
+    }
+
+    let photoUrl = null
+    if (place.photos?.[0]?.name) {
+      photoUrl = `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxHeightPx=200&maxWidthPx=200&key=${GOOGLE_PLACES_API_KEY}`
+    }
+
+    return {
+      id: place.id || '',
+      source: 'google' as const,
+      name: place.displayName?.text || '',
+      address: place.formattedAddress || '',
+      lat: place.location?.latitude || lat,
+      lng: place.location?.longitude || lng,
+      distance,
+      phone: place.internationalPhoneNumber || null,
+      website: place.websiteUri || null,
+      rating: place.rating || null,
+      reviewCount: place.userRatingCount || 0,
+      hours,
+      isOpenNow: place.currentOpeningHours?.openNow ?? false,
+      category: place.primaryType || category,
+      photoUrl,
+    }
+  })
+}
 
 export async function POST(request: NextRequest) {
   let body: unknown
@@ -44,93 +217,34 @@ export async function POST(request: NextRequest) {
     }
   } catch {}
 
-  // Google Places Nearby Search (New)
-  if (!GOOGLE_PLACES_API_KEY) {
-    return apiSuccess({ results: getMockResults(lat, lng, category, radius), cached: false, cacheAge: 0 })
-  }
-
   try {
-    // Use Google Places Nearby Search (New) API
-    const url = 'https://places.googleapis.com/v1/places:searchNearby'
+    // Fetch community and Google results in parallel
+    const [communityResults, googleResults] = await Promise.all([
+      fetchCommunityProviders(category, lat, lng, radius),
+      fetchGooglePlaces(category, lat, lng, radius),
+    ])
 
-    const requestBody = {
-      includedTypes: [mapCategoryToGoogleType(category)],
-      maxResultCount: 20,
-      locationRestriction: {
-        circle: {
-          center: { latitude: lat, longitude: lng },
-          radius: radius,
-        },
-      },
-    }
+    // Merge: community first, then Google, sorted by distance
+    const merged: MergedResult[] = [...communityResults, ...googleResults]
+      .sort((a, b) => {
+        // Providers with distance come before those without
+        if (a.distance == null && b.distance == null) return 0
+        if (a.distance == null) return 1
+        if (b.distance == null) return -1
+        return a.distance - b.distance
+      })
 
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
-        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.internationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.currentOpeningHours,places.regularOpeningHours,places.businessStatus,places.primaryType,places.photos',
-      },
-      body: JSON.stringify(requestBody),
-    })
-
-    if (!res.ok) {
-      const errText = await res.text()
-      console.error('Google Places error:', errText)
-      return apiError('Search failed', 'SEARCH_ERROR', 502)
-    }
-
-    const data = await res.json()
-    const results = (data.places || []).map((place: any) => {
-      // Calculate distance from search point
-      const dLat = (place.location?.latitude - lat) * 111320
-      const dLng = (place.location?.longitude - lng) * 111320 * Math.cos(lat * Math.PI / 180)
-      const distance = Math.round(Math.sqrt(dLat * dLat + dLng * dLng))
-
-      // Extract opening hours display
-      let hours = null
-      if (place.regularOpeningHours?.weekdayDescriptions) {
-        hours = {
-          display: place.regularOpeningHours.weekdayDescriptions,
-          isOpenNow: place.currentOpeningHours?.openNow ?? false,
-        }
-      }
-
-      // Get photo URL
-      let photoUrl = null
-      if (place.photos?.[0]?.name) {
-        photoUrl = `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxHeightPx=200&maxWidthPx=200&key=${GOOGLE_PLACES_API_KEY}`
-      }
-
-      return {
-        id: place.id || '',
-        name: place.displayName?.text || '',
-        address: place.formattedAddress || '',
-        lat: place.location?.latitude || lat,
-        lng: place.location?.longitude || lng,
-        distance,
-        phone: place.internationalPhoneNumber || null,
-        website: place.websiteUri || null,
-        rating: place.rating || null,
-        ratingCount: place.userRatingCount || 0,
-        hours,
-        isOpenNow: place.currentOpeningHours?.openNow ?? false,
-        category: place.primaryType || category,
-        photoUrl,
-      }
-    }).sort((a: any, b: any) => a.distance - b.distance)
-
-    // Cache results
+    // Cache merged results
     try {
       const supabase = await createClient()
       await supabase.from('local_services_cache').upsert({
         cache_key: cacheKey,
-        results,
+        results: merged,
         created_at: new Date().toISOString(),
       })
     } catch {}
 
-    return apiSuccess({ results, cached: false, cacheAge: 0 })
+    return apiSuccess({ results: merged, cached: false, cacheAge: 0 })
   } catch (e) {
     console.error('Search error:', e)
     return apiError('Search failed', 'SEARCH_ERROR', 500)
@@ -144,21 +258,20 @@ function mapCategoryToGoogleType(category: string): string {
     '11178': 'plumber',
     '11176': 'electrician',
     '11057': 'hair_salon',
-    '11182': 'landscaper',          // Not exact — closest match
-    '11174': 'house_cleaning',      // Not exact
+    '11182': 'landscaper',
+    '11174': 'house_cleaning',
     '11183': 'locksmith',
     '11029': 'car_repair',
     '15014': 'doctor',
     '15010': 'dentist',
     '15022': 'pharmacy',
     '15048': 'veterinary_care',
-    '12056': 'child_care',          // Not exact
+    '12056': 'child_care',
     '13065': 'restaurant',
     '13032': 'cafe',
     '17069': 'supermarket',
     '18021': 'gym',
     '11185': 'laundry',
-    // Fallback: use the category string directly as a Google type
     plumber: 'plumber',
     electrician: 'electrician',
     hairdresser: 'hair_salon',
@@ -180,14 +293,15 @@ function mapCategoryToGoogleType(category: string): string {
   return map[category] || category
 }
 
-// Mock data for development
-function getMockResults(lat: number, lng: number, category: string, radius: number) {
+// Mock data for development (returns MergedResult[])
+function getMockResults(lat: number, lng: number, category: string, radius: number): MergedResult[] {
   const names = ['Smith & Sons', 'City Pro Services', 'Quick Fix', 'Premier Care', 'Top Quality', 'Express Service']
   const streets = ['Queen St', 'High St', 'Main Rd', 'Park Ave', 'Victoria St', 'Albert St']
 
   return names.map((name, i) => ({
     id: `mock-${category}-${i}`,
-    name: `${name}`,
+    source: 'google' as const,
+    name,
     address: `${100 + i * 20} ${streets[i % streets.length]}`,
     lat: lat + (Math.random() - 0.5) * 0.01,
     lng: lng + (Math.random() - 0.5) * 0.01,
@@ -195,7 +309,7 @@ function getMockResults(lat: number, lng: number, category: string, radius: numb
     phone: `+64 9 ${100 + i}${200 + i} ${3000 + i}`,
     website: null,
     rating: Math.round((3 + Math.random() * 2) * 10) / 10,
-    ratingCount: Math.floor(Math.random() * 50),
+    reviewCount: Math.floor(Math.random() * 50),
     hours: {
       display: ['Monday: 8:00 AM – 5:30 PM', 'Tuesday: 8:00 AM – 5:30 PM', 'Wednesday: 8:00 AM – 5:30 PM', 'Thursday: 8:00 AM – 5:30 PM', 'Friday: 8:00 AM – 5:30 PM', 'Saturday: 9:00 AM – 1:00 PM', 'Sunday: Closed'],
       isOpenNow: Math.random() > 0.3,
@@ -203,5 +317,5 @@ function getMockResults(lat: number, lng: number, category: string, radius: numb
     isOpenNow: Math.random() > 0.3,
     category,
     photoUrl: null,
-  })).sort((a, b) => a.distance - b.distance)
+  })).sort((a, b) => (a.distance ?? 0) - (b.distance ?? 0))
 }

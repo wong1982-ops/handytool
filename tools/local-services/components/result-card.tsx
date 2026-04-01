@@ -1,9 +1,9 @@
 'use client'
 
-import type { ServiceResult } from '../local-services-types'
+import type { MergedResult } from '../local-services-types'
 
 interface ResultCardProps {
-  result: ServiceResult
+  result: MergedResult
   isSelected: boolean
   isFavourite: boolean
   onSelect: () => void
@@ -11,9 +11,11 @@ interface ResultCardProps {
 }
 
 export function ResultCard({ result, isSelected, isFavourite, onSelect, onToggleFavourite }: ResultCardProps) {
-  const distanceLabel = result.distance >= 1000
-    ? `${(result.distance / 1000).toFixed(1)}km away`
-    : `${result.distance}m away`
+  const distanceLabel = result.distance != null
+    ? result.distance >= 1000
+      ? `${(result.distance / 1000).toFixed(1)}km away`
+      : `${result.distance}m away`
+    : null
 
   return (
     <button
@@ -56,13 +58,15 @@ export function ResultCard({ result, isSelected, isFavourite, onSelect, onToggle
           )}
         </div>
         <div className="flex items-center justify-between mt-1.5">
-          <span className="text-[11px] text-slate-400 flex items-center gap-1">
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-            </svg>
-            {distanceLabel}
-          </span>
+          {distanceLabel && (
+            <span className="text-[11px] text-slate-400 flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              </svg>
+              {distanceLabel}
+            </span>
+          )}
           <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
             result.isOpenNow
               ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'

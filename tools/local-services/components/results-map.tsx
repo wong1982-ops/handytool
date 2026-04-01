@@ -2,12 +2,12 @@
 
 import dynamic from 'next/dynamic'
 import { useLocalServices } from '../local-services-provider'
-import type { ServiceResult, RadiusOption } from '../local-services-types'
+import type { MergedResult, RadiusOption } from '../local-services-types'
 
 interface MapInnerProps {
   userLat: number
   userLng: number
-  results: ServiceResult[]
+  results: MergedResult[]
   selectedPlaceId: string | null
   radius: RadiusOption
   onSelectPlace: (id: string) => void

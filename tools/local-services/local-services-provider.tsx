@@ -4,7 +4,7 @@ import {
   createContext, useContext, useReducer, useEffect, useMemo, useCallback,
   type ReactNode,
 } from 'react'
-import type { ServiceResult, UserLocation, TabId, RadiusOption, RecentSearch } from './local-services-types'
+import type { MergedResult, UserLocation, TabId, RadiusOption, RecentSearch } from './local-services-types'
 import { en } from './i18n/en'
 import type { I18nStrings } from './i18n/en'
 
@@ -12,14 +12,14 @@ import type { I18nStrings } from './i18n/en'
 interface LocalServicesState {
   location: UserLocation | null
   locationLoading: boolean
-  results: ServiceResult[]
+  results: MergedResult[]
   resultsLoading: boolean
   activeCategory: string | null
   searchQuery: string
   radius: RadiusOption
   activeTab: TabId
   selectedPlaceId: string | null
-  favourites: ServiceResult[]
+  favourites: MergedResult[]
   recentSearches: RecentSearch[]
   showLocationModal: boolean
 }
@@ -28,15 +28,15 @@ interface LocalServicesState {
 type Action =
   | { type: 'SET_LOCATION'; payload: UserLocation }
   | { type: 'SET_LOCATION_LOADING'; payload: boolean }
-  | { type: 'SET_RESULTS'; payload: ServiceResult[] }
+  | { type: 'SET_RESULTS'; payload: MergedResult[] }
   | { type: 'SET_RESULTS_LOADING'; payload: boolean }
   | { type: 'SET_CATEGORY'; payload: string | null }
   | { type: 'SET_SEARCH_QUERY'; payload: string }
   | { type: 'SET_RADIUS'; payload: RadiusOption }
   | { type: 'SET_TAB'; payload: TabId }
   | { type: 'SET_SELECTED_PLACE'; payload: string | null }
-  | { type: 'SET_FAVOURITES'; payload: ServiceResult[] }
-  | { type: 'ADD_FAVOURITE'; payload: ServiceResult }
+  | { type: 'SET_FAVOURITES'; payload: MergedResult[] }
+  | { type: 'ADD_FAVOURITE'; payload: MergedResult }
   | { type: 'REMOVE_FAVOURITE'; payload: string }
   | { type: 'SET_RECENT'; payload: RecentSearch[] }
   | { type: 'ADD_RECENT'; payload: RecentSearch }

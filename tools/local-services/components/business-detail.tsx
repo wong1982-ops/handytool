@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { ServiceResult } from '../local-services-types'
+import type { MergedResult } from '../local-services-types'
 import { useLocalServices } from '../local-services-provider'
 
 interface BusinessDetailProps {
-  result: ServiceResult
+  result: MergedResult
   onBack: () => void
 }
 

@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { ServiceResult } from '../local-services-types'
+import type { MergedResult } from '../local-services-types'
 import { useLocalServices } from '../local-services-provider'
 
 interface ResultDetailProps {
-  result: ServiceResult
+  result: MergedResult
   isFavourite: boolean
   onClose: () => void
   onToggleFavourite: () => void
