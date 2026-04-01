@@ -352,7 +352,7 @@ export const tools: Tool[] = [
     color: 'from-red-500 to-yellow-500',
   },
   {
-    name: 'ServiceFinder',
+    name: 'Service Finder',
     href: '/tools/local-services',
     description: 'Find trusted local & community services',
     icon: (

@@ -38,7 +38,7 @@ export function FloatingSearch() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search ServiceFinder..."
+              placeholder="Search Service Finder..."
               className="w-full pl-11 pr-4 py-3 rounded-full bg-white shadow-lg text-sm text-slate-900 placeholder:text-slate-400 border-0 focus:ring-2 focus:ring-[var(--tk-color-primary-500)] outline-none"
             />
           </div>

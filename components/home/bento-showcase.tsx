@@ -662,7 +662,7 @@ const bentoItems = [
     ),
   },
   {
-    name: 'ServiceFinder',
+    name: 'Service Finder',
     description: 'Find trusted local & community services',
     href: '/tools/local-services',
     gridClass: '',
