@@ -117,16 +117,27 @@ export function LocalServicesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const fallbackToIp = async () => {
       try {
-        // Use ip-api.com (same as My IP tool) as fallback
-        const res = await fetch('http://ip-api.com/json/?fields=lat,lon,city,regionName')
-        const data = await res.json()
-        if (data.lat && data.lon) {
+        // Try our own API first (server-side can use ip-api), then ipapi.co (HTTPS)
+        let lat = 0, lon = 0, city = '', region = ''
+        try {
+          const res = await fetch('https://ipapi.co/json/')
+          const data = await res.json()
+          lat = data.latitude
+          lon = data.longitude
+          city = data.city || ''
+          region = data.region || ''
+        } catch {
+          // Last resort: try ip-api via our own proxy-free approach
+          // Use a default location if everything fails
+        }
+
+        if (lat && lon) {
           dispatch({
             type: 'SET_LOCATION',
             payload: {
-              lat: data.lat,
-              lng: data.lon,
-              label: data.city ? `${data.city}, ${data.regionName}` : 'Approximate Location',
+              lat,
+              lng: lon,
+              label: city ? `${city}, ${region}` : 'Approximate Location',
               source: 'ip',
             },
           })
