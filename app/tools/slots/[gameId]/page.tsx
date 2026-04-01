@@ -117,9 +117,9 @@ function GamePlayer({ config }: { config: SlotGameConfig }) {
   const BonusComponent = BONUS_COMPONENTS[config.bonusConfig.type]
 
   return (
-    <div className="fixed inset-0 bg-black flex items-center justify-center">
+    <div className="fixed inset-0 bg-black flex items-center justify-center z-[70]">
       {/* Portrait container */}
-      <div className="w-[420px] max-w-full h-[100dvh] relative overflow-hidden">
+      <div className="w-full sm:w-[420px] lg:w-[480px] max-w-full h-[100dvh] relative overflow-hidden">
         {/* Background */}
         {config.theme.backgroundImage && (
           <div
