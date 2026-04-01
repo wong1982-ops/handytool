@@ -113,28 +113,68 @@ export function LocalServicesProvider({ children }: { children: ReactNode }) {
     try { localStorage.setItem('ls_recent', JSON.stringify(state.recentSearches)) } catch {}
   }, [state.recentSearches])
 
-  // Detect location on mount
+  // Detect location on mount — try GPS first, then IP fallback
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
+    const fallbackToIp = async () => {
+      try {
+        // Use ip-api.com (same as My IP tool) as fallback
+        const res = await fetch('http://ip-api.com/json/?fields=lat,lon,city,regionName')
+        const data = await res.json()
+        if (data.lat && data.lon) {
           dispatch({
             type: 'SET_LOCATION',
             payload: {
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-              label: 'Current Location',
-              source: 'gps',
+              lat: data.lat,
+              lng: data.lon,
+              label: data.city ? `${data.city}, ${data.regionName}` : 'Approximate Location',
+              source: 'ip',
             },
           })
+          return
+        }
+      } catch {}
+      dispatch({ type: 'SET_LOCATION_LOADING', payload: false })
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          // Reverse geocode to get a label
+          fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&zoom=14`)
+            .then(r => r.json())
+            .then(data => {
+              const label = data.address?.suburb || data.address?.city || data.address?.town || 'Current Location'
+              dispatch({
+                type: 'SET_LOCATION',
+                payload: {
+                  lat: pos.coords.latitude,
+                  lng: pos.coords.longitude,
+                  label,
+                  source: 'gps',
+                },
+              })
+            })
+            .catch(() => {
+              dispatch({
+                type: 'SET_LOCATION',
+                payload: {
+                  lat: pos.coords.latitude,
+                  lng: pos.coords.longitude,
+                  label: 'Current Location',
+                  source: 'gps',
+                },
+              })
+            })
         },
         () => {
-          dispatch({ type: 'SET_LOCATION_LOADING', payload: false })
+          // GPS denied or failed — fallback to IP
+          fallbackToIp()
         },
         { enableHighAccuracy: true, timeout: 10000 }
       )
     } else {
-      dispatch({ type: 'SET_LOCATION_LOADING', payload: false })
+      // No geolocation API — fallback to IP
+      fallbackToIp()
     }
   }, [])
 
