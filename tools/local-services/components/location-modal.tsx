@@ -48,12 +48,12 @@ export function LocationModal() {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800">
+      <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
         {/* Close button */}
         <button
           type="button"
           onClick={handleClose}
-          className="absolute right-3 top-3 rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/10 dark:hover:text-gray-300"
+          className="absolute right-3 top-3 rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600:bg-white/10:text-gray-300"
           aria-label="Close"
         >
           <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -61,11 +61,11 @@ export function LocationModal() {
           </svg>
         </button>
 
-        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="text-lg font-bold text-gray-900">
           {t.location.title}
         </h2>
 
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-2 text-sm text-gray-500">
           GPS is used to detect your current location. Tap the button below to re-detect.
         </p>
 
@@ -83,7 +83,7 @@ export function LocationModal() {
             {t.location.useGps}
           </button>
 
-          <p className="text-center text-xs text-gray-400 dark:text-gray-500">
+          <p className="text-center text-xs text-gray-400">
             Address search will be available in a future update.
           </p>
         </div>

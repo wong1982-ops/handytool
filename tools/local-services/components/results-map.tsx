@@ -20,7 +20,7 @@ export function ResultsMap() {
 
   if (!state.location) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/5">
+      <div className="flex h-64 items-center justify-center rounded-xl bg-gray-100">
         <span className="text-sm text-gray-400">Waiting for location...</span>
       </div>
     )

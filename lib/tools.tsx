@@ -352,9 +352,9 @@ export const tools: Tool[] = [
     color: 'from-red-500 to-yellow-500',
   },
   {
-    name: 'Local Services',
+    name: 'ServiceFinder',
     href: '/tools/local-services',
-    description: 'Find nearby plumber, doctor, hairdresser & more',
+    description: 'Find trusted local & community services',
     icon: (
       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />

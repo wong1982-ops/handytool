@@ -21,7 +21,7 @@ export function FloatingSearch() {
         {/* Back button */}
         <Link
           href="/"
-          className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300"
+          className="w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center shrink-0 text-slate-600"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -38,8 +38,8 @@ export function FloatingSearch() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search services nearby..."
-              className="w-full pl-11 pr-4 py-3 rounded-full bg-white dark:bg-slate-800 shadow-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-400 border-0 focus:ring-2 focus:ring-[var(--tk-color-primary-500)] outline-none"
+              placeholder="Search ServiceFinder..."
+              className="w-full pl-11 pr-4 py-3 rounded-full bg-white shadow-lg text-sm text-slate-900 placeholder:text-slate-400 border-0 focus:ring-2 focus:ring-[var(--tk-color-primary-500)] outline-none"
             />
           </div>
         </form>
@@ -47,7 +47,7 @@ export function FloatingSearch() {
         {/* Action buttons */}
         <button
           onClick={() => dispatch({ type: 'SET_TAB', payload: 'favourites' })}
-          className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center shrink-0 text-slate-500 dark:text-slate-400 hover:text-red-500"
+          className="w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center shrink-0 text-slate-500 hover:text-red-500"
           aria-label="Favourites"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -57,7 +57,7 @@ export function FloatingSearch() {
 
         <button
           onClick={() => dispatch({ type: 'SET_TAB', payload: 'recent' })}
-          className="hidden sm:flex w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-lg items-center justify-center shrink-0 text-slate-500 dark:text-slate-400"
+          className="hidden sm:flex w-10 h-10 rounded-full bg-white shadow-lg items-center justify-center shrink-0 text-slate-500"
           aria-label="Recent"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -74,7 +74,7 @@ export function FloatingSearch() {
             className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold shadow-md transition-colors ${
               !state.activeCategory
                 ? 'bg-[var(--tk-color-primary-500)] text-white'
-                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                : 'bg-white text-slate-600'
             }`}
           >
             All
@@ -86,7 +86,7 @@ export function FloatingSearch() {
               className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold shadow-md transition-colors whitespace-nowrap ${
                 state.activeCategory === cat.foursquareId
                   ? 'bg-[var(--tk-color-primary-500)] text-white'
-                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  : 'bg-white text-slate-600'
               }`}
             >
               {cat.icon} {cat.name}

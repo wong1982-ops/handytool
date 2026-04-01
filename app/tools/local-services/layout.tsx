@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Local Services - Find Nearby Businesses",
-  description: "Find nearby plumbers, electricians, hairdressers, doctors, and more. Contact info, opening hours, and reviews. Free local services directory.",
+  title: "ServiceFinder - Find Trusted Local Services",
+  description: "ServiceFinder helps you find trusted nearby plumbers, electricians, hairdressers, doctors, and more. Contact info, opening hours, and reviews.",
   alternates: { canonical: "/tools/local-services" },
   openGraph: {
-    title: "Local Services | Toolk1t",
+    title: "ServiceFinder | Toolk1t",
     description: "Find nearby services — plumber, hairdresser, doctor, and more.",
     url: "/tools/local-services",
   },
@@ -15,8 +15,8 @@ const jsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "Local Services",
-    description: "Find nearby plumbers, electricians, hairdressers, doctors, and more.",
+    name: "ServiceFinder",
+    description: "Find trusted nearby plumbers, electricians, hairdressers, doctors, and more.",
     url: "https://toolk1t.com/tools/local-services",
     applicationCategory: "UtilitiesApplication",
     operatingSystem: "Any",
@@ -29,7 +29,7 @@ const jsonLd = [
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: "https://toolk1t.com" },
       { "@type": "ListItem", position: 2, name: "Tools", item: "https://toolk1t.com/tools" },
-      { "@type": "ListItem", position: 3, name: "Local Services" },
+      { "@type": "ListItem", position: 3, name: "ServiceFinder" },
     ],
   },
 ];

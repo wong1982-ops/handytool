@@ -15,11 +15,11 @@ export function ResultsPanel({ onSuggest }: ResultsPanelProps) {
   const isFav = (id: string) => state.favourites.some(f => f.id === id)
 
   return (
-    <div className="w-[380px] max-lg:w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[50vh] h-full bg-white dark:bg-slate-900 shadow-2xl overflow-y-auto rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none">
+    <div className="w-[380px] max-lg:w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[50vh] h-full bg-white shadow-2xl overflow-y-auto rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none">
       {/* Header */}
-      <div className="sticky top-0 bg-white dark:bg-slate-900 z-10 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+      <div className="sticky top-0 bg-white z-10 px-4 py-3 border-b border-slate-100">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+          <h2 className="text-sm font-bold text-slate-900">
             {state.results.length} results nearby
           </h2>
           {state.resultsLoading && (
@@ -28,14 +28,14 @@ export function ResultsPanel({ onSuggest }: ResultsPanelProps) {
         </div>
         {/* Mobile drag handle */}
         <div className="lg:hidden flex justify-center pt-1">
-          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+          <div className="w-10 h-1 rounded-full bg-slate-300" />
         </div>
       </div>
 
       {/* Community results */}
       {communityResults.length > 0 && (
         <div className="px-3 pt-3">
-          <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-2 px-1">
+          <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-2 px-1">
             Community Recommended
           </p>
           <div className="space-y-2">
@@ -83,10 +83,10 @@ export function ResultsPanel({ onSuggest }: ResultsPanelProps) {
       )}
 
       {/* Suggest a provider CTA */}
-      <div className="px-4 py-4 border-t border-slate-100 dark:border-slate-800">
+      <div className="px-4 py-4 border-t border-slate-100">
         <button
           onClick={onSuggest}
-          className="w-full py-2.5 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:border-[var(--tk-color-primary-500)] hover:text-[var(--tk-color-primary-500)] transition-colors"
+          className="w-full py-2.5 rounded-xl border-2 border-dashed border-slate-300 text-xs font-semibold text-slate-500 hover:border-[var(--tk-color-primary-500)] hover:text-[var(--tk-color-primary-500)] transition-colors"
         >
           + Suggest a local provider
         </button>

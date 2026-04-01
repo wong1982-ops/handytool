@@ -662,8 +662,8 @@ const bentoItems = [
     ),
   },
   {
-    name: 'Local Services',
-    description: 'Find nearby plumber, doctor & more',
+    name: 'ServiceFinder',
+    description: 'Find trusted local & community services',
     href: '/tools/local-services',
     gridClass: '',
     glowClass: 'from-teal-500/10',
