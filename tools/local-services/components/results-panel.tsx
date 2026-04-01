@@ -1,0 +1,96 @@
+'use client'
+
+import { useLocalServices } from '../local-services-provider'
+import { ResultCard } from './result-card'
+
+interface ResultsPanelProps {
+  onSuggest: () => void
+}
+
+export function ResultsPanel({ onSuggest }: ResultsPanelProps) {
+  const { state, dispatch } = useLocalServices()
+
+  const communityResults = state.results.filter(r => r.source === 'community')
+  const googleResults = state.results.filter(r => r.source === 'google')
+  const isFav = (id: string) => state.favourites.some(f => f.id === id)
+
+  return (
+    <div className="w-[380px] max-lg:w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[50vh] h-full bg-white dark:bg-slate-900 shadow-2xl overflow-y-auto rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none">
+      {/* Header */}
+      <div className="sticky top-0 bg-white dark:bg-slate-900 z-10 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+            {state.results.length} results nearby
+          </h2>
+          {state.resultsLoading && (
+            <div className="w-4 h-4 border-2 border-[var(--tk-color-primary-500)] border-t-transparent rounded-full animate-spin" />
+          )}
+        </div>
+        {/* Mobile drag handle */}
+        <div className="lg:hidden flex justify-center pt-1">
+          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+        </div>
+      </div>
+
+      {/* Community results */}
+      {communityResults.length > 0 && (
+        <div className="px-3 pt-3">
+          <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-2 px-1">
+            Community Recommended
+          </p>
+          <div className="space-y-2">
+            {communityResults.map(r => (
+              <ResultCard
+                key={r.id}
+                result={r}
+                isSelected={state.selectedPlaceId === r.id}
+                isFavourite={isFav(r.id)}
+                onSelect={() => dispatch({ type: 'SET_SELECTED_PLACE', payload: r.id })}
+                onToggleFavourite={() => {
+                  if (isFav(r.id)) dispatch({ type: 'REMOVE_FAVOURITE', payload: r.id })
+                  else dispatch({ type: 'ADD_FAVOURITE', payload: r })
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Google results */}
+      {googleResults.length > 0 && (
+        <div className="px-3 pt-3 pb-3">
+          {communityResults.length > 0 && (
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">
+              Google Places
+            </p>
+          )}
+          <div className="space-y-2">
+            {googleResults.map(r => (
+              <ResultCard
+                key={r.id}
+                result={r}
+                isSelected={state.selectedPlaceId === r.id}
+                isFavourite={isFav(r.id)}
+                onSelect={() => dispatch({ type: 'SET_SELECTED_PLACE', payload: r.id })}
+                onToggleFavourite={() => {
+                  if (isFav(r.id)) dispatch({ type: 'REMOVE_FAVOURITE', payload: r.id })
+                  else dispatch({ type: 'ADD_FAVOURITE', payload: r })
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Suggest a provider CTA */}
+      <div className="px-4 py-4 border-t border-slate-100 dark:border-slate-800">
+        <button
+          onClick={onSuggest}
+          className="w-full py-2.5 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:border-[var(--tk-color-primary-500)] hover:text-[var(--tk-color-primary-500)] transition-colors"
+        >
+          + Suggest a local provider
+        </button>
+      </div>
+    </div>
+  )
+}
