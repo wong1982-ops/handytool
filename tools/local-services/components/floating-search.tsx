@@ -66,12 +66,12 @@ export function FloatingSearch() {
         </button>
       </div>
 
-      {/* Category chips */}
-      <div className="mt-2 max-w-3xl mx-auto overflow-x-auto scrollbar-hide">
-        <div className="flex gap-2 pb-1">
+      {/* Category chips — wrap into multiple rows */}
+      <div className="mt-2 max-w-3xl mx-auto">
+        <div className="flex flex-wrap gap-1.5 pb-1">
           <button
             onClick={() => { dispatch({ type: 'SET_CATEGORY', payload: null }); dispatch({ type: 'SET_RESULTS', payload: [] }) }}
-            className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold shadow-md transition-colors ${
+            className={`px-3 py-1.5 rounded-full text-[11px] font-semibold shadow-sm transition-colors ${
               !state.activeCategory
                 ? 'bg-[var(--tk-color-primary-500)] text-white'
                 : 'bg-white text-slate-600'
@@ -83,7 +83,7 @@ export function FloatingSearch() {
             <button
               key={cat.id}
               onClick={() => searchServices(cat.foursquareId)}
-              className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold shadow-md transition-colors whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-full text-[11px] font-semibold shadow-sm transition-colors whitespace-nowrap ${
                 state.activeCategory === cat.foursquareId
                   ? 'bg-[var(--tk-color-primary-500)] text-white'
                   : 'bg-white text-slate-600'

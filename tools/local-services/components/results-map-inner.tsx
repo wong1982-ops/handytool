@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import type { MergedResult } from '../local-services-types'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -71,15 +71,8 @@ export default function ResultsMapInner({
   const containerRef = useRef<HTMLDivElement>(null)
   const markersRef = useRef<L.LayerGroup | null>(null)
   const tileLayerRef = useRef<L.TileLayer | null>(null)
-  const [dark, setDark] = useState(false)
-
-  // Observe dark mode changes
-  useEffect(() => {
-    setDark(isDarkMode())
-    const observer = new MutationObserver(() => setDark(isDarkMode()))
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
+  // Service Finder always uses light mode map
+  const dark = false
 
   // Initialize map
   useEffect(() => {
