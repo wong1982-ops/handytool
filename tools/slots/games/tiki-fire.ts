@@ -15,8 +15,11 @@ export const tikiFire: SlotGameConfig = {
   theme: {
     backgroundColor: '#0a1a0a',
     accentColor: '#ff6b35',
-    reelBackground: '#1a2d1a',
+    reelBackground: '#1a0f05',
     headerGradient: 'linear-gradient(135deg, #2d5a1e, #ff6b35)',
+    cabinetFrame: 'linear-gradient(180deg, #3a1f0a, #e87830, #3a1f0a)',
+    cabinetAccent: '#e87830',
+    meterName: 'TIKI BLAZE',
     lobbyImage: '/images/slots/lobby/tiki-fire.webp',
     backgroundImage: '/images/slots/backgrounds/tiki-fire-bg.webp',
   },

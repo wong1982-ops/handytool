@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { PlayerState, LobbyTab } from './slots-types'
+import { JACKPOT_CONFIG } from './slots-types'
 import { en } from './i18n/en'
 import { zh } from './i18n/zh'
 import type { I18nStrings } from './i18n/en'
@@ -25,6 +26,8 @@ type PlayerAction =
   | { type: 'LEVEL_UP'; payload: { level: number; reward: number } }
   | { type: 'CLAIM_DAILY'; payload: { streak: number; amount: number } }
   | { type: 'TOGGLE_SOUND' }
+  | { type: 'ADD_JACKPOT'; payload: { tier: 'grand' | 'major' | 'minor'; amount: number } }
+  | { type: 'RESET_JACKPOT'; payload: { tier: 'grand' | 'major' | 'minor' } }
 
 const STORAGE_KEY = 'casino_player'
 
@@ -50,6 +53,7 @@ function defaultPlayer(): PlayerState {
     dailyStreak: 0,
     lastDailyClaimAt: null,
     soundEnabled: true,
+    jackpots: { grand: 1000000, major: 100000, minor: 10000 },
   }
 }
 
@@ -74,6 +78,22 @@ function playerReducer(state: PlayerState, action: PlayerAction): PlayerState {
       }
     case 'TOGGLE_SOUND':
       return { ...state, soundEnabled: !state.soundEnabled }
+    case 'ADD_JACKPOT':
+      return {
+        ...state,
+        jackpots: {
+          ...state.jackpots,
+          [action.payload.tier]: state.jackpots[action.payload.tier] + action.payload.amount,
+        },
+      }
+    case 'RESET_JACKPOT':
+      return {
+        ...state,
+        jackpots: {
+          ...state.jackpots,
+          [action.payload.tier]: JACKPOT_CONFIG[action.payload.tier].seed,
+        },
+      }
     default:
       return state
   }
@@ -107,7 +127,7 @@ export function SlotsProvider({ children }: { children: ReactNode }) {
     if (saveTimer.current) clearTimeout(saveTimer.current)
     saveTimer.current = setTimeout(() => savePlayer(playerRef.current), 500)
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
-  }, [player.coins, player.xp, player.level, player.dailyStreak, player.soundEnabled])
+  }, [player.coins, player.xp, player.level, player.dailyStreak, player.soundEnabled, player.jackpots])
 
   useEffect(() => {
     const h = () => savePlayer(playerRef.current)

@@ -8,8 +8,11 @@ export const wildStampede: SlotGameConfig = {
   theme: {
     backgroundColor: '#1a0f05',
     accentColor: '#d4a052',
-    reelBackground: '#2d1a0a',
+    reelBackground: '#3a0a0a',
     headerGradient: 'linear-gradient(135deg, #8B4513, #D2691E)',
+    cabinetFrame: 'linear-gradient(180deg, #8B0000, #d4a052, #8B0000)',
+    cabinetAccent: '#d4a052',
+    meterName: 'STAMPEDE METER',
     lobbyImage: '/images/slots/lobby/wild-stampede.webp',
     backgroundImage: '/images/slots/backgrounds/wild-stampede-bg.webp',
   },

@@ -16,8 +16,11 @@ export const sakuraGarden: SlotGameConfig = {
   theme: {
     backgroundColor: '#1a0a15',
     accentColor: '#ff69b4',
-    reelBackground: '#2d1525',
+    reelBackground: '#1a0515',
     headerGradient: 'linear-gradient(135deg, #c71585, #ff69b4)',
+    cabinetFrame: 'linear-gradient(180deg, #3a0a2a, #e88cba, #3a0a2a)',
+    cabinetAccent: '#e88cba',
+    meterName: 'BLOSSOM METER',
     lobbyImage: '/images/slots/lobby/sakura-garden.webp',
     backgroundImage: '/images/slots/backgrounds/sakura-garden-bg.webp',
   },

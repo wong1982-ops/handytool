@@ -25,8 +25,10 @@ export const goldenDragon: SlotGameConfig = {
   theme: {
     backgroundColor: '#1a0505',
     accentColor: '#ffd700',
-    reelBackground: '#2d0a0a',
+    reelBackground: '#2a0505',
     headerGradient: 'linear-gradient(135deg, #8B0000, #DC143C)',
+    cabinetFrame: 'linear-gradient(180deg, #5a0a0a, #cc3333, #5a0a0a)',
+    cabinetAccent: '#cc3333',
     lobbyImage: '/images/slots/lobby/golden-dragon.webp',
     backgroundImage: '/images/slots/backgrounds/golden-dragon-bg.webp',
   },

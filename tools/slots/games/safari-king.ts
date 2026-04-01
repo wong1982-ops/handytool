@@ -25,8 +25,11 @@ export const safariKing: SlotGameConfig = {
   theme: {
     backgroundColor: '#1a1505',
     accentColor: '#daa520',
-    reelBackground: '#2d2510',
+    reelBackground: '#1a0f00',
     headerGradient: 'linear-gradient(135deg, #8B6914, #DAA520)',
+    cabinetFrame: 'linear-gradient(180deg, #3a2a0a, #d4a030, #3a2a0a)',
+    cabinetAccent: '#d4a030',
+    meterName: 'SAFARI TRACKER',
     lobbyImage: '/images/slots/lobby/safari-king.webp',
     backgroundImage: '/images/slots/backgrounds/safari-king-bg.webp',
   },

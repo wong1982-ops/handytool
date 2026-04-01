@@ -16,8 +16,10 @@ export const chilliFiesta: SlotGameConfig = {
   theme: {
     backgroundColor: '#1a0f05',
     accentColor: '#ff4500',
-    reelBackground: '#2d1a0a',
+    reelBackground: '#2a0f05',
     headerGradient: 'linear-gradient(135deg, #cc0000, #ffcc00)',
+    cabinetFrame: 'linear-gradient(180deg, #4a1a0a, #e85020, #4a1a0a)',
+    cabinetAccent: '#e85020',
     lobbyImage: '/images/slots/lobby/chilli-fiesta.webp',
     backgroundImage: '/images/slots/backgrounds/chilli-fiesta-bg.webp',
   },

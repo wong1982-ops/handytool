@@ -5,6 +5,9 @@ export interface ThemeConfig {
   accentColor: string
   reelBackground: string
   headerGradient: string
+  cabinetFrame: string      // CSS gradient for frame border
+  cabinetAccent: string     // Glow/highlight color for wins
+  meterName?: string        // Bonus meter label (free-spin games only)
   lobbyImage?: string       // e.g. '/images/slots/lobby/wild-stampede.webp'
   backgroundImage?: string  // e.g. '/images/slots/backgrounds/wild-stampede-bg.webp'
 }
@@ -83,6 +86,11 @@ export interface PlayerState {
   dailyStreak: number
   lastDailyClaimAt: string | null
   soundEnabled: boolean
+  jackpots: {
+    grand: number
+    major: number
+    minor: number
+  }
 }
 
 // ── Economy ─────────────────────────────────────────
@@ -199,3 +207,13 @@ export interface BonusProps {
   betAmount: number
   onComplete: (totalWin: number) => void
 }
+
+// ── Jackpot Config ─────────────────────────────────
+
+export const JACKPOT_CONFIG = {
+  grand: { seed: 1000000, contribution: 0.005, odds: 50000 },
+  major: { seed: 100000, contribution: 0.01, odds: 5000 },
+  minor: { seed: 10000, contribution: 0.02, odds: 500 },
+} as const
+
+export type JackpotTier = 'grand' | 'major' | 'minor'

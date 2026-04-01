@@ -16,8 +16,10 @@ export const fortuneClover: SlotGameConfig = {
   theme: {
     backgroundColor: '#051a0a',
     accentColor: '#ffd700',
-    reelBackground: '#0a2d15',
+    reelBackground: '#051a0a',
     headerGradient: 'linear-gradient(135deg, #228B22, #ffd700)',
+    cabinetFrame: 'linear-gradient(180deg, #0a3a1a, #30b060, #0a3a1a)',
+    cabinetAccent: '#30b060',
     lobbyImage: '/images/slots/lobby/fortune-clover.webp',
     backgroundImage: '/images/slots/backgrounds/fortune-clover-bg.webp',
   },

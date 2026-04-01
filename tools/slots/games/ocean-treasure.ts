@@ -15,8 +15,11 @@ export const oceanTreasure: SlotGameConfig = {
   theme: {
     backgroundColor: '#051a2d',
     accentColor: '#00bcd4',
-    reelBackground: '#0a2540',
+    reelBackground: '#051a1a',
     headerGradient: 'linear-gradient(135deg, #006994, #00bcd4)',
+    cabinetFrame: 'linear-gradient(180deg, #0a3a3a, #40c4c4, #0a3a3a)',
+    cabinetAccent: '#40c4c4',
+    meterName: 'DEEP DIVE METER',
     lobbyImage: '/images/slots/lobby/ocean-treasure.webp',
     backgroundImage: '/images/slots/backgrounds/ocean-treasure-bg.webp',
   },

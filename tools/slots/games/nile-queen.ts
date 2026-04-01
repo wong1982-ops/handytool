@@ -16,8 +16,11 @@ export const nileQueen: SlotGameConfig = {
   theme: {
     backgroundColor: '#0d0a1a',
     accentColor: '#f0c040',
-    reelBackground: '#1a1530',
+    reelBackground: '#0a0a2a',
     headerGradient: 'linear-gradient(135deg, #1a1040, #3d2080)',
+    cabinetFrame: 'linear-gradient(180deg, #1a1a5a, #c9a84c, #1a1a5a)',
+    cabinetAccent: '#c9a84c',
+    meterName: 'PHARAOH\'S POWER',
     lobbyImage: '/images/slots/lobby/nile-queen.webp',
     backgroundImage: '/images/slots/backgrounds/nile-queen-bg.webp',
   },

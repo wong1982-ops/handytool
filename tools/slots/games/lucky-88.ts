@@ -16,8 +16,10 @@ export const lucky88: SlotGameConfig = {
   theme: {
     backgroundColor: '#1a0505',
     accentColor: '#ffd700',
-    reelBackground: '#2d0a0a',
+    reelBackground: '#2a0505',
     headerGradient: 'linear-gradient(135deg, #cc0000, #ffd700)',
+    cabinetFrame: 'linear-gradient(180deg, #5a0a0a, #cc0000, #5a0a0a)',
+    cabinetAccent: '#cc0000',
     lobbyImage: '/images/slots/lobby/lucky-88.webp',
     backgroundImage: '/images/slots/backgrounds/lucky-88-bg.webp',
   },
