@@ -1,6 +1,7 @@
 import type { ServiceCategory } from './local-services-types'
 
 export const CATEGORIES: ServiceCategory[] = [
+  { id: 'moving', name: 'Moving', icon: '🚛', foursquareId: 'moving' },
   { id: 'plumber', name: 'Plumber', icon: '🔧', foursquareId: '11178' },
   { id: 'electrician', name: 'Electrician', icon: '⚡', foursquareId: '11176' },
   { id: 'hairdresser', name: 'Hairdresser', icon: '✂️', foursquareId: '11057' },

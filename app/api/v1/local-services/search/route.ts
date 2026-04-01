@@ -434,6 +434,7 @@ function mapCategoryToGoogleType(category: string): string {
     '17069': 'supermarket',
     '18021': 'gym',
     '11185': 'laundry',
+    moving: 'moving_company',
     plumber: 'plumber',
     electrician: 'electrician',
     hairdresser: 'hair_salon',

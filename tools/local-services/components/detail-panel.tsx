@@ -63,7 +63,7 @@ export function DetailPanel({ result, onBack }: DetailPanelProps) {
           <img src={result.profilePhoto || result.photoUrl || ''} alt="" className="w-full h-full object-cover" />
           {result.source === 'community' && (
             <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex items-center gap-1">
-              <span>&#9733;</span> Community
+              <span>&#9733;</span> Community 社区推荐
             </div>
           )}
           {result.isVerified && (

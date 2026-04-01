@@ -36,7 +36,7 @@ export function ResultsPanel({ onSuggest }: ResultsPanelProps) {
       {communityResults.length > 0 && (
         <div className="px-3 pt-3">
           <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-2 px-1">
-            Community Recommended
+            Community Recommended 社区推荐
           </p>
           <div className="space-y-2">
             {communityResults.map(r => (
