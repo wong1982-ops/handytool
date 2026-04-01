@@ -31,8 +31,8 @@ function LocalServicesInner() {
 
       {/* Results panel — left side desktop, bottom sheet mobile */}
       {state.results.length > 0 && !selectedResult && (
-        <div className="absolute left-0 top-[120px] bottom-0 z-10 pointer-events-none">
-          <div className="pointer-events-auto">
+        <div className="absolute left-0 top-[120px] bottom-0 z-10 pointer-events-none flex">
+          <div className="pointer-events-auto h-full">
             <ResultsPanel onSuggest={() => setShowSuggest(true)} />
           </div>
         </div>
@@ -40,8 +40,8 @@ function LocalServicesInner() {
 
       {/* Detail panel — replaces results when a place is selected */}
       {selectedResult && (
-        <div className="absolute left-0 top-[120px] bottom-0 z-10 pointer-events-none">
-          <div className="pointer-events-auto">
+        <div className="absolute left-0 top-[120px] bottom-0 z-10 pointer-events-none flex">
+          <div className="pointer-events-auto h-full">
             <DetailPanel
               result={selectedResult}
               onBack={() => dispatch({ type: 'SET_SELECTED_PLACE', payload: null })}
