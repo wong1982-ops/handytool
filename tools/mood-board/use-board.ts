@@ -2,8 +2,8 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import type { Board, BoardElement, ElementType, ElementData } from './types'
-import { MAX_ELEMENTS, ELEMENT_DEFAULTS } from './types'
+import type { Board, BoardElement, ElementType, ElementData, MoodOption, ColorPreference } from './types'
+import { MAX_ELEMENTS, DEFAULT_BOARD } from './types'
 
 interface UseBoardReturn {
   board: Board
@@ -12,28 +12,19 @@ interface UseBoardReturn {
   addingMore: boolean
   error: string | null
   setBoard: (b: Board) => void
-  generate: (theme: string) => Promise<void>
+  generate: (theme: string, mood: MoodOption, colorPreference: ColorPreference) => Promise<void>
   addMore: (prompt: string) => Promise<void>
   addElement: (type: ElementType, data: ElementData) => void
   updateElement: (id: string, partial: Partial<BoardElement>) => void
   removeElement: (id: string) => void
-  bringToFront: (id: string) => void
+  reorderImages: (activeId: string, overId: string) => void
   save: () => Promise<void>
   share: () => Promise<string | null>
   loadBoard: (entry: any) => void
 }
 
 export function useBoard(): UseBoardReturn {
-  const [board, setBoard] = useState<Board>({
-    id: null,
-    title: 'Untitled Board',
-    theme: '',
-    elements: [],
-    shared: false,
-    shareId: null,
-    createdAt: null,
-    updatedAt: null,
-  })
+  const [board, setBoard] = useState<Board>({ ...DEFAULT_BOARD })
   const [saving, setSaving] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [addingMore, setAddingMore] = useState(false)
@@ -41,6 +32,29 @@ export function useBoard(): UseBoardReturn {
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const boardRef = useRef(board)
   boardRef.current = board
+
+  // Restore localStorage draft on mount if no board id
+  useEffect(() => {
+    try {
+      const draft = localStorage.getItem('mb_draft_board')
+      if (draft) {
+        const parsed: Board = JSON.parse(draft)
+        setBoard((b) => {
+          if (b.id === null) return parsed
+          return b
+        })
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, [])
+
+  // Clear localStorage draft once a real board id is assigned
+  useEffect(() => {
+    if (board.id) {
+      localStorage.removeItem('mb_draft_board')
+    }
+  }, [board.id])
 
   // Auto-save (debounced 2s)
   useEffect(() => {
@@ -64,7 +78,7 @@ export function useBoard(): UseBoardReturn {
   }, [board.id, board.elements, board.title, board.theme])
 
   // Generate initial board
-  const generate = useCallback(async (theme: string) => {
+  const generate = useCallback(async (theme: string, mood: MoodOption, colorPreference: ColorPreference) => {
     setGenerating(true)
     setError(null)
 
@@ -72,7 +86,7 @@ export function useBoard(): UseBoardReturn {
       const res = await fetch('/api/v1/mood-board/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme }),
+        body: JSON.stringify({ theme, mood, colorPreference }),
       })
       const json = await res.json()
       if (!res.ok) {
@@ -80,12 +94,16 @@ export function useBoard(): UseBoardReturn {
         return
       }
 
-      setBoard((b) => ({
-        ...b,
+      const elements: BoardElement[] = json.data?.elements || []
+      const newBoard: Board = {
+        ...DEFAULT_BOARD,
         theme,
+        mood,
+        colorPreference,
         title: theme.slice(0, 40),
-        elements: json.data?.elements || [],
-      }))
+        elements,
+      }
+      setBoard(newBoard)
 
       // Auto-save new board (fire-and-forget)
       fetch('/api/v1/mood-board/save', {
@@ -94,16 +112,32 @@ export function useBoard(): UseBoardReturn {
         body: JSON.stringify({
           title: theme.slice(0, 40),
           theme,
-          elements: json.data?.elements || [],
+          elements,
         }),
       })
         .then((r) => r.json())
         .then((saveJson) => {
           if (saveJson.data?.boardId) {
             setBoard((b) => ({ ...b, id: saveJson.data.boardId }))
+          } else {
+            // No auth — persist to localStorage as fallback
+            setBoard((b) => {
+              localStorage.setItem('mb_draft_board', JSON.stringify(b))
+              return b
+            })
           }
         })
-        .catch(() => {})
+        .catch(() => {
+          // Save failed — persist to localStorage as fallback
+          setBoard((b) => {
+            try {
+              localStorage.setItem('mb_draft_board', JSON.stringify(b))
+            } catch {
+              // ignore storage errors
+            }
+            return b
+          })
+        })
     } catch {
       setError('Network error')
     } finally {
@@ -136,11 +170,23 @@ export function useBoard(): UseBoardReturn {
         return
       }
 
-      const newElements: BoardElement[] = json.data?.elements || []
-      setBoard((b) => ({
-        ...b,
-        elements: [...b.elements, ...newElements].slice(0, MAX_ELEMENTS),
+      // Ignore x/y/rotation from API response — only keep valid fields
+      const rawElements: any[] = json.data?.elements || []
+      const newElements: BoardElement[] = rawElements.map((el: any) => ({
+        id: el.id,
+        type: el.type,
+        width: el.width,
+        height: el.height,
+        order: el.order ?? 0,
+        data: el.data,
       }))
+
+      setBoard((b) => {
+        const merged = [...b.elements, ...newElements].slice(0, MAX_ELEMENTS)
+        // Re-assign order values to maintain consistent ordering
+        const reordered = merged.map((el, idx) => ({ ...el, order: idx }))
+        return { ...b, elements: reordered }
+      })
     } catch {
       setError('Network error')
     } finally {
@@ -152,15 +198,20 @@ export function useBoard(): UseBoardReturn {
   const addElement = useCallback((type: ElementType, data: ElementData) => {
     setBoard((b) => {
       if (b.elements.length >= MAX_ELEMENTS) return b
-      const defaults = ELEMENT_DEFAULTS[type]
+      const defaultSizes: Record<ElementType, { width: number; height: number }> = {
+        image: { width: 200, height: 200 },
+        text: { width: 160, height: 100 },
+        swatch: { width: 80, height: 80 },
+        palette: { width: 200, height: 80 },
+        font: { width: 200, height: 100 },
+      }
+      const { width, height } = defaultSizes[type]
       const el: BoardElement = {
         id: `${type}-${crypto.randomUUID().slice(0, 8)}`,
         type,
-        x: 100 + Math.random() * 200,
-        y: 100 + Math.random() * 200,
-        width: defaults.width,
-        height: defaults.height,
-        rotation: Math.random() * 4 - 2,
+        width,
+        height,
+        order: b.elements.length,
         data,
       }
       return { ...b, elements: [...b.elements, el] }
@@ -178,11 +229,21 @@ export function useBoard(): UseBoardReturn {
     setBoard((b) => ({ ...b, elements: b.elements.filter((el) => el.id !== id) }))
   }, [])
 
-  const bringToFront = useCallback((id: string) => {
+  // Reorder images by swapping order values then re-sorting
+  const reorderImages = useCallback((activeId: string, overId: string) => {
     setBoard((b) => {
-      const el = b.elements.find((e) => e.id === id)
-      if (!el) return b
-      return { ...b, elements: [...b.elements.filter((e) => e.id !== id), el] }
+      const activeIdx = b.elements.findIndex((el) => el.id === activeId)
+      const overIdx = b.elements.findIndex((el) => el.id === overId)
+      if (activeIdx === -1 || overIdx === -1) return b
+
+      const elements = b.elements.map((el) => ({ ...el }))
+      const activeOrder = elements[activeIdx].order
+      const overOrder = elements[overIdx].order
+      elements[activeIdx].order = overOrder
+      elements[overIdx].order = activeOrder
+
+      const sorted = [...elements].sort((a, b) => a.order - b.order)
+      return { ...b, elements: sorted }
     })
   }, [])
 
@@ -244,12 +305,14 @@ export function useBoard(): UseBoardReturn {
       shareId: entry.share_id || null,
       createdAt: entry.created_at,
       updatedAt: entry.updated_at,
+      mood: entry.mood || null,
+      colorPreference: entry.colorPreference || entry.color_preference || 'surprise',
     })
   }, [])
 
   return {
     board, saving, generating, addingMore, error,
     setBoard, generate, addMore, addElement, updateElement,
-    removeElement, bringToFront, save, share, loadBoard,
+    removeElement, reorderImages, save, share, loadBoard,
   }
 }

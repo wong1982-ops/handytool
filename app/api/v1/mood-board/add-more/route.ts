@@ -4,7 +4,6 @@ import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/respo
 import { uploadToR2 } from '@/lib/storage/r2'
 import { callGeminiImage } from '@/lib/mood-board/gemini'
 import { buildAddMorePrompt } from '@/lib/mood-board/prompts'
-import { ELEMENT_DEFAULTS } from '@/tools/mood-board/types'
 import type { BoardElement } from '@/tools/mood-board/types'
 
 export const maxDuration = 30
@@ -60,11 +59,9 @@ export async function POST(request: Request) {
         elements.push({
           id: `add-${crypto.randomUUID().slice(0, 8)}`,
           type: 'image',
-          x: 100 + i * 230 + (Math.random() * 30 - 15),
-          y: 100 + (Math.random() * 30 - 15),
-          width: ELEMENT_DEFAULTS.image.width,
-          height: ELEMENT_DEFAULTS.image.height,
-          rotation: Math.random() * 6 - 3,
+          order: elements.length,
+          width: 200,
+          height: 200,
           data: { imageUrl: r.value, alt: body.prompt.trim() },
         })
       })
