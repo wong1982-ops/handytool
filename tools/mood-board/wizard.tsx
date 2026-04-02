@@ -42,7 +42,7 @@ export default function Wizard({ onGenerate, onViewBoards }: WizardProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#090f16] flex items-center justify-center relative">
+    <div className="min-h-full flex items-center justify-center relative">
       {/* My Boards button — top-right */}
       <div className="absolute top-4 right-4">
         <button
