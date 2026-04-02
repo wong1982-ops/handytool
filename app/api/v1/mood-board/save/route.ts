@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   const userId = await getAuthUserId()
   if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  let body: { boardId?: string; title: string; theme: string; elements: unknown[] }
+  let body: { boardId?: string; title: string; theme: string; elements: unknown[]; mood?: string; colorPreference?: string }
   try {
     body = await request.json()
   } catch {
@@ -23,6 +23,8 @@ export async function POST(request: Request) {
         title: body.title,
         theme: body.theme,
         elements: body.elements,
+        mood: body.mood ?? null,
+        color_preference: body.colorPreference ?? null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', body.boardId)
@@ -43,6 +45,8 @@ export async function POST(request: Request) {
       title: body.title || 'Untitled Board',
       theme: body.theme,
       elements: body.elements,
+      mood: body.mood ?? null,
+      color_preference: body.colorPreference ?? null,
     })
     .select('id')
     .single()

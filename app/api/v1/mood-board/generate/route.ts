@@ -3,13 +3,13 @@ import { apiSuccess, apiError } from '@/lib/api/response'
 import { uploadToR2 } from '@/lib/storage/r2'
 import { callGeminiImage, callGeminiText } from '@/lib/mood-board/gemini'
 import { buildMoodImagePrompt, buildPalettePrompt } from '@/lib/mood-board/prompts'
-import { FONT_SUGGESTIONS, ELEMENT_DEFAULTS } from '@/tools/mood-board/types'
-import type { BoardElement } from '@/tools/mood-board/types'
+import { FONT_SUGGESTIONS } from '@/tools/mood-board/types'
+import type { BoardElement, MoodOption, ColorPreference } from '@/tools/mood-board/types'
 
 export const maxDuration = 60
 
 export async function POST(request: Request) {
-  let body: { theme: string }
+  let body: { theme: string; mood?: string; colorPreference?: string }
   try {
     body = await request.json()
   } catch {
@@ -21,6 +21,8 @@ export async function POST(request: Request) {
   }
 
   const theme = body.theme.trim()
+  const mood = (body.mood as MoodOption) ?? null
+  const colorPreference = (body.colorPreference as ColorPreference) ?? undefined
   const boardId = crypto.randomUUID()
   const elements: BoardElement[] = []
 
@@ -29,7 +31,7 @@ export async function POST(request: Request) {
   // Generate 8 images in parallel
   const imageResults = await Promise.allSettled(
     Array.from({ length: 8 }, (_, i) => i).map(async (index) => {
-      const prompt = buildMoodImagePrompt(theme, index)
+      const prompt = buildMoodImagePrompt(theme, index, mood, colorPreference)
       const buffer = await callGeminiImage(prompt)
       const r2Path = `mood-board/${boardId}/img-${index}.png`
       const imageUrl = await uploadToR2(r2Path, buffer, 'image/png')
@@ -43,25 +45,21 @@ export async function POST(request: Request) {
 
   console.log(`[mood-board] Images: ${images.length}/8 succeeded`)
 
-  // Place images on canvas with organic layout
+  // Place images using order-based layout
   images.forEach(({ imageUrl }, i) => {
-    const col = i % 4
-    const row = Math.floor(i / 4)
     elements.push({
       id: `img-${crypto.randomUUID().slice(0, 8)}`,
       type: 'image',
-      x: 40 + col * 220 + (Math.random() * 20 - 10),
-      y: 20 + row * 220 + (Math.random() * 20 - 10),
-      width: ELEMENT_DEFAULTS.image.width,
-      height: ELEMENT_DEFAULTS.image.height,
-      rotation: Math.random() * 6 - 3,
+      order: i,
+      width: 200,
+      height: 200,
       data: { imageUrl, alt: `${theme} mood ${i + 1}` },
     })
   })
 
   // Generate color palette via text model
   try {
-    const paletteResponse = await callGeminiText(buildPalettePrompt(theme))
+    const paletteResponse = await callGeminiText(buildPalettePrompt(theme, mood, colorPreference))
     const colorMatch = paletteResponse.match(/\[[\s\S]*?\]/)
     if (colorMatch) {
       const colors: string[] = JSON.parse(colorMatch[0])
@@ -69,11 +67,9 @@ export async function POST(request: Request) {
         elements.push({
           id: `pal-${crypto.randomUUID().slice(0, 8)}`,
           type: 'palette',
-          x: 40 + (Math.random() * 20),
-          y: 460 + (Math.random() * 20),
-          width: ELEMENT_DEFAULTS.palette.width,
-          height: ELEMENT_DEFAULTS.palette.height,
-          rotation: Math.random() * 4 - 2,
+          order: elements.length,
+          width: 250,
+          height: 60,
           data: { colors: colors.slice(0, 5) },
         })
       }
@@ -88,21 +84,17 @@ export async function POST(request: Request) {
   elements.push({
     id: `font-h-${crypto.randomUUID().slice(0, 8)}`,
     type: 'font',
-    x: 300 + (Math.random() * 20),
-    y: 460 + (Math.random() * 20),
-    width: ELEMENT_DEFAULTS.font.width,
-    height: ELEMENT_DEFAULTS.font.height,
-    rotation: Math.random() * 4 - 2,
+    order: elements.length,
+    width: 220,
+    height: 80,
     data: { fontFamily: fontPair.heading, category: 'heading' as const, sampleText: theme },
   })
   elements.push({
     id: `font-b-${crypto.randomUUID().slice(0, 8)}`,
     type: 'font',
-    x: 540 + (Math.random() * 20),
-    y: 460 + (Math.random() * 20),
-    width: ELEMENT_DEFAULTS.font.width,
-    height: ELEMENT_DEFAULTS.font.height,
-    rotation: Math.random() * 4 - 2,
+    order: elements.length,
+    width: 220,
+    height: 80,
     data: { fontFamily: fontPair.body, category: 'body' as const, sampleText: 'The quick brown fox jumps over the lazy dog' },
   })
 
@@ -110,5 +102,5 @@ export async function POST(request: Request) {
     return apiError('Board generation failed — no elements created', 'GENERATION_FAILED', 500)
   }
 
-  return apiSuccess({ boardId, elements })
+  return apiSuccess({ boardId, elements, mood, colorPreference })
 }
