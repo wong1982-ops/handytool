@@ -344,82 +344,144 @@ async function executeScript(supabase: any, job: StoryVideoJobRow) {
   }
 }
 
-// ---------- Step: Scenes (one scene per invocation) ----------
+// ---------- Step: Scenes (async polling across cron runs) ----------
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function executeScenes(supabase: any, job: StoryVideoJobRow) {
   if (!job.screenplay) return
+  const artifacts = (job.artifacts || {}) as Record<string, unknown>
+  const geminiProvider = new GeminiVideoProvider()
 
-  // Try full-story generation first (only on first invocation, before any scenes are processed)
-  if (job.video_strategy !== 'scene-by-scene') {
-    const allPending = job.scene_status.every((s) => s.status === 'pending')
-    if (allPending) {
-      const geminiProvider = new GeminiVideoProvider()
-      const fullVideo = await geminiProvider.generateFullStoryVideo({
-        screenplay: job.screenplay,
-        characterBible: job.character_bible || { characters: [] },
-        artStyle: job.art_style,
-      })
+  // ── Phase 1: Poll an in-flight Veo operation if one exists ──
+  const pendingOp = artifacts.veoOperationName as string | undefined
+  const pendingOpType = (artifacts.veoOperationType as string) || 'full-story'
 
-      if (fullVideo) {
-        // Upload and use as the single video
-        const videoUrl = await uploadToR2(
-          `story-video/${job.id}/full-story.mp4`,
-          fullVideo,
-          'video/mp4'
-        )
-        // Mark all scenes as done with the full video URL
+  if (pendingOp) {
+    console.log(`[story-video-worker] Job ${job.id} polling Veo operation: ${pendingOp}`)
+    try {
+      const videoBuffer = await geminiProvider.pollVideoOperation(pendingOp)
+
+      if (!videoBuffer) {
+        console.log(`[story-video-worker] Job ${job.id} Veo still processing — will retry next run`)
+        return // Not done yet — wait for next cron run
+      }
+
+      // Video ready — handle based on type
+      if (pendingOpType === 'full-story') {
+        const videoUrl = await uploadToR2(`story-video/${job.id}/full-story.mp4`, videoBuffer, 'video/mp4')
         const fullSceneStatus: SceneStatus[] = job.screenplay.scenes.map((_, i) => ({
           index: i,
           status: 'done' as const,
           clipUrl: videoUrl,
         }))
 
-        // Re-read latest steps
         const { data: latestJob } = await supabase
-          .from('story_video_jobs')
-          .select('steps')
-          .eq('id', job.id)
-          .single()
-        const latestSteps = latestJob?.steps || job.steps
+          .from('story_video_jobs').select('steps').eq('id', job.id).single()
 
         await updateJob(supabase, job.id, {
           scene_status: fullSceneStatus,
           video_strategy: 'full-story',
           current_step: 'voices',
-          steps: { ...latestSteps, scenes: 'done' },
+          steps: { ...(latestJob?.steps || job.steps), scenes: 'done' },
+          artifacts: { ...artifacts, veoOperationName: null, veoOperationType: null },
         })
-        console.log(`[story-video-worker] Job ${job.id} full-story video generated successfully`)
+        console.log(`[story-video-worker] Job ${job.id} full-story video complete!`)
         return
+      }
+
+      // Scene-by-scene: find the generating scene
+      const sceneStatus = [...job.scene_status]
+      const genScene = sceneStatus.find(s => s.status === 'generating')
+      if (!genScene) return
+
+      const clipUrl = await uploadToR2(
+        `story-video/${job.id}/scene-${genScene.index}.mp4`, videoBuffer, 'video/mp4', { upsert: true }
+      )
+      sceneStatus[genScene.index] = { index: genScene.index, status: 'done', clipUrl }
+      const allDone = sceneStatus.every(s => s.status === 'done')
+
+      const { data: latestJob } = await supabase
+        .from('story_video_jobs').select('steps').eq('id', job.id).single()
+
+      await updateJob(supabase, job.id, {
+        scene_status: sceneStatus,
+        steps: { ...(latestJob?.steps || job.steps), scenes: allDone ? 'done' : 'processing' },
+        artifacts: { ...artifacts, veoOperationName: null, veoOperationType: null },
+      })
+      console.log(`[story-video-worker] Job ${job.id} scene ${genScene.index} done (${allDone ? 'all complete' : 'more pending'})`)
+      return
+
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      console.error(`[story-video-worker] Job ${job.id} Veo poll error:`, message)
+
+      if (pendingOpType === 'full-story') {
+        // Full-story failed — fallback to scene-by-scene
+        await updateJob(supabase, job.id, {
+          video_strategy: 'scene-by-scene',
+          artifacts: { ...artifacts, veoOperationName: null, veoOperationType: null },
+        })
       } else {
-        // Mark as scene-by-scene and continue with existing logic
+        // Scene failed — mark it
+        const sceneStatus = [...job.scene_status]
+        const genScene = sceneStatus.find(s => s.status === 'generating')
+        if (genScene) {
+          sceneStatus[genScene.index] = { index: genScene.index, status: 'failed', error: message }
+          await updateJob(supabase, job.id, {
+            scene_status: sceneStatus,
+            artifacts: { ...artifacts, veoOperationName: null, veoOperationType: null },
+          })
+        }
+      }
+      return
+    }
+  }
+
+  // ── Phase 2: Start a new Veo operation ──
+
+  // Try full-story first (only when all scenes are pending and we haven't failed before)
+  if (job.video_strategy !== 'scene-by-scene') {
+    const allPending = job.scene_status.every(s => s.status === 'pending')
+    if (allPending) {
+      try {
+        const prompt = geminiProvider.buildFullStoryPrompt({
+          screenplay: job.screenplay,
+          characterBible: job.character_bible || { characters: [] },
+          artStyle: job.art_style,
+        })
+        const targetDuration = Math.min(job.screenplay.totalDuration, 60)
+        const opName = await geminiProvider.startVideoGeneration(prompt, targetDuration)
+
+        await updateJob(supabase, job.id, {
+          artifacts: { ...artifacts, veoOperationName: opName, veoOperationType: 'full-story' },
+        })
+        console.log(`[story-video-worker] Job ${job.id} started full-story Veo operation: ${opName}`)
+        return
+      } catch (err) {
+        console.warn(`[story-video-worker] Job ${job.id} full-story start failed:`, err instanceof Error ? err.message : err)
         await updateJob(supabase, job.id, { video_strategy: 'scene-by-scene' })
+        // Fall through to scene-by-scene
       }
     }
   }
 
+  // Scene-by-scene: find next scene to generate
   const sceneStatus = [...job.scene_status]
-  const pendingScene = sceneStatus.find((s) => s.status === 'pending')
-  const failedScene = sceneStatus.find((s) => s.status === 'failed')
+  const pendingScene = sceneStatus.find(s => s.status === 'pending')
+  const failedScene = sceneStatus.find(s => s.status === 'failed')
 
   if (!pendingScene && !failedScene) {
-    // ALL scenes truly done — mark step complete
-    await updateJob(supabase, job.id, {
-      steps: { ...job.steps, scenes: 'done' },
-    })
+    await updateJob(supabase, job.id, { steps: { ...job.steps, scenes: 'done' } })
     return
   }
 
   if (!pendingScene && failedScene) {
-    // No pending but some failed — retry failed scenes automatically
-    const retryScene = sceneStatus.find((s) => s.status === 'failed')!
-    retryScene.status = 'pending'
-    retryScene.error = undefined
+    failedScene.status = 'pending'
+    failedScene.error = undefined
     await updateJob(supabase, job.id, { scene_status: sceneStatus })
     return
   }
 
-  // Mark scenes step as processing
   if (job.steps.scenes === 'pending') {
     await updateJob(supabase, job.id, {
       status: 'processing',
@@ -428,92 +490,26 @@ async function executeScenes(supabase: any, job: StoryVideoJobRow) {
     })
   }
 
-  if (!pendingScene) return // safety — should not reach here
+  if (!pendingScene) return
   const sceneData = job.screenplay.scenes[pendingScene.index]
   if (!sceneData) return
 
-  // Mark this scene as generating
   sceneStatus[pendingScene.index] = { ...pendingScene, status: 'generating' }
   await updateJob(supabase, job.id, { scene_status: sceneStatus })
 
   try {
-    const provider = getProvider(job.provider)
-
-    // Fetch character portraits from book data
-    let characterPortraits: { name: string; imageUrl: string }[] = []
-    const { data: bookDataRow } = await supabase
-      .from('books')
-      .select('data')
-      .eq('id', job.book_id)
-      .single()
-
-    const bookData = bookDataRow?.data as Record<string, unknown> | null
-    if (bookData?.characters) {
-      characterPortraits = (bookData.characters as any[])
-        .filter((c: { name: string; portraitUrl?: string }) => c.portraitUrl)
-        .map((c: { name: string; portraitUrl: string }) => ({
-          name: c.name,
-          imageUrl: c.portraitUrl,
-        }))
-    }
-
-    // Find previous scene URL for style consistency
-    const prevScene = pendingScene.index > 0 ? sceneStatus[pendingScene.index - 1] : null
-    const previousSceneUrl = prevScene?.clipUrl || undefined
-
-    const buffer = await provider.generateScene({
-      scene: sceneData,
-      artStyle: job.art_style,
-      characterBible: job.character_bible,
-      characterPortraits,
-      previousSceneUrl,
-    })
-
-    // Upload video clip to R2
-    const r2Path = `story-video/${job.id}/scene-${pendingScene.index}.mp4`
-    const contentType = 'video/mp4'
-    const clipUrl = await uploadToR2(r2Path, buffer, contentType, { upsert: true })
-
-    // Update scene status
-    sceneStatus[pendingScene.index] = {
-      index: pendingScene.index,
-      status: 'done',
-      clipUrl,
-    }
-
-    // Check if all scenes are now done
-    const allScenesDone = sceneStatus.every((s) => s.status === 'done')
-
-    // Re-read latest steps in case audio steps have progressed
-    const { data: latestJob } = await supabase
-      .from('story_video_jobs')
-      .select('steps')
-      .eq('id', job.id)
-      .single()
-
-    const latestSteps = latestJob?.steps || job.steps
+    const prompt = geminiProvider.buildScenePrompt(sceneData, job.art_style, job.character_bible)
+    const opName = await geminiProvider.startVideoGeneration(prompt, Math.min(sceneData.duration, 8))
 
     await updateJob(supabase, job.id, {
-      scene_status: sceneStatus,
-      steps: { ...latestSteps, scenes: allScenesDone ? 'done' : 'processing' },
+      artifacts: { ...artifacts, veoOperationName: opName, veoOperationType: 'scene' },
     })
-
-    console.log(
-      `[story-video-worker] Job ${job.id} scene ${pendingScene.index} done (${allScenesDone ? 'all scenes complete' : 'more pending'})`,
-    )
+    console.log(`[story-video-worker] Job ${job.id} scene ${pendingScene.index} started Veo operation: ${opName}`)
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
-    sceneStatus[pendingScene.index] = {
-      index: pendingScene.index,
-      status: 'failed',
-      error: message,
-    }
-
+    sceneStatus[pendingScene.index] = { index: pendingScene.index, status: 'failed', error: message }
     await updateJob(supabase, job.id, { scene_status: sceneStatus })
-    console.error(
-      `[story-video-worker] Job ${job.id} scene ${pendingScene.index} failed:`,
-      message,
-    )
+    console.error(`[story-video-worker] Job ${job.id} scene ${pendingScene.index} failed to start:`, message)
   }
 }
 

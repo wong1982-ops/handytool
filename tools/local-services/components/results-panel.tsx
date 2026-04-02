@@ -15,7 +15,7 @@ export function ResultsPanel({ onSuggest }: ResultsPanelProps) {
   const isFav = (id: string) => state.favourites.some(f => f.id === id)
 
   return (
-    <div className="w-[380px] max-lg:w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[70vh] h-full bg-white shadow-2xl flex flex-col rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none">
+    <div className="w-[380px] max-lg:w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[50vh] h-full bg-white shadow-2xl flex flex-col rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none">
       {/* Header — sticky */}
       <div className="shrink-0 bg-white z-10 px-4 py-3 border-b border-slate-100 rounded-t-2xl lg:rounded-t-none lg:rounded-tr-none">
         <div className="flex items-center justify-between">

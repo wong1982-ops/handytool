@@ -2,6 +2,7 @@
 
 import type { StoryBook, Page } from '@/tools/story-studio/types'
 import type { ArtStyle, DurationPreset, Screenplay, ScreenplayScene } from './types'
+import { jsonrepair } from 'jsonrepair'
 
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
 
@@ -176,21 +177,15 @@ Generate the screenplay JSON now. Ensure totalDuration is close to ${targetSecon
     throw new Error('No JSON found in screenplay response')
   }
 
-  // Repair common JSON issues from LLM output
+  // Repair and parse JSON — handles single quotes, trailing commas, unescaped chars, etc.
   let jsonStr = jsonMatch[0]
-    .replace(/,\s*}/g, '}')       // trailing commas before }
-    .replace(/,\s*\]/g, ']')      // trailing commas before ]
-    .replace(/[\x00-\x1F]/g, ' ') // control characters
-    .replace(/\n/g, '\\n')        // unescaped newlines in strings
-
   let screenplay: Screenplay
   try {
     screenplay = JSON.parse(jsonStr)
   } catch {
-    // Second attempt: try to fix unescaped quotes in strings
-    jsonStr = jsonStr.replace(/(?<=:\s*"[^"]*)"(?=[^"]*"[,}\]])/g, '\\"')
     try {
-      screenplay = JSON.parse(jsonStr)
+      const repaired = jsonrepair(jsonStr)
+      screenplay = JSON.parse(repaired)
     } catch (e2) {
       throw new Error(`Failed to parse screenplay JSON: ${e2 instanceof Error ? e2.message : 'Invalid JSON'}. Raw (first 500): ${jsonStr.slice(0, 500)}`)
     }

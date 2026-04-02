@@ -175,11 +175,17 @@ export function parseBankCsv(
         ? parseFloat(fields[columnMap.balance]?.replace(/[,$]/g, '') ?? '')
         : undefined
 
+    const sourceRef =
+      columnMap.uniqueId !== undefined
+        ? fields[columnMap.uniqueId]?.trim() || undefined
+        : undefined
+
     transactions.push({
       date,
       description: description.trim(),
       amount,
       balance: isNaN(balance as number) ? undefined : balance,
+      sourceRef,
     })
   }
 

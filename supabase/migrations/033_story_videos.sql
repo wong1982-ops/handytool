@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS public.story_video_jobs (
   screenplay JSONB,
   scene_status JSONB DEFAULT '[]',
   artifacts JSONB DEFAULT '{}',
+  character_bible JSONB,
+  video_strategy TEXT,
   credits_charged INT DEFAULT 0,
   error TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),

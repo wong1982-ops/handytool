@@ -42,7 +42,7 @@ export function DetailPanel({ result, onBack }: DetailPanelProps) {
   const hours = result.source === 'google' ? details?.hours : null
 
   return (
-    <div className="w-[380px] max-lg:w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[70vh] h-full bg-white shadow-2xl overflow-y-auto rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none">
+    <div className="w-[380px] max-lg:w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[50vh] h-full bg-white shadow-2xl overflow-y-auto rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none">
       {/* Back + close */}
       <div className="sticky top-0 bg-white z-10 px-4 py-3 border-b border-slate-100 flex items-center gap-3">
         <button onClick={onBack} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">

@@ -117,6 +117,7 @@ export interface ParsedTransaction {
   description: string
   amount: number
   balance?: number
+  sourceRef?: string
 }
 
 export interface ExtractedInvoice {
@@ -163,6 +164,7 @@ export interface BankFormat {
     debit?: number
     credit?: number
     balance?: number
+    uniqueId?: number
   }
   dateFormat: 'DD/MM/YYYY' | 'YYYY-MM-DD' | 'YYYY/MM/DD'
 }
@@ -179,14 +181,14 @@ export const NZ_BANKS: BankFormat[] = [
     id: 'asb',
     name: 'ASB',
     detectHeaders: ['Date', 'Unique Id', 'Tran Type', 'Cheque Number', 'Payee', 'Memo', 'Amount'],
-    columnMap: { date: 0, description: 4, amount: 6, balance: undefined },
+    columnMap: { date: 0, description: 4, amount: 6, balance: undefined, uniqueId: 1 },
     dateFormat: 'YYYY-MM-DD',
   },
   {
     id: 'asb-visa',
     name: 'ASB Visa/Credit Card',
     detectHeaders: ['Date Processed', 'Date of Transaction', 'Unique Id', 'Tran Type', 'Reference', 'Description', 'Amount'],
-    columnMap: { date: 1, description: 5, amount: 6, balance: undefined },
+    columnMap: { date: 1, description: 5, amount: 6, balance: undefined, uniqueId: 2 },
     dateFormat: 'YYYY/MM/DD',
   },
   {

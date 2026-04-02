@@ -139,23 +139,18 @@ export class GeminiVideoProvider implements VideoProvider {
   }
 
   /**
-   * Attempt to generate the entire story as a single video.
-   * Returns null if the model can't handle it (fallback to scene-by-scene).
+   * Build the prompt for full-story video generation.
    */
-  async generateFullStoryVideo(params: {
+  buildFullStoryPrompt(params: {
     screenplay: Screenplay
     characterBible: CharacterBible
     artStyle: ArtStyle
-  }): Promise<Buffer | null> {
+  }): string {
     const { screenplay, characterBible, artStyle } = params
-
-    if (!GEMINI_API_KEY) return null
-
     const parts: string[] = []
 
     parts.push(`Animation style: ${ART_STYLE_PREFIXES[artStyle]}`)
 
-    // Full character bible
     if (characterBible.characters.length > 0) {
       parts.push('CHARACTER APPEARANCES (maintain exact consistency throughout entire video):')
       for (const char of characterBible.characters) {
@@ -163,7 +158,6 @@ export class GeminiVideoProvider implements VideoProvider {
       }
     }
 
-    // All scenes as a continuous story
     parts.push('STORY SEQUENCE (generate as one continuous video with smooth transitions):')
     for (const scene of screenplay.scenes) {
       const sceneDesc = [
@@ -181,10 +175,31 @@ export class GeminiVideoProvider implements VideoProvider {
       'Cinematic quality, 16:9 widescreen. No text or writing visible.'
     )
 
-    const prompt = parts.join('\n')
-    const targetDuration = Math.min(screenplay.totalDuration, 60) // cap at 60s for safety
+    return parts.join('\n')
+  }
 
-    console.log(`[story-video] Attempting full-story generation (${screenplay.scenes.length} scenes, ~${targetDuration}s)`)
+  /**
+   * Build the prompt for a single scene.
+   */
+  buildScenePrompt(scene: ScreenplayScene, artStyle: ArtStyle, characterBible?: CharacterBible): string {
+    return this.buildVideoPrompt(scene, artStyle, characterBible)
+  }
+
+  /**
+   * Attempt to generate the entire story as a single video (synchronous).
+   * Returns null if the model can't handle it (fallback to scene-by-scene).
+   */
+  async generateFullStoryVideo(params: {
+    screenplay: Screenplay
+    characterBible: CharacterBible
+    artStyle: ArtStyle
+  }): Promise<Buffer | null> {
+    if (!GEMINI_API_KEY) return null
+
+    const prompt = this.buildFullStoryPrompt(params)
+    const targetDuration = Math.min(params.screenplay.totalDuration, 60)
+
+    console.log(`[story-video] Attempting full-story generation (${params.screenplay.scenes.length} scenes, ~${targetDuration}s)`)
 
     try {
       const videoBuffer = await this.generateVideo(prompt, targetDuration)
@@ -198,17 +213,17 @@ export class GeminiVideoProvider implements VideoProvider {
 
   // ── Video generation via Veo 3.1 ──────────────────────────
 
-  private async generateVideo(prompt: string, durationSeconds: number): Promise<Buffer> {
-    // Step 1: Start long-running operation
+  /**
+   * Start a Veo 3.1 long-running operation. Returns the operation name for polling.
+   */
+  async startVideoGeneration(prompt: string, durationSeconds: number): Promise<string> {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${VIDEO_MODEL}:predictLongRunning?key=${GEMINI_API_KEY}`
 
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        instances: [{
-          prompt,
-        }],
+        instances: [{ prompt }],
         parameters: {
           aspectRatio: '16:9',
           durationSeconds: Math.min(Math.max(durationSeconds, 4), 8),
@@ -223,63 +238,73 @@ export class GeminiVideoProvider implements VideoProvider {
     }
 
     const operation = await response.json()
-    const operationName = operation.name
-
-    if (!operationName) {
+    if (!operation.name) {
       throw new Error('No operation name returned from Veo 3.1')
     }
+    return operation.name
+  }
 
-    // Step 2: Poll for completion (max 120 seconds)
+  /**
+   * Poll a Veo 3.1 operation. Returns the video buffer if done, null if still pending.
+   * Throws on error.
+   */
+  async pollVideoOperation(operationName: string): Promise<Buffer | null> {
     const pollUrl = `https://generativelanguage.googleapis.com/v1beta/${operationName}?key=${GEMINI_API_KEY}`
+    const pollRes = await fetch(pollUrl)
+
+    if (!pollRes.ok) return null
+
+    const pollData = await pollRes.json()
+
+    if (pollData.error) {
+      throw new Error(`Veo 3.1 error: ${JSON.stringify(pollData.error).substring(0, 300)}`)
+    }
+
+    if (!pollData.done) return null
+
+    const videoData =
+      pollData.response?.generateVideoResponse?.generatedSamples?.[0]?.video
+      ?? pollData.response?.generatedVideos?.[0]?.video
+
+    if (!videoData) {
+      throw new Error(`No video in Veo 3.1 response. Keys: ${JSON.stringify(Object.keys(pollData.response || {}))}`)
+    }
+
+    if (videoData.uri) {
+      const downloadUrl = videoData.uri.includes('?')
+        ? `${videoData.uri}&key=${GEMINI_API_KEY}`
+        : `${videoData.uri}?key=${GEMINI_API_KEY}`
+
+      const videoRes = await fetch(downloadUrl, { redirect: 'follow' })
+      if (!videoRes.ok) throw new Error(`Failed to download video: ${videoRes.status}`)
+      const buffer = Buffer.from(await videoRes.arrayBuffer())
+      if (buffer.length < 1000) {
+        throw new Error(`Video download too small (${buffer.length} bytes) — likely an error response`)
+      }
+      return buffer
+    }
+
+    if (videoData.data) {
+      return Buffer.from(videoData.data, 'base64')
+    }
+
+    throw new Error('No video URI or data in response')
+  }
+
+  /**
+   * Generate video synchronously (start + poll in-process). Used for short operations.
+   */
+  private async generateVideo(prompt: string, durationSeconds: number): Promise<Buffer> {
+    const operationName = await this.startVideoGeneration(prompt, durationSeconds)
+
     const maxWait = 120_000
     const pollInterval = 5_000
     const startTime = Date.now()
 
     while (Date.now() - startTime < maxWait) {
       await new Promise((r) => setTimeout(r, pollInterval))
-
-      const pollRes = await fetch(pollUrl)
-      if (!pollRes.ok) continue
-
-      const pollData = await pollRes.json()
-
-      if (pollData.done) {
-        // Extract video — handle both response formats
-        const videoData =
-          pollData.response?.generateVideoResponse?.generatedSamples?.[0]?.video
-          ?? pollData.response?.generatedVideos?.[0]?.video
-
-        if (!videoData) {
-          throw new Error(`No video in Veo 3.1 response. Keys: ${JSON.stringify(Object.keys(pollData.response || {}))}`)
-        }
-
-        // Download the video file (follow redirects)
-        if (videoData.uri) {
-          const downloadUrl = videoData.uri.includes('?')
-            ? `${videoData.uri}&key=${GEMINI_API_KEY}`
-            : `${videoData.uri}?key=${GEMINI_API_KEY}`
-
-          // Veo returns a 302 redirect — need to follow it
-          const videoRes = await fetch(downloadUrl, { redirect: 'follow' })
-          if (!videoRes.ok) throw new Error(`Failed to download video: ${videoRes.status}`)
-          const buffer = Buffer.from(await videoRes.arrayBuffer())
-          if (buffer.length < 1000) {
-            throw new Error(`Video download too small (${buffer.length} bytes) — likely an error response`)
-          }
-          return buffer
-        }
-
-        // Or inline base64 data
-        if (videoData.data) {
-          return Buffer.from(videoData.data, 'base64')
-        }
-
-        throw new Error('No video URI or data in response')
-      }
-
-      if (pollData.error) {
-        throw new Error(`Veo 3.1 error: ${JSON.stringify(pollData.error).substring(0, 300)}`)
-      }
+      const result = await this.pollVideoOperation(operationName)
+      if (result) return result
     }
 
     throw new Error('Veo 3.1 timed out after 120 seconds')

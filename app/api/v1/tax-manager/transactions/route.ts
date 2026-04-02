@@ -59,8 +59,11 @@ export async function POST(request: Request) {
   if (!userId) return API_ERRORS.UNAUTHORIZED()
 
   let body: {
+    entity_id?: string
+    tax_year?: string
+    on_duplicate?: 'skip' | 'replace'
     transactions: Array<{
-      entity_id: string
+      entity_id?: string
       document_id?: string
       date: string
       description: string
@@ -69,8 +72,9 @@ export async function POST(request: Request) {
       category?: string
       category_confidence?: string
       approved?: boolean
-      tax_year: string
+      tax_year?: string
       notes?: string
+      sourceRef?: string
     }>
   }
   try {
@@ -83,9 +87,14 @@ export async function POST(request: Request) {
     return apiError('transactions array is required and must not be empty', 'VALIDATION_ERROR', 400)
   }
 
-  const rows = body.transactions.map((t) => ({
+  // Support entity_id/tax_year at top level (bank CSV import) or per-transaction
+  const topEntityId = body.entity_id
+  const topTaxYear = body.tax_year
+  const onDuplicate = body.on_duplicate ?? 'skip'
+
+  const allRows = body.transactions.map((t) => ({
     user_id: userId,
-    entity_id: t.entity_id,
+    entity_id: t.entity_id || topEntityId,
     document_id: t.document_id || null,
     date: t.date,
     description: t.description,
@@ -94,14 +103,123 @@ export async function POST(request: Request) {
     category: t.category || null,
     category_confidence: t.category_confidence || 'low',
     approved: t.approved ?? false,
-    tax_year: t.tax_year,
+    tax_year: t.tax_year || topTaxYear,
     notes: t.notes || null,
+    source_ref: t.sourceRef || null,
   }))
 
   const supabase = await getSupabase()
+  const entityId = topEntityId || allRows[0]?.entity_id
+  let duplicateIds: string[] = []
+
+  // Handle deduplication if on_duplicate is set
+  if (onDuplicate === 'skip' || onDuplicate === 'replace') {
+    // Find existing matches by source_ref
+    const sourceRefs = allRows
+      .map((r) => r.source_ref)
+      .filter((ref): ref is string => !!ref)
+
+    const refMatchSet = new Set<string>()
+
+    if (sourceRefs.length > 0 && entityId) {
+      const { data: refMatches } = await supabase
+        .from('tax_transactions')
+        .select('id, source_ref')
+        .eq('user_id', userId)
+        .eq('entity_id', entityId)
+        .in('source_ref', sourceRefs)
+
+      for (const row of refMatches ?? []) {
+        if (row.source_ref) {
+          refMatchSet.add(row.source_ref)
+          duplicateIds.push(row.id)
+        }
+      }
+    }
+
+    // Fallback: match by date+description+amount for rows without source_ref match
+    const fallbackRows = allRows.filter((r) => !r.source_ref || !refMatchSet.has(r.source_ref))
+    if (fallbackRows.length > 0 && entityId) {
+      const uniqueDates = [...new Set(fallbackRows.map((r) => r.date))]
+      const { data: dateMatches } = await supabase
+        .from('tax_transactions')
+        .select('id, date, description, amount')
+        .eq('user_id', userId)
+        .eq('entity_id', entityId)
+        .in('date', uniqueDates)
+
+      if (dateMatches && dateMatches.length > 0) {
+        const existingKeys = new Map<string, string>()
+        for (const row of dateMatches) {
+          existingKeys.set(`${row.date}|${row.description}|${row.amount}`, row.id)
+        }
+
+        for (const r of fallbackRows) {
+          const key = `${r.date}|${r.description}|${r.amount}`
+          const existingId = existingKeys.get(key)
+          if (existingId) {
+            refMatchSet.add(key) // reuse set to track matched fallbacks
+            duplicateIds.push(existingId)
+          }
+        }
+      }
+    }
+
+    if (onDuplicate === 'skip') {
+      // Filter out duplicate rows
+      const dupSourceRefs = new Set(
+        allRows.filter((r) => r.source_ref && refMatchSet.has(r.source_ref)).map((r) => r.source_ref),
+      )
+      const dupFallbackKeys = new Set<string>()
+      for (const r of allRows) {
+        if (!r.source_ref || !dupSourceRefs.has(r.source_ref)) {
+          const key = `${r.date}|${r.description}|${r.amount}`
+          if (refMatchSet.has(key)) dupFallbackKeys.add(key)
+        }
+      }
+
+      const rows = allRows.filter((r) => {
+        if (r.source_ref && dupSourceRefs.has(r.source_ref)) return false
+        const key = `${r.date}|${r.description}|${r.amount}`
+        return !dupFallbackKeys.has(key)
+      })
+
+      if (rows.length === 0) {
+        return apiSuccess({ inserted: 0, duplicates: duplicateIds.length, ids: [] }, 201)
+      }
+
+      const { data, error } = await supabase.from('tax_transactions').insert(rows).select('id')
+      if (error) {
+        console.error('[tax-manager/transactions] POST error:', error)
+        return API_ERRORS.INTERNAL()
+      }
+      return apiSuccess({
+        inserted: data?.length ?? 0,
+        duplicates: duplicateIds.length,
+        ids: data?.map((r: { id: string }) => r.id) ?? [],
+      }, 201)
+    }
+
+    if (onDuplicate === 'replace') {
+      // Delete existing duplicates, then insert all
+      if (duplicateIds.length > 0) {
+        const { error: delError } = await supabase
+          .from('tax_transactions')
+          .delete()
+          .in('id', duplicateIds)
+          .eq('user_id', userId)
+
+        if (delError) {
+          console.error('[tax-manager/transactions] DELETE duplicates error:', delError)
+          return API_ERRORS.INTERNAL()
+        }
+      }
+    }
+  }
+
   const { data, error } = await supabase
     .from('tax_transactions')
-    .insert(rows)
+    .insert(allRows)
     .select('id')
 
   if (error) {
@@ -109,7 +227,11 @@ export async function POST(request: Request) {
     return API_ERRORS.INTERNAL()
   }
 
-  return apiSuccess({ inserted: data?.length ?? 0, ids: data?.map((r: { id: string }) => r.id) ?? [] }, 201)
+  return apiSuccess({
+    inserted: data?.length ?? 0,
+    duplicates: duplicateIds.length,
+    ids: data?.map((r: { id: string }) => r.id) ?? [],
+  }, 201)
 }
 
 export async function PATCH(request: Request) {

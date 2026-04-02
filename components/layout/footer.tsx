@@ -1,4 +1,8 @@
+'use client'
+
+import { useEffect } from 'react'
 import Link from 'next/link'
+import Script from 'next/script'
 
 interface FooterLink {
   label: string
@@ -20,6 +24,29 @@ export function Footer({
     { label: 'Contact Support', href: '/contact' },
   ],
 }: FooterProps) {
+  useEffect(() => {
+    // Initialize Shielded embed once the script has loaded
+    const el = document.getElementById('shielded-logo')
+    if (el && typeof (window as any).ds07o6pcmkorn !== 'undefined') {
+      const frameName = new (window as any).ds07o6pcmkorn({
+        openElementId: '#shielded-logo',
+        modalID: 'modal',
+      })
+      frameName.init()
+    }
+  }, [])
+
+  function handleShieldedReady() {
+    const el = document.getElementById('shielded-logo')
+    if (el && typeof (window as any).ds07o6pcmkorn !== 'undefined') {
+      const frameName = new (window as any).ds07o6pcmkorn({
+        openElementId: '#shielded-logo',
+        modalID: 'modal',
+      })
+      frameName.init()
+    }
+  }
+
   return (
     <footer className="mt-auto py-4 px-6 border-t border-slate-200/50 dark:border-slate-800/50">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
@@ -41,26 +68,28 @@ export function Footer({
               {link.label}
             </Link>
           ))}
+          {/* Shielded Site — inline with links on desktop */}
+          <a
+            href="#"
+            id="shielded-logo"
+            title="Shielded Site — support for those experiencing family violence"
+          >
+            <img
+              src="https://shielded.co.nz/img/custom-logo.png"
+              alt="Shielded Site"
+              width={28}
+              height={28}
+              className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+            />
+          </a>
         </div>
       </div>
 
-      {/* Shielded Site — family violence support */}
-      <div className="mt-4 flex justify-center">
-        <a
-          href="https://shielded.co.nz/"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="Shielded Site — support for those experiencing family violence"
-        >
-          <img
-            src="/images/shielded-logo.png"
-            alt="Shielded Site"
-            width={48}
-            height={48}
-            className="opacity-60 hover:opacity-100 transition-opacity"
-          />
-        </a>
-      </div>
+      <Script
+        src="https://staticcdn.co.nz/embed/embed.js"
+        strategy="lazyOnload"
+        onLoad={handleShieldedReady}
+      />
     </footer>
   )
 }

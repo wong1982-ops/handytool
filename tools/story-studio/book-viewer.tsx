@@ -382,7 +382,7 @@ export function BookViewer({ book, onEdit, onStartOver, readOnly, isOwner, onEdi
         )}
 
         {/* Scrollable pages */}
-        <div className="space-y-5 pb-20">
+        <div className="space-y-5 pb-32">
           {/* Cover */}
           <div ref={el => { pageRefs.current[0] = el }} className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#1e2631] shadow-lg overflow-hidden">
             <div className="relative bg-slate-100 dark:bg-slate-800/50">

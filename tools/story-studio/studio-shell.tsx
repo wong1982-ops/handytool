@@ -10,7 +10,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
   const { activeBook } = useBookContext()
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen h-screen overflow-y-auto bg-slate-50 dark:bg-slate-950">
       {/* Fantasy header */}
       <div className="relative bg-gradient-to-r from-indigo-950 via-purple-900 to-indigo-950">
         {/* Starfield background */}
@@ -89,7 +89,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Tab content */}
-      <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+      <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8 pb-24 md:pb-8">
         {children}
       </main>
     </div>
