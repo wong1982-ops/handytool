@@ -8,8 +8,7 @@ import { CodeEditor, type CodeEditorHandle } from '@/tools/json-converter/code-e
 import { StatusBar } from '@/tools/json-converter/status-bar'
 import { TreeView } from '@/tools/json-converter/tree-view'
 import { DiffView } from '@/tools/json-converter/diff-view'
-import { FavoriteButton } from '@/components/ui/favorite-button'
-import { BackButton } from '@/components/ui/back-button'
+import { ToolFrame } from '@/components/layout/tool-frame'
 import { SchemaValidator } from '@/tools/json-converter/schema-validator'
 import { QueryPanel } from '@/tools/json-converter/query-panel'
 import { ProblemsPanel } from '@/components/ui/problems-panel'
@@ -625,8 +624,9 @@ export default function JsonConverterPage() {
   }, [handleToYaml, handleToJson, handleUndo, handleRedo, handleFormat])
 
   return (
+    <ToolFrame toolName="JSON Converter" toolSlug="json-converter" variant="compact" icon={<span className="text-lg">{'{}'}</span>}>
     <div
-      className="flex-1 flex flex-col relative"
+      className="h-full flex flex-col relative"
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
@@ -645,17 +645,8 @@ export default function JsonConverterPage() {
         </div>
       )}
 
-      {/* Top Bar: Breadcrumb + Undo/Redo + Clear */}
-      <div className="relative z-0 px-4 md:px-6 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between">
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2">
-          <BackButton />
-          <ol className="hidden md:flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-            <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
-            <li aria-hidden="true">/</li>
-            <li aria-current="page" className="text-slate-900 dark:text-white font-medium">JSON Converter</li>
-          </ol>
-          <FavoriteButton slug="json-converter" name="JSON Converter" />
-        </nav>
+      {/* Top Bar: Undo/Redo + Clear */}
+      <div className="relative z-0 px-4 md:px-6 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-end">
         <div className="flex items-center gap-1.5">
           <button
             onClick={handleUndo}
@@ -1019,6 +1010,7 @@ export default function JsonConverterPage() {
         </div>
       )}
     </div>
+    </ToolFrame>
   )
 }
 

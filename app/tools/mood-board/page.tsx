@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { ToolFrame } from '@/components/layout/tool-frame'
 import MoodBoardStudio from '@/tools/mood-board/mood-board-studio'
 
 export const metadata: Metadata = {
@@ -8,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function MoodBoardPage() {
   return (
-    <main className="flex-1 flex flex-col bg-[#090f16] min-h-screen">
+    <ToolFrame toolName="Mood Board" toolSlug="mood-board" icon={<span>🎨</span>}>
       <MoodBoardStudio />
-    </main>
+    </ToolFrame>
   )
 }

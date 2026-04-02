@@ -11,8 +11,7 @@ import { useFabricCanvas } from '@/tools/image-editor/use-fabric-canvas'
 import { LayersPanel } from '@/tools/image-editor/layers-panel'
 import { ExportDialog, type ExportOptions } from '@/tools/image-editor/export-dialog'
 import { HistoryStrip } from '@/tools/image-editor/history-strip'
-import { FavoriteButton } from '@/components/ui/favorite-button'
-import { BackButton } from '@/components/ui/back-button'
+import { ToolFrame } from '@/components/layout/tool-frame'
 
 const DEFAULT_ADJUSTMENTS: Adjustments = {
   brightness: 0,
@@ -445,18 +444,17 @@ export default function ImageEditorPage() {
   }, [fabric.clearMask, fabric.setAiMode])
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-[#101622]">
+    <ToolFrame toolName="Image Editor" toolSlug="image-editor" variant="compact" icon={<span className="text-lg">🖼️</span>}>
+    <div className="h-full flex flex-col overflow-hidden bg-[#101622]">
       {/* Top bar */}
       <header className="h-12 border-b border-slate-700 flex items-center justify-between px-4 shrink-0 bg-[#101622]">
         <div className="flex items-center gap-4">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2">
-            <BackButton />
             <ol className="hidden md:flex items-center gap-1.5 text-sm text-slate-400">
               <li><a href="/tools" className="hover:text-[var(--tk-color-primary-500)] transition-colors">Home</a></li>
               <li aria-hidden="true">/</li>
               <li aria-current="page" className="text-white font-medium">Image Editor</li>
             </ol>
-            <FavoriteButton slug="image-editor" name="Image Editor" />
           </nav>
 
           {/* Dropdown menus */}
@@ -916,5 +914,6 @@ export default function ImageEditorPage() {
         currentSize={fabric.imageSize}
       />
     </div>
+    </ToolFrame>
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
 import { useBoard } from './use-board'
 import Wizard from './wizard'
 import LoadingScreen from './loading-screen'
@@ -109,10 +108,7 @@ export default function MoodBoardStudio() {
 
   if (view === 'my-boards') {
     return (
-      <div className="min-h-screen bg-[#090f16]">
-        <div className="px-4 pt-4">
-          <ToolBreadcrumb toolName="Mood Board" toolSlug="mood-board" />
-        </div>
+      <div>
         <BoardToolbar
           title={board.board.title}
           saving={board.saving}
@@ -132,11 +128,7 @@ export default function MoodBoardStudio() {
   // --- View: Board ---
 
   return (
-    <div className="min-h-screen bg-[#090f16]">
-      <div className="px-4 pt-4">
-        <ToolBreadcrumb toolName="Mood Board" toolSlug="mood-board" />
-      </div>
-
+    <div>
       <BoardToolbar
         title={board.board.title}
         saving={board.saving}
