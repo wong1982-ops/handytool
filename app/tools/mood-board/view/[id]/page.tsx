@@ -28,70 +28,84 @@ export default async function SharedBoardPage({ params }: { params: Promise<{ id
     )
   }
 
-  // Render read-only board view — images positioned absolutely based on elements JSON
+  const elements = (board.elements || []) as any[]
+  const images = elements.filter((el: any) => el.type === 'image' && el.data?.imageUrl)
+  const palette = elements.find((el: any) => el.type === 'palette' && el.data?.colors)
+  const fonts = elements.filter((el: any) => el.type === 'font' && el.data?.fontFamily)
+  const notes = elements.filter((el: any) => el.type === 'text' || el.type === 'swatch')
+
   return (
     <main className="flex-1 flex flex-col items-center bg-[#090f16] min-h-screen p-4">
-      <h1 className="text-white text-2xl font-bold mb-4">{board.title}</h1>
+      <h1 className="text-white text-2xl font-bold mb-1">{board.title}</h1>
       <p className="text-[#70767f] text-sm mb-6">Theme: {board.theme}</p>
-      <div className="relative w-full max-w-5xl min-h-[600px] bg-[#0d1117] rounded-xl overflow-hidden">
-        {(board.elements as any[]).map((el: any) => {
-          if (el.type === 'image' && el.data?.imageUrl) {
-            return (
+
+      <div className="w-full max-w-5xl space-y-6">
+        {/* Image Grid */}
+        {images.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {images.map((el: any, i: number) => (
               <div
                 key={el.id}
-                className="absolute rounded-lg overflow-hidden border-2 border-white/10 shadow-lg"
-                style={{
-                  left: el.x, top: el.y,
-                  width: el.width, height: el.height,
-                  transform: `rotate(${el.rotation || 0}deg)`,
-                }}
+                className={`rounded-xl overflow-hidden ${i < 2 ? 'md:col-span-2 md:row-span-2' : ''}`}
               >
-                <img src={el.data.imageUrl} alt={el.data.alt || ''} className="w-full h-full object-cover" />
+                <div className="aspect-square">
+                  <img src={el.data.imageUrl} alt={el.data.alt || ''} className="w-full h-full object-cover" />
+                </div>
               </div>
-            )
-          }
-          if (el.type === 'palette' && el.data?.colors) {
-            return (
-              <div
-                key={el.id}
-                className="absolute flex gap-2 items-center bg-[#131a23] rounded-xl px-3 py-2"
-                style={{ left: el.x, top: el.y, transform: `rotate(${el.rotation || 0}deg)` }}
-              >
-                {el.data.colors.map((c: string, i: number) => (
+            ))}
+          </div>
+        )}
+
+        {/* Palette + Fonts Row */}
+        {(palette || fonts.length > 0) && (
+          <div className="flex flex-col md:flex-row gap-6 py-6 border-t border-b border-[#1e2631]">
+            {palette && (
+              <div className="flex gap-3">
+                {(palette.data.colors as string[]).map((c: string, i: number) => (
                   <div key={i} className="flex flex-col items-center gap-1">
-                    <div className="w-8 h-8 rounded-full" style={{ backgroundColor: c }} />
-                    <span className="text-[9px] text-[#70767f]">{c}</span>
+                    <div className="w-12 h-12 rounded-lg" style={{ backgroundColor: c }} />
+                    <span className="text-xs text-[#70767f]">{c}</span>
                   </div>
                 ))}
               </div>
-            )
-          }
-          if (el.type === 'font' && el.data?.fontFamily) {
-            return (
-              <div
-                key={el.id}
-                className="absolute bg-[#131a23] rounded-xl px-4 py-3"
-                style={{ left: el.x, top: el.y, width: el.width, transform: `rotate(${el.rotation || 0}deg)` }}
-              >
-                <p className="text-[10px] text-[#70767f] mb-1">{el.data.category === 'heading' ? 'Heading' : 'Body'}</p>
-                <p className="text-white text-sm font-medium">{el.data.fontFamily}</p>
-                <p className="text-[#a6abb5] text-xs mt-1" style={{ fontFamily: el.data.fontFamily }}>{el.data.sampleText}</p>
+            )}
+            {fonts.length > 0 && (
+              <div className="flex gap-4">
+                {fonts.map((el: any) => (
+                  <div key={el.id} className="rounded-xl bg-[#131a23] border border-[#1e2631] p-4">
+                    <p className="text-[10px] text-[#70767f] mb-1">{el.data.category === 'heading' ? 'Heading' : 'Body'}</p>
+                    <p className="text-white text-sm font-medium">{el.data.fontFamily}</p>
+                    <p className="text-[#a6abb5] text-xs mt-1" style={{ fontFamily: el.data.fontFamily }}>{el.data.sampleText}</p>
+                  </div>
+                ))}
               </div>
-            )
-          }
-          if (el.type === 'text' && el.data?.content) {
-            return (
-              <div
-                key={el.id}
-                className="absolute bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-3 py-2"
-                style={{ left: el.x, top: el.y, width: el.width, transform: `rotate(${el.rotation || 0}deg)` }}
-              >
-                <p className="text-white text-sm">{el.data.content}</p>
-              </div>
-            )
-          }
-          return null
-        })}
+            )}
+          </div>
+        )}
+
+        {/* Notes */}
+        {notes.length > 0 && (
+          <div className="flex flex-wrap gap-3">
+            {notes.map((el: any) => {
+              if (el.type === 'text') {
+                return (
+                  <div key={el.id} className="w-40 min-h-[80px] rounded-lg bg-amber-200/90 p-3 text-sm text-slate-800">
+                    {el.data.content}
+                  </div>
+                )
+              }
+              if (el.type === 'swatch') {
+                return (
+                  <div key={el.id} className="flex flex-col items-center gap-1">
+                    <div className="w-16 h-16 rounded-lg" style={{ backgroundColor: el.data.color }} />
+                    <span className="text-xs text-[#70767f]">{el.data.color}</span>
+                  </div>
+                )
+              }
+              return null
+            })}
+          </div>
+        )}
       </div>
     </main>
   )
