@@ -108,11 +108,27 @@ export default function StylePicker({
     <div className="flex flex-col gap-8">
       {STYLE_CATEGORIES.map((category) => {
         const styles = ART_STYLES.filter((s) => s.category === category.id)
-        const categoryIcons: Record<string, string> = { classic: '\u{1F3A8}', modern: '\u{26A1}', fantasy: '\u{2728}' }
+        const categoryIconMap: Record<string, React.ReactNode> = {
+          classic: (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+            </svg>
+          ),
+          modern: (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+            </svg>
+          ),
+          fantasy: (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
+            </svg>
+          ),
+        }
         return (
           <section key={category.id}>
             <h3 className="flex items-center gap-2 mb-4 text-sm font-semibold uppercase tracking-wider text-[#a6abb5]">
-              <span>{categoryIcons[category.id] || '\u{2728}'}</span>
+              {categoryIconMap[category.id]}
               {category.label}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -138,7 +154,7 @@ export default function StylePicker({
             isFun ? 'text-sm' : 'text-xs uppercase tracking-wider text-[var(--tk-color-text-secondary)]'
           }`}
         >
-          {isFun ? '✍️ Or describe your own style' : 'Custom style'}
+          {isFun ? 'Or describe your own style' : 'Custom style'}
         </label>
         <input
           id="custom-style-input"

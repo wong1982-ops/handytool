@@ -79,7 +79,7 @@ export default function RefinementChat({
             ? 'All spells used! Your art is complete!'
             : 'All refinements used.'
           : isFun
-            ? `\u{1FA84} ${remaining}/${MAX_REFINEMENTS} spells left!`
+            ? `${remaining}/${MAX_REFINEMENTS} spells left!`
             : `${remaining}/${MAX_REFINEMENTS} refinements remaining`}
       </p>
 

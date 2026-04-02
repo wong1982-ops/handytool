@@ -186,7 +186,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
         <div className="rounded-2xl bg-[#131a23] p-5 space-y-3">
           {/* Header */}
           <div className="flex items-center gap-2.5 mb-4">
-            <span className="text-[#af88ff] text-lg" aria-hidden="true">✨</span>
+            <svg className="w-5 h-5 text-[#af88ff]" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
             <h3 className="font-bold text-lg text-white">Creation Hub</h3>
           </div>
 
@@ -295,7 +295,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                     : 'text-[#70767f] hover:text-white'
                 }`}
               >
-                {isFun ? '📁 Upload' : 'Upload'}
+                Upload
               </button>
               <button
                 type="button"
@@ -308,7 +308,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                     : 'text-[#70767f] hover:text-white'
                 }`}
               >
-                {isFun ? '✏️ Draw' : 'Draw'}
+                Draw
               </button>
             </div>
           )}
@@ -378,7 +378,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                     : 'bg-[#3D6AF2] text-white hover:bg-[#3D6AF2]/85'
                 }`}
               >
-                {isFun ? '📂 Browse Files' : 'Browse Files'}
+                Browse Files
               </button>
 
               {error && (
@@ -400,7 +400,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                     className="min-h-[44px] px-6 rounded-xl bg-[#3D6AF2] text-white font-semibold hover:bg-[#3D6AF2]/85 transition-colors"
                     onClick={() => handleTabSwitch('upload')}
                   >
-                    {isFun ? '📁 Go to Upload' : 'Switch to Upload'}
+                    {isFun ? 'Go to Upload' : 'Switch to Upload'}
                   </button>
                 </div>
               ) : !cameraActive && !capturedPhoto ? (
@@ -413,7 +413,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                   }`}
                   onClick={startCamera}
                 >
-                  {isFun ? '📸 Open Camera' : 'Open Camera'}
+                  Open Camera
                 </button>
               ) : (
                 <>
@@ -434,7 +434,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                       }`}
                       onClick={capturePhoto}
                     >
-                      {isFun ? '📸 Snap!' : 'Capture'}
+                      {isFun ? 'Snap!' : 'Capture'}
                     </button>
                     <button
                       type="button"

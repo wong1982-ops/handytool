@@ -117,7 +117,7 @@ export default function SaveShare({
     <div className="flex flex-col items-center gap-6">
       {/* Heading */}
       <h2 className="text-center text-xl font-bold text-[var(--tk-color-text-primary)]">
-        {isFun ? '\u{1F389} Your masterpiece is ready!' : 'Your art is ready'}
+        {isFun ? 'Your masterpiece is ready!' : 'Your art is ready'}
       </h2>
 
       {/* Final image */}
@@ -172,7 +172,7 @@ export default function SaveShare({
         onClick={handleDownload}
         className="min-h-[44px] w-full max-w-sm rounded-xl bg-[var(--tk-color-primary-500)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--tk-color-primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] focus:ring-offset-2"
       >
-        {isFun ? '\u{1F4E5} Download PNG' : 'Download PNG'}
+        Download PNG
       </button>
 
       {/* Share buttons */}
@@ -204,7 +204,7 @@ export default function SaveShare({
       <div className="w-full max-w-sm rounded-xl border border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-700)] p-4">
         {published ? (
           <p className="text-center text-sm font-medium text-[var(--tk-color-success-500)]">
-            {isFun ? '\u{1F31F} Published to the gallery!' : 'Published to gallery.'}
+            {isFun ? 'Published to the gallery!' : 'Published to gallery.'}
           </p>
         ) : (
           <>
@@ -267,7 +267,7 @@ export default function SaveShare({
         onClick={onStartOver}
         className="min-h-[44px] w-full max-w-sm rounded-xl border border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] px-6 py-3 text-sm font-medium text-[var(--tk-color-text-primary)] transition-colors hover:bg-[var(--tk-color-surface-100)] dark:hover:bg-[var(--tk-color-surface-700)]"
       >
-        {isFun ? '\u{1F504} Start Over' : 'Start Over'}
+        Start Over
       </button>
     </div>
   )

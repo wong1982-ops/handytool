@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
 import ModeToggle from '@/tools/sketch-to-art/mode-toggle'
+import { SketchTabNavigation } from '@/tools/sketch-to-art/sketch-tab-navigation'
 import SketchInput from '@/tools/sketch-to-art/sketch-input'
 import StylePicker from '@/tools/sketch-to-art/style-picker'
 import GenerationResults from '@/tools/sketch-to-art/generation-results'
@@ -17,7 +18,6 @@ import type {
   WizardState,
   WizardStep,
   GeneratedVariation,
-  RefinementMessage,
 } from '@/tools/sketch-to-art/types'
 import { DEFAULT_WIZARD_STATE } from '@/tools/sketch-to-art/types'
 
@@ -222,278 +222,297 @@ export default function SketchToArtPage() {
   }, [imageHistory.length])
 
   return (
-    <main
-      className="flex-1 flex flex-col items-center py-10 px-4 bg-[#090f16]"
+    <div
+      className="min-h-screen h-screen overflow-y-auto bg-[#090f16]"
       style={{ overscrollBehaviorX: 'none' }}
     >
-      <div className="w-full max-w-4xl relative">
-        {/* Breadcrumb + Mode toggle row */}
-        <div className="flex items-center justify-between mb-4">
-          <ToolBreadcrumb toolName="Sketch to Art" toolSlug="sketch-to-art" />
-          <ModeToggle mode={mode} onToggle={handleModeToggle} />
+      {/* Themed header — matching Story Studio pattern */}
+      <div className="relative bg-gradient-to-r from-[#0c1424] via-[#111b2e] to-[#0c1424]">
+        {/* Subtle particle background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 opacity-30" style={{
+            backgroundImage: `
+              radial-gradient(1px 1px at 10% 25%, #3D6AF2, transparent),
+              radial-gradient(1.5px 1.5px at 30% 65%, #af88ff, transparent),
+              radial-gradient(1px 1px at 50% 15%, #3D9DF2, transparent),
+              radial-gradient(2px 2px at 70% 45%, #3D6AF2, transparent),
+              radial-gradient(1px 1px at 85% 75%, #af88ff, transparent),
+              radial-gradient(1.5px 1.5px at 95% 30%, #3D9DF2, transparent)
+            `,
+            animation: 'starfield-drift 14s ease-in-out infinite alternate',
+          }} />
+          <div className="absolute bottom-0 left-1/4 w-1/2 h-16 bg-gradient-to-t from-[#3D6AF2]/10 via-[#af88ff]/5 to-transparent blur-2xl" />
         </div>
 
-        {/* Showcase Gallery — visible before upload on step 1 */}
-        {state.step === 1 && !state.sketchDataUrl && (
-          <ShowcaseGallery mode={mode} />
-        )}
-
-        {/* Title + Tabs */}
-        <h1 className="text-2xl sm:text-4xl font-extrabold text-white text-center mb-2 tracking-tight">
-          Bring your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#af88ff]">vision</span> to life
-        </h1>
-        <p className="text-sm text-[#a6abb5] text-center mb-6">
-          {isFun ? 'Upload a sketch and watch AI transform it into art' : 'Step ' + state.step + ': ' + ['Upload your sketch', 'Choose a style', 'Generating art', 'Refine your art', 'Save and share'][state.step - 1]}
-        </p>
-
-        {/* Create / My Creations tabs */}
-        {user && (
-          <div className="flex justify-center mb-6">
-            <div className="inline-flex rounded-xl bg-[#131a23]/60 backdrop-blur-xl p-1 gap-1">
-              <button
-                type="button"
-                onClick={() => setActiveTab('create')}
-                className={`px-4 sm:px-6 py-2 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === 'create'
-                    ? 'bg-[#3D6AF2]/20 text-[#93aaff]'
-                    : 'text-[#a6abb5] hover:text-white'
-                }`}
-              >
-                {isFun ? '\u{1F3A8} Create' : 'Create'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('creations')}
-                className={`px-4 sm:px-6 py-2 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === 'creations'
-                    ? 'bg-[#3D6AF2]/20 text-[#93aaff]'
-                    : 'text-[#a6abb5] hover:text-white'
-                }`}
-              >
-                {isFun ? '\u{1F5BC}\u{FE0F} My Creations' : 'My Creations'}
-              </button>
-            </div>
+        <div className="relative max-w-4xl mx-auto px-4 pt-4 pb-4 md:pt-5 md:pb-5">
+          {/* Top row: breadcrumb (desktop) */}
+          <div className="hidden md:block">
+            <ToolBreadcrumb toolName="Sketch to Art" toolSlug="sketch-to-art" />
           </div>
-        )}
+
+          {/* Header row: title + mode toggle */}
+          <div className="mt-1 md:mt-3 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              {/* Mobile: home link */}
+              <a
+                href="/"
+                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full text-[#93aaff] hover:text-white transition-colors"
+                aria-label="Home"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+              </a>
+
+              <div className="relative">
+                <svg className="w-7 h-7 md:w-8 md:h-8 text-[#3D6AF2]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+                </svg>
+                <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#af88ff] rounded-full animate-pulse" />
+              </div>
+              <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+                Sketch to Art
+              </h1>
+            </div>
+
+            <ModeToggle mode={mode} onToggle={handleModeToggle} />
+          </div>
+        </div>
+      </div>
+
+      {/* Sticky tab navigation — always accessible */}
+      <div className="sticky top-0 z-30">
+        <SketchTabNavigation activeTab={activeTab} onTabChange={setActiveTab} mode={mode} />
+      </div>
+
+      {/* Tab content */}
+      <main className="max-w-4xl mx-auto px-4 py-6 md:py-8 pb-24 md:pb-8">
 
         {/* My Creations tab */}
         <MyCreations mode={mode} visible={activeTab === 'creations'} />
 
         {activeTab === 'create' && (<>
-        {/* Step indicator — labeled stepper */}
-        {(() => {
-          const stepLabels = isFun
-            ? ['Sketch', 'Style', 'Magic', 'Refine', 'Share']
-            : ['Upload', 'Style', 'Generate', 'Refine', 'Save']
-          // Icons reserved for future use
-          return (
-            <nav aria-label="Wizard progress" className="mb-8">
-              {/* Desktop: full labeled stepper */}
-              <ol className="hidden sm:flex items-center justify-center gap-0">
-                {STEPS.map((s, i) => {
-                  const isCompleted = s < state.step
-                  const isCurrent = s === state.step
-                  return (
-                    <li key={s} className="flex items-center">
-                      <div className="flex flex-col items-center">
-                        {/* Circle */}
-                        <div className={`flex items-center justify-center w-9 h-9 rounded-full border-2 transition-all duration-300 ${
+          {/* Showcase Gallery — visible before upload on step 1 */}
+          {state.step === 1 && !state.sketchDataUrl && (
+            <ShowcaseGallery mode={mode} />
+          )}
+
+          {/* Subtitle */}
+          <p className="text-sm text-[#a6abb5] text-center mb-6">
+            {isFun ? 'Upload a sketch and watch AI transform it into art' : 'Step ' + state.step + ': ' + ['Upload your sketch', 'Choose a style', 'Generating art', 'Refine your art', 'Save and share'][state.step - 1]}
+          </p>
+
+          {/* Step indicator — labeled stepper */}
+          {(() => {
+            const stepLabels = isFun
+              ? ['Sketch', 'Style', 'Magic', 'Refine', 'Share']
+              : ['Upload', 'Style', 'Generate', 'Refine', 'Save']
+            return (
+              <nav aria-label="Wizard progress" className="mb-8">
+                {/* Desktop: full labeled stepper */}
+                <ol className="hidden sm:flex items-center justify-center gap-0">
+                  {STEPS.map((s, i) => {
+                    const isCompleted = s < state.step
+                    const isCurrent = s === state.step
+                    return (
+                      <li key={s} className="flex items-center">
+                        <div className="flex flex-col items-center">
+                          {/* Circle */}
+                          <div className={`flex items-center justify-center w-9 h-9 rounded-full border-2 transition-all duration-300 ${
+                            isCompleted
+                              ? 'bg-[#3D6AF2] border-[#3D6AF2]'
+                              : isCurrent
+                              ? 'border-[#3D6AF2] bg-[#3D6AF2]/20 shadow-[0_0_15px_rgba(61,106,242,0.4)]'
+                              : 'border-[#1e2631] bg-transparent'
+                          }`}>
+                            {isCompleted ? (
+                              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            ) : (
+                              <span className={`text-xs font-bold ${
+                                isCurrent ? 'text-[#93aaff]' : 'text-[#70767f]'
+                              }`}>{s}</span>
+                            )}
+                          </div>
+                          {/* Label */}
+                          <span className={`mt-1.5 text-[11px] font-medium transition-colors ${
+                            isCompleted || isCurrent
+                              ? 'text-[#93aaff]'
+                              : 'text-[#70767f]'
+                          }`}>
+                            {stepLabels[i]}
+                          </span>
+                        </div>
+                        {/* Connector line */}
+                        {i < STEPS.length - 1 && (
+                          <div className={`w-12 lg:w-20 h-0.5 mx-2 rounded-full transition-colors duration-300 ${
+                            s < state.step ? 'bg-gradient-to-r from-[#3D6AF2] to-[#3D6AF2]' : 'bg-[#1e2631]'
+                          }`} />
+                        )}
+                      </li>
+                    )
+                  })}
+                </ol>
+
+                {/* Mobile: compact pill stepper */}
+                <div className="flex sm:hidden items-center justify-center gap-1.5">
+                  {STEPS.map((s, i) => {
+                    const isCompleted = s < state.step
+                    const isCurrent = s === state.step
+                    return (
+                      <div key={s} className="flex items-center gap-1.5">
+                        <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
                           isCompleted
-                            ? 'bg-[#3D6AF2] border-[#3D6AF2]'
+                            ? 'bg-[#3D6AF2] text-white'
                             : isCurrent
-                            ? 'border-[#3D6AF2] bg-[#3D6AF2]/20 shadow-[0_0_15px_rgba(61,106,242,0.4)]'
-                            : 'border-[#1e2631] bg-transparent'
+                            ? 'bg-[#3D6AF2]/15 text-[#93aaff] ring-1 ring-[#3D6AF2]/30'
+                            : 'bg-[#131a23] text-[#70767f]'
                         }`}>
                           {isCompleted ? (
-                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                           ) : (
-                            <span className={`text-xs font-bold ${
-                              isCurrent ? 'text-[#93aaff]' : 'text-[#70767f]'
-                            }`}>{s}</span>
+                            <span>{s}</span>
                           )}
+                          {isCurrent && <span>{stepLabels[i]}</span>}
                         </div>
-                        {/* Label */}
-                        <span className={`mt-1.5 text-[11px] font-medium transition-colors ${
-                          isCompleted || isCurrent
-                            ? 'text-[#93aaff]'
-                            : 'text-[#70767f]'
-                        }`}>
-                          {stepLabels[i]}
-                        </span>
-                      </div>
-                      {/* Connector line */}
-                      {i < STEPS.length - 1 && (
-                        <div className={`w-12 lg:w-20 h-0.5 mx-2 rounded-full transition-colors duration-300 ${
-                          s < state.step ? 'bg-gradient-to-r from-[#3D6AF2] to-[#3D6AF2]' : 'bg-[#1e2631]'
-                        }`} />
-                      )}
-                    </li>
-                  )
-                })}
-              </ol>
-
-              {/* Mobile: compact pill stepper */}
-              <div className="flex sm:hidden items-center justify-center gap-1.5">
-                {STEPS.map((s, i) => {
-                  const isCompleted = s < state.step
-                  const isCurrent = s === state.step
-                  return (
-                    <div key={s} className="flex items-center gap-1.5">
-                      <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
-                        isCompleted
-                          ? 'bg-[var(--tk-color-primary-500)] text-white'
-                          : isCurrent
-                          ? 'bg-[var(--tk-color-primary-500)]/15 text-[var(--tk-color-primary-500)] ring-1 ring-[var(--tk-color-primary-500)]/30'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                      }`}>
-                        {isCompleted ? (
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        ) : (
-                          <span>{s}</span>
+                        {i < STEPS.length - 1 && (
+                          <div className={`w-3 h-0.5 rounded-full ${
+                            s < state.step ? 'bg-[#3D6AF2]' : 'bg-[#1e2631]'
+                          }`} />
                         )}
-                        {isCurrent && <span>{stepLabels[i]}</span>}
                       </div>
-                      {i < STEPS.length - 1 && (
-                        <div className={`w-3 h-0.5 rounded-full ${
-                          s < state.step ? 'bg-[var(--tk-color-primary-500)]' : 'bg-slate-200 dark:bg-slate-700'
-                        }`} />
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </nav>
-          )
-        })()}
+                    )
+                  })}
+                </div>
+              </nav>
+            )
+          })()}
 
-        {/* Wizard content */}
-        <div id="wizard" style={{ scrollMarginTop: '80px' }}>
+          {/* Wizard content */}
+          <div id="wizard" style={{ scrollMarginTop: '80px' }}>
 
-        {/* Back button removed — replaced by sticky action footer below */}
+          {/* Error display */}
+          {state.error && (
+            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              {state.error}
+            </div>
+          )}
 
-        {/* Error display */}
-        {state.error && (
-          <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm">
-            {state.error}
-          </div>
-        )}
+          {/* Step 1: Sketch Input */}
+          {state.step === 1 && (
+            <SketchInput onSketchReady={handleSketchReady} mode={mode} />
+          )}
 
-        {/* Step 1: Sketch Input */}
-        {state.step === 1 && (
-          <SketchInput onSketchReady={handleSketchReady} mode={mode} />
-        )}
+          {/* Step 2: Style Picker + Generate */}
+          {state.step === 2 && (
+            <div>
+              <StylePicker
+                selectedStyle={state.selectedStyle}
+                customStyle={state.customStyle}
+                onSelectStyle={(id) => setState((s) => ({ ...s, selectedStyle: id }))}
+                onCustomStyleChange={(text) => setState((s) => ({ ...s, customStyle: text }))}
+                mode={mode}
+              />
 
-        {/* Step 2: Style Picker + Generate */}
-        {state.step === 2 && (
-          <div>
-            <StylePicker
-              selectedStyle={state.selectedStyle}
-              customStyle={state.customStyle}
-              onSelectStyle={(id) => setState((s) => ({ ...s, selectedStyle: id }))}
-              onCustomStyleChange={(text) => setState((s) => ({ ...s, customStyle: text }))}
-              mode={mode}
-            />
-
-            {/* Auth gate */}
-            {!user && !authLoading ? (
-              <div className="mt-6 text-center">
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
-                  Sign in to generate art
-                </p>
+              {/* Auth gate */}
+              {!user && !authLoading ? (
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-[#a6abb5] mb-3">
+                    Sign in to generate art
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => signInWithOAuth('google')}
+                    className="min-h-[44px] px-6 rounded-xl bg-gradient-to-r from-pink-500 to-violet-500 text-white font-medium hover:opacity-90 transition-opacity"
+                  >
+                    Sign in with Google
+                  </button>
+                </div>
+              ) : (
                 <button
                   type="button"
-                  onClick={() => signInWithOAuth('google')}
-                  className="min-h-[44px] px-6 rounded-xl bg-gradient-to-r from-pink-500 to-violet-500 text-white font-medium hover:opacity-90 transition-opacity"
+                  onClick={handleGenerate}
+                  disabled={!state.selectedStyle && !state.customStyle.trim()}
+                  className="mt-6 w-full min-h-[44px] rounded-xl bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold text-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Sign in with Google
+                  {isFun ? '\u2728 Make Magic!' : 'Generate'}
                 </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={handleGenerate}
-                disabled={!state.selectedStyle && !state.customStyle.trim()}
-                className="mt-6 w-full min-h-[44px] rounded-xl bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold text-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {isFun ? '✨ Make Magic!' : 'Generate'}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Step 3: Generation Results */}
-        {state.step === 3 && (
-          <GenerationResults
-            variations={state.variations}
-            selectedIndex={state.selectedIndex}
-            onSelect={handleSelectVariation}
-            loading={state.loading}
-            mode={mode}
-          />
-        )}
-
-        {/* Step 4: Refinement Chat */}
-        {state.step === 4 && state.currentImage && (
-          <RefinementChat
-            currentImage={state.currentImage}
-            originalSketch={state.sketchDataUrl || ''}
-            style={state.selectedStyle || state.customStyle}
-            chatHistory={state.chatHistory}
-            onSendMessage={handleSendRefinement}
-            refinementCount={state.refinementCount}
-            loading={state.loading}
-            error={state.error}
-            imageHistory={imageHistory}
-            onRevert={handleRevert}
-            mode={mode}
-            onDone={handleRefinementDone}
-          />
-        )}
-
-        {/* Step 5: Save & Share */}
-        {state.step === 5 && state.currentImage && (
-          <SaveShare
-            finalImage={state.currentImage}
-            originalSketch={state.sketchDataUrl || ''}
-            style={state.selectedStyle || state.customStyle}
-            mode={mode}
-            onStartOver={handleStartOver}
-          />
-        )}
-
-        {/* Sticky action footer — Prev / Next */}
-        {state.step > 1 && state.step < 5 && (
-          <div className="sticky bottom-0 z-20 mt-6 -mx-4 px-4 py-3 bg-[#090f16]/90 backdrop-blur-lg border-t border-[#1e2631]">
-            <div className="flex items-center justify-between max-w-4xl mx-auto">
-              <button
-                type="button"
-                onClick={handleBack}
-                className="min-h-[44px] px-5 py-2 rounded-xl text-sm font-medium text-[#a6abb5] hover:text-white bg-[#131a23] hover:bg-[#1e2631] transition-colors cursor-pointer inline-flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-                {isFun
-                  ? ['', 'Sketch', 'Style', 'Magic', 'Refine'][state.step - 1]
-                  : 'Previous'}
-              </button>
-              <span className="text-xs text-[#70767f]">
-                Step {state.step} of 5
-              </span>
-              {state.step === 1 && (
-                <div className="w-20" /> // spacer
               )}
             </div>
-          </div>
-        )}
+          )}
 
-        </div>{/* end #wizard */}
+          {/* Step 3: Generation Results */}
+          {state.step === 3 && (
+            <GenerationResults
+              variations={state.variations}
+              selectedIndex={state.selectedIndex}
+              onSelect={handleSelectVariation}
+              loading={state.loading}
+              mode={mode}
+            />
+          )}
+
+          {/* Step 4: Refinement Chat */}
+          {state.step === 4 && state.currentImage && (
+            <RefinementChat
+              currentImage={state.currentImage}
+              originalSketch={state.sketchDataUrl || ''}
+              style={state.selectedStyle || state.customStyle}
+              chatHistory={state.chatHistory}
+              onSendMessage={handleSendRefinement}
+              refinementCount={state.refinementCount}
+              loading={state.loading}
+              error={state.error}
+              imageHistory={imageHistory}
+              onRevert={handleRevert}
+              mode={mode}
+              onDone={handleRefinementDone}
+            />
+          )}
+
+          {/* Step 5: Save & Share */}
+          {state.step === 5 && state.currentImage && (
+            <SaveShare
+              finalImage={state.currentImage}
+              originalSketch={state.sketchDataUrl || ''}
+              style={state.selectedStyle || state.customStyle}
+              mode={mode}
+              onStartOver={handleStartOver}
+            />
+          )}
+
+          {/* Sticky action footer — Prev / Next */}
+          {state.step > 1 && state.step < 5 && (
+            <div className="sticky bottom-0 z-20 mt-6 -mx-4 px-4 py-3 bg-[#090f16]/90 backdrop-blur-lg border-t border-[#1e2631]">
+              <div className="flex items-center justify-between max-w-4xl mx-auto">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="min-h-[44px] px-5 py-2 rounded-xl text-sm font-medium text-[#a6abb5] hover:text-white bg-[#131a23] hover:bg-[#1e2631] transition-colors cursor-pointer inline-flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  {isFun
+                    ? ['', 'Sketch', 'Style', 'Magic', 'Refine'][state.step - 1]
+                    : 'Previous'}
+                </button>
+                <span className="text-xs text-[#70767f]">
+                  Step {state.step} of 5
+                </span>
+                {state.step === 1 && (
+                  <div className="w-20" />
+                )}
+              </div>
+            </div>
+          )}
+
+          </div>{/* end #wizard */}
         </>)}
-      </div>
-    </main>
+      </main>
+    </div>
   )
 }

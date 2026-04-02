@@ -135,7 +135,7 @@ export default function MyCreations({ mode, visible }: MyCreationsProps) {
     return (
       <div className="flex flex-col items-center py-16 px-4">
         <div className="w-20 h-20 mb-5 rounded-2xl bg-gradient-to-br from-pink-100 to-violet-100 dark:from-pink-500/10 dark:to-violet-500/10 flex items-center justify-center">
-          <span className="text-3xl">{isFun ? '\u{1F3A8}' : '\u{1F5BC}\u{FE0F}'}</span>
+          <svg className="w-8 h-8 text-[#93aaff]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" /></svg>
         </div>
         <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
           {isFun ? 'Your gallery is empty!' : 'No creations yet'}
@@ -199,7 +199,16 @@ export default function MyCreations({ mode, visible }: MyCreationsProps) {
         <dialog
           open
           className="fixed inset-0 z-50 m-0 p-0 w-full h-full max-w-none max-h-none bg-black/85"
+          style={{ touchAction: 'none', overscrollBehavior: 'contain' }}
           onClick={(e) => { if (e.target === e.currentTarget) setSelectedId(null) }}
+          onTouchMove={(e) => {
+            // Prevent horizontal swipe from triggering browser back navigation
+            const target = e.target as HTMLElement
+            // Allow vertical scroll inside the modal content
+            if (!target.closest('.modal-scrollable')) {
+              e.preventDefault()
+            }
+          }}
         >
           <div className="flex items-center justify-center min-h-full p-4">
             <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden">

@@ -110,22 +110,51 @@ export default function Wizard({ onGenerate, onViewBoards }: WizardProps) {
             <h2 className="text-2xl font-bold text-white">Pick a vibe</h2>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {MOOD_CARDS.map((card) => (
-                <button
-                  key={card.id}
-                  onClick={() => setMood(card.id)}
-                  className={[
-                    'rounded-xl bg-[#131a23] border border-[#1e2631] p-4 text-center cursor-pointer hover:bg-[#1e2631] transition-colors',
-                    mood === card.id ? 'ring-2 ring-[#3D6AF2] bg-[#1e2631]' : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
-                >
-                  <div className="text-3xl mb-2">{card.emoji}</div>
-                  <div className="text-sm font-semibold text-white">{card.label}</div>
-                  <div className="text-xs text-[#70767f] mt-1">{card.description}</div>
-                </button>
-              ))}
+              {MOOD_CARDS.map((card) => {
+                const isSelected = mood === card.id
+                return (
+                  <button
+                    key={card.id}
+                    onClick={() => setMood(card.id)}
+                    className={[
+                      'group relative rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3D6AF2]',
+                      isSelected
+                        ? 'ring-2 shadow-lg'
+                        : 'ring-1 ring-[#1e2631] hover:ring-[#2a3545]',
+                    ].join(' ')}
+                    style={{
+                      ...(isSelected ? { ringColor: card.accent, boxShadow: `0 0 20px ${card.accent}40` } : {}),
+                    }}
+                  >
+                    {/* Gradient background */}
+                    <div
+                      className="aspect-[4/3] w-full relative"
+                      style={{ background: card.gradient }}
+                    >
+                      {/* Pattern overlay */}
+                      <div
+                        className="absolute inset-0"
+                        style={{ backgroundImage: card.pattern, backgroundSize: '20px 20px' }}
+                      />
+                      {/* Hover shimmer */}
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-tr from-white/10 via-transparent to-white/5" />
+                      {/* Selected check */}
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center">
+                          <svg className="w-4 h-4 text-[#3D6AF2]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    {/* Label area */}
+                    <div className="px-3 py-2.5 bg-[#131a23] text-left">
+                      <div className="text-sm font-semibold text-white">{card.label}</div>
+                      <div className="text-[11px] text-[#70767f] mt-0.5 leading-snug">{card.description}</div>
+                    </div>
+                  </button>
+                )
+              })}
             </div>
 
             <div className="flex gap-3">
