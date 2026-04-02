@@ -2,6 +2,9 @@
 
 export type ElementType = 'image' | 'palette' | 'swatch' | 'font' | 'text'
 
+export type MoodOption = 'cozy' | 'bold' | 'elegant' | 'playful' | 'minimal' | 'vintage' | 'luxurious' | 'natural'
+export type ColorPreference = 'warm' | 'cool' | 'neutral' | 'surprise'
+
 export interface ImageData {
   imageUrl: string
   alt: string
@@ -31,11 +34,9 @@ export type ElementData = ImageData | PaletteData | SwatchData | FontData | Text
 export interface BoardElement {
   id: string
   type: ElementType
-  x: number
-  y: number
   width: number
   height: number
-  rotation: number
+  order: number
   data: ElementData
 }
 
@@ -48,6 +49,8 @@ export interface Board {
   shareId: string | null
   createdAt: string | null
   updatedAt: string | null
+  mood: MoodOption | null
+  colorPreference: ColorPreference
 }
 
 export const DEFAULT_BOARD: Board = {
@@ -59,17 +62,11 @@ export const DEFAULT_BOARD: Board = {
   shareId: null,
   createdAt: null,
   updatedAt: null,
+  mood: null,
+  colorPreference: 'surprise',
 }
 
 export const MAX_ELEMENTS = 30
-
-export const ELEMENT_DEFAULTS: Record<ElementType, { width: number; height: number }> = {
-  image: { width: 200, height: 200 },
-  palette: { width: 250, height: 60 },
-  swatch: { width: 80, height: 80 },
-  font: { width: 220, height: 80 },
-  text: { width: 160, height: 100 },
-}
 
 export const FONT_SUGGESTIONS = [
   { heading: 'Playfair Display', body: 'Inter' },
