@@ -389,7 +389,7 @@ export function SideDrawer({
       {/* ---- Backdrop ---- */}
       {open && (
         <div
-          className="fixed inset-0 z-35 bg-black/30"
+          className="fixed inset-0 z-[35] bg-black/30"
           onClick={onClose}
           aria-hidden="true"
         />

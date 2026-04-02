@@ -1,0 +1,92 @@
+<h2>Canvas — What Kind of Board Layout?</h2>
+<p class="subtitle">How should generated elements be arranged on the canvas?</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#131a23; padding:1.5rem; min-height:200px;">
+      <!-- Freeform scattered mockup -->
+      <div style="position:relative; height:180px;">
+        <div style="position:absolute;top:5px;left:10px;width:90px;height:70px;background:#2a3444;border-radius:6px;transform:rotate(-2deg);border:2px solid #fff3"></div>
+        <div style="position:absolute;top:15px;left:120px;width:110px;height:80px;background:#2a3444;border-radius:6px;transform:rotate(3deg);border:2px solid #fff3"></div>
+        <div style="position:absolute;top:90px;left:30px;width:80px;height:60px;background:#2a3444;border-radius:6px;transform:rotate(-4deg);border:2px solid #fff3"></div>
+        <div style="position:absolute;top:80px;left:140px;width:70px;height:50px;background:#3D6AF2;border-radius:6px;opacity:0.6"></div>
+        <div style="position:absolute;top:100px;right:20px;width:60px;height:40px;background:#fbbf24;border-radius:4px;padding:4px;font-size:8px;color:#333">Note text</div>
+        <div style="position:absolute;bottom:5px;left:60px;display:flex;gap:4px">
+          <div style="width:16px;height:16px;border-radius:50%;background:#ef4444"></div>
+          <div style="width:16px;height:16px;border-radius:50%;background:#3b82f6"></div>
+          <div style="width:16px;height:16px;border-radius:50%;background:#10b981"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: Freeform Scatter</h3>
+      <p>Elements placed with organic offsets and slight rotations. Drag anywhere. Feels like a real mood board on a table.</p>
+      <p style="color:#70767f;font-size:0.85rem">Current approach but improved with snap-to-grid and alignment guides.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#131a23; padding:1.5rem; min-height:200px;">
+      <!-- Masonry grid mockup -->
+      <div style="display:flex;gap:8px;height:180px;">
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="flex:2;background:#2a3444;border-radius:6px;border:2px solid #fff3"></div>
+          <div style="flex:1;background:#2a3444;border-radius:6px;border:2px solid #fff3"></div>
+          <div style="height:24px;display:flex;gap:4px">
+            <div style="width:16px;height:16px;border-radius:50%;background:#ef4444"></div>
+            <div style="width:16px;height:16px;border-radius:50%;background:#3b82f6"></div>
+            <div style="width:16px;height:16px;border-radius:50%;background:#10b981"></div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="flex:1;background:#2a3444;border-radius:6px;border:2px solid #fff3"></div>
+          <div style="flex:2;background:#2a3444;border-radius:6px;border:2px solid #fff3"></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="flex:1.5;background:#2a3444;border-radius:6px;border:2px solid #fff3"></div>
+          <div style="flex:1;background:#fbbf24;border-radius:4px;padding:6px;font-size:8px;color:#333">Note</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B: Auto-Layout Grid</h3>
+      <p>Masonry-style grid that auto-arranges. Elements snap into columns. Clean, polished look. Can still drag to reorder.</p>
+      <p style="color:#70767f;font-size:0.85rem">Pinterest/Canva-like. Easier to get a good-looking result without effort.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#131a23; padding:1.5rem; min-height:200px;">
+      <!-- Hybrid mockup -->
+      <div style="position:relative;height:180px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;height:120px;">
+          <div style="background:#2a3444;border-radius:6px;grid-row:span 2;border:2px solid #fff3"></div>
+          <div style="background:#2a3444;border-radius:6px;border:2px solid #fff3"></div>
+          <div style="background:#2a3444;border-radius:6px;border:2px solid #fff3"></div>
+          <div style="background:#2a3444;border-radius:6px;border:2px solid #fff3"></div>
+          <div style="background:#3D6AF2;border-radius:6px;opacity:0.6"></div>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:6px;align-items:center;">
+          <div style="display:flex;gap:3px">
+            <div style="width:14px;height:14px;border-radius:50%;background:#ef4444"></div>
+            <div style="width:14px;height:14px;border-radius:50%;background:#3b82f6"></div>
+            <div style="width:14px;height:14px;border-radius:50%;background:#10b981"></div>
+            <div style="width:14px;height:14px;border-radius:50%;background:#f59e0b"></div>
+            <div style="width:14px;height:14px;border-radius:50%;background:#8b5cf6"></div>
+          </div>
+          <div style="flex:1;height:28px;background:#fbbf24;border-radius:4px;padding:4px;font-size:8px;color:#333">Note text here</div>
+          <div style="width:60px;height:28px;background:#2a3444;border-radius:4px;font-size:8px;color:#a6abb5;display:flex;align-items:center;justify-content:center">Serif</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C: Sectioned Board</h3>
+      <p>Images in a grid at top. Palette, fonts, and notes in organized rows below. Structured but still visual.</p>
+      <p style="color:#70767f;font-size:0.85rem">Most presentable output. Best for sharing/exporting. Less "crafty", more professional.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 2rem; padding: 1rem; border: 1px solid #333; border-radius: 8px;">
+  <p style="color: #a6abb5; font-size: 0.9rem;"><strong>My recommendation: C (Sectioned Board)</strong> — Produces the most polished output by default. Non-designers get a great-looking board without arranging anything. Elements can still be dragged to customize. Best export quality.</p>
+</div>

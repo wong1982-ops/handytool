@@ -1,0 +1,41 @@
+<h2>Mood Board — Layout Approach</h2>
+<p class="subtitle">How should the overall experience be structured?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Wizard → Canvas (Guided Start)</h3>
+      <p><strong>Step 1:</strong> Full-screen "Create" wizard — theme input, style preferences, color mood picker. Feels like a creative brief.</p>
+      <p><strong>Step 2:</strong> Generated board opens in a full-screen canvas (no sidebar). Tools appear in a floating toolbar or slide-out drawer.</p>
+      <p><strong>Best for:</strong> Non-designers who need hand-holding. Reduces blank-canvas anxiety.</p>
+      <p><strong>Trade-off:</strong> Extra step before seeing results. Power users may find it slow.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Inspiring Empty State → Sidebar Studio</h3>
+      <p><strong>Landing:</strong> Instead of blank canvas, show template gallery / example boards / trending themes. One click to start.</p>
+      <p><strong>Studio:</strong> Keep sidebar + canvas split but redesign both — collapsible sidebar, better canvas with snap-to-grid, zoom/pan.</p>
+      <p><strong>Best for:</strong> Familiar pattern (Figma/Canva-like). Works for both audiences.</p>
+      <p><strong>Trade-off:</strong> Sidebar takes screen space. Mobile experience harder to get right.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Chat-Driven Generation → Full Canvas</h3>
+      <p><strong>Start:</strong> Conversational prompt interface — "Describe your project and I'll create a mood board." AI asks follow-up questions.</p>
+      <p><strong>Result:</strong> Board generates into full-screen canvas. Floating chat bubble for "add more" / refinements.</p>
+      <p><strong>Best for:</strong> Most approachable for non-designers. AI does the heavy lifting.</p>
+      <p><strong>Trade-off:</strong> Less direct control. May feel too "AI-generated" for designers.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 2rem; padding: 1rem; border: 1px solid #333; border-radius: 8px;">
+  <p style="color: #a6abb5; font-size: 0.9rem;"><strong>My recommendation: A (Wizard → Canvas)</strong> — It solves the empty state problem completely, gives non-designers confidence, and the full-screen canvas gives more room for the board. Power users can skip through the wizard quickly.</p>
+</div>

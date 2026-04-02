@@ -1,6 +1,14 @@
 // app/api/v1/mood-board/save/route.ts
 import { createClient } from '@/lib/supabase/server'
+import { getAdminSupabase } from '@/lib/supabase/admin'
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
+
+async function getSupabase() {
+  if (process.env.NODE_ENV === 'development' || process.env.DEV_USER_ID) {
+    try { return getAdminSupabase() } catch { /* fall through */ }
+  }
+  return createClient()
+}
 
 export async function POST(request: Request) {
   const userId = await getAuthUserId()
@@ -13,7 +21,7 @@ export async function POST(request: Request) {
     return apiError('Invalid JSON body', 'VALIDATION_ERROR', 400)
   }
 
-  const supabase = await createClient()
+  const supabase = await getSupabase()
 
   if (body.boardId) {
     // Update existing board

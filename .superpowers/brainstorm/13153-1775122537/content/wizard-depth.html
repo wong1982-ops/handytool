@@ -1,0 +1,38 @@
+<h2>Wizard — How Much Input Before Generating?</h2>
+<p class="subtitle">More inputs = better results, but more friction. Where's the sweet spot?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Minimal (1 step)</h3>
+      <p>Just a theme prompt + "Generate" button. Maybe a style dropdown (modern/vintage/minimal).</p>
+      <p style="color:#70767f">Like the current design but full-screen with better presentation. Fastest path to results.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Guided (2-3 steps)</h3>
+      <p><strong>Step 1:</strong> Theme prompt — "What's this mood board for?"</p>
+      <p><strong>Step 2:</strong> Visual preferences — pick from mood thumbnails (cozy, bold, elegant, playful, etc.)</p>
+      <p><strong>Step 3 (optional):</strong> Color preference — warm/cool/neutral or pick a starting color</p>
+      <p style="color:#70767f">Better results because AI has more context. Still quick (~15 seconds to fill out).</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Template-First</h3>
+      <p>Show a gallery of pre-made mood board templates (Wedding, Brand Identity, Interior Design, Fashion, etc.).</p>
+      <p>User picks a template, then customizes with their theme text. AI generates based on template + theme.</p>
+      <p style="color:#70767f">Lowest friction for users who don't know where to start. But limits creativity.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 2rem; padding: 1rem; border: 1px solid #333; border-radius: 8px;">
+  <p style="color: #a6abb5; font-size: 0.9rem;"><strong>My recommendation: B (Guided, 2-3 steps)</strong> — The mood thumbnails in step 2 make it feel creative rather than form-filling, and the extra context produces noticeably better AI output. Step 3 (color) can be skippable.</p>
+</div>
