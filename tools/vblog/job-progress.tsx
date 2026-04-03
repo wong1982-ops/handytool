@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { VBlogJob, PipelineStep, StepStatus } from './types'
+import type { VBlogJob, StepStatus } from './types'
 import { PIPELINE_STEPS, STEP_LABELS } from './types'
 import { VideoPreview } from './video-preview'
 
