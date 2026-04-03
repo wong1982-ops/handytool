@@ -25,15 +25,17 @@ export function ResumePreview() {
   const Layout = THEME_LAYOUTS[theme.templateId]
   const hasContent = resume.baseInfo.name || resume.baseInfo.email || resume.baseInfo.phone
 
-  const fontStyle = {
+  const fontStyle: React.CSSProperties = {
     fontFamily:
       theme.fontFamily === 'serif'
         ? 'Georgia, "Times New Roman", serif'
         : theme.fontFamily === 'mono'
           ? 'ui-monospace, SFMono-Regular, monospace'
           : 'system-ui, -apple-system, sans-serif',
-    fontSize: theme.fontSize === 'sm' ? '12px' : theme.fontSize === 'lg' ? '16px' : '14px',
   }
+
+  // Font scale applied via CSS zoom — scales all hardcoded px values in layouts proportionally
+  const fontZoom = theme.fontSize === 'sm' ? 0.85 : theme.fontSize === 'lg' ? 1.15 : 1
 
   useEffect(() => {
     const measure = () => {
@@ -93,8 +95,9 @@ export function ResumePreview() {
                 <div
                   style={{
                     ...fontStyle,
+                    zoom: fontZoom,
                     position: 'relative',
-                    top: -getPageOffset(pageIdx),
+                    top: -getPageOffset(pageIdx) / fontZoom,
                     width: '100%',
                   }}
                 >
@@ -123,6 +126,7 @@ export function ResumePreview() {
         className="w-[595px] bg-white"
         style={{
           ...fontStyle,
+          zoom: fontZoom,
           position: 'absolute',
           left: '-9999px',
           top: 0,
