@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Flight Monitor — Stitch Design</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#3D6AF2",
+          "primary-light": "#3D9DF2",
+          "secondary": "#32A9D9",
+          "page-bg": "#090f16",
+          "card-bg": "#131a23",
+          "card-hover": "#1e2631",
+          "border": "#1e2631",
+          "text-primary": "#ffffff",
+          "text-secondary": "#a6abb5",
+          "text-muted": "#70767f",
+          "success": "#10B981",
+          "danger": "#EF4444",
+          "warning": "#F59E0B",
+          "deal-green": "#059669",
+        },
+        fontFamily: {
+          "sans": ["Inter", "system-ui", "sans-serif"],
+        },
+        borderRadius: {
+          "DEFAULT": "0.75rem",
+          "lg": "1rem",
+          "xl": "1.5rem",
+          "full": "9999px",
+        },
+      },
+    },
+  }
+</script>
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .sparkline { display: flex; align-items: end; gap: 2px; height: 32px; }
+  .sparkline-bar { width: 4px; border-radius: 2px; background: #3D6AF2; opacity: 0.6; transition: opacity 0.2s; }
+  .sparkline-bar:last-child { opacity: 1; }
+  .sparkline-bar.down { background: #10B981; }
+  .tab-active { border-color: #3D6AF2; color: #93aaff; }
+  .tab-inactive { border-color: transparent; color: #70767f; }
+  .tab-inactive:hover { color: #a6abb5; border-color: #2a3545; }
+  .pulse-dot { animation: pulse-glow 2s ease-in-out infinite; }
+  @keyframes pulse-glow { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16,185,129,0.4); } 50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(16,185,129,0); } }
+  @keyframes starfield-drift { 0% { transform: translateY(0); } 100% { transform: translateY(-4px); } }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  [data-tab-content] { display: none; }
+  [data-tab-content].active { display: block; }
+</style>
+</head>
+<body class="bg-page-bg text-text-primary min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+
+<!-- ==================== THEMED HEADER ==================== -->
+<div class="relative bg-gradient-to-r from-[#0c1424] via-[#111b2e] to-[#0c1424]">
+  <!-- Starfield particles -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute inset-0 opacity-25" style="background-image:
+      radial-gradient(1px 1px at 12% 30%, #3D6AF2, transparent),
+      radial-gradient(1.5px 1.5px at 35% 70%, #32A9D9, transparent),
+      radial-gradient(1px 1px at 55% 20%, #3D9DF2, transparent),
+      radial-gradient(2px 2px at 75% 50%, #3D6AF2, transparent),
+      radial-gradient(1px 1px at 90% 80%, #32A9D9, transparent);
+      animation: starfield-drift 14s ease-in-out infinite alternate;"></div>
+    <div class="absolute bottom-0 left-1/4 w-1/2 h-16 bg-gradient-to-t from-primary/10 via-secondary/5 to-transparent blur-2xl"></div>
+  </div>
+
+  <div class="relative max-w-5xl mx-auto px-4 md:px-6 pt-4 pb-4 md:pt-5 md:pb-5">
+    <!-- Breadcrumb (desktop) -->
+    <div class="hidden md:flex items-center gap-1.5 text-xs text-text-muted">
+      <a href="#" class="hover:text-text-secondary transition-colors">Home</a>
+      <span class="material-symbols-outlined text-sm">chevron_right</span>
+      <a href="#" class="hover:text-text-secondary transition-colors">Tools</a>
+      <span class="material-symbols-outlined text-sm">chevron_right</span>
+      <span class="text-text-secondary">Flight Monitor</span>
+    </div>
+
+    <!-- Title row -->
+    <div class="mt-1 md:mt-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <!-- Mobile home -->
+        <a href="#" class="md:hidden flex items-center justify-center w-9 h-9 rounded-full text-primary/70 hover:text-white transition-colors">
+          <span class="material-symbols-outlined">home</span>
+        </a>
+        <div class="relative">
+          <span class="material-symbols-outlined text-3xl md:text-4xl text-primary">flight</span>
+          <div class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-secondary rounded-full pulse-dot"></div>
+        </div>
+        <h1 class="text-xl md:text-2xl font-bold text-white tracking-tight">Flight Monitor</h1>
+      </div>
+      <!-- User avatar -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary text-sm font-bold">M</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== STICKY TAB NAVIGATION ==================== -->
+<div class="sticky top-0 z-30">
+  <nav class="flex overflow-x-auto border-b border-border bg-[#0c1219]/95 backdrop-blur-lg hide-scrollbar" aria-label="Flight Monitor navigation">
+    <div class="flex w-full max-w-5xl mx-auto px-4">
+      <button onclick="switchTab('search')" data-tab="search" class="tab-btn flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 tab-active" style="min-height:44px">
+        <span class="material-symbols-outlined text-lg">search</span>
+        Search
+      </button>
+      <button onclick="switchTab('alerts')" data-tab="alerts" class="tab-btn flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 tab-inactive" style="min-height:44px">
+        <span class="material-symbols-outlined text-lg">notifications</span>
+        My Alerts
+        <span class="bg-success text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">2</span>
+      </button>
+      <button onclick="switchTab('deals')" data-tab="deals" class="tab-btn flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 tab-inactive" style="min-height:44px">
+        <span class="material-symbols-outlined text-lg">local_offer</span>
+        Deals
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- ==================== CONTENT AREA ==================== -->
+<main class="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8 pb-24 md:pb-8 w-full">
+
+  <!-- ==================== SEARCH TAB ==================== -->
+  <div data-tab-content="search" class="active">
+
+    <!-- Search Form -->
+    <div class="rounded-xl bg-card-bg border border-border p-5 md:p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+        <!-- From -->
+        <div class="md:col-span-3 flex flex-col gap-1.5">
+          <label class="text-xs font-semibold uppercase tracking-wider text-text-muted">From</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-lg">flight_takeoff</span>
+            <input type="text" value="SYD" placeholder="City or airport" class="w-full pl-10 pr-3 py-3 rounded-lg bg-page-bg border border-border text-white placeholder-text-muted text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" style="min-height:44px" />
+          </div>
+        </div>
+
+        <!-- Swap icon -->
+        <div class="hidden md:flex md:col-span-1 items-end justify-center pb-1.5">
+          <button class="w-10 h-10 rounded-full bg-card-hover border border-border flex items-center justify-center text-text-muted hover:text-primary hover:border-primary/40 transition-colors">
+            <span class="material-symbols-outlined text-lg">swap_horiz</span>
+          </button>
+        </div>
+
+        <!-- To -->
+        <div class="md:col-span-3 flex flex-col gap-1.5">
+          <label class="text-xs font-semibold uppercase tracking-wider text-text-muted">To</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-lg">flight_land</span>
+            <input type="text" value="NRT" placeholder="City or airport" class="w-full pl-10 pr-3 py-3 rounded-lg bg-page-bg border border-border text-white placeholder-text-muted text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" style="min-height:44px" />
+          </div>
+        </div>
+
+        <!-- Departure -->
+        <div class="md:col-span-2 flex flex-col gap-1.5">
+          <label class="text-xs font-semibold uppercase tracking-wider text-text-muted">Departure</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-lg">calendar_today</span>
+            <input type="text" value="15 May 2026" class="w-full pl-10 pr-3 py-3 rounded-lg bg-page-bg border border-border text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" style="min-height:44px" />
+          </div>
+        </div>
+
+        <!-- Passengers -->
+        <div class="md:col-span-1 flex flex-col gap-1.5">
+          <label class="text-xs font-semibold uppercase tracking-wider text-text-muted">Pax</label>
+          <input type="number" value="1" min="1" max="9" class="w-full px-3 py-3 rounded-lg bg-page-bg border border-border text-white text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" style="min-height:44px" />
+        </div>
+
+        <!-- Search button -->
+        <div class="md:col-span-2 flex flex-col justify-end">
+          <button class="w-full bg-gradient-to-r from-primary to-primary-light text-white rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">search</span>
+            Search
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cache indicator -->
+    <div class="flex items-center justify-between mb-4">
+      <p class="text-sm text-text-secondary">5 results <span class="text-text-muted">for SYD to NRT</span></p>
+      <div class="flex items-center gap-2 text-xs text-text-muted">
+        <span class="material-symbols-outlined text-sm">cached</span>
+        Cached &middot; refreshed 23 min ago
+        <button class="text-primary hover:underline ml-1">Refresh</button>
+      </div>
+    </div>
+
+    <!-- Flight Result Cards -->
+    <div class="flex flex-col gap-3">
+
+      <!-- Result 1 -->
+      <div class="rounded-xl bg-card-bg border border-border p-4 md:p-5 hover:border-primary/30 transition-colors group">
+        <div class="flex flex-col md:flex-row md:items-center gap-4">
+          <!-- Airline -->
+          <div class="flex items-center gap-3 md:w-40">
+            <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 font-bold text-xs shrink-0">QF</div>
+            <div>
+              <p class="text-sm font-semibold text-white">Qantas</p>
+              <p class="text-xs text-text-muted">QF 25</p>
+            </div>
+          </div>
+          <!-- Time -->
+          <div class="flex items-center gap-3 flex-1">
+            <div class="text-center">
+              <p class="text-lg font-bold text-white">09:30</p>
+              <p class="text-xs text-text-muted">SYD</p>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1 px-2">
+              <p class="text-[10px] text-text-muted">9h 45m</p>
+              <div class="w-full h-px bg-border relative">
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-text-muted"></div>
+                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary"></div>
+              </div>
+              <p class="text-[10px] text-success font-medium">Direct</p>
+            </div>
+            <div class="text-center">
+              <p class="text-lg font-bold text-white">19:15</p>
+              <p class="text-xs text-text-muted">NRT</p>
+            </div>
+          </div>
+          <!-- Price comparison -->
+          <div class="flex flex-col items-end gap-1 md:w-44">
+            <p class="text-xl font-bold text-white">$785</p>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20">Google: $792</span>
+            </div>
+          </div>
+          <!-- Set Alert -->
+          <button class="md:w-auto px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center gap-1.5" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">add_alert</span>
+            Set Alert
+          </button>
+        </div>
+      </div>
+
+      <!-- Result 2 -->
+      <div class="rounded-xl bg-card-bg border border-border p-4 md:p-5 hover:border-primary/30 transition-colors">
+        <div class="flex flex-col md:flex-row md:items-center gap-4">
+          <div class="flex items-center gap-3 md:w-40">
+            <div class="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-xs shrink-0">NH</div>
+            <div>
+              <p class="text-sm font-semibold text-white">ANA</p>
+              <p class="text-xs text-text-muted">NH 890</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 flex-1">
+            <div class="text-center">
+              <p class="text-lg font-bold text-white">11:00</p>
+              <p class="text-xs text-text-muted">SYD</p>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1 px-2">
+              <p class="text-[10px] text-text-muted">10h 15m</p>
+              <div class="w-full h-px bg-border relative">
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-text-muted"></div>
+                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary"></div>
+              </div>
+              <p class="text-[10px] text-success font-medium">Direct</p>
+            </div>
+            <div class="text-center">
+              <p class="text-lg font-bold text-white">21:15</p>
+              <p class="text-xs text-text-muted">NRT</p>
+            </div>
+          </div>
+          <div class="flex flex-col items-end gap-1 md:w-44">
+            <p class="text-xl font-bold text-white">$650</p>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">Lowest price</span>
+            </div>
+          </div>
+          <button class="md:w-auto px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center gap-1.5" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">add_alert</span>
+            Set Alert
+          </button>
+        </div>
+      </div>
+
+      <!-- Result 3 — with stop -->
+      <div class="rounded-xl bg-card-bg border border-border p-4 md:p-5 hover:border-primary/30 transition-colors">
+        <div class="flex flex-col md:flex-row md:items-center gap-4">
+          <div class="flex items-center gap-3 md:w-40">
+            <div class="w-10 h-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 font-bold text-xs shrink-0">SQ</div>
+            <div>
+              <p class="text-sm font-semibold text-white">Singapore Air</p>
+              <p class="text-xs text-text-muted">SQ 232</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 flex-1">
+            <div class="text-center">
+              <p class="text-lg font-bold text-white">14:20</p>
+              <p class="text-xs text-text-muted">SYD</p>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1 px-2">
+              <p class="text-[10px] text-text-muted">14h 30m</p>
+              <div class="w-full h-px bg-border relative">
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-text-muted"></div>
+                <div class="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-warning"></div>
+                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary"></div>
+              </div>
+              <p class="text-[10px] text-warning font-medium">1 stop (SIN)</p>
+            </div>
+            <div class="text-center">
+              <p class="text-lg font-bold text-white">04:50<span class="text-[10px] text-text-muted ml-0.5">+1</span></p>
+              <p class="text-xs text-text-muted">NRT</p>
+            </div>
+          </div>
+          <div class="flex flex-col items-end gap-1 md:w-44">
+            <p class="text-xl font-bold text-white">$520</p>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20">Google: $515</span>
+            </div>
+          </div>
+          <button class="md:w-auto px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center gap-1.5" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">add_alert</span>
+            Set Alert
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ==================== MY ALERTS TAB ==================== -->
+  <div data-tab-content="alerts">
+
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-lg font-bold text-white">Tracked Routes</h2>
+        <p class="text-sm text-text-muted mt-0.5">3 active alerts</p>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-4">
+
+      <!-- Alert 1 — Price Drop! -->
+      <div class="rounded-xl bg-card-bg border border-success/30 p-5 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-success"></div>
+        <div class="flex flex-col md:flex-row md:items-center gap-4">
+          <!-- Route -->
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-success/15 text-success border border-success/20">
+                <span class="w-2 h-2 rounded-full bg-success pulse-dot inline-block"></span>
+                Price Drop!
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <p class="text-lg font-bold text-white">Sydney</p>
+              <span class="text-text-muted text-sm">SYD</span>
+              <span class="material-symbols-outlined text-text-muted text-lg">arrow_forward</span>
+              <p class="text-lg font-bold text-white">Tokyo</p>
+              <span class="text-text-muted text-sm">NRT</span>
+            </div>
+          </div>
+
+          <!-- Prices -->
+          <div class="flex items-center gap-6">
+            <div class="text-center">
+              <p class="text-xs text-text-muted mb-1">Current</p>
+              <p class="text-xl font-bold text-success">$580</p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-text-muted mb-1">Target</p>
+              <p class="text-lg font-semibold text-text-secondary">$600</p>
+            </div>
+          </div>
+
+          <!-- Sparkline -->
+          <div class="flex flex-col items-center gap-1">
+            <p class="text-[10px] text-text-muted">30-day trend</p>
+            <div class="sparkline">
+              <div class="sparkline-bar" style="height:70%"></div>
+              <div class="sparkline-bar" style="height:75%"></div>
+              <div class="sparkline-bar" style="height:80%"></div>
+              <div class="sparkline-bar" style="height:85%"></div>
+              <div class="sparkline-bar" style="height:78%"></div>
+              <div class="sparkline-bar" style="height:72%"></div>
+              <div class="sparkline-bar" style="height:65%"></div>
+              <div class="sparkline-bar" style="height:60%"></div>
+              <div class="sparkline-bar" style="height:55%"></div>
+              <div class="sparkline-bar down" style="height:45%"></div>
+              <div class="sparkline-bar down" style="height:40%"></div>
+              <div class="sparkline-bar down" style="height:35%"></div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2">
+            <a href="#" class="px-4 py-2 rounded-lg bg-success text-white text-sm font-semibold hover:bg-success/90 transition-colors flex items-center gap-1.5" style="min-height:44px">
+              <span class="material-symbols-outlined text-lg">open_in_new</span>
+              Book Now
+            </a>
+            <button class="w-10 h-10 rounded-lg border border-border hover:border-text-muted flex items-center justify-center text-text-muted hover:text-white transition-colors">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+            <button class="w-10 h-10 rounded-lg border border-border hover:border-danger/40 flex items-center justify-center text-text-muted hover:text-danger transition-colors">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alert 2 — Price Drop! -->
+      <div class="rounded-xl bg-card-bg border border-success/30 p-5 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-success"></div>
+        <div class="flex flex-col md:flex-row md:items-center gap-4">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-success/15 text-success border border-success/20">
+                <span class="w-2 h-2 rounded-full bg-success pulse-dot inline-block"></span>
+                Price Drop!
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <p class="text-lg font-bold text-white">Melbourne</p>
+              <span class="text-text-muted text-sm">MEL</span>
+              <span class="material-symbols-outlined text-text-muted text-lg">arrow_forward</span>
+              <p class="text-lg font-bold text-white">Bali</p>
+              <span class="text-text-muted text-sm">DPS</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-6">
+            <div class="text-center">
+              <p class="text-xs text-text-muted mb-1">Current</p>
+              <p class="text-xl font-bold text-success">$280</p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-text-muted mb-1">Target</p>
+              <p class="text-lg font-semibold text-text-secondary">$300</p>
+            </div>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <p class="text-[10px] text-text-muted">30-day trend</p>
+            <div class="sparkline">
+              <div class="sparkline-bar" style="height:60%"></div>
+              <div class="sparkline-bar" style="height:65%"></div>
+              <div class="sparkline-bar" style="height:55%"></div>
+              <div class="sparkline-bar" style="height:70%"></div>
+              <div class="sparkline-bar" style="height:75%"></div>
+              <div class="sparkline-bar" style="height:65%"></div>
+              <div class="sparkline-bar" style="height:50%"></div>
+              <div class="sparkline-bar" style="height:45%"></div>
+              <div class="sparkline-bar down" style="height:40%"></div>
+              <div class="sparkline-bar down" style="height:35%"></div>
+              <div class="sparkline-bar down" style="height:30%"></div>
+              <div class="sparkline-bar down" style="height:28%"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="#" class="px-4 py-2 rounded-lg bg-success text-white text-sm font-semibold hover:bg-success/90 transition-colors flex items-center gap-1.5" style="min-height:44px">
+              <span class="material-symbols-outlined text-lg">open_in_new</span>
+              Book Now
+            </a>
+            <button class="w-10 h-10 rounded-lg border border-border hover:border-text-muted flex items-center justify-center text-text-muted hover:text-white transition-colors">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+            <button class="w-10 h-10 rounded-lg border border-border hover:border-danger/40 flex items-center justify-center text-text-muted hover:text-danger transition-colors">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alert 3 — Tracking -->
+      <div class="rounded-xl bg-card-bg border border-border p-5 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-text-muted"></div>
+        <div class="flex flex-col md:flex-row md:items-center gap-4">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-card-hover text-text-muted border border-border">
+                <span class="w-2 h-2 rounded-full bg-text-muted inline-block"></span>
+                Tracking
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <p class="text-lg font-bold text-white">Sydney</p>
+              <span class="text-text-muted text-sm">SYD</span>
+              <span class="material-symbols-outlined text-text-muted text-lg">arrow_forward</span>
+              <p class="text-lg font-bold text-white">London</p>
+              <span class="text-text-muted text-sm">LHR</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-6">
+            <div class="text-center">
+              <p class="text-xs text-text-muted mb-1">Current</p>
+              <p class="text-xl font-bold text-white">$1,420</p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-text-muted mb-1">Target</p>
+              <p class="text-lg font-semibold text-text-secondary">$1,000</p>
+            </div>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <p class="text-[10px] text-text-muted">30-day trend</p>
+            <div class="sparkline">
+              <div class="sparkline-bar" style="height:55%"></div>
+              <div class="sparkline-bar" style="height:60%"></div>
+              <div class="sparkline-bar" style="height:65%"></div>
+              <div class="sparkline-bar" style="height:58%"></div>
+              <div class="sparkline-bar" style="height:62%"></div>
+              <div class="sparkline-bar" style="height:70%"></div>
+              <div class="sparkline-bar" style="height:68%"></div>
+              <div class="sparkline-bar" style="height:72%"></div>
+              <div class="sparkline-bar" style="height:66%"></div>
+              <div class="sparkline-bar" style="height:64%"></div>
+              <div class="sparkline-bar" style="height:60%"></div>
+              <div class="sparkline-bar" style="height:62%"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="w-10 h-10 rounded-lg border border-border hover:border-text-muted flex items-center justify-center text-text-muted hover:text-white transition-colors">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+            <button class="w-10 h-10 rounded-lg border border-border hover:border-danger/40 flex items-center justify-center text-text-muted hover:text-danger transition-colors">
+              <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ==================== DEALS TAB ==================== -->
+  <div data-tab-content="deals">
+
+    <!-- Filters -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-lg">filter_alt</span>
+        <select class="pl-10 pr-8 py-2.5 rounded-lg bg-card-bg border border-border text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none" style="min-height:44px">
+          <option>All cities</option>
+          <option selected>From: Sydney</option>
+          <option>From: Melbourne</option>
+          <option>From: Brisbane</option>
+        </select>
+      </div>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-lg">sort</span>
+        <select class="pl-10 pr-8 py-2.5 rounded-lg bg-card-bg border border-border text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none" style="min-height:44px">
+          <option selected>Biggest discount</option>
+          <option>Lowest price</option>
+          <option>Newest</option>
+        </select>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-text-muted ml-auto">
+        <span class="material-symbols-outlined text-sm text-success">check_circle</span>
+        Updated 6 hours ago
+      </div>
+    </div>
+
+    <!-- Deals Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <!-- Deal 1 -->
+      <div class="rounded-xl bg-card-bg border border-border p-5 hover:border-deal-green/40 transition-colors group">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <p class="text-base font-bold text-white">Sydney</p>
+              <span class="material-symbols-outlined text-text-muted text-base">arrow_forward</span>
+              <p class="text-base font-bold text-white">Bali</p>
+            </div>
+            <p class="text-xs text-text-muted">SYD &rarr; DPS &middot; Multiple airlines</p>
+          </div>
+          <span class="px-3 py-1.5 rounded-lg bg-success/10 text-success text-sm font-bold border border-success/20">-34%</span>
+        </div>
+
+        <div class="flex items-end justify-between mb-4">
+          <div>
+            <p class="text-xs text-text-muted mb-0.5">Current price</p>
+            <p class="text-2xl font-bold text-white">$295</p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-text-muted mb-0.5">30-day avg</p>
+            <p class="text-lg text-text-secondary line-through">$450</p>
+          </div>
+        </div>
+
+        <!-- Mini sparkline -->
+        <div class="flex items-end gap-1 h-6 mb-4">
+          <div class="w-full bg-card-hover rounded-sm h-full relative overflow-hidden">
+            <div class="absolute inset-0 flex items-end gap-[2px] px-1">
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:65%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:70%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:60%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:75%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:68%"></div>
+              <div class="flex-1 bg-primary/40 rounded-t-sm" style="height:55%"></div>
+              <div class="flex-1 bg-primary/40 rounded-t-sm" style="height:50%"></div>
+              <div class="flex-1 bg-success/50 rounded-t-sm" style="height:42%"></div>
+              <div class="flex-1 bg-success/50 rounded-t-sm" style="height:38%"></div>
+              <div class="flex-1 bg-success/60 rounded-t-sm" style="height:33%"></div>
+              <div class="flex-1 bg-success/70 rounded-t-sm" style="height:30%"></div>
+              <div class="flex-1 bg-success rounded-t-sm" style="height:28%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button class="flex-1 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-1.5" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">add_alert</span>
+            Set Alert
+          </button>
+          <button class="flex-1 px-3 py-2 rounded-lg bg-card-hover border border-border text-text-secondary text-sm font-medium hover:text-white transition-colors flex items-center justify-center gap-1.5" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">search</span>
+            Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Deal 2 -->
+      <div class="rounded-xl bg-card-bg border border-border p-5 hover:border-deal-green/40 transition-colors">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <p class="text-base font-bold text-white">Sydney</p>
+              <span class="material-symbols-outlined text-text-muted text-base">arrow_forward</span>
+              <p class="text-base font-bold text-white">Bangkok</p>
+            </div>
+            <p class="text-xs text-text-muted">SYD &rarr; BKK &middot; Thai Airways, Jetstar</p>
+          </div>
+          <span class="px-3 py-1.5 rounded-lg bg-success/10 text-success text-sm font-bold border border-success/20">-28%</span>
+        </div>
+        <div class="flex items-end justify-between mb-4">
+          <div>
+            <p class="text-xs text-text-muted mb-0.5">Current price</p>
+            <p class="text-2xl font-bold text-white">$380</p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-text-muted mb-0.5">30-day avg</p>
+            <p class="text-lg text-text-secondary line-through">$530</p>
+          </div>
+        </div>
+        <div class="flex items-end gap-1 h-6 mb-4">
+          <div class="w-full bg-card-hover rounded-sm h-full relative overflow-hidden">
+            <div class="absolute inset-0 flex items-end gap-[2px] px-1">
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:50%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:55%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:70%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:65%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:60%"></div>
+              <div class="flex-1 bg-primary/40 rounded-t-sm" style="height:55%"></div>
+              <div class="flex-1 bg-primary/40 rounded-t-sm" style="height:48%"></div>
+              <div class="flex-1 bg-primary/40 rounded-t-sm" style="height:45%"></div>
+              <div class="flex-1 bg-success/50 rounded-t-sm" style="height:40%"></div>
+              <div class="flex-1 bg-success/50 rounded-t-sm" style="height:38%"></div>
+              <div class="flex-1 bg-success/60 rounded-t-sm" style="height:35%"></div>
+              <div class="flex-1 bg-success rounded-t-sm" style="height:32%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button class="flex-1 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-1.5" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">add_alert</span>
+            Set Alert
+          </button>
+          <button class="flex-1 px-3 py-2 rounded-lg bg-card-hover border border-border text-text-secondary text-sm font-medium hover:text-white transition-colors flex items-center justify-center gap-1.5" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">search</span>
+            Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Deal 3 -->
+      <div class="rounded-xl bg-card-bg border border-border p-5 hover:border-deal-green/40 transition-colors">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <p class="text-base font-bold text-white">Melbourne</p>
+              <span class="material-symbols-outlined text-text-muted text-base">arrow_forward</span>
+              <p class="text-base font-bold text-white">Singapore</p>
+            </div>
+            <p class="text-xs text-text-muted">MEL &rarr; SIN &middot; Scoot, Singapore Air</p>
+          </div>
+          <span class="px-3 py-1.5 rounded-lg bg-success/10 text-success text-sm font-bold border border-success/20">-25%</span>
+        </div>
+        <div class="flex items-end justify-between mb-4">
+          <div>
+            <p class="text-xs text-text-muted mb-0.5">Current price</p>
+            <p class="text-2xl font-bold text-white">$310</p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-text-muted mb-0.5">30-day avg</p>
+            <p class="text-lg text-text-secondary line-through">$415</p>
+          </div>
+        </div>
+        <div class="flex items-end gap-1 h-6 mb-4">
+          <div class="w-full bg-card-hover rounded-sm h-full relative overflow-hidden">
+            <div class="absolute inset-0 flex items-end gap-[2px] px-1">
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:60%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:65%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:58%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:55%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:60%"></div>
+              <div class="flex-1 bg-primary/40 rounded-t-sm" style="height:52%"></div>
+              <div class="flex-1 bg-primary/40 rounded-t-sm" style="height:48%"></div>
+              <div class="flex-1 bg-primary/40 rounded-t-sm" style="height:45%"></div>
+              <div class="flex-1 bg-success/50 rounded-t-sm" style="height:40%"></div>
+              <div class="flex-1 bg-success/50 rounded-t-sm" style="height:38%"></div>
+              <div class="flex-1 bg-success/60 rounded-t-sm" style="height:36%"></div>
+              <div class="flex-1 bg-success rounded-t-sm" style="height:34%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button class="flex-1 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-1.5" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">add_alert</span>
+            Set Alert
+          </button>
+          <button class="flex-1 px-3 py-2 rounded-lg bg-card-hover border border-border text-text-secondary text-sm font-medium hover:text-white transition-colors flex items-center justify-center gap-1.5" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">search</span>
+            Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Deal 4 -->
+      <div class="rounded-xl bg-card-bg border border-border p-5 hover:border-deal-green/40 transition-colors">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <p class="text-base font-bold text-white">Sydney</p>
+              <span class="material-symbols-outlined text-text-muted text-base">arrow_forward</span>
+              <p class="text-base font-bold text-white">Seoul</p>
+            </div>
+            <p class="text-xs text-text-muted">SYD &rarr; ICN &middot; Korean Air, Asiana</p>
+          </div>
+          <span class="px-3 py-1.5 rounded-lg bg-success/10 text-success text-sm font-bold border border-success/20">-22%</span>
+        </div>
+        <div class="flex items-end justify-between mb-4">
+          <div>
+            <p class="text-xs text-text-muted mb-0.5">Current price</p>
+            <p class="text-2xl font-bold text-white">$545</p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-text-muted mb-0.5">30-day avg</p>
+            <p class="text-lg text-text-secondary line-through">$700</p>
+          </div>
+        </div>
+        <div class="flex items-end gap-1 h-6 mb-4">
+          <div class="w-full bg-card-hover rounded-sm h-full relative overflow-hidden">
+            <div class="absolute inset-0 flex items-end gap-[2px] px-1">
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:70%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:72%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:68%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:65%"></div>
+              <div class="flex-1 bg-primary/30 rounded-t-sm" style="height:62%"></div>
+              <div class="flex-1 bg-primary/40 rounded-t-sm" style="height:58%"></div>
+              <div class="flex-1 bg-primary/40 rounded-t-sm" style="height:55%"></div>
+              <div class="flex-1 bg-primary/40 rounded-t-sm" style="height:50%"></div>
+              <div class="flex-1 bg-success/50 rounded-t-sm" style="height:48%"></div>
+              <div class="flex-1 bg-success/50 rounded-t-sm" style="height:45%"></div>
+              <div class="flex-1 bg-success/60 rounded-t-sm" style="height:42%"></div>
+              <div class="flex-1 bg-success rounded-t-sm" style="height:40%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button class="flex-1 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-1.5" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">add_alert</span>
+            Set Alert
+          </button>
+          <button class="flex-1 px-3 py-2 rounded-lg bg-card-hover border border-border text-text-secondary text-sm font-medium hover:text-white transition-colors flex items-center justify-center gap-1.5" style="min-height:44px">
+            <span class="material-symbols-outlined text-lg">search</span>
+            Search
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- Tab switching script -->
+<script>
+function switchTab(tabName) {
+  // Update tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    if (btn.dataset.tab === tabName) {
+      btn.classList.remove('tab-inactive');
+      btn.classList.add('tab-active');
+    } else {
+      btn.classList.remove('tab-active');
+      btn.classList.add('tab-inactive');
+    }
+  });
+  // Update content
+  document.querySelectorAll('[data-tab-content]').forEach(content => {
+    if (content.dataset.tabContent === tabName) {
+      content.classList.add('active');
+    } else {
+      content.classList.remove('active');
+    }
+  });
+}
+</script>
+</body>
+</html>

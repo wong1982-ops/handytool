@@ -174,9 +174,10 @@ export default function ImageEditorPage() {
   // Sync zoom from wheel zoom (hook → page state) — only when canvas zoom actually changes
   const prevZoomPercent = useRef(fabric.zoomPercent)
   useEffect(() => {
-    if (fabric.zoomPercent !== prevZoomPercent.current) {
-      prevZoomPercent.current = fabric.zoomPercent
-      setZoom(fabric.zoomPercent)
+    const rounded = Math.round(fabric.zoomPercent)
+    if (rounded !== prevZoomPercent.current) {
+      prevZoomPercent.current = rounded
+      setZoom(rounded)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.zoomPercent])
@@ -444,7 +445,7 @@ export default function ImageEditorPage() {
   }, [fabric.clearMask, fabric.setAiMode])
 
   return (
-    <ToolFrame toolName="Image Editor" toolSlug="image-editor" variant="compact" icon={<span className="text-lg">🖼️</span>}>
+    <ToolFrame toolName="Image Editor" toolSlug="image-editor" variant="compact" icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" /></svg>}>
     <div className="h-full flex flex-col overflow-hidden bg-[#101622]">
       {/* Top bar */}
       <header className="h-12 border-b border-slate-700 flex items-center justify-between px-4 shrink-0 bg-[#101622]">

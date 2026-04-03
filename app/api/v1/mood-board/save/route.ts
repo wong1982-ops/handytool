@@ -46,6 +46,7 @@ export async function POST(request: Request) {
   }
 
   // Create new board
+  console.log('[mood-board/save] Inserting new board for user:', userId)
   const { data, error } = await supabase
     .from('mood_boards')
     .insert({
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
     .single()
 
   if (error) {
-    console.error('[mood-board/save] Insert error:', error)
+    console.error('[mood-board/save] Insert error:', error.code, error.message, error.details)
     return API_ERRORS.INTERNAL()
   }
 

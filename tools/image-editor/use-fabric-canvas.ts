@@ -1403,7 +1403,7 @@ export function useFabricCanvas(): FabricCanvasAPI {
     // Skip if canvas is already at the requested zoom (prevents overwriting
     // cursor-based viewport positioning from wheel zoom)
     if (Math.abs(oldZoom - newZoom) < 0.001) {
-      setZoomPercent(percent)
+      setZoomPercent(Math.round(percent))
       return
     }
 
