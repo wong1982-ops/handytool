@@ -76,15 +76,15 @@ function MachineButton({
   const baseStyles = 'relative font-bold uppercase tracking-wider transition-all active:translate-y-[1px] disabled:opacity-30 disabled:cursor-not-allowed disabled:active:translate-y-0'
 
   const sizeStyles = {
-    sm: 'px-4 py-2 text-[11px] rounded-lg',
-    md: 'px-5 py-2.5 text-xs rounded-lg',
-    lg: 'px-6 py-4 text-base rounded-2xl',
+    sm: 'px-4 py-2 min-h-[44px] text-[12px] rounded-lg',
+    md: 'px-5 py-2.5 min-h-[44px] text-[11px] rounded-[10px]',
+    lg: 'px-6 py-3.5 min-h-[52px] text-[15px] rounded-[14px]',
   }
 
   const variantStyles = {
     default: {
-      background: 'linear-gradient(180deg, #3d2060 0%, #2d1052 40%, #1a0a2e 100%)',
-      boxShadow: '0 3px 0 #0d0519, 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)',
+      background: 'linear-gradient(180deg, #1e0a3e 0%, #0d0519 100%)',
+      boxShadow: '0 3px 0 #060310, 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)',
       border: '1px solid rgba(212,160,82,0.3)',
       color: '#d4a052',
     },
@@ -92,7 +92,7 @@ function MachineButton({
       background: 'linear-gradient(180deg, #34d058 0%, #22c55e 30%, #16a34a 100%)',
       boxShadow: '0 4px 0 #0f7a2f, 0 6px 16px rgba(34,197,94,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
       border: '1px solid rgba(255,255,255,0.15)',
-      color: '#ffffff',
+      color: '#fff',
     },
     accent: {
       background: 'linear-gradient(180deg, #e8b230 0%, #d4a052 40%, #a07030 100%)',
@@ -151,9 +151,9 @@ export function BetControls({
 
       {/* Bet selector — metallic panel with arrow buttons */}
       <div
-        className="flex items-center justify-center gap-4 py-2 rounded-xl"
+        className="flex items-center justify-center gap-3.5 py-2 rounded-xl"
         style={{
-          background: 'linear-gradient(180deg, #1a0a2e 0%, #0d0519 100%)',
+          background: '#090f16',
           border: '1px solid rgba(212,160,82,0.2)',
         }}
       >
@@ -220,8 +220,8 @@ export function BetControls({
       {/* Insufficient coins */}
       {player.coins < totalBet && !spinning && (
         <div
-          className="text-center text-xs py-1 rounded-lg"
-          style={{ color: '#ff6b6b', backgroundColor: 'rgba(255,50,50,0.1)', border: '1px solid rgba(255,50,50,0.2)' }}
+          className="text-center text-xs py-2 rounded-lg"
+          style={{ color: '#EF4444', backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}
         >
           {t.machine.insufficientCoins}
         </div>

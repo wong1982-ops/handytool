@@ -22,24 +22,28 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="flex items-center bg-[#1a0a2e]/95 backdrop-blur-xl border-t border-[#d4a052]/20 shrink-0" role="tablist" aria-label="Casino navigation">
+    <nav className="flex items-center bg-[#131a23]/96 backdrop-blur-2xl border-t border-[#3D6AF2]/20 shrink-0" role="tablist" aria-label="Casino navigation">
       {TABS.map(({ id, icon }) => (
         <button
           key={id}
           onClick={() => setActiveTab(id)}
-          className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-xs transition-colors ${
+          className={`flex-1 flex flex-col items-center gap-[2px] min-h-[56px] transition-colors ${
             activeTab === id
-              ? 'text-[#f0d080]'
-              : 'text-[#d4a052]/40 hover:text-[#d4a052]/70'
+              ? 'pt-[6px] pb-2.5 gap-[1px]'
+              : 'justify-center py-2 pb-2.5'
           }`}
           role="tab"
           aria-selected={activeTab === id}
         >
           {activeTab === id && (
-            <span className="w-1 h-1 rounded-full bg-[#f0d080] mb-0.5" />
+            <span className="w-[5px] h-[5px] rounded-full bg-[#f0d080] mb-0.5" />
           )}
-          <span className="text-lg" aria-hidden="true">{icon}</span>
-          <span>{tabLabels[id]}</span>
+          <span className="text-lg leading-tight" aria-hidden="true">{icon}</span>
+          <span className={`text-[10px] ${
+            activeTab === id
+              ? 'text-[#f0d080] font-semibold'
+              : 'text-[#70767f] font-medium'
+          }`}>{tabLabels[id]}</span>
         </button>
       ))}
     </nav>

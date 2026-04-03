@@ -17,12 +17,6 @@ export function EventsBanner() {
 
   if (!event) return null
 
-  const typeColors: Record<string, string> = {
-    tournament: 'from-[#2d1052] to-[#1a0a2e] border-[#d4a052]/40',
-    challenge: 'from-[#2d1052] to-[#0d0519] border-[#d4a052]/30',
-    happy_hour: 'from-[#2d1052] via-[#1a0a2e] to-[#0d0519] border-[#f0d080]/40',
-  }
-
   const typeIcons: Record<string, string> = {
     tournament: '🏆',
     challenge: '🎯',
@@ -30,15 +24,16 @@ export function EventsBanner() {
   }
 
   return (
-    <div className={`mx-4 my-2 px-4 py-3 rounded-xl bg-gradient-to-r border ${typeColors[event.type] || typeColors.tournament}`}>
-      <div className="flex items-center gap-2">
+    <div className="mx-4 mt-3 px-3.5 py-3 rounded-xl bg-[#131a23] border border-[#3D6AF2]/30">
+      <div className="flex items-center gap-3">
         <span className="text-lg">{typeIcons[event.type] || '🎉'}</span>
-        <div>
-          <p className="text-sm font-medium text-[#f0d080]">{event.name}</p>
-          <p className="text-xs text-[#d4a052]/50">
+        <div className="flex-1 min-w-0">
+          <p className="text-[13px] font-semibold text-[#f0d080]">{event.name}</p>
+          <p className="text-[11px] text-[#70767f] mt-px">
             Ends: {new Date(event.endsAt).toLocaleDateString()}
           </p>
         </div>
+        <span className="px-2 py-[3px] text-[10px] font-semibold text-[#3D9DF2] bg-[#3D6AF2]/15 border border-[#3D6AF2]/30 rounded-full">LIVE</span>
       </div>
     </div>
   )

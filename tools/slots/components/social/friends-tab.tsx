@@ -30,8 +30,8 @@ export function FriendsTab() {
   }
 
   return (
-    <div className="p-4 space-y-6">
-      <h2 className="text-lg font-bold text-[#f0d080]">{t.social.friends}</h2>
+    <div className="p-4 space-y-5">
+      <h2 className="text-[17px] font-bold text-white">{t.social.friends}</h2>
 
       {/* Add friend */}
       <div className="flex gap-2">
@@ -39,9 +39,9 @@ export function FriendsTab() {
           value={username}
           onChange={e => setUsername(e.target.value)}
           placeholder={t.social.usernamePlaceholder}
-          className="flex-1 px-3 py-2 rounded-lg bg-[#0d0519] border border-[#d4a052]/30 text-sm text-white placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-[#d4a052]/50"
+          className="flex-1 px-3 py-2.5 min-h-[44px] rounded-lg bg-[#090f16] border border-[#1e2631] text-[13px] text-white placeholder:text-[#70767f] outline-none focus:border-[#3D6AF2]/70 transition-colors"
         />
-        <button className="px-4 py-2 rounded-lg text-sm font-medium bg-[#22c55e] text-white hover:bg-[#16a34a] transition-colors">
+        <button className="px-3.5 py-2.5 min-h-[44px] rounded-lg text-xs font-bold bg-[#10B981] text-white hover:bg-[#0d9668] transition-colors whitespace-nowrap">
           {t.social.sendRequest}
         </button>
       </div>
@@ -49,13 +49,18 @@ export function FriendsTab() {
       {/* Pending requests */}
       {pending.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-[#d4a052]">{t.social.pending}</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.06em] text-[#F59E0B]">{t.social.pending}</h3>
           {pending.map(p => (
-            <div key={p.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#0d0519] border border-[#d4a052]/20">
-              <span className="text-sm text-gray-300">User {p.user_id?.slice(0, 8)}...</span>
-              <div className="flex gap-2">
-                <button onClick={() => handleAccept(p.id)} className="px-3 py-1 text-xs rounded-lg bg-[#22c55e] text-white hover:bg-[#16a34a]">{t.social.accept}</button>
-                <button className="px-3 py-1 text-xs rounded-lg bg-[#2d1052] text-[#d4a052] hover:bg-[#3d1872]">{t.social.decline}</button>
+            <div key={p.id} className="flex items-center justify-between px-3 py-2.5 rounded-[10px] bg-[#131a23] border border-[#F59E0B]/30">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-[#3D6AF2]/20 flex items-center justify-center">
+                  <span className="text-sm text-[#a6abb5]">👤</span>
+                </div>
+                <span className="text-[13px] font-semibold text-white">User {p.user_id?.slice(0, 8)}...</span>
+              </div>
+              <div className="flex gap-1.5">
+                <button onClick={() => handleAccept(p.id)} className="px-3 py-1.5 min-h-[32px] text-xs font-bold rounded-lg bg-[#10B981] text-white hover:bg-[#0d9668]">{t.social.accept}</button>
+                <button className="px-3 py-1.5 min-h-[32px] text-xs font-medium rounded-lg bg-[#131a23] text-[#70767f] border border-[#1e2631] hover:bg-[#1e2631]">{t.social.decline}</button>
               </div>
             </div>
           ))}
@@ -64,15 +69,15 @@ export function FriendsTab() {
 
       {/* Friend list */}
       {loading ? (
-        <div className="text-center text-gray-500 py-8 text-sm">Loading...</div>
+        <div className="text-center text-[#70767f] py-8 text-sm">Loading...</div>
       ) : friends.length === 0 ? (
-        <div className="text-center text-gray-500 py-8 text-sm">{t.social.noFriends}</div>
+        <div className="text-center text-[#70767f] py-8 text-sm">{t.social.noFriends}</div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {friends.map(f => (
-            <div key={f.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#0d0519] border border-[#d4a052]/20">
-              <span className="text-sm text-white">User {f.friend_id?.slice(0, 8)}...</span>
-              <span className="text-xs text-[#22c55e]">{t.social.online}</span>
+            <div key={f.id} className="flex items-center justify-between px-3 py-2.5 rounded-[10px] bg-[#131a23] border border-[#1e2631]">
+              <span className="text-[13px] font-semibold text-white">User {f.friend_id?.slice(0, 8)}...</span>
+              <span className="text-xs font-medium text-[#10B981]">{t.social.online}</span>
             </div>
           ))}
         </div>

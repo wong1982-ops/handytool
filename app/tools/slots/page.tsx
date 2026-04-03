@@ -16,18 +16,18 @@ function LobbyInner() {
   const { activeTab } = useSlots()
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-[#0d0519]">
+    <div className="flex flex-col h-[100dvh] bg-[#090f16]">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-2 border-b border-[#d4a052]/30 bg-[#1a0a2e] shrink-0">
-        <div className="flex items-center gap-3">
+      <header className="flex items-center justify-between px-4 py-2.5 border-b border-[#3D6AF2]/30 bg-[#131a23] shrink-0">
+        <div className="flex items-center gap-2.5">
           <BackButton />
-          <h1 className="text-lg font-bold text-[#f0d080] tracking-wide">TOOLK1T CASINO</h1>
+          <h1 className="text-[15px] font-extrabold text-[#f0d080] tracking-[0.06em]">TOOLK1T CASINO</h1>
         </div>
         <div className="flex items-center gap-2">
           <CoinDisplay />
           <button
             onClick={() => {}}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#22c55e] text-white hover:bg-[#16a34a] transition-colors"
+            className="px-3 py-1.5 min-h-[32px] rounded-lg text-[11px] font-bold tracking-[0.04em] bg-[#10B981] text-white hover:bg-[#0d9668] transition-colors"
           >
             Store
           </button>
