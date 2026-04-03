@@ -10,7 +10,7 @@ interface ModeToggleProps {
 export default function ModeToggle({ mode, onToggle }: ModeToggleProps) {
   return (
     <div
-      className="inline-flex min-h-[44px] rounded-full border border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-800)] p-1"
+      className="inline-flex min-h-[44px] rounded-full border border-[#1e2631] bg-[#131a23] p-[3px] gap-0.5"
       role="radiogroup"
       aria-label="Mode selection"
     >
@@ -19,10 +19,10 @@ export default function ModeToggle({ mode, onToggle }: ModeToggleProps) {
         role="radio"
         aria-checked={mode === 'fun'}
         onClick={() => onToggle('fun')}
-        className={`min-h-[36px] rounded-full px-5 py-2 text-sm font-medium transition-all inline-flex items-center gap-1.5 ${
+        className={`min-h-[32px] rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-all inline-flex items-center gap-1.5 ${
           mode === 'fun'
-            ? 'bg-[var(--tk-color-primary-500)] text-white shadow-sm'
-            : 'text-[var(--tk-color-text-secondary)] hover:text-[var(--tk-color-text-primary)]'
+            ? 'bg-[#3D6AF2] text-white'
+            : 'text-[#a6abb5] hover:text-white'
         }`}
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -35,10 +35,10 @@ export default function ModeToggle({ mode, onToggle }: ModeToggleProps) {
         role="radio"
         aria-checked={mode === 'pro'}
         onClick={() => onToggle('pro')}
-        className={`min-h-[36px] rounded-full px-5 py-2 text-sm font-medium transition-all inline-flex items-center gap-1.5 ${
+        className={`min-h-[32px] rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-all inline-flex items-center gap-1.5 ${
           mode === 'pro'
-            ? 'bg-[var(--tk-color-primary-500)] text-white shadow-sm'
-            : 'text-[var(--tk-color-text-secondary)] hover:text-[var(--tk-color-text-primary)]'
+            ? 'bg-[#3D6AF2] text-white'
+            : 'text-[#a6abb5] hover:text-white'
         }`}
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">

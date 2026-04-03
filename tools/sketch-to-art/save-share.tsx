@@ -24,7 +24,6 @@ export default function SaveShare({
 }: SaveShareProps) {
   const isFun = mode === 'fun'
   const [linkCopied, setLinkCopied] = useState(false)
-  const [showGallery, setShowGallery] = useState(false)
   const [editedUrl, setEditedUrl] = useState<string | null>(null)
   const [editing, setEditing] = useState(false)
   const activeUrl = editedUrl || finalImage.imageUrl
@@ -72,15 +71,6 @@ export default function SaveShare({
     )
   }, [activeUrl])
 
-  const handleShareLinkedIn = useCallback(() => {
-    const url = encodeURIComponent(activeUrl)
-    window.open(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
-      '_blank',
-      'noopener',
-    )
-  }, [activeUrl])
-
   const handlePublish = useCallback(async () => {
     if (!galleryTitle.trim() || publishing) return
     setPublishing(true)
@@ -115,13 +105,8 @@ export default function SaveShare({
 
   return (
     <div className="flex flex-col items-center gap-6">
-      {/* Heading */}
-      <h2 className="text-center text-xl font-bold text-[var(--tk-color-text-primary)]">
-        {isFun ? 'Your masterpiece is ready!' : 'Your art is ready'}
-      </h2>
-
       {/* Final image */}
-      <div className="mx-auto w-full max-w-lg">
+      <div className="mx-auto w-full max-w-[480px]">
         {editing ? (
           <ImageEditor
             src={finalImage.imageUrl}
@@ -131,144 +116,130 @@ export default function SaveShare({
             applyLabel="Apply"
           />
         ) : (
-          <div className="relative aspect-square overflow-hidden rounded-2xl shadow-lg">
+          <div className="relative aspect-square overflow-hidden rounded-2xl shadow-[0_24px_48px_rgba(0,0,0,0.4)]">
             <Image
               src={activeUrl}
               alt="Final artwork"
               fill
               className="object-cover"
-              sizes="(max-width: 640px) 100vw, 512px"
+              sizes="(max-width: 640px) 100vw, 480px"
               priority
             />
           </div>
         )}
       </div>
 
-      {/* Edit / Reset buttons */}
-      {!editing && (
-        <div className="flex w-full max-w-sm gap-2">
+      {/* Metadata card */}
+      <div className="w-full max-w-[480px] bg-[#131a23] rounded-2xl p-5 flex flex-col gap-3.5">
+        <div>
+          <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#70767f] mb-1.5">
+            Title
+          </label>
+          <input
+            type="text"
+            value={galleryTitle}
+            onChange={(e) => setGalleryTitle(e.target.value)}
+            placeholder="Give your art a title..."
+            className="w-full min-h-[44px] rounded-[10px] border border-[#1e2631] bg-[#090f16] text-white text-sm px-3.5 py-2.5 placeholder:text-[#70767f] focus:outline-none focus:border-[#3D6AF2] transition-colors"
+          />
+        </div>
+        <div className="flex gap-4 text-[13px] text-[#a6abb5]">
+          <span>Style: <strong className="text-white">{style || 'Custom'}</strong></span>
+          <span>·</span>
+          <span>{new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+        </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className="w-full max-w-[480px] flex flex-col gap-2.5">
+        {/* Download */}
+        <button
+          type="button"
+          onClick={handleDownload}
+          className="min-h-[44px] w-full rounded-xl bg-[#3D6AF2] px-6 py-3 text-[15px] font-semibold text-white transition-opacity hover:opacity-85 focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] focus:ring-offset-2 inline-flex items-center justify-center gap-2"
+        >
+          <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          Download PNG
+        </button>
+
+        {/* Share row */}
+        <div className="flex gap-2.5">
           <button
             type="button"
-            onClick={() => setEditing(true)}
-            className="min-h-[44px] flex-1 rounded-xl border border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] px-4 py-3 text-sm font-medium text-[var(--tk-color-text-primary)] transition-colors hover:bg-[var(--tk-color-surface-100)] dark:hover:bg-[var(--tk-color-surface-700)]"
+            onClick={handleCopyLink}
+            className="min-h-[44px] flex-1 rounded-xl bg-[#131a23] border border-[#1e2631] px-4 py-3 text-sm font-semibold text-[#a6abb5] transition-colors hover:bg-[#1e2631] hover:text-white inline-flex items-center justify-center gap-1.5"
           >
-            {isFun ? 'Crop / Rotate' : 'Edit'}
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-4.482a4.5 4.5 0 00-6.364-6.364L4.5 8.625a4.5 4.5 0 001.242 7.244" />
+            </svg>
+            {linkCopied ? 'Copied!' : 'Copy Link'}
           </button>
-          {editedUrl && (
+          <button
+            type="button"
+            onClick={handleShareX}
+            className="min-h-[44px] flex-1 rounded-xl bg-gradient-to-r from-[#3D6AF2] to-[#32A9D9] px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 inline-flex items-center justify-center gap-1.5"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+            </svg>
+            Share
+          </button>
+        </div>
+
+        {/* Edit / Reset (inline) */}
+        {!editing && (
+          <div className="flex gap-2.5">
             <button
               type="button"
-              onClick={() => setEditedUrl(null)}
-              className="min-h-[44px] flex-1 rounded-xl border border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] px-4 py-3 text-sm font-medium text-[var(--tk-color-text-primary)] transition-colors hover:bg-[var(--tk-color-surface-100)] dark:hover:bg-[var(--tk-color-surface-700)]"
+              onClick={() => setEditing(true)}
+              className="min-h-[44px] flex-1 rounded-xl bg-[#131a23] border border-[#1e2631] px-4 py-3 text-sm font-medium text-[#a6abb5] transition-colors hover:bg-[#1e2631] hover:text-white"
             >
-              Reset to original
+              {isFun ? 'Crop / Rotate' : 'Edit'}
             </button>
-          )}
-        </div>
-      )}
+            {editedUrl && (
+              <button
+                type="button"
+                onClick={() => setEditedUrl(null)}
+                className="min-h-[44px] flex-1 rounded-xl bg-[#131a23] border border-[#1e2631] px-4 py-3 text-sm font-medium text-[#a6abb5] transition-colors hover:bg-[#1e2631] hover:text-white"
+              >
+                Reset to original
+              </button>
+            )}
+          </div>
+        )}
 
-      {/* Download button */}
-      <button
-        type="button"
-        onClick={handleDownload}
-        className="min-h-[44px] w-full max-w-sm rounded-xl bg-[var(--tk-color-primary-500)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--tk-color-primary-600)] focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] focus:ring-offset-2"
-      >
-        Download PNG
-      </button>
-
-      {/* Share buttons */}
-      <div className="flex w-full max-w-sm gap-2">
-        <button
-          type="button"
-          onClick={handleCopyLink}
-          className="min-h-[44px] flex-1 rounded-xl border border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] px-4 py-3 text-sm font-medium text-[var(--tk-color-text-primary)] transition-colors hover:bg-[var(--tk-color-surface-100)] dark:hover:bg-[var(--tk-color-surface-700)]"
-        >
-          {linkCopied ? 'Copied!' : 'Copy Link'}
-        </button>
-        <button
-          type="button"
-          onClick={handleShareX}
-          className="min-h-[44px] flex-1 rounded-xl border border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] px-4 py-3 text-sm font-medium text-[var(--tk-color-text-primary)] transition-colors hover:bg-[var(--tk-color-surface-100)] dark:hover:bg-[var(--tk-color-surface-700)]"
-        >
-          Share on X
-        </button>
-        <button
-          type="button"
-          onClick={handleShareLinkedIn}
-          className="min-h-[44px] flex-1 rounded-xl border border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] px-4 py-3 text-sm font-medium text-[var(--tk-color-text-primary)] transition-colors hover:bg-[var(--tk-color-surface-100)] dark:hover:bg-[var(--tk-color-surface-700)]"
-        >
-          LinkedIn
-        </button>
-      </div>
-
-      {/* Gallery submit */}
-      <div className="w-full max-w-sm rounded-xl border border-[var(--tk-color-surface-200)] dark:border-[var(--tk-color-surface-700)] p-4">
+        {/* Publish to gallery */}
         {published ? (
-          <p className="text-center text-sm font-medium text-[var(--tk-color-success-500)]">
+          <p className="text-center text-sm font-medium text-[#10B981] py-2">
             {isFun ? 'Published to the gallery!' : 'Published to gallery.'}
           </p>
-        ) : (
-          <>
-            <div className="mb-3 flex items-center justify-between">
-              <label
-                htmlFor="gallery-toggle"
-                className="text-sm font-medium text-[var(--tk-color-text-primary)]"
-              >
-                Share to gallery?
-              </label>
-              <button
-                id="gallery-toggle"
-                type="button"
-                role="switch"
-                aria-checked={showGallery}
-                onClick={() => setShowGallery(!showGallery)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  showGallery
-                    ? 'bg-[var(--tk-color-primary-500)]'
-                    : 'bg-[var(--tk-color-surface-300)] dark:bg-[var(--tk-color-surface-600)]'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
-                    showGallery ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-
-            {showGallery && (
-              <div className="flex flex-col gap-3">
-                <input
-                  type="text"
-                  value={galleryTitle}
-                  onChange={(e) => setGalleryTitle(e.target.value)}
-                  placeholder="Give your art a title..."
-                  className="min-h-[44px] w-full rounded-xl border border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] bg-[var(--tk-color-surface-50)] dark:bg-[var(--tk-color-surface-800)] px-4 py-3 text-sm text-[var(--tk-color-text-primary)] placeholder:text-[var(--tk-color-text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]"
-                />
-                {publishError && (
-                  <p className="text-xs text-[var(--tk-color-error-500)]">{publishError}</p>
-                )}
-                <button
-                  type="button"
-                  onClick={handlePublish}
-                  disabled={!galleryTitle.trim() || publishing}
-                  className="min-h-[44px] w-full rounded-xl bg-[var(--tk-color-primary-500)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--tk-color-primary-600)] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {publishing ? 'Publishing...' : 'Publish'}
-                </button>
-              </div>
+        ) : galleryTitle.trim() ? (
+          <div className="flex flex-col gap-2">
+            {publishError && (
+              <p className="text-xs text-red-400">{publishError}</p>
             )}
-          </>
-        )}
-      </div>
+            <button
+              type="button"
+              onClick={handlePublish}
+              disabled={!galleryTitle.trim() || publishing}
+              className="min-h-[44px] w-full rounded-xl bg-[#10B981] px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {publishing ? 'Publishing...' : 'Publish to Gallery'}
+            </button>
+          </div>
+        ) : null}
 
-      {/* Start over */}
-      <button
-        type="button"
-        onClick={onStartOver}
-        className="min-h-[44px] w-full max-w-sm rounded-xl border border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)] px-6 py-3 text-sm font-medium text-[var(--tk-color-text-primary)] transition-colors hover:bg-[var(--tk-color-surface-100)] dark:hover:bg-[var(--tk-color-surface-700)]"
-      >
-        Start Over
-      </button>
+        {/* Start over */}
+        <button
+          type="button"
+          onClick={onStartOver}
+          className="min-h-[44px] w-full rounded-xl text-sm text-[#70767f] transition-colors hover:text-white"
+        >
+          Start Over
+        </button>
+      </div>
     </div>
   )
 }

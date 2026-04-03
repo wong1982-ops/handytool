@@ -75,7 +75,7 @@ export default function MyCreations({ mode, visible }: MyCreationsProps) {
       <div className="py-8">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="aspect-square rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+            <div key={i} className="aspect-square rounded-2xl bg-[#131a23] animate-pulse" />
           ))}
         </div>
       </div>
@@ -86,15 +86,15 @@ export default function MyCreations({ mode, visible }: MyCreationsProps) {
   if (needsAuth) {
     return (
       <div className="flex flex-col items-center py-16 px-4">
-        <div className="w-16 h-16 mb-4 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-          <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <div className="w-16 h-16 mb-4 rounded-2xl bg-[#131a23] flex items-center justify-center">
+          <svg className="w-8 h-8 text-[#70767f]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>
         </div>
-        <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
+        <h3 className="text-base font-semibold text-white mb-1">
           Sign in to see your creations
         </h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 text-center max-w-xs mb-5">
+        <p className="text-sm text-[#a6abb5] text-center max-w-xs mb-5">
           Your generated artwork is saved automatically. Sign in to access your collection.
         </p>
       </div>
@@ -105,15 +105,15 @@ export default function MyCreations({ mode, visible }: MyCreationsProps) {
   if (error) {
     return (
       <div className="flex flex-col items-center py-16 px-4">
-        <div className="w-16 h-16 mb-4 rounded-2xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center">
+        <div className="w-16 h-16 mb-4 rounded-2xl bg-red-500/10 flex items-center justify-center">
           <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
           </svg>
         </div>
-        <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
+        <h3 className="text-base font-semibold text-white mb-1">
           Couldn&apos;t load your creations
         </h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 text-center max-w-xs mb-5">
+        <p className="text-sm text-[#a6abb5] text-center max-w-xs mb-5">
           Don&apos;t worry, your artwork is safe. Please try again.
         </p>
         <button
@@ -134,24 +134,24 @@ export default function MyCreations({ mode, visible }: MyCreationsProps) {
   if (creations.length === 0) {
     return (
       <div className="flex flex-col items-center py-16 px-4">
-        <div className="w-20 h-20 mb-5 rounded-2xl bg-gradient-to-br from-pink-100 to-violet-100 dark:from-pink-500/10 dark:to-violet-500/10 flex items-center justify-center">
+        <div className="w-20 h-20 mb-5 rounded-2xl bg-gradient-to-br from-pink-500/10 to-violet-500/10 flex items-center justify-center">
           <svg className="w-8 h-8 text-[#93aaff]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" /></svg>
         </div>
-        <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
+        <h3 className="text-base font-semibold text-white mb-1">
           {isFun ? 'Your gallery is empty!' : 'No creations yet'}
         </h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 text-center max-w-xs mb-5">
+        <p className="text-sm text-[#a6abb5] text-center max-w-xs mb-5">
           {isFun
             ? 'Upload a sketch and make some magic \u2014 your artwork will appear here!'
             : 'Generate your first artwork and it will be saved here automatically.'}
         </p>
-        <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
+        <div className="flex items-center gap-3 text-xs text-[#70767f]">
           <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
             Auto-saved
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#3D6AF2]" />
             Private by default
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function MyCreations({ mode, visible }: MyCreationsProps) {
     <>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-[#a6abb5]">
           {creations.length} creation{creations.length !== 1 ? 's' : ''}
         </p>
       </div>
@@ -211,20 +211,20 @@ export default function MyCreations({ mode, visible }: MyCreationsProps) {
           }}
         >
           <div className="flex items-center justify-center min-h-full p-4">
-            <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="w-full max-w-lg bg-[#131a23] rounded-2xl shadow-2xl overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#1e2631]">
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">{selected.title}</h3>
-                  <p className="text-xs text-slate-400">{selected.style} · {formatDate(selected.created_at)}</p>
+                  <h3 className="text-base font-bold text-white">{selected.title}</h3>
+                  <p className="text-xs text-[#70767f]">{selected.style} · {formatDate(selected.created_at)}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedId(null)}
-                  className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[#1e2631] transition-colors"
                   aria-label="Close"
                 >
-                  <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-5 h-5 text-[#70767f]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -261,7 +261,7 @@ export default function MyCreations({ mode, visible }: MyCreationsProps) {
                   onClick={() => {
                     navigator.clipboard.writeText(selected.result_image_url)
                   }}
-                  className="min-h-[44px] flex-1 flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                  className="min-h-[44px] flex-1 flex items-center justify-center gap-2 rounded-xl border border-[#1e2631] text-sm font-medium text-[#a6abb5] hover:bg-[#1e2631] hover:text-white transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-4.482a4.5 4.5 0 00-6.364-6.364L4.5 8.625a4.5 4.5 0 001.242 7.244" />

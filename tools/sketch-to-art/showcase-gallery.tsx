@@ -86,7 +86,7 @@ function BeforeAfterSlider({ beforeSrc, afterSrc, afterLabel }: {
         style={{ left: `${position}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
       >
         <div className={`w-10 h-10 rounded-full bg-white shadow-xl flex items-center justify-center cursor-grab active:cursor-grabbing transition-transform ${dragging ? 'scale-110' : ''}`}>
-          <svg className="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-5 h-5 text-[#131a23]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 8l4 4-4 4M9 16l-4-4 4-4" />
           </svg>
         </div>
@@ -235,10 +235,10 @@ export function ShowcaseGallery({ mode: _mode }: ShowcaseGalleryProps) {
           </svg>
           AI-Powered Art
         </div>
-        <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2 leading-tight">
+        <h2 className="text-2xl sm:text-4xl font-extrabold text-white mb-2 leading-tight">
           One sketch. Every style.
         </h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+        <p className="text-sm text-[#a6abb5] max-w-sm mx-auto">
           Drag the slider to see the magic
         </p>
       </div>
@@ -289,23 +289,23 @@ export function ShowcaseGallery({ mode: _mode }: ShowcaseGalleryProps) {
       >
         {selectedStyle && (
           <div className="flex items-center justify-center min-h-full p-3 sm:p-6">
-            <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="w-full max-w-lg bg-[#131a23] rounded-2xl shadow-2xl overflow-hidden">
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3">
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                <h3 className="text-base font-bold text-white">
                   {selectedStyle.funLabel}
                 </h3>
                 <div className="flex items-center gap-1">
-                  <span className="text-xs text-slate-400 mr-2">
+                  <span className="text-xs text-[#70767f] mr-2">
                     {selectedIndex !== null ? selectedIndex + 1 : 0}/{ART_STYLES.length}
                   </span>
                   <button
                     type="button"
                     onClick={closeLightbox}
                     aria-label="Close"
-                    className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[#1e2631] transition-colors"
                   >
-                    <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-5 h-5 text-[#70767f]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -327,7 +327,7 @@ export function ShowcaseGallery({ mode: _mode }: ShowcaseGalleryProps) {
                   type="button"
                   onClick={goPrev}
                   aria-label="Previous style"
-                  className="min-h-[44px] flex-1 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                  className="min-h-[44px] flex-1 rounded-xl border border-[#1e2631] text-sm font-medium text-[#a6abb5] hover:bg-[#1e2631] hover:text-white transition-colors"
                 >
                   Previous
                 </button>

@@ -58,10 +58,10 @@ function StyleCard({
         )}
       </div>
       {/* Label */}
-      <span className={`text-center leading-tight ${
+      <span className={`text-center leading-tight text-xs ${
         isFun
-          ? 'text-xs font-medium text-[var(--tk-color-text-primary)]'
-          : 'text-xs text-[var(--tk-color-text-secondary)]'
+          ? 'font-medium text-white'
+          : isSelected ? 'font-medium text-white' : 'text-[#a6abb5]'
       }`}>
         {isFun ? style.funLabel : style.name}
       </span>
@@ -151,7 +151,7 @@ export default function StylePicker({
         <label
           htmlFor="custom-style-input"
           className={`mb-2 block font-medium ${
-            isFun ? 'text-sm' : 'text-xs uppercase tracking-wider text-[var(--tk-color-text-secondary)]'
+            isFun ? 'text-sm text-white' : 'text-[11px] uppercase tracking-wider text-[#a6abb5]'
           }`}
         >
           {isFun ? 'Or describe your own style' : 'Custom style'}
@@ -161,12 +161,12 @@ export default function StylePicker({
           type="text"
           value={customStyle}
           onChange={(e) => handleCustomChange(e.target.value)}
-          placeholder="Or describe your own style — e.g., 'underwater kingdom'"
-          className={`w-full min-h-[44px] rounded-xl border px-4 py-3 text-sm transition-colors bg-[var(--tk-color-surface-50)] dark:bg-[var(--tk-color-surface-800)] text-[var(--tk-color-text-primary)] placeholder:text-[var(--tk-color-text-tertiary)] ${
+          placeholder="e.g. 'underwater kingdom', 'retro 80s poster'..."
+          className={`w-full min-h-[44px] rounded-xl border px-4 py-3 text-sm transition-colors bg-[#0d1520] text-white placeholder:text-[#70767f] ${
             customStyle.trim()
-              ? 'border-[var(--tk-color-primary-500)]'
-              : 'border-[var(--tk-color-surface-300)] dark:border-[var(--tk-color-surface-600)]'
-          } focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]`}
+              ? 'border-[#3D6AF2] shadow-[0_0_0_2px_rgba(61,106,242,0.25)]'
+              : 'border-[#1e2631]'
+          } focus:outline-none focus:border-[#3D6AF2] focus:shadow-[0_0_0_2px_rgba(61,106,242,0.25)]`}
         />
       </div>
     </div>

@@ -94,7 +94,7 @@ export default function GenerationResults({
   return (
     <div className="flex flex-col items-center gap-4">
       {/* Heading */}
-      <p className="text-base font-semibold text-[var(--tk-color-text-primary)]">
+      <p className="text-base font-semibold text-white">
         {isFun ? 'Pick your favourite!' : `Variation ${activeIndex + 1} of ${total}`}
       </p>
 
@@ -167,10 +167,10 @@ export default function GenerationResults({
               aria-selected={activeIndex === index}
               aria-label={`Go to variation ${index + 1}`}
               onClick={() => goTo(index)}
-              className={`rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] ${
+              className={`rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] ${
                 activeIndex === index
-                  ? 'w-3 h-3 bg-[var(--tk-color-primary-500)]'
-                  : 'w-2 h-2 bg-[var(--tk-color-surface-400)] dark:bg-[var(--tk-color-surface-600)]'
+                  ? 'w-3 h-3 bg-[#3D6AF2]'
+                  : 'w-2 h-2 bg-[#a6abb5]'
               }`}
             />
           ))}
@@ -181,10 +181,10 @@ export default function GenerationResults({
       <button
         type="button"
         onClick={() => onSelect(activeIndex)}
-        className={`rounded-xl px-6 py-3 text-sm font-semibold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] focus:ring-offset-2 ${
+        className={`min-h-[44px] rounded-xl px-6 py-3 text-sm font-semibold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] ${
           selectedIndex === activeIndex
-            ? 'bg-[var(--tk-color-primary-500)] text-white ring-2 ring-[var(--tk-color-primary-500)] ring-offset-2 dark:ring-offset-[var(--tk-color-surface-900)]'
-            : 'bg-[var(--tk-color-surface-100)] dark:bg-[var(--tk-color-surface-800)] text-[var(--tk-color-text-primary)] hover:bg-[var(--tk-color-primary-500)] hover:text-white'
+            ? 'bg-[#3D6AF2] text-white border-2 border-[#3D6AF2]'
+            : 'bg-[#3D6AF2] text-white border-2 border-[#3D6AF2] hover:opacity-85'
         }`}
       >
         {selectedIndex === activeIndex

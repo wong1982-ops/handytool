@@ -36,7 +36,7 @@ export function SketchTabNavigation({ activeTab, onTabChange, mode }: SketchTabN
 
   return (
     <nav
-      className="flex overflow-x-auto border-b border-[#1e2631] bg-[#0c1219]/95 backdrop-blur-lg
+      className="flex overflow-x-auto border-b border-[#1e2631] bg-[#090f16]/95 backdrop-blur-xl
         [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       aria-label="Sketch to Art navigation"
     >
@@ -50,13 +50,13 @@ export function SketchTabNavigation({ activeTab, onTabChange, mode }: SketchTabN
               type="button"
               onClick={() => onTabChange(tab.id)}
               aria-current={isActive ? 'page' : undefined}
-              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors cursor-pointer
+              className={`flex items-center gap-1.5 px-5 py-3.5 text-sm whitespace-nowrap transition-colors cursor-pointer
                 border-b-2 ${
                   isActive
-                    ? 'border-[#3D6AF2] text-[#93aaff]'
-                    : 'border-transparent text-[#70767f] hover:text-[#a6abb5] hover:border-[#2a3545]'
+                    ? 'border-[#3D6AF2] text-white font-bold'
+                    : 'border-transparent text-[#70767f] hover:text-white font-medium'
                 }`}
-              style={{ minHeight: '44px' }}
+              style={{ minHeight: '48px' }}
             >
               {tab.icon}
               {isFun ? tab.funLabel : tab.label}
