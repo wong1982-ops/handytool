@@ -15,7 +15,7 @@ export function SetAlertModal({ offer, onClose, onCreated }: SetAlertModalProps)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (targetPrice <= 0) return
 

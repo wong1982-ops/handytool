@@ -153,7 +153,7 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
     setDestDisplay(originDisplay)
   }, [originCode, originDisplay, destCode, destDisplay])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!canSearch) return
     onSearch({
