@@ -160,7 +160,7 @@ export default function ComponentViewer({ component }: ComponentViewerProps) {
                 key={fw.id}
                 type="button"
                 onClick={() => setActiveTab(fw.id)}
-                className={`px-3 min-h-[44px] rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                className={`px-3 min-h-[44px] rounded-lg text-sm font-medium transition-all cursor-pointer ${
                   activeTab === fw.id
                     ? 'bg-[#3D6AF2] text-white'
                     : 'text-[#a6abb5] hover:text-white hover:bg-[#1e2631]'
@@ -176,7 +176,7 @@ export default function ComponentViewer({ component }: ComponentViewerProps) {
           <button
             type="button"
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 min-h-[44px] rounded-lg text-sm font-medium text-[#a6abb5] hover:text-white hover:bg-[#1e2631] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 min-h-[44px] rounded-lg text-sm font-medium text-[#a6abb5] hover:text-white hover:bg-[#1e2631] transition-all cursor-pointer"
             aria-label="Copy code"
           >
             {copied ? (

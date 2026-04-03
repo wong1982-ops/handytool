@@ -299,7 +299,7 @@ export default function CodeEditor({
             type="button"
             onClick={() => onFrameworkChange(fw.id)}
             className={[
-              'px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer',
+              'px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer',
               'min-h-[32px]',
               activeFramework === fw.id
                 ? 'bg-[#3D6AF2] text-white'
@@ -319,7 +319,7 @@ export default function CodeEditor({
           type="button"
           onClick={onReset}
           title="Reset to AI-generated code"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-[#70767f] hover:text-[#a6abb5] hover:bg-[#1a2333] transition-colors cursor-pointer min-h-[44px]"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-[#70767f] hover:text-[#a6abb5] hover:bg-[#1a2333] transition-all cursor-pointer min-h-[44px]"
           aria-label="Reset code to AI-generated version"
         >
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -333,7 +333,7 @@ export default function CodeEditor({
           type="button"
           onClick={handleCopy}
           title={copied ? 'Copied!' : 'Copy code'}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-colors cursor-pointer min-h-[44px] bg-[#1a2333] text-[#a6abb5] hover:bg-[#1e2d3d] hover:text-[#e6edf3]"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer min-h-[44px] bg-[#1a2333] text-[#a6abb5] hover:bg-[#1e2d3d] hover:text-[#e6edf3]"
           aria-label={copied ? 'Code copied to clipboard' : 'Copy code to clipboard'}
         >
           {copied ? (

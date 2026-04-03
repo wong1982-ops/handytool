@@ -164,14 +164,20 @@ export default function ComponentLab() {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-[#1e2631] shrink-0">
-        <h1 className="text-lg font-bold text-white tracking-tight">
-          Component{' '}
-          <span className="bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] bg-clip-text text-transparent">
-            Lab
+      <header className="flex items-center justify-between px-4 h-14 border-b border-[#1e2631] shrink-0 bg-[#090f16]">
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-[#70767f]">
+            Tools&nbsp;/&nbsp;<span className="text-[#3D6AF2]">Component Lab</span>
           </span>
-        </h1>
-        <div className="flex items-center gap-2">
+          <span className="w-px h-4 bg-[#1e2631]" aria-hidden="true" />
+          <h1 className="text-base font-bold text-white tracking-tight">
+            Component{' '}
+            <span className="bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] bg-clip-text text-transparent">
+              Lab
+            </span>
+          </h1>
+        </div>
+        <div className="flex items-center gap-1.5">
           <Link
             href="/tools/component-lab/library"
             className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#a6abb5] hover:text-white hover:bg-[#1e2631] transition-colors min-h-[36px] flex items-center"
@@ -186,14 +192,14 @@ export default function ComponentLab() {
           </Link>
           <button
             type="button"
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white min-h-[36px] flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
+            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white min-h-[36px] flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
             disabled={!session.code.react && !session.code.html}
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
             </svg>
             Save
-            <span className="text-[10px] opacity-70">1cr</span>
+            <span className="text-[10px] opacity-65 font-normal">1cr</span>
           </button>
         </div>
       </header>
@@ -201,7 +207,7 @@ export default function ComponentLab() {
       {/* Desktop layout (lg+) */}
       <div className="hidden lg:flex flex-row flex-1 min-h-0">
         {/* Prompt Panel */}
-        <aside className="w-72 shrink-0 overflow-y-auto border-r border-[#1e2631]">
+        <aside className="w-72 shrink-0 overflow-y-auto border-r border-[#1e2631] bg-[#090f16]">
           <PromptPanel
             prompt={session.prompt}
             settings={session.settings}
@@ -266,10 +272,10 @@ export default function ComponentLab() {
               type="button"
               onClick={() => setMobileTab(tab)}
               className={[
-                'flex-1 py-2.5 text-xs font-medium text-center transition-colors min-h-[44px] cursor-pointer',
+                'flex-1 py-2.5 text-xs font-medium text-center transition-all min-h-[44px] cursor-pointer',
                 mobileTab === tab
                   ? 'text-white border-b-2 border-[#3D6AF2]'
-                  : 'text-[#70767f] hover:text-[#a6abb5]',
+                  : 'text-[#70767f] border-b-2 border-transparent hover:text-[#a6abb5]',
               ].join(' ')}
             >
               {tab === 'preview' ? 'Preview' : tab === 'code' ? 'Code' : 'Chat'}

@@ -22,7 +22,7 @@ export default function ExplorePage() {
         <div className="mb-6">
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
             Explore{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#32A9D9]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED]">
               Components
             </span>
           </h1>

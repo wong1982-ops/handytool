@@ -145,7 +145,7 @@ export default function ChatBar({
             disabled={!canUndo || refining}
             title="Undo version"
             aria-label="Previous version"
-            className="w-7 h-7 flex items-center justify-center rounded-lg text-[#70767f] hover:text-white hover:bg-[#1e2631] transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-[#70767f] hover:text-white hover:bg-[#1e2631] transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
             <svg
               className="w-3.5 h-3.5"
@@ -171,7 +171,7 @@ export default function ChatBar({
             disabled={!canRedo || refining}
             title="Redo version"
             aria-label="Next version"
-            className="w-7 h-7 flex items-center justify-center rounded-lg text-[#70767f] hover:text-white hover:bg-[#1e2631] transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-[#70767f] hover:text-white hover:bg-[#1e2631] transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
             <svg
               className="w-3.5 h-3.5"
@@ -198,7 +198,7 @@ export default function ChatBar({
           onKeyDown={handleKeyDown}
           disabled={refining}
           placeholder="Describe changes... (e.g. make the button larger, add a shadow)"
-          className="flex-1 min-h-[44px] rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-sm px-4 py-2.5 placeholder:text-[#4a5060] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex-1 min-h-[44px] rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-[13px] px-4 py-2.5 placeholder:text-[#4a5060] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         />
 
         {/* Send button */}
@@ -208,7 +208,7 @@ export default function ChatBar({
           disabled={!input.trim() || refining}
           aria-label="Send refinement instruction"
           className={[
-            'w-10 h-10 shrink-0 rounded-xl flex items-center justify-center transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed',
+            'w-10 h-10 shrink-0 rounded-xl flex items-center justify-center transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed border-none',
             refining
               ? 'bg-[#3D6AF2] animate-pulse'
               : 'bg-[#3D6AF2] hover:bg-[#3D79F2]',

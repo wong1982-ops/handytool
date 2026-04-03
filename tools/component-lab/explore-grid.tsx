@@ -168,10 +168,10 @@ export default function ExploreGrid() {
             key={mode}
             type="button"
             onClick={() => handleSortChange(mode)}
-            className={`px-4 min-h-[44px] rounded-full text-sm font-semibold transition-colors cursor-pointer ${
+            className={`px-4 min-h-[44px] rounded-full text-sm font-semibold transition-all cursor-pointer ${
               sort === mode
                 ? 'bg-[#3D6AF2] text-white'
-                : 'bg-[#131a23] text-[#a6abb5] hover:bg-[#1e2631] hover:text-white border border-[#1e2631]'
+                : 'bg-[#131a23] text-[#a6abb5] hover:bg-[#1a2333] hover:text-white border border-[#1e2631]'
             }`}
             aria-pressed={sort === mode}
           >

@@ -197,7 +197,7 @@ export default function LibraryGrid() {
       {entries.map((entry) => (
         <div
           key={entry.id}
-          className="rounded-xl bg-[#131a23] border border-[#1e2631] hover:border-[#3D6AF2]/30 transition-all group overflow-hidden"
+          className="rounded-xl bg-[#131a23] border border-[#1e2631] hover:border-[#3D6AF2]/30 transition-all duration-150 group overflow-hidden"
         >
           {/* Gradient fallback thumbnail */}
           <button

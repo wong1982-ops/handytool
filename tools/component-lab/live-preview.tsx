@@ -296,30 +296,50 @@ export default function LivePreview({
   )
 
   return (
-    <div className="flex flex-col h-full bg-[#0d1117] rounded-xl overflow-hidden">
+    <div className="flex flex-col h-full bg-[#0d1117] overflow-hidden">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-[#1e2631] shrink-0">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-[#1e2631] shrink-0">
         {/* Viewport preset buttons */}
         <div className="flex items-center gap-1">
-          {VIEWPORT_PRESETS.map((preset) => (
-            <button
-              key={preset.width}
-              type="button"
-              onClick={() => handleViewportPreset(preset.width)}
-              className={[
-                'flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors min-h-[32px]',
-                viewportWidth === preset.width
-                  ? 'bg-[#1e2631] text-white'
-                  : 'text-[#6b7280] hover:text-[#9ca3af] hover:bg-[#161d27]',
-              ].join(' ')}
-              aria-label={`${preset.label} viewport (${preset.width}px)`}
-              aria-pressed={viewportWidth === preset.width}
-            >
-              <span className="hidden sm:inline">{preset.label}</span>
-              <span className="text-[10px] text-[#4b5563]">{preset.width}</span>
-            </button>
-          ))}
-          <span className="ml-2 text-[#4b5563] text-xs tabular-nums" aria-live="polite">
+          {VIEWPORT_PRESETS.map((preset) => {
+            const icons: Record<string, React.ReactNode> = {
+              Mobile: (
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                </svg>
+              ),
+              Tablet: (
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.5 19.5h3m-6.75 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.5a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 4.5v15a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+              ),
+              Desktop: (
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25A2.25 2.25 0 0 1 5.25 3h13.5A2.25 2.25 0 0 1 21 5.25Z" />
+                </svg>
+              ),
+            }
+            return (
+              <button
+                key={preset.width}
+                type="button"
+                onClick={() => handleViewportPreset(preset.width)}
+                className={[
+                  'flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-colors min-h-[32px]',
+                  viewportWidth === preset.width
+                    ? 'bg-[#1e2631] text-white'
+                    : 'text-[#6b7280] hover:text-[#9ca3af] hover:bg-[#161d27]',
+                ].join(' ')}
+                aria-label={`${preset.label} viewport (${preset.width}px)`}
+                aria-pressed={viewportWidth === preset.width}
+              >
+                {icons[preset.label]}
+                <span className="hidden sm:inline">{preset.label}</span>
+                <span className="text-[10px] text-[#4b5563]">{preset.width}</span>
+              </button>
+            )
+          })}
+          <span className="ml-2 text-[#4b5563] text-[11px] tabular-nums" aria-live="polite">
             {viewportWidth}px
           </span>
         </div>
@@ -332,9 +352,9 @@ export default function LivePreview({
               type="button"
               onClick={() => onBackgroundChange(bg)}
               className={[
-                'flex items-center justify-center w-8 h-8 rounded transition-colors min-h-[32px]',
+                'flex items-center justify-center w-8 h-8 rounded-md transition-colors min-h-[32px]',
                 background === bg
-                  ? 'bg-[#1e2631] ring-1 ring-[#3d6af2]'
+                  ? 'bg-[#1e2631] shadow-[0_0_0_1px_#3d6af2]'
                   : 'hover:bg-[#161d27]',
               ].join(' ')}
               aria-label={`${bg} background`}

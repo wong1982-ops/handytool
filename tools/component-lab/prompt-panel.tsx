@@ -29,10 +29,10 @@ function PillButton({
       type="button"
       onClick={onClick}
       className={[
-        'px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-colors min-h-[32px]',
+        'px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition-all min-h-[28px]',
         active
           ? 'bg-[#3D6AF2] text-white'
-          : 'bg-[#131a23] text-[#70767f] hover:text-white',
+          : 'bg-[#131a23] text-[#70767f] hover:text-[#a6abb5] hover:bg-[#1a2333]',
       ].join(' ')}
     >
       {children}
@@ -104,7 +104,7 @@ export default function PromptPanel({
     <div className="space-y-5 p-4">
       {/* 1. Component Description */}
       <section>
-        <label className="block text-sm font-medium text-[#a6abb5] mb-2">
+        <label className="block text-[13px] font-medium text-[#a6abb5] mb-2">
           Component Description
         </label>
         <div className="relative">
@@ -114,7 +114,7 @@ export default function PromptPanel({
             maxLength={1000}
             rows={5}
             placeholder={PROMPT_PLACEHOLDERS[placeholderIndex]}
-            className="w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-sm px-4 py-3 placeholder:text-[#4a5060] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors resize-none"
+            className="w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-[13px] px-3.5 py-3 placeholder:text-[#4a5060] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors resize-none leading-relaxed"
           />
         </div>
         <p className="text-[10px] text-[#4a5060] mt-1 text-right">
@@ -124,7 +124,7 @@ export default function PromptPanel({
 
       {/* 2. Reference Image */}
       <section>
-        <label className="block text-sm font-medium text-[#a6abb5] mb-2">
+        <label className="block text-[13px] font-medium text-[#a6abb5] mb-2">
           Reference Image
         </label>
 
@@ -211,11 +211,11 @@ export default function PromptPanel({
 
       {/* 3. Settings */}
       <section className="space-y-4">
-        <p className="text-sm font-medium text-[#a6abb5]">Settings</p>
+        <p className="text-[13px] font-medium text-[#a6abb5]">Settings</p>
 
         {/* Theme */}
         <div>
-          <p className="text-xs text-[#70767f] mb-1.5">Theme</p>
+          <p className="text-[11px] text-[#70767f] mb-1.5">Theme</p>
           <div className="flex flex-wrap gap-2">
             {(['light', 'dark', 'both'] as const).map((t) => (
               <PillButton
@@ -231,7 +231,7 @@ export default function PromptPanel({
 
         {/* Responsive */}
         <div>
-          <p className="text-xs text-[#70767f] mb-1.5">Responsive</p>
+          <p className="text-[11px] text-[#70767f] mb-1.5">Responsive</p>
           <div className="flex gap-2">
             <PillButton
               active={settings.responsive}
@@ -250,7 +250,7 @@ export default function PromptPanel({
 
         {/* Animations */}
         <div>
-          <p className="text-xs text-[#70767f] mb-1.5">Animations</p>
+          <p className="text-[11px] text-[#70767f] mb-1.5">Animations</p>
           <div className="flex flex-wrap gap-2">
             {(['none', 'subtle', 'rich'] as const).map((a) => (
               <PillButton
@@ -266,7 +266,7 @@ export default function PromptPanel({
 
         {/* Accessibility */}
         <div>
-          <p className="text-xs text-[#70767f] mb-1.5">Accessibility</p>
+          <p className="text-[11px] text-[#70767f] mb-1.5">Accessibility</p>
           <div className="flex flex-wrap gap-2">
             {([
               { id: 'standard', label: 'Standard' },
@@ -285,7 +285,7 @@ export default function PromptPanel({
 
         {/* CSS Framework */}
         <div>
-          <p className="text-xs text-[#70767f] mb-1.5">CSS Framework</p>
+          <p className="text-[11px] text-[#70767f] mb-1.5">CSS Framework</p>
           <div className="flex flex-wrap gap-2">
             {([
               { id: 'tailwind', label: 'Tailwind' },
@@ -309,7 +309,7 @@ export default function PromptPanel({
         type="button"
         onClick={onGenerate}
         disabled={generating || !prompt.trim()}
-        className="w-full min-h-[44px] rounded-xl bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white text-sm font-semibold flex items-center justify-center gap-2 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+        className="w-full min-h-[44px] rounded-xl bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:from-[#3D79F2] hover:to-[#8B4CF0] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
       >
         {generating ? (
           <>
