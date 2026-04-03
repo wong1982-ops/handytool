@@ -114,7 +114,7 @@ export function useLyria(apiKey: string): UseLyriaReturn {
     try {
       getAudioContext() // ensure AudioContext exists (user gesture)
 
-      const client = new GoogleGenAI({ apiKey })
+      const client = new GoogleGenAI({ apiKey, httpOptions: { apiVersion: 'v1alpha' } })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const session = await (client as any).live.music.connect({
         model: 'models/lyria-realtime-exp',
@@ -129,8 +129,9 @@ export function useLyria(apiKey: string): UseLyriaReturn {
           },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           onerror: (err: any) => {
-            console.error('[music-studio] Lyria error:', err)
-            setError('Connection error. Try reconnecting.')
+            const errMsg = err?.message || err?.error?.message || (typeof err === 'string' ? err : JSON.stringify(err))
+            console.error('[music-studio] Lyria error:', errMsg, err)
+            setError(errMsg || 'Connection error. Try reconnecting.')
             setStatus('error')
           },
           onclose: () => {
@@ -157,8 +158,9 @@ export function useLyria(apiKey: string): UseLyriaReturn {
 
       await session.play()
     } catch (err) {
-      console.error('[music-studio] Connect failed:', err)
-      setError(err instanceof Error ? err.message : 'Failed to connect')
+      const errDetail = err instanceof Error ? err.message : (typeof err === 'string' ? err : JSON.stringify(err))
+      console.error('[music-studio] Connect failed:', errDetail, err)
+      setError(errDetail || 'Failed to connect')
       setStatus('error')
     }
   }, [apiKey, getAudioContext, handleAudioChunk, status])

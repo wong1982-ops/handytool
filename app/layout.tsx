@@ -113,6 +113,7 @@ export default function RootLayout({
       <body
         className="antialiased min-h-screen flex flex-col"
         style={{ overscrollBehaviorX: 'none' }}
+        suppressHydrationWarning
       >
         <script
           type="application/ld+json"
