@@ -140,8 +140,10 @@ export default function MoodBoardStudio() {
 
       {/* Error banner */}
       {board.error && (
-        <div className="mx-4 mt-2 px-4 py-2 rounded-lg bg-red-900/30 text-red-400 text-sm">
-          {board.error}
+        <div className="max-w-[960px] mx-auto px-4 md:px-6 mt-2">
+          <div className="px-4 py-2.5 rounded-[10px] bg-red-900/30 border border-red-900/40 text-red-400 text-sm">
+            {board.error}
+          </div>
         </div>
       )}
 

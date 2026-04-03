@@ -45,9 +45,9 @@ function SortableImage({
       style={style}
       {...attributes}
       {...listeners}
-      className={`relative group cursor-pointer rounded-xl overflow-hidden ${
+      className={`relative group cursor-pointer rounded-[10px] overflow-hidden border ${
         isHero ? 'md:col-span-2 md:row-span-2' : ''
-      } ${isSelected ? 'ring-2 ring-[#3D6AF2]' : ''}`}
+      } ${isSelected ? 'border-[#3D6AF2] ring-2 ring-[#3D6AF2]' : 'border-[#1e2631]'}`}
       onClick={onSelect}
     >
       <div className="aspect-square">
@@ -62,10 +62,10 @@ function SortableImage({
       {/* Delete overlay */}
       <button
         onClick={(e) => { e.stopPropagation(); onRemove() }}
-        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-md bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
         aria-label="Remove image"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
@@ -83,7 +83,7 @@ export function ImageGrid({ images, selectedId, onSelect, onReorder, onRemove }:
 
   if (images.length === 0) {
     return (
-      <div className="border-2 border-dashed border-[#1e2631] rounded-xl p-12 text-center text-[#70767f] text-sm">
+      <div className="border-2 border-dashed border-[#1e2631] rounded-[10px] p-12 text-center text-[#70767f] text-sm">
         No images generated yet
       </div>
     )
@@ -92,7 +92,7 @@ export function ImageGrid({ images, selectedId, onSelect, onReorder, onRemove }:
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={images.map((i) => i.id)} strategy={rectSortingStrategy}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
           {images.map((img, i) => (
             <SortableImage
               key={img.id}

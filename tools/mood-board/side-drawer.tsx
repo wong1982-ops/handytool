@@ -146,14 +146,14 @@ function AISection({
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-sm font-semibold text-white">Add More Elements</h3>
+      <h3 className="text-[13px] font-semibold text-white">Add More Elements</h3>
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="What should I add?"
+        placeholder="What should I add? e.g. 'More summer photos'"
         rows={3}
-        className="w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-white placeholder-[#70767f] text-sm px-3 py-2.5 resize-none outline-none focus:border-[#3D6AF2] transition-colors"
+        className="w-full rounded-[10px] bg-[#131a23] border border-[#1e2631] text-white placeholder-[#70767f] text-[13px] px-3 py-3 resize-none outline-none focus:border-[#3D6AF2] transition-colors"
         aria-label="Prompt for AI to add elements"
       />
       <div className="flex items-center justify-between gap-2">
@@ -163,7 +163,7 @@ function AISection({
       <button
         onClick={handleAdd}
         disabled={addingMore || !prompt.trim()}
-        className="min-h-[44px] w-full rounded-xl bg-gradient-to-r from-[#3D6AF2] to-[#3D9DF2] text-white text-sm font-medium flex items-center justify-center gap-2 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
+        className="min-h-[44px] w-full rounded-[10px] bg-gradient-to-r from-[#3D6AF2] to-[#3D9DF2] text-white text-[13px] font-semibold flex items-center justify-center gap-2 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
         aria-label="Add elements using AI"
       >
         {addingMore ? (
@@ -202,14 +202,14 @@ function UploadSection({ onUploadImage }: { onUploadImage: (file: File) => void 
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-sm font-semibold text-white">Upload Image</h3>
+      <h3 className="text-[13px] font-semibold text-white">Upload Image</h3>
       <button
         type="button"
         onClick={() => fileInputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
-        className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors cursor-pointer flex flex-col items-center gap-3 w-full ${
+        className={`border-2 border-dashed rounded-[10px] p-8 text-center transition-colors cursor-pointer flex flex-col items-center gap-2.5 w-full ${
           dragging ? 'border-[#3D6AF2] bg-[#3D6AF2]/5' : 'border-[#1e2631] hover:border-[#3D6AF2]'
         }`}
         aria-label="Upload image: click to browse or drag and drop"
@@ -236,11 +236,11 @@ function UploadSection({ onUploadImage }: { onUploadImage: (file: File) => void 
 function TextSection({ onAddTextNote }: { onAddTextNote: () => void }) {
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-sm font-semibold text-white">Add Text Note</h3>
+      <h3 className="text-[13px] font-semibold text-white">Add Text Note</h3>
       <p className="text-sm text-[#a6abb5]">Add a sticky note to your board</p>
       <button
         onClick={onAddTextNote}
-        className="min-h-[44px] w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-[#a6abb5] text-sm font-medium hover:bg-[#1e2631] hover:text-white transition-colors"
+        className="min-h-[44px] w-full rounded-[10px] bg-[#131a23] border border-[#1e2631] text-[#a6abb5] text-[13px] font-medium hover:bg-[#1e2631] hover:text-white transition-colors"
         aria-label="Add a text note to the board"
       >
         Add Note
@@ -254,20 +254,20 @@ function SwatchSection({ onAddSwatch }: { onAddSwatch: (color: string) => void }
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-sm font-semibold text-white">Add Color</h3>
+      <h3 className="text-[13px] font-semibold text-white">Add Color</h3>
       <div className="flex items-center gap-3">
         <input
           type="color"
           value={color}
           onChange={(e) => setColor(e.target.value)}
-          className="w-10 h-10 rounded-lg border border-[#1e2631] cursor-pointer bg-transparent p-0.5"
+          className="w-11 h-11 rounded-[10px] border border-[#1e2631] cursor-pointer bg-transparent p-0.5"
           aria-label="Pick a color"
         />
-        <span className="text-sm text-[#a6abb5] font-mono">{color.toUpperCase()}</span>
+        <span className="text-[13px] text-[#a6abb5] font-mono">{color.toUpperCase()}</span>
       </div>
       <button
         onClick={() => onAddSwatch(color)}
-        className="min-h-[44px] w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-[#a6abb5] text-sm font-medium hover:bg-[#1e2631] hover:text-white transition-colors"
+        className="min-h-[44px] w-full rounded-[10px] bg-[#131a23] border border-[#1e2631] text-[#a6abb5] text-[13px] font-medium hover:bg-[#1e2631] hover:text-white transition-colors"
         aria-label={`Add color swatch ${color} to the board`}
       >
         Add to Board
@@ -299,16 +299,16 @@ function LinksSection({ paletteColors }: { paletteColors: string[] }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-sm font-semibold text-white">Open in Other Tools</h3>
+      <h3 className="text-[13px] font-semibold text-white">Open in Other Tools</h3>
       <ul className="flex flex-col gap-2" role="list">
         {links.map(({ label, href, description }) => (
           <li key={label}>
             <Link
               href={href}
-              className="rounded-xl bg-[#131a23] border border-[#1e2631] p-3 hover:bg-[#1e2631] cursor-pointer block transition-colors group"
+              className="rounded-[10px] bg-[#131a23] border border-[#1e2631] px-3.5 py-3 hover:bg-[#1e2631] cursor-pointer block transition-colors group"
             >
-              <span className="text-sm font-medium text-white group-hover:text-[#3D9DF2] transition-colors">{label}</span>
-              <span className="block text-xs text-[#70767f] mt-0.5">{description}</span>
+              <span className="text-[13px] font-medium text-white group-hover:text-[#3D9DF2] transition-colors">{label}</span>
+              <span className="block text-[11px] text-[#70767f] mt-0.5">{description}</span>
             </Link>
           </li>
         ))}
@@ -364,7 +364,7 @@ export function SideDrawer({
       {/* ---- Collapsed icon strip (desktop only, hidden when open) ---- */}
       {!open && (
         <div
-          className="hidden md:flex fixed right-0 top-1/3 z-30 w-12 flex-col bg-[#131a23] border-l border-[#1e2631] rounded-l-xl overflow-hidden"
+          className="hidden md:flex fixed right-0 top-1/2 -translate-y-1/2 z-30 flex-col bg-[#131a23] border border-[#1e2631] border-r-0 rounded-l-xl overflow-hidden"
           role="toolbar"
           aria-label="Board tools"
         >
@@ -372,13 +372,13 @@ export function SideDrawer({
             <button
               key={id}
               onClick={() => onToggle(id)}
-              className="p-3 hover:bg-[#1e2631] transition-colors text-[#a6abb5] hover:text-white min-h-[44px] flex items-center justify-center group relative"
+              className="w-12 min-h-[44px] flex items-center justify-center text-[#70767f] hover:bg-[#1e2631] hover:text-white transition-colors group relative bg-transparent border-none cursor-pointer"
               aria-label={label}
               title={label}
             >
               <Icon />
               {/* Tooltip */}
-              <span className="pointer-events-none absolute right-full mr-2 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-[#131a23] border border-[#1e2631] px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+              <span className="pointer-events-none absolute right-[calc(100%+8px)] top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-[#131a23] border border-[#1e2631] px-2.5 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                 {label}
               </span>
             </button>

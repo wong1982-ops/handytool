@@ -45,18 +45,26 @@ export function MyBoards({ onLoadBoard, onBack }: MyBoardsProps) {
   }, [fetchHistory])
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="max-w-[720px] mx-auto px-4 md:px-6 py-8">
       {/* Back button */}
       <button
         type="button"
         onClick={onBack}
-        className="flex items-center gap-2 text-sm text-[#70767f] hover:text-white transition-colors cursor-pointer w-fit"
+        className="flex items-center gap-1.5 text-[13px] text-[#70767f] hover:text-white transition-colors cursor-pointer w-fit mb-6 bg-transparent border-none p-0"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
-        Back
+        Back to board
       </button>
+
+      {/* Heading */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-white">My Boards</h2>
+        {!loading && !error && entries.length > 0 && (
+          <span className="text-[13px] text-[#70767f]">{entries.length} {entries.length === 1 ? 'board' : 'boards'}</span>
+        )}
+      </div>
 
       {/* Loading state */}
       {loading && (
@@ -96,7 +104,7 @@ export function MyBoards({ onLoadBoard, onBack }: MyBoardsProps) {
 
       {/* Entry list */}
       {!loading && !error && entries.length > 0 && (
-        <div className="space-y-3">
+        <div className="flex flex-col gap-2.5">
           {entries.map((entry) => {
             const firstImage = entry.elements?.find((el) => el.type === 'image' && el.src)
             const title = entry.title || 'Untitled Board'
@@ -119,11 +127,11 @@ export function MyBoards({ onLoadBoard, onBack }: MyBoardsProps) {
                     <img
                       src={firstImage.src as string}
                       alt={title}
-                      className="w-16 h-16 rounded-lg object-cover shrink-0 bg-white"
+                      className="w-16 h-16 rounded-[10px] object-cover shrink-0 bg-white"
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-lg shrink-0 bg-white/5 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-[10px] shrink-0 bg-white/5 flex items-center justify-center">
                       <svg className="w-6 h-6 text-[#70767f]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 3h18M3 21h18" />
                       </svg>
@@ -131,22 +139,22 @@ export function MyBoards({ onLoadBoard, onBack }: MyBoardsProps) {
                   )}
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-white font-semibold text-sm truncate group-hover:text-[#3D6AF2] transition-colors">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-semibold text-white truncate group-hover:text-[#3D9DF2] transition-colors">
                         {title}
                       </p>
                       {entry.shared && (
-                        <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#3D6AF2]/20 text-[#3D6AF2]">
+                        <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#3D6AF2]/20 text-[#3D6AF2]">
                           Shared
                         </span>
                       )}
                     </div>
 
                     {entry.theme && (
-                      <p className="text-[#70767f] text-xs mt-0.5 truncate">{entry.theme}</p>
+                      <p className="text-[#70767f] text-xs truncate">{entry.theme}</p>
                     )}
 
-                    <p className="text-[#70767f] text-xs mt-1">
+                    <p className="text-[#70767f] text-xs mt-1.5">
                       {elementCount} {elementCount === 1 ? 'element' : 'elements'} &middot; {dateLabel}
                     </p>
                   </div>

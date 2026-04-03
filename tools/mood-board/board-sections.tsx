@@ -57,11 +57,11 @@ export function BoardSections({
   return (
     <div
       ref={containerRef}
-      className="max-w-5xl mx-auto px-4 md:px-8 py-6"
+      className="max-w-[960px] mx-auto px-4 md:px-6 md:pr-20 py-8 pb-20"
       onClick={handleBackgroundClick}
     >
       {/* Board title */}
-      <div data-background="true" className="mb-1">
+      <div data-background="true" className="mb-1.5">
         <input
           type="text"
           value={board.title}
@@ -71,19 +71,20 @@ export function BoardSections({
           placeholder="Untitled Board"
           className={[
             'text-2xl font-bold text-white bg-transparent border-none outline-none w-full',
-            'placeholder:text-white/30',
-            'focus:placeholder:text-white/20',
+            'placeholder:text-white/20',
+            'focus:text-white',
           ].join(' ')}
         />
       </div>
 
       {/* Theme subtitle */}
       {board.theme && (
-        <p className="text-sm text-[#70767f] mt-1 mb-6">{board.theme}</p>
+        <p className="text-[13px] text-[#70767f] mb-8">{board.theme}</p>
       )}
 
       {/* Image grid section */}
       <section aria-label="Images" className="mb-2">
+        <p className="text-[11px] font-bold tracking-[0.08em] uppercase text-[#70767f] mb-3">Images</p>
         <ImageGrid
           images={imageElements}
           selectedId={selectedId}
