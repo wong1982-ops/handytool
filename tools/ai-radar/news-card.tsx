@@ -28,12 +28,12 @@ export function NewsCard({ item, onClick }: NewsCardProps) {
     <button
       type="button"
       onClick={() => onClick(item)}
-      className="w-full text-left p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-[var(--tk-color-primary-500)]/50 hover:shadow-md transition-all cursor-pointer group flex gap-4"
+      className="news-card w-full text-left p-5 rounded-xl border border-[#1e2631] bg-[#131a23] hover:border-[rgba(61,106,242,0.5)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all cursor-pointer group flex gap-4"
       aria-label={`View details: ${item.title}`}
     >
       {/* Thumbnail */}
       {item.image_url && (
-        <div className="hidden sm:block w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800">
+        <div className="hidden sm:block w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-[#1e2631]">
           <img
             src={item.image_url}
             alt=""
@@ -48,28 +48,28 @@ export function NewsCard({ item, onClick }: NewsCardProps) {
 
       <div className="flex-1 min-w-0">
         {/* Title */}
-        <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white group-hover:text-[var(--tk-color-primary-500)] transition-colors line-clamp-2 mb-1">
+        <h3 className="text-sm sm:text-base font-semibold text-white group-hover:text-[#3D6AF2] transition-colors line-clamp-2 mb-1">
           {item.title}
         </h3>
 
         {/* Summary */}
-        <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mb-2">
+        <p className="text-sm text-[#a6abb5] line-clamp-2 mb-2">
           {item.summary}
         </p>
 
         {/* Footer: model badge + source + date */}
         <div className="flex items-center gap-2 flex-wrap">
           {item.model_name && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-[var(--tk-color-primary-500)]/10 text-[var(--tk-color-primary-500)]">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-[#3D6AF2]/10 text-[#3D6AF2]">
               {item.model_name}
             </span>
           )}
           {item.provider && !item.model_name && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-900/30 text-purple-300">
               {item.provider}
             </span>
           )}
-          <span className="text-xs text-slate-400 dark:text-slate-500">
+          <span className="text-xs text-[#70767f]">
             {SOURCE_LABELS[item.source]} · {formatRelativeDate(item.posted_at)}
           </span>
         </div>

@@ -29,8 +29,8 @@ export function NewsPagination({ pagination, onPageChange }: NewsPaginationProps
   }
 
   return (
-    <nav aria-label="News pagination" className="flex flex-col items-center gap-3 mt-6">
-      <p className="text-sm text-slate-500 dark:text-slate-400">
+    <nav aria-label="News pagination" className="flex flex-col items-center gap-3 mt-2">
+      <p className="text-sm text-[#70767f]">
         {total} article{total !== 1 ? 's' : ''} found
       </p>
       <div className="flex items-center gap-1">
@@ -38,7 +38,7 @@ export function NewsPagination({ pagination, onPageChange }: NewsPaginationProps
           type="button"
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          className="px-3 h-10 text-sm rounded-lg border border-[#1e2631] text-[#a6abb5] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#1e2631] hover:text-white transition-colors cursor-pointer min-h-[44px]"
           aria-label="Previous page"
         >
           Prev
@@ -46,17 +46,17 @@ export function NewsPagination({ pagination, onPageChange }: NewsPaginationProps
 
         {pages.map((p, i) =>
           p === 'ellipsis' ? (
-            <span key={`ellipsis-${i}`} className="px-2 text-slate-400">...</span>
+            <span key={`ellipsis-${i}`} className="px-2 text-[#70767f] text-sm">...</span>
           ) : (
             <button
               key={p}
               type="button"
               onClick={() => onPageChange(p)}
               aria-current={p === page ? 'page' : undefined}
-              className={`min-w-[40px] h-[40px] flex items-center justify-center text-sm rounded-lg border transition-colors cursor-pointer ${
+              className={`w-10 h-10 flex items-center justify-center text-sm rounded-lg transition-colors cursor-pointer min-h-[44px] ${
                 p === page
-                  ? 'bg-[var(--tk-color-primary-500)] text-white border-transparent'
-                  : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  ? 'bg-[#3D6AF2] text-white font-medium'
+                  : 'border border-[#1e2631] text-[#a6abb5] hover:bg-[#1e2631] hover:text-white'
               }`}
             >
               {p}
@@ -68,7 +68,7 @@ export function NewsPagination({ pagination, onPageChange }: NewsPaginationProps
           type="button"
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          className="px-3 h-10 text-sm rounded-lg border border-[#1e2631] text-[#a6abb5] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#1e2631] hover:text-white transition-colors cursor-pointer min-h-[44px]"
           aria-label="Next page"
         >
           Next

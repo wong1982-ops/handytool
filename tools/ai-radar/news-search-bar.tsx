@@ -30,7 +30,7 @@ export function NewsSearchBar({ value, onChange }: NewsSearchBarProps) {
   return (
     <div className="relative w-full">
       <svg
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+        className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#70767f]"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -43,7 +43,7 @@ export function NewsSearchBar({ value, onChange }: NewsSearchBarProps) {
         value={localValue}
         onChange={(e) => handleChange(e.target.value)}
         placeholder="Search by model name, topic, or keyword..."
-        className="w-full h-12 pl-10 pr-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]/50 focus:border-transparent transition-all"
+        className="w-full h-12 pl-11 pr-4 rounded-xl border border-[#1e2631] bg-[#131a23] text-sm text-white placeholder:text-[#70767f] focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/50 focus:border-transparent transition-all"
         aria-label="Search AI news"
       />
     </div>

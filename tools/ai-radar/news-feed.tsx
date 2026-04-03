@@ -100,8 +100,8 @@ export function NewsFeed({ category }: NewsFeedProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Search + days filter row — sticky on mobile with solid bg like Job Radar */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-slate-950 pb-3 -mx-4 px-4 pt-2 border-b border-slate-200/50 dark:border-slate-800/50 sm:static sm:mx-0 sm:px-0 sm:pt-0 sm:pb-0 sm:bg-transparent sm:z-auto sm:border-b-0 flex gap-3 items-center">
+      {/* Search + days filter row */}
+      <div className="flex gap-3 items-center">
         <div className="flex-1">
           <NewsSearchBar
             value={filters.q ?? ''}
@@ -111,7 +111,7 @@ export function NewsFeed({ category }: NewsFeedProps) {
         <select
           value={filters.days?.toString() ?? ''}
           onChange={(e) => updateFilters({ days: e.target.value ? Number(e.target.value) : undefined, page: 1 })}
-          className="h-12 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]/50 shrink-0"
+          className="h-12 px-3 pr-8 rounded-xl border border-[#1e2631] bg-[#131a23] text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/50 shrink-0 cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%2370767f%22%20d%3D%22M2%204l4%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_12px_center] bg-no-repeat"
           aria-label="Filter by time range"
         >
           <option value="">All time</option>
@@ -123,12 +123,12 @@ export function NewsFeed({ category }: NewsFeedProps) {
 
       {/* Content */}
       {state === 'error' && (
-        <div className="p-6 text-center rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
-          <p className="text-sm text-red-600 dark:text-red-400 mb-3">{error}</p>
+        <div className="p-6 text-center rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10">
+          <p className="text-sm text-[#EF4444] mb-3">{error}</p>
           <button
             type="button"
             onClick={() => fetchNews(filters)}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm font-medium rounded-lg bg-[#EF4444]/20 text-[#EF4444] hover:bg-[#EF4444]/30 transition-colors cursor-pointer min-h-[44px]"
           >
             Retry
           </button>
@@ -138,7 +138,7 @@ export function NewsFeed({ category }: NewsFeedProps) {
       {state === 'loading' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" aria-busy="true">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-32 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+            <div key={i} className="h-32 rounded-xl bg-[#1e2631] animate-pulse" />
           ))}
         </div>
       )}
@@ -146,8 +146,8 @@ export function NewsFeed({ category }: NewsFeedProps) {
       {state === 'success' && response && (
         <>
           {response.data.length === 0 ? (
-            <div className="p-10 text-center rounded-xl border border-slate-200 dark:border-slate-700">
-              <p className="text-slate-500 dark:text-slate-400">No AI news found matching your search.</p>
+            <div className="p-10 text-center rounded-xl border border-[#1e2631]">
+              <p className="text-[#a6abb5]">No AI news found matching your search.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
