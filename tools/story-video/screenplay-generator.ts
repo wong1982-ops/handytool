@@ -2,47 +2,18 @@
 
 import type { StoryBook, Page } from '@/tools/story-studio/types'
 import type { ArtStyle, DurationPreset, Screenplay, ScreenplayScene } from './types'
+// DurationPreset kept in signature for API compatibility
 import { jsonrepair } from 'jsonrepair'
 
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
 
-const MAX_SCENES = 30
-
-/** Target durations in seconds for each preset */
-const DURATION_TARGETS: Record<Exclude<DurationPreset, 'auto'>, number> = {
-  short: 60,
-  medium: 180,
-  long: 300,
-}
-
 /**
- * Resolve 'auto' duration to a concrete preset based on page count.
- */
-function resolveDuration(pageCount: number, duration: DurationPreset): Exclude<DurationPreset, 'auto'> {
-  if (duration !== 'auto') return duration
-  if (pageCount <= 8) return 'short'
-  if (pageCount <= 16) return 'medium'
-  return 'long'
-}
-
-/**
- * Consolidate pages for long books (>20 pages).
- * Merges 2-3 pages into groups that become single scenes.
+ * Combine ALL pages into a single scene group.
+ * Veo 3.1 supports max 8 seconds per video, so we generate one condensed scene
+ * that captures the entire story's essence rather than individual page scenes.
  */
 function consolidatePages(pages: Page[]): Page[][] {
-  if (pages.length <= 20) {
-    return pages.map((p) => [p])
-  }
-
-  // Merge pages into groups of 2-3 to stay under MAX_SCENES
-  const groupSize = Math.ceil(pages.length / MAX_SCENES)
-  const groups: Page[][] = []
-
-  for (let i = 0; i < pages.length; i += groupSize) {
-    groups.push(pages.slice(i, i + groupSize))
-  }
-
-  return groups
+  return [pages]
 }
 
 /**
@@ -68,37 +39,37 @@ function buildPageSummaries(pageGroups: Page[][]): string {
     .join('\n\n')
 }
 
-const SYSTEM_PROMPT = `You are a screenplay writer converting children's storybooks into structured screenplays for animated video production.
+const SYSTEM_PROMPT = `You are a screenplay writer converting children's storybooks into a SINGLE condensed scene for an 8-second animated video.
 
-Given the book's pages, characters, and metadata, produce a JSON screenplay.
+Given the book's pages, characters, and metadata, distill the entire story into ONE scene that captures the essence, key characters, and emotional arc.
 
 Rules:
-- Each scene should have a clear visual description suitable for AI image/video generation
-- Include camera directions (e.g., "wide establishing shot", "close-up on face", "slow pan right")
-- Include transitions between scenes (e.g., "fade to black", "cross dissolve", "cut")
-- Estimate scene duration in seconds based on dialogue and narration text length (~150 words/minute for narration, ~180 words/minute for dialogue)
-- sfxHints should be short descriptions of sound effects (e.g., "door creaking", "birds chirping", "thunder rumble")
-- musicMood should describe the overall background music mood (e.g., "whimsical and playful", "mysterious and tense")
-- sceneIndex must be 0-based and sequential
-- characters array should list character names present in each scene
+- Produce EXACTLY 1 scene — combine the entire story into a single cinematic moment
+- The scene description should be a rich, detailed visual prompt capturing the story's most iconic moment or a montage of key moments
+- Include ALL main characters in the scene
+- Camera direction should describe a dynamic shot (e.g., "sweeping establishing shot that reveals characters in their world")
+- Duration must be exactly 8 (seconds) — this is the maximum for the video generation model
+- sfxHints should be the 2-3 most important sound effects for the story
+- musicMood should capture the overall emotional tone
+- The narration should be a brief 1-2 sentence summary of the story's message
 
 Return ONLY valid JSON matching this exact schema (no markdown, no explanation):
 {
   "scenes": [
     {
       "sceneIndex": 0,
-      "description": "Visual description of the scene for image generation",
+      "description": "Rich visual description combining the story's key moments and characters",
       "characters": ["Character Name"],
-      "dialogue": [{ "character": "Character Name", "text": "What they say" }],
-      "narration": "Narrator text for this scene",
+      "dialogue": [{ "character": "Character Name", "text": "Most memorable line" }],
+      "narration": "Brief story essence narration",
       "mood": "emotional mood",
-      "sfxHints": ["sound effect description"],
+      "sfxHints": ["sound effect"],
       "duration": 8,
-      "cameraDirection": "camera movement/angle",
-      "transition": "transition to next scene"
+      "cameraDirection": "dynamic camera movement",
+      "transition": "fade to black"
     }
   ],
-  "totalDuration": 120,
+  "totalDuration": 8,
   "musicMood": "overall music mood description"
 }`
 
@@ -112,14 +83,12 @@ Return ONLY valid JSON matching this exact schema (no markdown, no explanation):
 export async function generateScreenplay(
   book: StoryBook,
   artStyle: ArtStyle,
-  targetDuration: DurationPreset,
+  _targetDuration: DurationPreset,
 ): Promise<Screenplay> {
   if (!GEMINI_API_KEY) {
     throw new Error('GEMINI_API_KEY is not configured')
   }
 
-  const resolvedDuration = resolveDuration(book.pages.length, targetDuration)
-  const targetSeconds = DURATION_TARGETS[resolvedDuration]
   const pageGroups = consolidatePages(book.pages)
 
   // Build character list
@@ -133,21 +102,20 @@ export async function generateScreenplay(
 Theme: ${book.theme}
 Setting: ${book.setting}
 Art style for video: ${artStyle}
-Target total duration: ~${targetSeconds} seconds
-Number of scene groups: ${pageGroups.length} (max ${MAX_SCENES} scenes)
+Target total duration: 8 seconds (single scene)
 
 Characters:
 ${characterDescriptions}
 
-Pages:
+Pages (combine ALL into one scene):
 ${pageSummaries}
 
-Generate the screenplay JSON now. Ensure totalDuration is close to ${targetSeconds} seconds.`
+Generate a single-scene screenplay JSON. Duration must be exactly 8 seconds.`
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`
 
   console.log(
-    `[story-video] Generating screenplay for "${book.title}" (${book.pages.length} pages → ${pageGroups.length} groups, target ${targetSeconds}s)`
+    `[story-video] Generating screenplay for "${book.title}" (${book.pages.length} pages → 1 scene, 8s)`
   )
 
   const response = await fetch(url, {
@@ -196,9 +164,9 @@ Generate the screenplay JSON now. Ensure totalDuration is close to ${targetSecon
     throw new Error('Invalid screenplay: no scenes generated')
   }
 
-  // Enforce max scenes
-  if (screenplay.scenes.length > MAX_SCENES) {
-    screenplay.scenes = screenplay.scenes.slice(0, MAX_SCENES)
+  // Enforce single scene
+  if (screenplay.scenes.length > 1) {
+    screenplay.scenes = screenplay.scenes.slice(0, 1)
   }
 
   // Ensure sceneIndex is correct and sequential
