@@ -28,7 +28,7 @@ export function Launchpad({
   const presets = MODE_PRESETS[mode]
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Mode toggle */}
       <div className="flex gap-1.5 rounded-xl bg-[#131a23] p-1">
         {MODES.map((m) => (
@@ -75,7 +75,7 @@ export function Launchpad({
             key={inst.id}
             type="button"
             onClick={() => onToggleInstrument(inst.id)}
-            className={`min-h-[44px] cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`min-h-[44px] cursor-pointer rounded-full px-3.5 py-2 text-xs font-medium transition-colors ${
               activeInstruments.has(inst.id)
                 ? 'bg-[#3D6AF2]/20 text-[#3D6AF2] ring-1 ring-[#3D6AF2]/30'
                 : 'bg-[#131a23] text-[#70767f] hover:text-white'

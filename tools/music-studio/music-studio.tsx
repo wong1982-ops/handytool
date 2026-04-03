@@ -147,29 +147,31 @@ export default function MusicStudio() {
   return (
     <div className="flex flex-col h-full">
       {/* Tab toggle */}
-      <div className="mx-auto flex w-full max-w-xs gap-1 rounded-xl bg-[#131a23] p-1 mb-4 px-4 md:px-0">
-        <button
-          type="button"
-          onClick={() => setActiveTab('studio')}
-          className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
-            activeTab === 'studio'
-              ? 'bg-[#3D6AF2] text-white shadow-lg'
-              : 'text-[#70767f] hover:text-white'
-          }`}
-        >
-          Studio
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('history')}
-          className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
-            activeTab === 'history'
-              ? 'bg-[#3D6AF2] text-white shadow-lg'
-              : 'text-[#70767f] hover:text-white'
-          }`}
-        >
-          My Clips
-        </button>
+      <div className="flex justify-center md:justify-start px-4 md:px-0 mb-5">
+        <div className="flex w-full max-w-xs gap-1 rounded-xl bg-[#131a23] p-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab('studio')}
+            className={`flex-1 min-h-[44px] rounded-lg px-4 py-2 text-sm font-semibold transition-all cursor-pointer ${
+              activeTab === 'studio'
+                ? 'bg-[#3D6AF2] text-white shadow-lg'
+                : 'text-[#70767f] hover:text-white'
+            }`}
+          >
+            Studio
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('history')}
+            className={`flex-1 min-h-[44px] rounded-lg px-4 py-2 text-sm font-semibold transition-all cursor-pointer ${
+              activeTab === 'history'
+                ? 'bg-[#3D6AF2] text-white shadow-lg'
+                : 'text-[#70767f] hover:text-white'
+            }`}
+          >
+            My Clips
+          </button>
+        </div>
       </div>
 
       {activeTab === 'history' ? (
@@ -179,7 +181,7 @@ export default function MusicStudio() {
       ) : (
         <>
           {/* ── Desktop Layout ── */}
-          <div className="hidden md:grid md:grid-cols-12 md:gap-4 md:p-4 md:h-full">
+          <div className="hidden md:grid md:grid-cols-12 md:gap-4 md:px-4">
             {/* Left column */}
             <div className="col-span-8 flex flex-col gap-4">
               <Launchpad
@@ -204,12 +206,18 @@ export default function MusicStudio() {
                 onStopRecording={stopRecording}
                 onDisconnect={disconnect}
               />
-              <ClipsPanel clips={clips} onRemove={removeClip} />
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-widest text-[#70767f]">Session Clips</p>
+                <ClipsPanel clips={clips} onRemove={removeClip} />
+              </div>
             </div>
 
             {/* Right column: controls sidebar */}
             <div className="col-span-4">
-              <div className="sticky top-4 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl bg-[#131a23] border border-[#1e2631]">
+              <div className="sticky top-20 max-h-[calc(100vh-5.5rem)] overflow-y-auto rounded-xl bg-[#131a23] border border-[#1e2631]">
+                <div className="border-b border-[#1e2631] px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-[#70767f]">Controls</p>
+                </div>
                 <ControlsPanel
                   config={config}
                   customPrompt={customPrompt}
@@ -221,7 +229,7 @@ export default function MusicStudio() {
           </div>
 
           {/* ── Mobile Layout ── */}
-          <div className="flex flex-col gap-3 p-3 md:hidden">
+          <div className="flex flex-col gap-4 p-4 md:hidden">
             <Launchpad
               mode={mode}
               activeButtons={activeButtons}
@@ -244,7 +252,10 @@ export default function MusicStudio() {
               onStopRecording={stopRecording}
               onDisconnect={disconnect}
             />
-            <ClipsPanel clips={clips} onRemove={removeClip} />
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#70767f]">Session Clips</p>
+              <ClipsPanel clips={clips} onRemove={removeClip} />
+            </div>
 
             {/* Gear toggle for controls drawer */}
             <button
@@ -296,7 +307,7 @@ export default function MusicStudio() {
 
           {/* Error display */}
           {error && (
-            <div className="mx-4 mb-4 rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400">
+            <div className="mx-4 mb-4 rounded-xl border border-[#EF4444]/20 bg-[#EF4444]/5 px-4 py-3 text-sm text-[#EF4444]">
               {error}
             </div>
           )}

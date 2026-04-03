@@ -83,7 +83,7 @@ export function TransportBar({
       <div className="flex items-center justify-center py-4">
         <button
           onClick={onConnect}
-          className="min-h-[44px] cursor-pointer rounded-full bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] px-8 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="min-h-[44px] cursor-pointer rounded-full bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-900/30 transition-opacity hover:opacity-90"
         >
           Start Session
         </button>
@@ -105,11 +105,11 @@ export function TransportBar({
   if (status === 'error') {
     return (
       <div className="flex items-center justify-center gap-3 py-4">
-        <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-        <span className="text-sm text-red-400">Connection error</span>
+        <span className="h-2.5 w-2.5 rounded-full bg-[#EF4444]" />
+        <span className="text-sm text-[#EF4444]">Connection error</span>
         <button
           onClick={onConnect}
-          className="min-h-[44px] cursor-pointer rounded-full border border-red-500/30 px-4 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10"
+          className="min-h-[44px] cursor-pointer rounded-full border border-[#EF4444]/30 px-4 py-2 text-sm font-medium text-[#EF4444] transition-colors hover:bg-[#EF4444]/10"
         >
           Retry
         </button>
@@ -121,12 +121,12 @@ export function TransportBar({
   const isConnectedPlaying = status === 'playing'
 
   return (
-    <div className="flex items-center justify-between px-4 py-3">
+    <div className="flex items-center justify-between rounded-xl bg-[#131a23] border border-[#1e2631] px-4 py-3">
       {/* Left: status */}
       <div className="flex items-center gap-2">
         <span
           className={`h-2.5 w-2.5 rounded-full ${
-            isConnectedPlaying ? 'bg-green-500' : 'bg-yellow-500'
+            isConnectedPlaying ? 'bg-[#10B981]' : 'bg-yellow-500'
           }`}
         />
         <span className="text-xs font-medium text-[#a6abb5]">Connected</span>
@@ -148,18 +148,18 @@ export function TransportBar({
           onClick={isRecording ? onStopRecording : onStartRecording}
           className={`relative flex h-12 w-12 min-h-[44px] cursor-pointer items-center justify-center rounded-full transition-opacity hover:opacity-90 ${
             isRecording
-              ? 'bg-red-500 text-white'
-              : 'bg-red-500/20 text-red-400'
+              ? 'bg-[#EF4444] text-white'
+              : 'bg-[#EF4444]/20 text-[#EF4444]'
           }`}
           aria-label={isRecording ? 'Stop recording' : 'Start recording'}
         >
           {/* Pulsing ring when recording */}
           {isRecording && (
-            <span className="absolute inset-0 animate-pulse rounded-full ring-2 ring-red-500/50" />
+            <span className="absolute inset-0 animate-pulse rounded-full ring-2 ring-[#EF4444]/50" />
           )}
           <span
             className={`block rounded-full ${
-              isRecording ? 'h-4 w-4 rounded-sm bg-white' : 'h-4 w-4 bg-red-400'
+              isRecording ? 'h-4 w-4 rounded-sm bg-white' : 'h-4 w-4 bg-[#EF4444]'
             }`}
           />
         </button>
@@ -178,7 +178,7 @@ export function TransportBar({
       <div className="flex items-center gap-3">
         <span
           className={`font-mono text-sm ${
-            isRecording ? 'text-red-400' : 'text-[#a6abb5]'
+            isRecording ? 'text-[#EF4444]' : 'text-[#a6abb5]'
           }`}
         >
           {formatDuration(recordingDuration)}
