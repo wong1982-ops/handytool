@@ -27,7 +27,7 @@ export function PageNarrationList({
             className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer
               hover:shadow-sm transition-all ${
                 isSelected
-                  ? 'border-indigo-400 dark:border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/10'
+                  ? 'border-[#3D6AF2] dark:border-[#3D6AF2] bg-[#3D6AF2]/10/50 bg-[#3D6AF2]/10'
                   : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
               }`}
             onClick={() => onPageClick(page.id)}
@@ -39,7 +39,7 @@ export function PageNarrationList({
             >
               <div className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer ${
                 isSelected
-                  ? 'bg-indigo-600 border-indigo-600'
+                  ? 'bg-[#3D6AF2] border-[#3D6AF2]'
                   : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600'
               }`}>
                 {isSelected && (
@@ -119,7 +119,7 @@ function InlinePlayer({ audioUrl }: { audioUrl: string }) {
     <button
       onClick={toggle}
       className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full
-        text-slate-400 hover:text-indigo-500 hover:bg-slate-100 dark:hover:bg-slate-800
+        text-slate-400 hover:text-[#3D6AF2] hover:bg-slate-100 dark:hover:bg-slate-800
         transition-colors cursor-pointer"
       aria-label={playing ? 'Pause' : 'Play'}
     >

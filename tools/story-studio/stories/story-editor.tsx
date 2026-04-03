@@ -114,7 +114,7 @@ function ProgressCard({ done, total, noun, color, onOpen }: {
 }) {
   const label = getProgressLabel(done, total, noun)
   const borderColor = noun === 'illustrated'
-    ? 'border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+    ? 'border-[#1e2631] dark:border-[#1e2631] text-[#3D6AF2] dark:text-[#93aaff] hover:bg-[#3D6AF2]/10 dark:hover:bg-[#3D6AF2]/15'
     : 'border-purple-200 dark:border-purple-800 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
   return (
     <div className="flex items-center gap-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-3">
@@ -139,9 +139,9 @@ function EmptyHint({ text }: { text: string }) {
 /* ── Inline generate bar (compact, lives inside each fieldset) ── */
 const GEN_BAR_STYLES = {
   illustration: {
-    spinner: 'border-indigo-500',
-    primary: 'bg-indigo-600 hover:bg-indigo-700 text-white',
-    outline: 'border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20',
+    spinner: 'border-[#3D6AF2]',
+    primary: 'bg-[#3D6AF2] hover:bg-[#3560d8] text-white',
+    outline: 'border-[#1e2631] dark:border-[#1e2631] text-[#3D6AF2] dark:text-[#93aaff] hover:bg-[#3D6AF2]/10 dark:hover:bg-[#3D6AF2]/15',
   },
   narration: {
     spinner: 'border-purple-500',
@@ -543,7 +543,7 @@ function FullPagePreview({ media, pageNumber, totalPages, narrativeText, dialogu
             <div className="md:w-[60%] shrink-0 relative bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center">
               {imageGenerating && (
                 <div className="flex flex-col items-center justify-center py-12">
-                  <div className="w-8 h-8 border-3 border-t-transparent rounded-full animate-spin border-indigo-500" />
+                  <div className="w-8 h-8 border-3 border-t-transparent rounded-full animate-spin border-[#3D6AF2]" />
                   <p className="text-slate-400 text-sm mt-2">Generating illustration...</p>
                 </div>
               )}
@@ -598,7 +598,7 @@ function FullPagePreview({ media, pageNumber, totalPages, narrativeText, dialogu
           <>
             {imageGenerating && (
               <div className="flex flex-col items-center justify-center py-12 bg-slate-50 dark:bg-slate-800/30">
-                <div className="w-8 h-8 border-3 border-t-transparent rounded-full animate-spin border-indigo-500" />
+                <div className="w-8 h-8 border-3 border-t-transparent rounded-full animate-spin border-[#3D6AF2]" />
                 <p className="text-slate-400 text-sm mt-2">Generating illustration...</p>
               </div>
             )}
@@ -1053,7 +1053,7 @@ export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, art
           <button
             onClick={handleManualSave}
             disabled={!dirty || saving}
-            className="px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700
+            className="px-3 py-1.5 text-sm font-medium text-white bg-[#3D6AF2] hover:bg-[#3560d8]
               disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors cursor-pointer"
             style={{ minHeight: '36px' }}
           >
@@ -1107,7 +1107,7 @@ export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, art
             rows={2}
             className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
               bg-white dark:bg-slate-800 resize-none
-              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
             placeholder="Describe what happens in this scene..."
           />
         </div>
@@ -1116,8 +1116,8 @@ export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, art
       {/* ── Illustrations fieldset ─────────────────────── */}
       <CollapsibleFieldset
         legend="Illustrations"
-        borderClass="border-indigo-200 dark:border-indigo-800/50"
-        legendClass="text-indigo-600 dark:text-indigo-400"
+        borderClass="border-[#1e2631] dark:border-[#1e2631]/50"
+        legendClass="text-[#3D6AF2] dark:text-[#93aaff]"
       >
         <div className="space-y-4">
           <ImagePromptViewer
@@ -1177,7 +1177,7 @@ export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, art
               rows={5}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
                 bg-white dark:bg-slate-800 resize-y
-                focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
               placeholder="Write the story text for this page..."
             />
           </div>
@@ -1253,7 +1253,7 @@ export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, art
                           onChange={e => updateDialogueLine(i, 'speaker', e.target.value)}
                           placeholder="Name"
                           className="bg-transparent border-b border-slate-300 dark:border-slate-600 text-sm font-semibold
-                            focus:outline-none focus:border-indigo-500 p-0"
+                            focus:outline-none focus:border-[#3D6AF2] p-0"
                           style={{ width: `${Math.max(4, (d.speaker.length || 5) + 1)}ch` }}
                         />
                       )}
@@ -1320,7 +1320,7 @@ export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, art
               onChange={e => updateCurrentPage({ mood: e.target.value })}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
                 bg-white dark:bg-slate-800
-                focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
               placeholder="e.g. cheerful, mysterious, tense"
             />
           </div>

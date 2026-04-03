@@ -43,16 +43,16 @@ export function ConceptCards({ concept, onPick, loading }: ConceptCardsProps) {
         onClick={() => !loading && onPick(concept)}
       >
         {/* Magical glow border */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400/20 via-purple-400/15 to-indigo-400/20 dark:from-amber-400/10 dark:via-purple-400/5 dark:to-indigo-400/10" />
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400/20 via-purple-400/15 to-[#3D6AF2]/15 dark:from-amber-400/10 dark:via-purple-400/5 dark:to-[#3D6AF2]/10" />
 
         <div className="relative bg-white/95 dark:bg-slate-900/95 border border-amber-200/50 dark:border-amber-700/30 rounded-2xl shadow-lg shadow-amber-500/5 overflow-hidden">
           {/* Accent bar */}
-          <div className="h-1.5 bg-gradient-to-r from-amber-400 via-purple-500 to-indigo-500" />
+          <div className="h-1.5 bg-gradient-to-r from-amber-400 via-purple-500 to-[#3D6AF2]/100" />
 
           {/* Header */}
           <div className="p-5 pb-3">
             <div className="flex items-start justify-between gap-3 mb-3">
-              <h3 className="text-lg md:text-xl font-bold bg-gradient-to-r from-amber-600 via-purple-600 to-indigo-600 dark:from-amber-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
+              <h3 className="text-lg md:text-xl font-bold bg-gradient-to-r from-amber-600 via-purple-600 to-[#3D6AF2] dark:from-amber-400 dark:via-purple-400 dark:to-[#93aaff] bg-clip-text text-transparent" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
                 {concept.title}
               </h3>
               <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-full border border-amber-200/50 dark:border-amber-700/30">
@@ -68,7 +68,7 @@ export function ConceptCards({ concept, onPick, loading }: ConceptCardsProps) {
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-800/40">
                 {concept.tags.audience}
               </span>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-300 border border-purple-200/50 dark:border-purple-800/40">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-[#a6abb5] border border-purple-200/50 dark:border-purple-800/40">
                 {concept.tags.pageCount} pages
               </span>
             </div>

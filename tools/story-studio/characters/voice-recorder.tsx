@@ -336,7 +336,7 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
           <button
             type="button"
             onClick={startRecording}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold bg-[#3D6AF2] hover:bg-[#3560d8] text-white transition-colors cursor-pointer"
             style={{ minHeight: '44px' }}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -431,7 +431,7 @@ export function VoiceRecorder({ characterId, characterName }: VoiceRecorderProps
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors cursor-pointer disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-[#3D6AF2] hover:bg-[#3560d8] text-white transition-colors cursor-pointer disabled:opacity-50"
               style={{ minHeight: '44px' }}
             >
               {saving ? (

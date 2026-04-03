@@ -19,7 +19,7 @@ function HintIcon({ hint }: { hint: string }) {
         onClick={() => setOpen(v => !v)}
         className="w-4 h-4 inline-flex items-center justify-center rounded-full
           bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400
-          hover:bg-indigo-100 dark:hover:bg-indigo-900/40 hover:text-indigo-600 dark:hover:text-indigo-400
+          hover:bg-[#3D6AF2]/15 hover:bg-[#3D6AF2]/15 hover:text-[#3D6AF2] dark:hover:text-[#93aaff]
           transition-colors cursor-pointer text-[10px] font-bold leading-none"
         aria-label="Hint"
       >
@@ -94,7 +94,7 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
           maxLength={100}
           className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
             bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm
-            focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
           placeholder="Character name"
         />
       </div>
@@ -113,7 +113,7 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
             maxLength={50}
             className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
               bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm
-              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
             placeholder="e.g. 8 years old"
           />
         </div>
@@ -127,7 +127,7 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
             onChange={e => setRole(e.target.value)}
             className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
               bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm
-              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
           >
             <option value="">Select role</option>
             <option value="protagonist">Protagonist</option>
@@ -150,7 +150,7 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
           rows={2}
           className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
             bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm
-            focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] resize-none"
           placeholder="Brave, curious, always looking for adventure..."
         />
       </div>
@@ -168,7 +168,7 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
           rows={3}
           className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
             bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm
-            focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] resize-none"
           placeholder="A young girl with curly red hair, freckles, and bright green eyes..."
         />
       </div>
@@ -183,7 +183,7 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
           <button
             type="button"
             onClick={() => setShowVoicePicker(!showVoicePicker)}
-            className="text-xs text-indigo-500 hover:text-indigo-700 cursor-pointer"
+            className="text-xs text-[#3D6AF2] hover:text-[#3D6AF2] cursor-pointer"
           >
             {showVoicePicker ? 'Hide picker' : voice ? 'Change' : 'Choose voice'}
           </button>
@@ -213,7 +213,7 @@ export function CharacterForm({ initial, onSubmit, onCancel, loading }: Characte
         <button
           type="submit"
           disabled={!name.trim() || loading}
-          className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700
+          className="px-4 py-2 text-sm font-medium text-white bg-[#3D6AF2] hover:bg-[#3560d8]
             disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors cursor-pointer"
           style={{ minHeight: '44px' }}
         >

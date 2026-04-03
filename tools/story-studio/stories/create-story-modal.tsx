@@ -56,13 +56,13 @@ export function CreateStoryModal({ open, onClose, onSelectMode, onWriteFromScrat
           <button
             onClick={() => onSelectMode('professional')}
             className="w-full text-left p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700
-              hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors cursor-pointer group"
+              hover:border-[#1e2631] dark:hover:border-[#3D6AF2] transition-colors cursor-pointer group"
             style={{ minHeight: '44px' }}
           >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30
-                flex items-center justify-center shrink-0 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50">
-                <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <div className="w-10 h-10 rounded-lg bg-[#3D6AF2]/10 dark:bg-[#3D6AF2]/15
+                flex items-center justify-center shrink-0 group-hover:bg-[#3D6AF2]/15 dark:group-hover:bg-[#1e2631]">
+                <svg className="w-5 h-5 text-[#3D6AF2]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
                 </svg>
               </div>
@@ -71,7 +71,7 @@ export function CreateStoryModal({ open, onClose, onSelectMode, onWriteFromScrat
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Full creative control. Edit each page, fine-tune illustrations &amp; narration.
                 </p>
-                <p className="text-xs text-indigo-500 mt-1.5">50 credits</p>
+                <p className="text-xs text-[#3D6AF2] mt-1.5">50 credits</p>
               </div>
             </div>
           </button>
@@ -80,7 +80,7 @@ export function CreateStoryModal({ open, onClose, onSelectMode, onWriteFromScrat
           <button
             onClick={onWriteFromScratch}
             className="w-full text-left p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700
-              hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors cursor-pointer group"
+              hover:border-[#1e2631] dark:hover:border-[#3D6AF2] transition-colors cursor-pointer group"
             style={{ minHeight: '44px' }}
           >
             <div className="flex items-start gap-3">

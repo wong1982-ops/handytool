@@ -85,9 +85,9 @@ export function StudioMobileSidebar({ open, onClose }: StudioMobileSidebarProps)
       />
 
       {/* Sidebar panel — slides in from left */}
-      <div className="fixed inset-y-0 left-0 z-[80] w-64 bg-indigo-950 shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
+      <div className="fixed inset-y-0 left-0 z-[80] w-64 bg-[#0c1219] shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 h-12 border-b border-indigo-800/50">
+        <div className="flex items-center justify-between px-4 h-12 border-b border-[#1e2631]/50">
           <span
             className="text-sm font-bold text-white"
             style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}
@@ -96,7 +96,7 @@ export function StudioMobileSidebar({ open, onClose }: StudioMobileSidebarProps)
           </span>
           <button
             onClick={onClose}
-            className="flex items-center justify-center w-9 h-9 rounded-full text-purple-300 hover:text-white transition-colors cursor-pointer"
+            className="flex items-center justify-center w-9 h-9 rounded-full text-[#a6abb5] hover:text-white transition-colors cursor-pointer"
             aria-label="Close menu"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -116,15 +116,15 @@ export function StudioMobileSidebar({ open, onClose }: StudioMobileSidebarProps)
                 onClick={onClose}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-indigo-800/50 text-white'
-                    : 'text-purple-300 hover:bg-indigo-900/50 hover:text-white'
+                    ? 'bg-[#1e2631] text-white'
+                    : 'text-[#a6abb5] hover:bg-[#1e2631] hover:text-white'
                 }`}
                 style={{ minHeight: '44px' }}
               >
                 <span className={isActive ? 'text-amber-400' : 'text-purple-400'}>{item.icon}</span>
                 {item.label}
                 {item.label === 'Series' && seriesCount > 0 && (
-                  <span className="ml-auto text-[11px] font-semibold bg-indigo-800/60 text-purple-200 px-1.5 py-0.5 rounded-full">
+                  <span className="ml-auto text-[11px] font-semibold bg-[#131a23] text-[#a6abb5] px-1.5 py-0.5 rounded-full">
                     {seriesCount}
                   </span>
                 )}
@@ -134,11 +134,11 @@ export function StudioMobileSidebar({ open, onClose }: StudioMobileSidebarProps)
         </nav>
 
         {/* Home link at bottom */}
-        <div className="px-3 pb-4 pt-2 border-t border-indigo-800/50">
+        <div className="px-3 pb-4 pt-2 border-t border-[#1e2631]/50">
           <Link
             href="/"
             onClick={onClose}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-purple-300 hover:bg-indigo-900/50 hover:text-white transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#a6abb5] hover:bg-[#1e2631] hover:text-white transition-colors"
             style={{ minHeight: '44px' }}
           >
             <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">

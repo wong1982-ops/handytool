@@ -260,7 +260,7 @@ export function NarrationFlow({ bookId, onBack }: NarrationFlowProps) {
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Pages</h3>
               <div className="flex gap-2">
-                <button onClick={handleSelectAll} className="text-xs text-indigo-500 hover:text-indigo-700 cursor-pointer">Select all</button>
+                <button onClick={handleSelectAll} className="text-xs text-[#3D6AF2] hover:text-[#3D6AF2] cursor-pointer">Select all</button>
                 <button onClick={handleSelectNone} className="text-xs text-slate-400 hover:text-slate-600 cursor-pointer">None</button>
               </div>
             </div>
@@ -356,7 +356,7 @@ export function NarrationFlow({ bookId, onBack }: NarrationFlowProps) {
             <button
               onClick={handleGenerate}
               disabled={selectedCount === 0 || generating}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-purple-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-[#3D6AF2] hover:from-purple-500 hover:to-[#3D6AF2]/100 text-white font-bold text-sm transition-all shadow-lg shadow-purple-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               style={{ minHeight: '44px' }}
             >
               {generating ? (

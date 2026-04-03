@@ -51,7 +51,7 @@ export function SavedTab({ currentColors, onLoad }: SavedTabProps) {
     <div className="flex flex-col gap-5">
       {/* Save current palette */}
       <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-semibold text-[var(--tk-color-text)]">
+        <h3 className="text-sm font-semibold text-white">
           Save Current Palette
         </h3>
         <div className="flex gap-2">
@@ -62,18 +62,18 @@ export function SavedTab({ currentColors, onLoad }: SavedTabProps) {
             onKeyDown={(e) => e.key === 'Enter' && handleSave()}
             placeholder="Palette name..."
             aria-label="Palette name"
-            className="flex-1 px-4 py-2 text-sm rounded-lg border border-[var(--tk-color-border)] bg-[var(--tk-color-bg)] text-[var(--tk-color-text)] placeholder:text-[var(--tk-color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]"
+            className="flex-1 px-4 py-2 text-sm rounded-lg border border-[#1e2631] bg-[#090f16] text-white placeholder:text-[#70767f] focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/40"
           />
           <button
             type="button"
             onClick={handleSave}
-            className="px-4 py-2 min-h-[44px] rounded-lg bg-[var(--tk-color-primary-500)] text-white font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer shrink-0"
+            className="px-4 py-2 min-h-[44px] rounded-lg bg-[#3D6AF2] text-white font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer shrink-0"
           >
             Save
           </button>
         </div>
         {/* Preview strip of current colors */}
-        <div className="flex gap-1 rounded-lg overflow-hidden h-8 border border-[var(--tk-color-border)]">
+        <div className="flex gap-1 rounded-lg overflow-hidden h-8 border border-[#1e2631]">
           {currentColors.map((hex, i) => (
             <div key={i} className="flex-1" style={{ backgroundColor: hex }} />
           ))}
@@ -82,13 +82,13 @@ export function SavedTab({ currentColors, onLoad }: SavedTabProps) {
 
       {/* Saved palettes grid */}
       <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-semibold text-[var(--tk-color-text)]">
+        <h3 className="text-sm font-semibold text-white">
           Saved Palettes
         </h3>
 
         {palettes.length === 0 ? (
-          <div className="flex items-center justify-center py-8 rounded-xl border border-[var(--tk-color-border)] bg-[var(--tk-color-hover)]">
-            <p className="text-sm text-[var(--tk-color-text-muted)]">
+          <div className="flex items-center justify-center py-8 rounded-xl border border-[#1e2631] bg-[#1e2631]">
+            <p className="text-sm text-[#70767f]">
               No saved palettes yet. Create a palette and save it!
             </p>
           </div>
@@ -97,7 +97,7 @@ export function SavedTab({ currentColors, onLoad }: SavedTabProps) {
             {palettes.map((palette) => (
               <div
                 key={palette.id}
-                className="rounded-xl border border-[var(--tk-color-border)] bg-[var(--tk-color-surface)] overflow-hidden hover:border-[var(--tk-color-text-muted)] transition-colors group"
+                className="rounded-xl border border-[#1e2631] bg-[#131a23] overflow-hidden hover:border-[#70767f] transition-colors group"
               >
                 {/* Click area to load */}
                 <button
@@ -118,10 +118,10 @@ export function SavedTab({ currentColors, onLoad }: SavedTabProps) {
                   </div>
                   {/* Name and time */}
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-[var(--tk-color-text)] truncate">
+                    <span className="text-sm font-medium text-white truncate">
                       {palette.name}
                     </span>
-                    <span className="text-xs text-[var(--tk-color-text-muted)] shrink-0 ml-2">
+                    <span className="text-xs text-[#70767f] shrink-0 ml-2">
                       {formatRelativeTime(palette.createdAt)}
                     </span>
                   </div>
@@ -136,7 +136,7 @@ export function SavedTab({ currentColors, onLoad }: SavedTabProps) {
                       handleDelete(palette.id)
                     }}
                     aria-label={`Delete palette: ${palette.name}`}
-                    className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-[var(--tk-color-text-muted)] hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                    className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-[#70767f] hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
                   >
                     <svg
                       className="w-4 h-4"

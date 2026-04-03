@@ -19,7 +19,7 @@ export function JobCard({ jobProgress, onRetry, onRequestDelete }: JobCardProps)
   return (
     <Link
       href={`/tools/story-studio/jobs/${job.id}`}
-      className="block relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
+      className="block relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-4 hover:border-[#1e2631] dark:hover:border-[#1e2631] transition-colors">
       {/* Delete button — top-right corner */}
       {onRequestDelete && (
         <button

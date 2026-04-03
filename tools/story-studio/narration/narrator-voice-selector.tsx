@@ -62,7 +62,7 @@ export function NarratorVoiceSelector({ selectedVoice, onSelect }: NarratorVoice
               key={voice.name}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
                 isSelected
-                  ? 'border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20'
+                  ? 'border-[#1e2631] dark:border-[#1e2631] bg-[#3D6AF2]/10 dark:bg-[#3D6AF2]/15'
                   : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
               }`}
             >
@@ -71,7 +71,7 @@ export function NarratorVoiceSelector({ selectedVoice, onSelect }: NarratorVoice
                 className="text-sm font-medium cursor-pointer"
                 style={{ minHeight: '36px' }}
               >
-                <span className={isSelected ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'}>
+                <span className={isSelected ? 'text-[#3D6AF2] dark:text-[#93aaff]' : 'text-slate-700 dark:text-slate-300'}>
                   {voice.name}
                 </span>
                 <span className="ml-1 text-[10px] text-slate-400">
@@ -80,7 +80,7 @@ export function NarratorVoiceSelector({ selectedVoice, onSelect }: NarratorVoice
               </button>
               <button
                 onClick={() => handlePreview(voice)}
-                className="w-7 h-7 flex items-center justify-center rounded-full text-slate-400 hover:text-indigo-500 cursor-pointer"
+                className="w-7 h-7 flex items-center justify-center rounded-full text-slate-400 hover:text-[#3D6AF2] cursor-pointer"
                 aria-label={`Preview ${voice.name}`}
               >
                 {isPreviewing ? (

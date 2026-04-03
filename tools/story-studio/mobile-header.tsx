@@ -11,11 +11,11 @@ export function StudioMobileHeader({ title, onMenuToggle }: StudioMobileHeaderPr
   const router = useRouter()
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between px-2 h-12 bg-indigo-950/95 backdrop-blur-lg border-b border-indigo-800/50">
+    <header className="sticky top-0 z-30 flex items-center justify-between px-2 h-12 bg-[#090f16]/95 backdrop-blur-lg border-b border-[#1e2631]/50">
       {/* Back button */}
       <button
         onClick={() => router.back()}
-        className="flex items-center justify-center w-11 h-11 rounded-full text-purple-300 hover:text-white transition-colors cursor-pointer"
+        className="flex items-center justify-center w-11 h-11 rounded-full text-[#a6abb5] hover:text-white transition-colors cursor-pointer"
         aria-label="Go back"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -34,7 +34,7 @@ export function StudioMobileHeader({ title, onMenuToggle }: StudioMobileHeaderPr
       {/* Hamburger menu */}
       <button
         onClick={onMenuToggle}
-        className="flex items-center justify-center w-11 h-11 rounded-full text-purple-300 hover:text-white transition-colors cursor-pointer"
+        className="flex items-center justify-center w-11 h-11 rounded-full text-[#a6abb5] hover:text-white transition-colors cursor-pointer"
         aria-label="Open menu"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

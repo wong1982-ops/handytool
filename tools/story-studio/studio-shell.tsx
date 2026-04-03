@@ -12,19 +12,19 @@ function ShellInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen h-screen overflow-y-auto bg-slate-50 dark:bg-slate-950">
       {/* Fantasy header */}
-      <div className="relative bg-gradient-to-r from-indigo-950 via-purple-900 to-indigo-950">
+      <div className="relative" style={{ background: '#090f16' }}>
         {/* Starfield background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 opacity-40" style={{
             backgroundImage: `
               radial-gradient(1px 1px at 10% 20%, #fff, transparent),
-              radial-gradient(1.5px 1.5px at 25% 60%, #c4b5fd, transparent),
+              radial-gradient(1.5px 1.5px at 25% 60%, #93aaff, transparent),
               radial-gradient(1px 1px at 40% 15%, #fff, transparent),
               radial-gradient(2px 2px at 55% 45%, #fbbf24, transparent),
-              radial-gradient(1px 1px at 70% 75%, #c4b5fd, transparent),
+              radial-gradient(1px 1px at 70% 75%, #93aaff, transparent),
               radial-gradient(1.5px 1.5px at 85% 30%, #fff, transparent),
               radial-gradient(1px 1px at 95% 80%, #fbbf24, transparent),
-              radial-gradient(2px 2px at 15% 85%, #a78bfa, transparent),
+              radial-gradient(2px 2px at 15% 85%, #3D6AF2, transparent),
               radial-gradient(1px 1px at 50% 90%, #fff, transparent),
               radial-gradient(1.5px 1.5px at 75% 10%, #fbbf24, transparent)
             `,
@@ -33,14 +33,14 @@ function ShellInner({ children }: { children: React.ReactNode }) {
           <div className="absolute inset-0 opacity-20" style={{
             backgroundImage: `
               radial-gradient(1px 1px at 5% 50%, #fff, transparent),
-              radial-gradient(2px 2px at 30% 35%, #a78bfa, transparent),
+              radial-gradient(2px 2px at 30% 35%, #3D6AF2, transparent),
               radial-gradient(1px 1px at 60% 65%, #fbbf24, transparent),
-              radial-gradient(1.5px 1.5px at 80% 50%, #c4b5fd, transparent),
+              radial-gradient(1.5px 1.5px at 80% 50%, #93aaff, transparent),
               radial-gradient(1px 1px at 45% 25%, #fff, transparent)
             `,
             animation: 'starfield-drift 16s ease-in-out 3s infinite alternate-reverse',
           }} />
-          <div className="absolute bottom-0 left-1/4 w-1/2 h-24 bg-gradient-to-t from-amber-500/10 via-purple-500/5 to-transparent blur-2xl" />
+          <div className="absolute bottom-0 left-1/4 w-1/2 h-24 bg-gradient-to-t from-amber-500/10 via-[#3D6AF2]/5 to-transparent blur-2xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 md:px-6 pt-4 pb-4 md:pt-5 md:pb-5">
@@ -55,7 +55,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
               {/* Mobile: home link */}
               <Link
                 href="/"
-                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full text-purple-300 hover:text-white transition-colors"
+                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full text-[#a6abb5] hover:text-white transition-colors"
                 aria-label="Home"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">

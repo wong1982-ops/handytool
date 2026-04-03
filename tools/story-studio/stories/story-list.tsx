@@ -37,7 +37,7 @@ export function StoryList({
         <button
           onClick={onCreateNew}
           className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white
-            bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors cursor-pointer"
+            bg-[#3D6AF2] hover:bg-[#3560d8] rounded-lg transition-colors cursor-pointer"
           style={{ minHeight: '44px' }}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -61,7 +61,7 @@ export function StoryList({
             placeholder="Search stories..."
             className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
               bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white
-              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
           />
         </div>
 
@@ -71,7 +71,7 @@ export function StoryList({
           onChange={e => onSortChange(e.target.value as SortOption)}
           className="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
             bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white
-            focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
         >
           <option value="newest">Newest first</option>
           <option value="oldest">Oldest first</option>
@@ -86,7 +86,7 @@ export function StoryList({
             onChange={e => onFilterSeriesChange(e.target.value || null)}
             className="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
               bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white
-              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
           >
             <option value="">All series</option>
             {series.map(s => (

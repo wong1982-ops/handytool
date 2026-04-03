@@ -32,8 +32,8 @@ export function BookSelector() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-800/30 text-purple-300 text-sm">
-        <div className="w-4 h-4 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin" />
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#131a23] text-[#a6abb5] text-sm">
+        <div className="w-4 h-4 border-2 border-[#3D6AF2]/30 border-t-[#3D6AF2] rounded-full animate-spin" />
         Loading...
       </div>
     )
@@ -41,7 +41,7 @@ export function BookSelector() {
 
   if (books.length === 0) {
     return (
-      <span className="text-purple-300/60 text-sm italic">
+      <span className="text-[#70767f] text-sm italic">
         No books yet
       </span>
     )
@@ -51,9 +51,9 @@ export function BookSelector() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-800/40 hover:bg-indigo-800/60
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#131a23] hover:bg-[#1e2631]
           text-white text-sm font-medium transition-colors cursor-pointer
-          border border-indigo-700/50 max-w-[240px]"
+          border border-[#1e2631] max-w-[240px]"
         style={{ minHeight: '36px' }}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -64,7 +64,7 @@ export function BookSelector() {
         <span className="truncate">
           {activeBook ? activeBook.title : 'Select a book...'}
         </span>
-        <svg className={`w-4 h-4 text-purple-300 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+        <svg className={`w-4 h-4 text-[#a6abb5] shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
         </svg>
       </button>
@@ -97,7 +97,7 @@ export function BookSelector() {
                 aria-selected={isSelected}
                 className={`w-full text-left px-4 py-2.5 flex items-center gap-3 text-sm transition-colors cursor-pointer ${
                   isSelected
-                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                    ? 'bg-[#3D6AF2]/10 text-[#93aaff]'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'
                 }`}
                 style={{ minHeight: '44px' }}
@@ -125,7 +125,7 @@ export function BookSelector() {
                 </div>
 
                 {isSelected && (
-                  <svg className="w-4 h-4 text-indigo-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4 text-[#3D6AF2] shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
                   </svg>
                 )}

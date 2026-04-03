@@ -126,7 +126,7 @@ function BackgroundJobProgress({ jobId: _jobId }: { jobId: string }) {
           filter: 'blur(12px)',
           opacity: 0.4,
         }} />
-        <div className="absolute inset-3 rounded-full bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 shadow-2xl flex items-center justify-center">
+        <div className="absolute inset-3 rounded-full bg-gradient-to-br from-[#0c1424] via-purple-900 to-[#090f16] shadow-2xl flex items-center justify-center">
           <svg className="w-10 h-10 text-amber-300 drop-shadow-lg animate-[orb-float_2s_ease-in-out_infinite]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
           </svg>
@@ -267,7 +267,7 @@ export function GenerationProgress({ events, totalPages, activeJobId, mode }: Ge
               opacity: 0.4,
             }} />
             {/* Inner orb */}
-            <div className="absolute inset-3 rounded-full bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 shadow-2xl flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-3 rounded-full bg-gradient-to-br from-[#0c1424] via-purple-900 to-[#090f16] shadow-2xl flex items-center justify-center overflow-hidden">
               {/* Swirling inner particles */}
               <div className="absolute inset-0 opacity-60" style={{
                 backgroundImage: `
@@ -307,7 +307,7 @@ export function GenerationProgress({ events, totalPages, activeJobId, mode }: Ge
                   </svg>
                 ) : stage === 3 ? (
                   /* Paintbrush — illustrating */
-                  <svg className="w-10 h-10 text-purple-300 drop-shadow-lg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <svg className="w-10 h-10 text-[#a6abb5] drop-shadow-lg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
                   </svg>
                 ) : (
@@ -351,7 +351,7 @@ export function GenerationProgress({ events, totalPages, activeJobId, mode }: Ge
                 )}
                 <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium transition-all duration-500 ${
                   stage === s.idx
-                    ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-300 dark:ring-indigo-700'
+                    ? 'bg-[#3D6AF2]/15 bg-[#3D6AF2]/15 text-[#3D6AF2] dark:text-[#93aaff] ring-1 ring-indigo-300 dark:ring-indigo-700'
                     : stage > s.idx
                       ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
@@ -361,7 +361,7 @@ export function GenerationProgress({ events, totalPages, activeJobId, mode }: Ge
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
                   ) : stage === s.idx ? (
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#3D6AF2] animate-pulse" />
                   ) : null}
                   {s.label}
                 </div>

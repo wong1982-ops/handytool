@@ -149,8 +149,8 @@ export function ExportPanel({ colors }: ExportPanelProps) {
   const isTextFormat = format === 'CSS' || format === 'Tailwind' || format === 'SCSS' || format === 'JSON'
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-[var(--tk-color-border)] bg-[var(--tk-color-surface)] p-4">
-      <h3 className="text-sm font-semibold text-[var(--tk-color-text)]">Export</h3>
+    <div className="flex flex-col gap-3 rounded-xl border border-[#1e2631] bg-[#131a23] p-4">
+      <h3 className="text-sm font-semibold text-white">Export</h3>
 
       {/* Format pills */}
       <div className="flex flex-wrap gap-1.5">
@@ -161,8 +161,8 @@ export function ExportPanel({ colors }: ExportPanelProps) {
             onClick={() => setFormat(f)}
             className={`px-3 py-2 min-h-[44px] rounded-full text-sm font-medium transition-colors cursor-pointer ${
               format === f
-                ? 'bg-[var(--tk-color-primary-500)] text-white'
-                : 'bg-[var(--tk-color-hover)] text-[var(--tk-color-text)] hover:bg-[var(--tk-color-border)]'
+                ? 'bg-[#3D6AF2] text-white'
+                : 'bg-[#1e2631] text-white hover:bg-[#1e2631]/80'
             }`}
           >
             {f}
@@ -173,13 +173,13 @@ export function ExportPanel({ colors }: ExportPanelProps) {
       {/* Text formats: code block + copy */}
       {isTextFormat && (
         <div className="relative">
-          <pre className="max-h-[300px] overflow-y-auto rounded-lg bg-[var(--tk-color-bg)] border border-[var(--tk-color-border)] p-3 text-xs font-mono text-[var(--tk-color-text)]">
+          <pre className="max-h-[300px] overflow-y-auto rounded-lg bg-[#090f16] border border-[#1e2631] p-3 text-xs font-mono text-white">
             <code>{getTextOutput()}</code>
           </pre>
           <button
             type="button"
             onClick={handleCopy}
-            className="absolute top-2 right-2 px-3 py-1.5 min-h-[36px] rounded-lg bg-[var(--tk-color-hover)] text-xs font-medium text-[var(--tk-color-text)] hover:bg-[var(--tk-color-border)] transition-colors cursor-pointer"
+            className="absolute top-2 right-2 px-3 py-1.5 min-h-[36px] rounded-lg bg-[#1e2631] text-xs font-medium text-white hover:bg-[#1e2631]/80 transition-colors cursor-pointer"
           >
             {copied ? 'Copied!' : 'Copy'}
           </button>
@@ -191,7 +191,7 @@ export function ExportPanel({ colors }: ExportPanelProps) {
         <button
           type="button"
           onClick={handleAseDownload}
-          className="w-full py-3 min-h-[44px] rounded-xl bg-[var(--tk-color-primary-500)] text-white font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-2"
+          className="w-full py-3 min-h-[44px] rounded-xl bg-[#3D6AF2] text-white font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -206,14 +206,14 @@ export function ExportPanel({ colors }: ExportPanelProps) {
           <button
             type="button"
             onClick={handlePngDownload}
-            className="w-full py-3 min-h-[44px] rounded-xl bg-[var(--tk-color-primary-500)] text-white font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-2"
+            className="w-full py-3 min-h-[44px] rounded-xl bg-[#3D6AF2] text-white font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
             Download palette.png
           </button>
-          <p className="text-xs text-[var(--tk-color-text-muted)] text-center">
+          <p className="text-xs text-[#70767f] text-center">
             1200 x 630 — optimized for social sharing
           </p>
           <canvas ref={canvasRef} className="hidden" />

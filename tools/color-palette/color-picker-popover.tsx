@@ -109,17 +109,17 @@ export function ColorPickerPopover({ color, onChange, onClose }: ColorPickerPopo
       ref={popoverRef}
       role="dialog"
       aria-label="Color picker"
-      className="absolute z-50 top-full mt-2 left-0 w-64 rounded-xl border border-[var(--tk-color-border)] bg-[var(--tk-color-surface)] shadow-xl p-4 flex flex-col gap-3"
+      className="absolute z-50 top-full mt-2 left-0 w-64 rounded-xl border border-[#1e2631] bg-[#131a23] shadow-xl p-4 flex flex-col gap-3"
     >
       {/* Preview swatch + hex input */}
       <div className="flex items-center gap-3">
         <div
-          className="w-10 h-10 rounded-full border border-[var(--tk-color-border)] shrink-0"
+          className="w-10 h-10 rounded-full border border-[#1e2631] shrink-0"
           style={{ backgroundColor: previewColor }}
           aria-label={`Preview: ${previewColor}`}
         />
         <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[var(--tk-color-text-muted)] pointer-events-none">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#70767f] pointer-events-none">
             #
           </span>
           <input
@@ -130,7 +130,7 @@ export function ColorPickerPopover({ color, onChange, onClose }: ColorPickerPopo
             onKeyDown={handleHexKeyDown}
             maxLength={6}
             aria-label="Hex color value"
-            className="w-full pl-7 pr-2 py-2 text-sm font-mono rounded-lg border border-[var(--tk-color-border)] bg-[var(--tk-color-bg)] text-[var(--tk-color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]"
+            className="w-full pl-7 pr-2 py-2 text-sm font-mono rounded-lg border border-[#1e2631] bg-[#090f16] text-white focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/50"
           />
         </div>
       </div>
@@ -189,7 +189,7 @@ interface SliderRowProps {
 function SliderRow({ label, value, min, max, onChange, trackStyle }: SliderRowProps) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs font-semibold text-[var(--tk-color-text-muted)] w-4 shrink-0">
+      <span className="text-xs font-semibold text-[#70767f] w-4 shrink-0">
         {label}
       </span>
       <div className="relative flex-1 h-6 flex items-center">
@@ -207,13 +207,13 @@ function SliderRow({ label, value, min, max, onChange, trackStyle }: SliderRowPr
           className="relative w-full h-6 appearance-none bg-transparent cursor-pointer
             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5
             [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2
-            [&::-webkit-slider-thumb]:border-[var(--tk-color-border)] [&::-webkit-slider-thumb]:shadow-md
+            [&::-webkit-slider-thumb]:border-[#1e2631] [&::-webkit-slider-thumb]:shadow-md
             [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full
             [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2
-            [&::-moz-range-thumb]:border-[var(--tk-color-border)] [&::-moz-range-thumb]:shadow-md"
+            [&::-moz-range-thumb]:border-[#1e2631] [&::-moz-range-thumb]:shadow-md"
         />
       </div>
-      <span className="text-xs font-mono text-[var(--tk-color-text-muted)] w-8 text-right shrink-0">
+      <span className="text-xs font-mono text-[#70767f] w-8 text-right shrink-0">
         {value}
       </span>
     </div>

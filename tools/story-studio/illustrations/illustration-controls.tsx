@@ -30,7 +30,7 @@ export function IllustrationControls({
               onClick={() => onQualityChange(mode)}
               className={`px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer ${
                 qualityMode === mode
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-[#3D6AF2] text-white'
                   : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
               }`}
             >
@@ -47,7 +47,7 @@ export function IllustrationControls({
       <button
         onClick={onGenerateSelected}
         disabled={selectedCount === 0 || generating}
-        className="ml-auto px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700
+        className="ml-auto px-4 py-2 text-sm font-medium text-white bg-[#3D6AF2] hover:bg-[#3560d8]
           disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors cursor-pointer"
         style={{ minHeight: '44px' }}
       >

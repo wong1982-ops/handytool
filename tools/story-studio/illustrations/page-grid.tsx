@@ -23,7 +23,7 @@ export function PageGrid({
       <div className="flex items-center gap-3 mb-4">
         <button
           onClick={allSelected ? onDeselectAll : onSelectAll}
-          className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+          className="text-sm text-[#3D6AF2] dark:text-[#93aaff] hover:underline cursor-pointer"
         >
           {allSelected ? 'Deselect all' : 'Select all'}
         </button>
@@ -66,7 +66,7 @@ export function PageGrid({
               className={`relative bg-white dark:bg-slate-900 rounded-xl border overflow-hidden
                 cursor-pointer hover:shadow-md transition-all ${
                   isSelected
-                    ? 'border-indigo-400 dark:border-indigo-600 ring-2 ring-indigo-200 dark:ring-indigo-800'
+                    ? 'border-[#3D6AF2] dark:border-[#3D6AF2] ring-2 ring-[#3D6AF2]/30 dark:ring-[#1e2631]'
                     : 'border-slate-200 dark:border-slate-800'
                 }`}
               onClick={() => onPageClick(page.id)}
@@ -78,7 +78,7 @@ export function PageGrid({
               >
                 <div className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer
                   ${isSelected
-                    ? 'bg-indigo-600 border-indigo-600'
+                    ? 'bg-[#3D6AF2] border-[#3D6AF2]'
                     : 'bg-white/80 dark:bg-slate-800/80 border-slate-300 dark:border-slate-600'
                   }`}
                 >
@@ -96,7 +96,7 @@ export function PageGrid({
                   <img src={ill.imageUrl} alt={`Page ${page.sequence}`} className="w-full h-full object-cover" />
                 ) : ill?.status === 'generating' ? (
                   <div className="text-center text-slate-400">
-                    <div className="w-8 h-8 mx-auto border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-8 h-8 mx-auto border-2 border-[#3D6AF2] border-t-transparent rounded-full animate-spin" />
                     <p className="text-xs mt-2">Generating...</p>
                   </div>
                 ) : (

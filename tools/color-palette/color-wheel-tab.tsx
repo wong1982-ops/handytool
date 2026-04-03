@@ -158,7 +158,7 @@ export function ColorWheelTab({
           aria-hidden="true"
         >
           {/* Inner cutout */}
-          <div className="absolute inset-[30px] rounded-full bg-[var(--tk-color-surface)]" />
+          <div className="absolute inset-[30px] rounded-full bg-[#131a23]" />
           {/* Color dots */}
           {dotPositions.map((dot, i) => (
             <div
@@ -183,8 +183,8 @@ export function ColorWheelTab({
             onClick={() => handleRuleChange(rule)}
             className={`px-3 py-2 min-h-[44px] rounded-full text-sm font-medium transition-colors cursor-pointer ${
               harmonyRule === rule
-                ? 'bg-[var(--tk-color-primary-500)] text-white'
-                : 'bg-[var(--tk-color-hover)] text-[var(--tk-color-text)] hover:bg-[var(--tk-color-border)]'
+                ? 'bg-[#3D6AF2] text-white'
+                : 'bg-[#1e2631] text-[#a6abb5] hover:bg-[#1e2631]/80'
             }`}
           >
             {label}
@@ -195,18 +195,18 @@ export function ColorWheelTab({
       {/* Base color controls (non-custom mode) */}
       {harmonyRule !== 'custom' && (
         <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-semibold text-[var(--tk-color-text)]">
+          <h3 className="text-sm font-semibold text-white">
             Base Color
           </h3>
 
           {/* Hex input */}
           <div className="flex items-center gap-3">
             <div
-              className="w-10 h-10 rounded-lg border border-[var(--tk-color-border)] shrink-0"
+              className="w-10 h-10 rounded-lg border border-[#1e2631] shrink-0"
               style={{ backgroundColor: currentBaseHex }}
             />
             <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[var(--tk-color-text-muted)] pointer-events-none">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#70767f] pointer-events-none">
                 #
               </span>
               <input
@@ -217,7 +217,7 @@ export function ColorWheelTab({
                 onKeyDown={(e) => e.key === 'Enter' && handleHexSubmit()}
                 maxLength={6}
                 aria-label="Base hex color"
-                className="w-full pl-7 pr-2 py-2 text-sm font-mono rounded-lg border border-[var(--tk-color-border)] bg-[var(--tk-color-bg)] text-[var(--tk-color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]"
+                className="w-full pl-7 pr-2 py-2 text-sm font-mono rounded-lg border border-[#1e2631] bg-[#090f16] text-white focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/50 focus:border-[#3D6AF2]/50"
               />
             </div>
           </div>
@@ -263,7 +263,7 @@ export function ColorWheelTab({
           <button
             type="button"
             onClick={handleGenerate}
-            className="w-full py-3 min-h-[44px] rounded-xl bg-[var(--tk-color-primary-500)] text-white font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer"
+            className="w-full py-3 min-h-[44px] rounded-xl bg-[#3D6AF2] hover:bg-[#3D6AF2]/90 text-white font-semibold text-sm transition-all cursor-pointer"
           >
             Generate Palette
           </button>
@@ -273,20 +273,20 @@ export function ColorWheelTab({
       {/* Custom mode: individual hex inputs */}
       {harmonyRule === 'custom' && (
         <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-semibold text-[var(--tk-color-text)]">
+          <h3 className="text-sm font-semibold text-white">
             Custom Colors
           </h3>
           {colors.map((c, i) => (
             <div key={i} className="flex items-center gap-3">
               <div
-                className="w-8 h-8 rounded-lg border border-[var(--tk-color-border)] shrink-0"
+                className="w-8 h-8 rounded-lg border border-[#1e2631] shrink-0"
                 style={{ backgroundColor: c.hex }}
               />
-              <span className="text-xs font-medium text-[var(--tk-color-text-muted)] w-16 shrink-0 capitalize">
+              <span className="text-xs font-medium text-[#70767f] w-16 shrink-0 capitalize">
                 {c.name}
               </span>
               <div className="relative flex-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[var(--tk-color-text-muted)] pointer-events-none">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#70767f] pointer-events-none">
                   #
                 </span>
                 <input
@@ -301,7 +301,7 @@ export function ColorWheelTab({
                   }
                   maxLength={6}
                   aria-label={`${c.name} hex color`}
-                  className="w-full pl-7 pr-2 py-2 text-sm font-mono rounded-lg border border-[var(--tk-color-border)] bg-[var(--tk-color-bg)] text-[var(--tk-color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]"
+                  className="w-full pl-7 pr-2 py-2 text-sm font-mono rounded-lg border border-[#1e2631] bg-[#090f16] text-white focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/50 focus:border-[#3D6AF2]/50"
                 />
               </div>
             </div>
@@ -326,7 +326,7 @@ interface SliderRowProps {
 function SliderRow({ label, value, min, max, onChange, trackStyle }: SliderRowProps) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs font-semibold text-[var(--tk-color-text-muted)] w-10 shrink-0">
+      <span className="text-xs font-semibold text-[#70767f] w-10 shrink-0">
         {label}
       </span>
       <div className="relative flex-1 h-6 flex items-center">
@@ -344,13 +344,13 @@ function SliderRow({ label, value, min, max, onChange, trackStyle }: SliderRowPr
           className="relative w-full h-6 appearance-none bg-transparent cursor-pointer
             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5
             [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2
-            [&::-webkit-slider-thumb]:border-[var(--tk-color-border)] [&::-webkit-slider-thumb]:shadow-md
+            [&::-webkit-slider-thumb]:border-[#1e2631] [&::-webkit-slider-thumb]:shadow-md
             [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full
             [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2
-            [&::-moz-range-thumb]:border-[var(--tk-color-border)] [&::-moz-range-thumb]:shadow-md"
+            [&::-moz-range-thumb]:border-[#1e2631] [&::-moz-range-thumb]:shadow-md"
         />
       </div>
-      <span className="text-xs font-mono text-[var(--tk-color-text-muted)] w-8 text-right shrink-0">
+      <span className="text-xs font-mono text-[#70767f] w-8 text-right shrink-0">
         {value}
       </span>
     </div>

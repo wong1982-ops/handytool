@@ -31,7 +31,7 @@ export function CharacterList({ characters, loading, onSelect, onDelete, onCreat
         <button
           onClick={onCreate}
           className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white
-            bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors cursor-pointer"
+            bg-[#3D6AF2] hover:bg-[#3560d8] rounded-lg transition-colors cursor-pointer"
           style={{ minHeight: '44px' }}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

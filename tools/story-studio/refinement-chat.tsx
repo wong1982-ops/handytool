@@ -127,7 +127,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
       {/* Current concept — magical card */}
       <div className="relative rounded-2xl overflow-hidden">
         {/* Magical glow border */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400/20 via-purple-400/10 to-indigo-400/20 dark:from-amber-400/10 dark:via-purple-400/5 dark:to-indigo-400/10" />
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400/20 via-purple-400/10 to-[#3D6AF2]/15 dark:from-amber-400/10 dark:via-purple-400/5 dark:to-[#3D6AF2]/10" />
         <div className="relative rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-amber-200/50 dark:border-amber-700/30 shadow-lg shadow-amber-500/5 dark:shadow-amber-500/5 p-5 md:p-6">
           {/* Title with sparkle */}
           <div className="flex items-start gap-3 mb-3">
@@ -137,7 +137,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
               </svg>
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg md:text-xl font-bold bg-gradient-to-r from-amber-600 via-purple-600 to-indigo-600 dark:from-amber-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
+              <h3 className="text-lg md:text-xl font-bold bg-gradient-to-r from-amber-600 via-purple-600 to-[#3D6AF2] dark:from-amber-400 dark:via-purple-400 dark:to-[#93aaff] bg-clip-text text-transparent" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
                 {concept.title}
               </h3>
               <div className="flex flex-wrap gap-1.5 mt-2">
@@ -147,7 +147,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-800/40">
                   {concept.tags.audience}
                 </span>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-300 border border-purple-200/50 dark:border-purple-800/40">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-[#a6abb5] border border-purple-200/50 dark:border-purple-800/40">
                   {concept.tags.pageCount} pages
                 </span>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border border-amber-200/50 dark:border-amber-800/40">
@@ -182,13 +182,13 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
               key={i}
               className={`rounded-2xl p-4 text-sm ${
                 msg.role === 'user'
-                  ? 'bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-200/50 dark:border-indigo-800/40 ml-6'
+                  ? 'bg-gradient-to-r from-[#3D6AF2]/10 to-purple-50 dark:from-[#3D6AF2]/10 dark:to-purple-900/20 border border-[#1e2631] dark:border-[#1e2631]/40 ml-6'
                   : 'bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/15 dark:to-orange-900/15 border border-amber-200/50 dark:border-amber-800/30 mr-6'
               }`}
             >
               <span className={`text-[10px] font-bold uppercase tracking-wider block mb-1.5 ${
                 msg.role === 'user'
-                  ? 'text-indigo-400 dark:text-indigo-500'
+                  ? 'text-[#93aaff] dark:text-[#3D6AF2]'
                   : 'text-amber-500 dark:text-amber-400'
               }`}>
                 {msg.role === 'user' ? 'Your Wish' : 'Story Fairy'}
@@ -203,13 +203,13 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
 
       {/* Casting spell — enchanted loading */}
       {refining && (
-        <div className="rounded-2xl bg-gradient-to-br from-purple-900/90 via-indigo-900/90 to-purple-900/90 dark:from-purple-950 dark:via-indigo-950 dark:to-purple-950 border border-purple-500/30 p-6 text-center overflow-hidden relative">
+        <div className="rounded-2xl bg-gradient-to-br from-purple-900/90 via-[#0c1424] to-purple-900/90 dark:from-purple-950 dark:via-[#090f16] dark:to-purple-950 border border-purple-500/30 p-6 text-center overflow-hidden relative">
           {/* Animated sparkle particles */}
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute top-2 left-[10%] w-1.5 h-1.5 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '0s', animationDuration: '1.2s' }} />
             <div className="absolute top-4 left-[30%] w-1 h-1 bg-purple-300 rounded-full animate-bounce" style={{ animationDelay: '0.3s', animationDuration: '1.4s' }} />
             <div className="absolute top-3 left-[60%] w-1.5 h-1.5 bg-amber-300 rounded-full animate-bounce" style={{ animationDelay: '0.6s', animationDuration: '1.1s' }} />
-            <div className="absolute top-5 left-[80%] w-1 h-1 bg-indigo-300 rounded-full animate-bounce" style={{ animationDelay: '0.9s', animationDuration: '1.3s' }} />
+            <div className="absolute top-5 left-[80%] w-1 h-1 bg-[#93aaff] rounded-full animate-bounce" style={{ animationDelay: '0.9s', animationDuration: '1.3s' }} />
             <div className="absolute top-1 left-[45%] w-2 h-2 bg-yellow-300 rounded-full animate-bounce" style={{ animationDelay: '0.2s', animationDuration: '1.5s' }} />
             <div className="absolute bottom-3 left-[20%] w-1 h-1 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s', animationDuration: '1.2s' }} />
             <div className="absolute bottom-4 left-[70%] w-1.5 h-1.5 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '0.7s', animationDuration: '1.4s' }} />
@@ -223,7 +223,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
             <h3 className="text-lg font-bold text-amber-300 mb-1" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
               Casting a spell on your story...
             </h3>
-            <p className="text-sm text-purple-300/80 italic">
+            <p className="text-sm text-[#a6abb5]/80 italic">
               {streamingReply ? 'The Story Fairy is rewriting your tale...' : 'The Story Fairy is weaving new magic into your tale'}
             </p>
           </div>
@@ -236,7 +236,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-amber-500/5" />
           <div className="relative rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-purple-200/40 dark:border-purple-800/30 p-5">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-[#3D6AF2] flex items-center justify-center">
                 <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                 </svg>
@@ -257,7 +257,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                 >
                   <span className="text-lg shrink-0 group-hover:scale-110 transition-transform duration-200">{option.icon}</span>
                   <div className="min-w-0">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors block truncate">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-purple-700 dark:group-hover:text-[#a6abb5] transition-colors block truncate">
                       {option.label}
                     </span>
                     <span className="text-[11px] text-slate-400 dark:text-slate-500 block truncate">
@@ -333,23 +333,23 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
 
         return (
           <div className="relative rounded-2xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-purple-600/10 to-amber-500/10 dark:from-indigo-400/5 dark:via-purple-400/5 dark:to-amber-400/5" />
-            <div className="relative rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-indigo-200/50 dark:border-indigo-800/30 p-5">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#3D6AF2]/10 via-purple-600/10 to-amber-500/10 dark:from-[#3D6AF2]/5 dark:via-purple-400/5 dark:to-amber-400/5" />
+            <div className="relative rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-[#1e2631] dark:border-[#1e2631]/30 p-5">
               {/* Header with presets */}
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#3D6AF2] to-purple-600 flex items-center justify-center flex-shrink-0">
                   <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                   </svg>
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Generation</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#3D6AF2] dark:text-[#93aaff]">Generation</span>
                 <div className="flex gap-1.5 ml-auto">
                   <button
                     type="button"
                     onClick={() => { setSkipValidation(false); setSkipIllustration(false); setSkipAudio(false) }}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                       isFullQuality
-                        ? 'border-indigo-400 dark:border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                        ? 'border-[#3D6AF2] dark:border-[#3D6AF2] bg-[#3D6AF2]/10 dark:bg-[#3D6AF2]/15 text-[#3D6AF2] dark:text-[#93aaff] shadow-sm'
                         : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                     style={{ minHeight: '36px' }}
@@ -400,7 +400,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     ))}
                     {/* Toggleable: Consistency Check */}
                     <tr
-                      className={`cursor-pointer transition-colors ${skipValidation ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10'}`}
+                      className={`cursor-pointer transition-colors ${skipValidation ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'hover:bg-[#3D6AF2]/10/30 dark:hover:bg-indigo-900/10'}`}
                       onClick={() => setSkipValidation(v => !v)}
                     >
                       <td className="px-3 py-1.5">
@@ -434,7 +434,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     ))}
                     {/* Toggleable: Illustrations */}
                     <tr
-                      className={`cursor-pointer transition-colors ${skipIllustration ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10'}`}
+                      className={`cursor-pointer transition-colors ${skipIllustration ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'hover:bg-[#3D6AF2]/10/30 dark:hover:bg-indigo-900/10'}`}
                       onClick={() => setSkipIllustration(v => !v)}
                     >
                       <td className="px-3 py-1.5">
@@ -448,7 +448,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     </tr>
                     {/* Toggleable: Narration */}
                     <tr
-                      className={`cursor-pointer transition-colors ${skipAudio ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10'}`}
+                      className={`cursor-pointer transition-colors ${skipAudio ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'hover:bg-[#3D6AF2]/10/30 dark:hover:bg-indigo-900/10'}`}
                       onClick={() => setSkipAudio(v => !v)}
                     >
                       <td className="px-3 py-1.5">
@@ -474,7 +474,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     {/* Total row */}
                     <tr className="bg-slate-50/80 dark:bg-slate-800/30 font-semibold">
                       <td className="px-3 py-2 text-slate-700 dark:text-slate-300">Estimated total</td>
-                      <td className="text-center px-2 py-2 text-indigo-600 dark:text-indigo-400 font-mono">{estLabel}</td>
+                      <td className="text-center px-2 py-2 text-[#3D6AF2] dark:text-[#93aaff] font-mono">{estLabel}</td>
                       <td className="text-center px-2 py-2" />
                     </tr>
                   </tbody>
@@ -483,9 +483,9 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
 
               {/* Context hint for skipped validation */}
               {!skipValidation && (
-                <div className="rounded-xl bg-indigo-50/80 dark:bg-indigo-900/15 border border-indigo-200/40 dark:border-indigo-800/30 px-3 py-2.5 mb-4">
-                  <p className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 mb-1">Consistency check verifies:</p>
-                  <ul className="text-[10px] text-indigo-600/80 dark:text-indigo-400/70 space-y-0.5 pl-3">
+                <div className="rounded-xl bg-[#3D6AF2]/10/80 dark:bg-indigo-900/15 border border-[#1e2631]/40 dark:border-[#1e2631]/30 px-3 py-2.5 mb-4">
+                  <p className="text-[11px] font-semibold text-[#3D6AF2] dark:text-[#93aaff] mb-1">Consistency check verifies:</p>
+                  <ul className="text-[10px] text-[#3D6AF2]/80 dark:text-[#93aaff]/70 space-y-0.5 pl-3">
                     <li>Character descriptions match Story Bible on every page</li>
                     <li>Timeline &amp; causality — no plot holes or contradictions</li>
                     <li>Auto-fixes any issues found before illustration</li>
@@ -505,7 +505,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                   skipValidation: skipValidation || undefined,
                 } : undefined)}
                 disabled={loading || refining}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-amber-600 hover:from-indigo-500 hover:via-purple-500 hover:to-amber-500 text-white font-bold text-sm transition-all shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 cursor-pointer disabled:opacity-50 disabled:cursor-default disabled:shadow-none"
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#3D6AF2] via-purple-600 to-amber-600 hover:from-[#3D6AF2] hover:via-purple-500 hover:to-amber-500 text-white font-bold text-sm transition-all shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 cursor-pointer disabled:opacity-50 disabled:cursor-default disabled:shadow-none"
                 style={{ minHeight: '44px' }}
               >
                 {loading ? (

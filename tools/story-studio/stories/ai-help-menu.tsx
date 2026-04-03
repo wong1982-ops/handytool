@@ -59,8 +59,8 @@ export function AIHelpMenu({ field, onAction, loading }: AIHelpMenuProps) {
         onClick={() => setOpen(!open)}
         disabled={loading}
         className="flex items-center gap-1 px-2 py-1 text-xs font-medium
-          text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20
-          hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-lg
+          text-[#3D6AF2] dark:text-[#93aaff] bg-[#3D6AF2]/10 dark:bg-[#3D6AF2]/15
+          hover:bg-[#3D6AF2]/15 hover:bg-[#3D6AF2]/15 rounded-lg
           transition-colors cursor-pointer disabled:opacity-50"
       >
         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">

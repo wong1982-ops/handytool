@@ -98,11 +98,11 @@ export function AITab({ onApply }: AITabProps) {
   // Auth gate
   if (!user) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-12 rounded-2xl border border-slate-200 dark:border-[#1e2631]">
-        <svg className="w-10 h-10 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <div className="flex flex-col items-center justify-center gap-4 py-12 rounded-2xl border border-[#1e2631] bg-[#131a23]">
+        <svg className="w-10 h-10 text-[#70767f]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
         </svg>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Sign in to use AI palette generation</p>
+        <p className="text-sm text-[#a6abb5]">Sign in to use AI palette generation</p>
         <button
           onClick={() => signInWithOAuth('google')}
           className="px-4 py-2 bg-[#3D6AF2] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer"
@@ -118,7 +118,7 @@ export function AITab({ onApply }: AITabProps) {
     <div className="flex flex-col gap-5">
       {/* Prompt textarea */}
       <div className="flex flex-col gap-2">
-        <label htmlFor="ai-prompt" className="text-sm font-medium text-slate-900 dark:text-white">
+        <label htmlFor="ai-prompt" className="text-sm font-medium text-white">
           Describe your palette
         </label>
         <textarea
@@ -128,9 +128,9 @@ export function AITab({ onApply }: AITabProps) {
           placeholder="e.g., 'warm sunset over ocean, luxury feel' or 'modern tech startup, clean and bold'"
           rows={3}
           maxLength={500}
-          className="w-full px-4 py-3 text-sm rounded-xl border border-slate-200 dark:border-[#1e2631] bg-white dark:bg-[#131a23] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/50 resize-none"
+          className="w-full px-4 py-3 text-sm rounded-xl border border-[#1e2631] bg-[#131a23] text-white placeholder:text-[#70767f] focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/40 focus:border-[#3D6AF2]/50 resize-none transition-all"
         />
-        <p className="text-xs text-slate-400">{prompt.length}/500</p>
+        <p className="text-xs text-[#70767f]">{prompt.length}/500</p>
       </div>
 
       {/* Generate button */}
@@ -162,7 +162,7 @@ export function AITab({ onApply }: AITabProps) {
 
       {/* Error */}
       {error && (
-        <div className="px-4 py-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
+        <div className="px-4 py-3 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/30 text-sm text-[#EF4444]">
           {error}
         </div>
       )}
@@ -170,7 +170,7 @@ export function AITab({ onApply }: AITabProps) {
       {/* AI Results — 3 palette suggestions */}
       {aiResults.length > 0 && (
         <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">AI Suggestions</h3>
+          <h3 className="text-sm font-semibold text-white">AI Suggestions</h3>
           {aiResults.map((palette, i) => {
             const isSelected = generatedColors === palette.colors
             return (
@@ -178,15 +178,15 @@ export function AITab({ onApply }: AITabProps) {
                 key={i}
                 type="button"
                 onClick={() => handleSelectAiPalette(palette)}
-                className={`flex flex-col gap-1.5 p-3 rounded-xl border-2 transition-all cursor-pointer text-left ${
+                className={`flex flex-col gap-2 p-3 rounded-xl transition-all cursor-pointer text-left ${
                   isSelected
-                    ? 'border-[#3D6AF2] bg-[#3D6AF2]/5'
-                    : 'border-slate-200 dark:border-[#1e2631] hover:border-slate-300 dark:hover:border-[#2a3547]'
+                    ? 'border-2 border-[#3D6AF2] bg-[#3D6AF2]/5'
+                    : 'border border-[#1e2631] hover:border-[#2a3547]'
                 }`}
                 style={{ minHeight: '44px' }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{palette.name}</span>
+                  <span className={`text-xs font-semibold ${isSelected ? 'text-white' : 'text-[#a6abb5]'}`}>{palette.name}</span>
                   {isSelected && (
                     <svg className="w-4 h-4 text-[#3D6AF2]" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -206,7 +206,7 @@ export function AITab({ onApply }: AITabProps) {
 
       {/* Quick preset pills */}
       <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Quick Presets</h3>
+        <h3 className="text-sm font-semibold text-white">Quick Presets</h3>
         <div className="flex flex-wrap gap-1.5">
           {PRESET_NAMES.map((name) => (
             <button
@@ -216,7 +216,7 @@ export function AITab({ onApply }: AITabProps) {
               className={`px-3 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                 selectedPreset === name
                   ? 'bg-[#3D6AF2] text-white'
-                  : 'bg-slate-100 dark:bg-[#131a23] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#1e2631]'
+                  : 'bg-[#131a23] text-[#a6abb5] hover:bg-[#1e2631] border border-[#1e2631]'
               }`}
               style={{ minHeight: '44px' }}
             >
@@ -229,7 +229,7 @@ export function AITab({ onApply }: AITabProps) {
       {/* Selected colors preview + apply */}
       {generatedColors.length > 0 && (
         <div className="flex flex-col gap-3">
-          <div className="flex gap-1.5 rounded-xl overflow-hidden h-14 border border-slate-200 dark:border-[#1e2631]">
+          <div className="flex gap-0.5 rounded-xl overflow-hidden h-14 border border-[#1e2631]">
             {generatedColors.map((hex, i) => (
               <div key={i} className="flex-1" style={{ backgroundColor: hex }} title={hex} />
             ))}

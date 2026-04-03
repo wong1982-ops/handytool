@@ -192,7 +192,7 @@ export function IllustrationReviewFlow({ bookId, onBack, onNarration }: Illustra
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <svg className="w-8 h-8 text-indigo-500 animate-spin" fill="none" viewBox="0 0 24 24">
+        <svg className="w-8 h-8 text-[#3D6AF2] animate-spin" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
@@ -229,7 +229,7 @@ export function IllustrationReviewFlow({ bookId, onBack, onNarration }: Illustra
                   onClick={() => setQualityMode(mode)}
                   className={`px-2.5 py-1 text-[11px] font-semibold transition-colors cursor-pointer ${
                     qualityMode === mode
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-[#3D6AF2] text-white'
                       : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
@@ -259,7 +259,7 @@ export function IllustrationReviewFlow({ bookId, onBack, onNarration }: Illustra
                 onClick={() => setCurrentIndex(i)}
                 className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold transition-all cursor-pointer ${
                   isActive
-                    ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900'
+                    ? 'ring-2 ring-[#3D6AF2] ring-offset-2 dark:ring-offset-slate-900'
                     : ''
                 } ${
                   d === 'generate'
@@ -276,7 +276,7 @@ export function IllustrationReviewFlow({ bookId, onBack, onNarration }: Illustra
           {/* Finish button */}
           <button
             onClick={() => setShowSummary(true)}
-            className="px-3 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold flex-shrink-0 hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors cursor-pointer"
+            className="px-3 h-6 rounded-full bg-[#3D6AF2]/15 dark:bg-[#3D6AF2]/15 text-[#3D6AF2] dark:text-[#93aaff] text-[10px] font-bold flex-shrink-0 hover:bg-indigo-200 dark:hover:bg-[#1e2631] transition-colors cursor-pointer"
           >
             Finish
           </button>

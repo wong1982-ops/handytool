@@ -35,9 +35,9 @@ export function IllustrationSummary({
     <div className="space-y-6">
       {/* Stats */}
       <div className="flex flex-wrap gap-3">
-        <div className="px-3 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200/50 dark:border-indigo-800/40">
-          <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">{toGenerate.length}</span>
-          <span className="text-xs text-indigo-500 dark:text-indigo-400 ml-1">to illustrate</span>
+        <div className="px-3 py-2 rounded-lg bg-[#3D6AF2]/10 dark:bg-[#3D6AF2]/15 border border-[#1e2631] dark:border-[#1e2631]/40">
+          <span className="text-sm font-semibold text-[#3D6AF2] dark:text-[#93aaff]">{toGenerate.length}</span>
+          <span className="text-xs text-[#3D6AF2] dark:text-[#93aaff] ml-1">to illustrate</span>
         </div>
         <div className="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/40">
           <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{skipped.length}</span>
@@ -61,7 +61,7 @@ export function IllustrationSummary({
 
       {/* Generate button (before batch submission) */}
       {!generating && toGenerate.length > 0 && (
-        <div className="rounded-xl border border-indigo-200 dark:border-indigo-800/50 bg-white dark:bg-slate-900/80 p-4">
+        <div className="rounded-xl border border-[#1e2631] dark:border-[#1e2631]/50 bg-white dark:bg-slate-900/80 p-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-slate-600 dark:text-slate-400">
               {toGenerate.length} page{toGenerate.length > 1 ? 's' : ''} x {CREDIT_COST[qualityMode]} credits ({qualityMode})
@@ -70,7 +70,7 @@ export function IllustrationSummary({
           </div>
           <button
             onClick={onGenerate}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm transition-all shadow-lg shadow-indigo-500/20 cursor-pointer"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-[#3D6AF2] to-purple-600 hover:from-[#3D6AF2] hover:to-purple-500 text-white font-bold text-sm transition-all shadow-lg shadow-[#3D6AF2]/20 cursor-pointer"
             style={{ minHeight: '44px' }}
           >
             Generate All Illustrations
@@ -91,15 +91,15 @@ export function IllustrationSummary({
                   : page.status === 'error'
                     ? 'border-red-400 dark:border-red-600'
                     : page.status === 'generating'
-                      ? 'border-indigo-400 dark:border-indigo-600'
+                      ? 'border-[#3D6AF2] dark:border-[#3D6AF2]'
                       : 'border-slate-200 dark:border-slate-700'
             }`}
           >
             {page.status === 'done' && page.imageUrl ? (
               <img src={page.imageUrl} alt="" className="w-full h-full object-cover" />
             ) : page.status === 'generating' ? (
-              <div className="w-full h-full flex items-center justify-center bg-indigo-50 dark:bg-indigo-900/20">
-                <svg className="w-5 h-5 text-indigo-400 animate-spin" fill="none" viewBox="0 0 24 24">
+              <div className="w-full h-full flex items-center justify-center bg-[#3D6AF2]/10 dark:bg-[#3D6AF2]/15">
+                <svg className="w-5 h-5 text-[#93aaff] animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
@@ -139,8 +139,8 @@ export function IllustrationSummary({
 
       {/* Narration prompt (after completion) */}
       {allComplete && (
-        <div className="rounded-xl border border-purple-200 dark:border-purple-800/50 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-5 text-center">
-          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+        <div className="rounded-xl border border-purple-200 dark:border-purple-800/50 bg-gradient-to-r from-purple-50 to-[#3D6AF2]/10 dark:from-purple-900/20 dark:to-[#0c1424]/20 p-5 text-center">
+          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-br from-purple-500 to-[#3D6AF2] flex items-center justify-center">
             <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
             </svg>

@@ -150,7 +150,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
               <button
                 onClick={handleConfirmGenerate}
                 className="flex-1 px-4 py-2.5 text-sm font-medium text-white
-                  bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors cursor-pointer"
+                  bg-[#3D6AF2] hover:bg-[#3560d8] rounded-lg transition-colors cursor-pointer"
                 style={{ minHeight: '44px' }}
               >
                 Generate
@@ -222,8 +222,8 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
               <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
                 {refining ? (
                   <>
-                    <div className="w-12 h-12 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm mt-3 text-indigo-500 font-medium">Generating portrait...</p>
+                    <div className="w-12 h-12 border-2 border-[#3D6AF2] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm mt-3 text-[#3D6AF2] font-medium">Generating portrait...</p>
                   </>
                 ) : (
                   <>
@@ -251,7 +251,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                     className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden cursor-pointer
                       transition-all ring-2 ring-offset-1
                       ${isSelected
-                        ? 'ring-indigo-500 dark:ring-indigo-400'
+                        ? 'ring-[#3D6AF2] ring-[#3D6AF2]'
                         : 'ring-transparent hover:ring-slate-300 dark:hover:ring-slate-600'
                       }`}
                     aria-label={`${styleLabel}${p.isPrimary ? ' (primary)' : ''}`}
@@ -301,12 +301,12 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                     rows={2}
                     className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
                       bg-white dark:bg-slate-800 text-sm resize-none
-                      focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
                   />
                   <button
                     onClick={handleRefine}
                     disabled={refining || !feedback.trim()}
-                    className="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700
+                    className="w-full px-4 py-2 text-sm font-medium text-white bg-[#3D6AF2] hover:bg-[#3560d8]
                       disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors cursor-pointer"
                     style={{ minHeight: '44px' }}
                   >
@@ -349,10 +349,10 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                     className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all cursor-pointer
                       disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1
                       ${isSelected
-                        ? 'bg-indigo-600 text-white shadow-sm'
+                        ? 'bg-[#3D6AF2] text-white shadow-sm'
                         : existing
                           ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-700'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-[#3D6AF2]/10 dark:hover:bg-[#3D6AF2]/15 hover:text-[#3D6AF2] dark:hover:text-[#93aaff] border border-slate-200 dark:border-slate-700'
                       }`}
                     style={{ minHeight: '32px' }}
                   >
@@ -434,8 +434,8 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
 
           <button
             onClick={() => setEditing(true)}
-            className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400
-              hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm font-medium text-[#3D6AF2] dark:text-[#93aaff]
+              hover:bg-[#3D6AF2]/10 dark:hover:bg-[#3D6AF2]/15 rounded-lg transition-colors cursor-pointer"
             style={{ minHeight: '44px' }}
           >
             Edit Details
@@ -470,7 +470,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                   onChange={e => setLinkingSeriesId(e.target.value || null)}
                   className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
                     bg-white dark:bg-slate-800 text-sm
-                    focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
                 >
                   <option value="">Add to series...</option>
                   {availableSeries.map(s => (
@@ -484,7 +484,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                     setLinkingSeriesId(null)
                   }}
                   disabled={!linkingSeriesId}
-                  className="px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700
+                  className="px-3 py-2 text-sm font-medium text-white bg-[#3D6AF2] hover:bg-[#3560d8]
                     disabled:opacity-50 disabled:cursor-not-allowed rounded-lg cursor-pointer"
                   style={{ minHeight: '44px' }}
                 >

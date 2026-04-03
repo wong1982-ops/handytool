@@ -21,8 +21,8 @@ export function SeriesSection({ characters, onSelectCharacter, onCreateSeries }:
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Series</h2>
         <button
           onClick={onCreateSeries}
-          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400
-            hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[#3D6AF2] dark:text-[#93aaff]
+            hover:bg-[#3D6AF2]/10 dark:hover:bg-[#3D6AF2]/15 rounded-lg transition-colors cursor-pointer"
           style={{ minHeight: '44px' }}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

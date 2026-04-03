@@ -104,7 +104,7 @@ export function PlotInput({
           value={plot}
           onChange={(e) => updatePlot(e.target.value)}
           placeholder="Example: Two kittens find a magic door that leads to a land made of candy..."
-          className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm resize-none h-36 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none placeholder:text-slate-400 transition-all"
+          className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm resize-none h-36 focus:border-[#3D6AF2] focus:ring-2 focus:ring-[#3D6AF2]/20 focus:outline-none placeholder:text-slate-400 transition-all"
           maxLength={2000}
           disabled={rephrasing}
         />
@@ -114,7 +114,7 @@ export function PlotInput({
             type="button"
             onClick={handleRephrase}
             disabled={!plotValid || rephrasing || loading}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-800 transition-colors disabled:opacity-40 disabled:cursor-default cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#3D6AF2] dark:text-[#93aaff] bg-[#3D6AF2]/10 dark:bg-indigo-950/40 hover:bg-[#3D6AF2]/15 hover:bg-[#3D6AF2]/15 border border-[#1e2631] dark:border-[#1e2631] transition-colors disabled:opacity-40 disabled:cursor-default cursor-pointer"
           >
             {rephrasing ? (
               <>
@@ -141,7 +141,7 @@ export function PlotInput({
       <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 md:p-8 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <svg className="w-5 h-5 text-[#3D6AF2]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
             </svg>
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Characters</h3>
@@ -151,7 +151,7 @@ export function PlotInput({
             <button
               type="button"
               onClick={() => setShowCharPicker(v => !v)}
-              className="text-xs text-indigo-500 hover:text-indigo-700 dark:hover:text-indigo-300 cursor-pointer"
+              className="text-xs text-[#3D6AF2] hover:text-[#3D6AF2] dark:hover:text-[#93aaff] cursor-pointer"
             >
               {showCharPicker ? 'Hide' : `Choose from ${approvedCharacters.length} character${approvedCharacters.length > 1 ? 's' : ''}`}
             </button>
@@ -164,16 +164,16 @@ export function PlotInput({
             {selectedChars.map(c => (
               <div
                 key={c.id}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#3D6AF2]/10 dark:bg-[#3D6AF2]/15 border border-[#1e2631] dark:border-[#1e2631]"
               >
                 {c.referenceImageUrl && (
                   <img src={c.referenceImageUrl} alt="" className="w-5 h-5 rounded-full object-cover" />
                 )}
-                <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">{c.name}</span>
+                <span className="text-xs font-medium text-[#3D6AF2] dark:text-[#93aaff]">{c.name}</span>
                 <button
                   type="button"
                   onClick={() => toggleCharacter(c.id)}
-                  className="w-4 h-4 flex items-center justify-center text-indigo-400 hover:text-indigo-600 cursor-pointer"
+                  className="w-4 h-4 flex items-center justify-center text-[#93aaff] hover:text-[#3D6AF2] cursor-pointer"
                   aria-label={`Remove ${c.name}`}
                 >
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -197,7 +197,7 @@ export function PlotInput({
                   onClick={() => toggleCharacter(c.id)}
                   className={`flex items-center gap-2.5 p-2.5 rounded-xl border-2 transition-all cursor-pointer text-left
                     ${isSelected
-                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+                      ? 'border-[#3D6AF2] bg-[#3D6AF2]/10 dark:bg-[#3D6AF2]/15'
                       : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                   style={{ minHeight: '44px' }}
@@ -220,7 +220,7 @@ export function PlotInput({
                     )}
                   </div>
                   {isSelected && (
-                    <svg className="w-4 h-4 text-indigo-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 text-[#3D6AF2] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   )}
@@ -281,7 +281,7 @@ export function PlotInput({
         <button
           type="submit"
           disabled={!plotValid || loading}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-sm transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-default"
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#3D6AF2] to-purple-600 hover:from-[#3D6AF2] hover:to-purple-500 text-white font-semibold text-sm transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-default"
           style={{ minHeight: '44px' }}
         >
           {loading ? (

@@ -55,8 +55,8 @@ export function IllustrationReviewPage({
           {page.dialogue && page.dialogue.length > 0 && (
             <div className="mt-4 space-y-2">
               {page.dialogue.map((d, i) => (
-                <div key={i} className="pl-3 border-l-2 border-indigo-300 dark:border-indigo-700">
-                  <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">{d.speaker}</span>
+                <div key={i} className="pl-3 border-l-2 border-[#1e2631] dark:border-[#1e2631]">
+                  <span className="text-xs font-semibold text-[#3D6AF2] dark:text-[#93aaff]">{d.speaker}</span>
                   <p className="text-sm text-slate-600 dark:text-slate-400 italic">&ldquo;{d.line}&rdquo;</p>
                 </div>
               ))}
@@ -112,7 +112,7 @@ export function IllustrationReviewPage({
             rows={4}
             className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
               bg-white dark:bg-slate-800 text-sm resize-y
-              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
             placeholder="Describe the illustration for this page..."
           />
         </div>
@@ -132,7 +132,7 @@ export function IllustrationReviewPage({
                     onClick={() => onCharacterToggle(c.id)}
                     className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
                       selected
-                        ? 'border-indigo-400 dark:border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                        ? 'border-[#3D6AF2] dark:border-[#3D6AF2] bg-[#3D6AF2]/10 dark:bg-[#3D6AF2]/15 text-[#3D6AF2] dark:text-[#93aaff]'
                         : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300'
                     }`}
                     style={{ minHeight: '32px' }}
@@ -150,7 +150,7 @@ export function IllustrationReviewPage({
           <div className="flex gap-2">
             <button
               onClick={onGenerate}
-              className="flex-1 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors cursor-pointer"
+              className="flex-1 py-2.5 rounded-lg bg-[#3D6AF2] hover:bg-[#3560d8] text-white text-sm font-semibold transition-colors cursor-pointer"
               style={{ minHeight: '44px' }}
             >
               Generate & Next

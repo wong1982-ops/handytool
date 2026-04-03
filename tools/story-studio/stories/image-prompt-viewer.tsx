@@ -182,7 +182,7 @@ export function ImagePromptViewer({ value, onChange, bookId, aiLoading }: ImageP
           {hasStructure && (
             <button
               onClick={() => setRawMode(false)}
-              className="text-xs text-indigo-500 hover:text-indigo-700 cursor-pointer"
+              className="text-xs text-[#3D6AF2] hover:text-[#3D6AF2] cursor-pointer"
             >
               Structured view
             </button>
@@ -194,7 +194,7 @@ export function ImagePromptViewer({ value, onChange, bookId, aiLoading }: ImageP
           rows={5}
           className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
             bg-white dark:bg-slate-800 text-sm resize-y
-            focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
           placeholder="Auto-generated from scene (editable)"
         />
       </div>
@@ -208,7 +208,7 @@ export function ImagePromptViewer({ value, onChange, bookId, aiLoading }: ImageP
         <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Image Prompt</label>
         <button
           onClick={() => setRawMode(true)}
-          className="text-xs text-indigo-500 hover:text-indigo-700 cursor-pointer"
+          className="text-xs text-[#3D6AF2] hover:text-[#3D6AF2] cursor-pointer"
         >
           Edit raw
         </button>
@@ -223,8 +223,8 @@ export function ImagePromptViewer({ value, onChange, bookId, aiLoading }: ImageP
               value={parsed.style}
               onChange={e => update(d => { d.style = e.target.value })}
               className="flex-1 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700
-                bg-transparent text-indigo-600 dark:text-indigo-400 font-semibold
-                focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                bg-transparent text-[#3D6AF2] dark:text-[#93aaff] font-semibold
+                focus:outline-none focus:ring-1 focus:ring-[#3D6AF2]"
               placeholder="e.g. anime style"
             />
             {bookId && (
@@ -249,7 +249,7 @@ export function ImagePromptViewer({ value, onChange, bookId, aiLoading }: ImageP
                   onChange={e => update(d => { d.characters[i].name = e.target.value })}
                   className="flex-1 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700
                     bg-transparent font-semibold text-slate-800 dark:text-slate-200
-                    focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    focus:outline-none focus:ring-1 focus:ring-[#3D6AF2]"
                   placeholder="Name"
                 />
                 {bookId && (
@@ -268,7 +268,7 @@ export function ImagePromptViewer({ value, onChange, bookId, aiLoading }: ImageP
                   onChange={e => update(d => { d.characters[i].type = e.target.value })}
                   className="flex-1 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700
                     bg-transparent text-slate-400 dark:text-slate-500
-                    focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    focus:outline-none focus:ring-1 focus:ring-[#3D6AF2]"
                   placeholder="e.g. human girl"
                 />
                 {bookId && (
@@ -294,7 +294,7 @@ export function ImagePromptViewer({ value, onChange, bookId, aiLoading }: ImageP
                     rows={['Outfit', 'Accessories', 'Distinguishing features'].includes(attr.label) ? 3 : 1}
                     className="flex-1 min-w-0 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700
                       bg-transparent text-slate-500 dark:text-slate-400 resize-y
-                      focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      focus:outline-none focus:ring-1 focus:ring-[#3D6AF2]"
                   />
                   {bookId && (
                     <AIHelpMenu
@@ -327,7 +327,7 @@ export function ImagePromptViewer({ value, onChange, bookId, aiLoading }: ImageP
             rows={3}
             className="w-full px-2 py-1 rounded border border-slate-200 dark:border-slate-700
               bg-transparent text-slate-600 dark:text-slate-400 resize-y
-              focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              focus:outline-none focus:ring-1 focus:ring-[#3D6AF2]"
             placeholder="Scene description..."
           />
         </div>

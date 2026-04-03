@@ -215,13 +215,13 @@ export function ImageTab({ onApply }: ImageTabProps) {
           aria-label="Upload an image to extract colors"
           className={`flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed cursor-pointer transition-colors min-h-[180px] ${
             dragActive
-              ? 'border-[var(--tk-color-primary-500)] bg-[var(--tk-color-primary-500)]/10'
-              : 'border-[var(--tk-color-border)] hover:border-[var(--tk-color-text-muted)]'
+              ? 'border-[#3D6AF2] bg-[#3D6AF2]/10'
+              : 'border-[#1e2631] hover:border-[#70767f]'
           }`}
         >
           {/* Upload icon */}
           <svg
-            className="w-10 h-10 text-[var(--tk-color-text-muted)]"
+            className="w-10 h-10 text-[#70767f]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -234,10 +234,10 @@ export function ImageTab({ onApply }: ImageTabProps) {
             />
           </svg>
           <div className="text-center">
-            <p className="text-sm font-medium text-[var(--tk-color-text)]">
+            <p className="text-sm font-medium text-white">
               Drop an image here or click to upload
             </p>
-            <p className="text-xs text-[var(--tk-color-text-muted)] mt-1">
+            <p className="text-xs text-[#70767f] mt-1">
               PNG, JPG, or WebP — max 10 MB
             </p>
           </div>
@@ -253,12 +253,12 @@ export function ImageTab({ onApply }: ImageTabProps) {
       ) : (
         <div className="flex flex-col gap-3">
           {/* Image thumbnail */}
-          <div className="relative rounded-xl overflow-hidden border border-[var(--tk-color-border)]">
+          <div className="relative rounded-xl overflow-hidden border border-[#1e2631]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={imageUrl}
               alt="Uploaded image for color extraction"
-              className="w-full max-h-48 object-contain bg-[var(--tk-color-hover)]"
+              className="w-full max-h-48 object-contain bg-[#1e2631]"
             />
           </div>
 
@@ -266,7 +266,7 @@ export function ImageTab({ onApply }: ImageTabProps) {
           <div className="flex items-center gap-3">
             <label
               htmlFor="color-count"
-              className="text-sm font-medium text-[var(--tk-color-text)] shrink-0"
+              className="text-sm font-medium text-white shrink-0"
             >
               Colors: {colorCount}
             </label>
@@ -278,18 +278,18 @@ export function ImageTab({ onApply }: ImageTabProps) {
               value={colorCount}
               onChange={(e) => setColorCount(Number(e.target.value))}
               className="flex-1 h-6 appearance-none bg-transparent cursor-pointer
-                [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-[var(--tk-color-border)]
+                [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-[#1e2631]
                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5
-                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--tk-color-primary-500)] [&::-webkit-slider-thumb]:-mt-1.5
+                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#3D6AF2] [&::-webkit-slider-thumb]:-mt-1.5
                 [&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-[var(--tk-color-border)]
                 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full
-                [&::-moz-range-thumb]:bg-[var(--tk-color-primary-500)] [&::-moz-range-thumb]:border-0"
+                [&::-moz-range-thumb]:bg-[#3D6AF2] [&::-moz-range-thumb]:border-0"
             />
             <button
               type="button"
               onClick={handleReExtract}
               disabled={state === 'extracting'}
-              className="px-3 py-2 min-h-[44px] text-sm font-medium rounded-lg bg-[var(--tk-color-hover)] text-[var(--tk-color-text)] hover:bg-[var(--tk-color-border)] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 min-h-[44px] text-sm font-medium rounded-lg bg-[#1e2631] text-white hover:bg-[#1e2631] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Re-extract
             </button>
@@ -301,7 +301,7 @@ export function ImageTab({ onApply }: ImageTabProps) {
       {state === 'extracting' && (
         <div className="flex items-center justify-center gap-2 py-4">
           <svg
-            className="w-5 h-5 animate-spin text-[var(--tk-color-primary-500)]"
+            className="w-5 h-5 animate-spin text-[#3D6AF2]"
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -319,7 +319,7 @@ export function ImageTab({ onApply }: ImageTabProps) {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
             />
           </svg>
-          <span className="text-sm text-[var(--tk-color-text-muted)]">
+          <span className="text-sm text-[#70767f]">
             Extracting colors...
           </span>
         </div>
@@ -335,14 +335,14 @@ export function ImageTab({ onApply }: ImageTabProps) {
       {/* Extracted color swatches */}
       {state === 'done' && extractedColors.length > 0 && (
         <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-semibold text-[var(--tk-color-text)]">
+          <h3 className="text-sm font-semibold text-white">
             Extracted Colors
           </h3>
           <div className="flex gap-2">
             {extractedColors.map((hex, i) => (
               <div key={i} className="flex flex-col items-center gap-1 flex-1 min-w-0">
                 <div
-                  className="w-full aspect-square rounded-lg border border-[var(--tk-color-border)] flex items-center justify-center"
+                  className="w-full aspect-square rounded-lg border border-[#1e2631] flex items-center justify-center"
                   style={{ backgroundColor: hex }}
                 >
                   <span
@@ -358,7 +358,7 @@ export function ImageTab({ onApply }: ImageTabProps) {
           <button
             type="button"
             onClick={() => onApply(extractedColors)}
-            className="w-full py-3 min-h-[44px] rounded-xl bg-[var(--tk-color-primary-500)] text-white font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer"
+            className="w-full py-3 min-h-[44px] rounded-xl bg-[#3D6AF2] text-white font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer"
           >
             Apply to Palette
           </button>
@@ -370,7 +370,7 @@ export function ImageTab({ onApply }: ImageTabProps) {
         <button
           type="button"
           onClick={handleClear}
-          className="w-full py-3 min-h-[44px] rounded-xl border border-[var(--tk-color-border)] text-[var(--tk-color-text-muted)] font-medium text-sm hover:bg-[var(--tk-color-hover)] transition-colors cursor-pointer"
+          className="w-full py-3 min-h-[44px] rounded-xl border border-[#1e2631] text-[#70767f] font-medium text-sm hover:bg-[#1e2631] transition-colors cursor-pointer"
         >
           Clear
         </button>

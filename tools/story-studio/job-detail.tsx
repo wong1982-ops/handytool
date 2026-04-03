@@ -221,7 +221,7 @@ export function JobDetailView({ jobId }: JobDetailViewProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <svg className="w-8 h-8 text-indigo-500 animate-spin" fill="none" viewBox="0 0 24 24">
+        <svg className="w-8 h-8 text-[#3D6AF2] animate-spin" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
@@ -240,7 +240,7 @@ export function JobDetailView({ jobId }: JobDetailViewProps) {
         <p className="text-slate-500 dark:text-slate-400 mb-4">{error || 'Job not found'}</p>
         <Link
           href="/tools/story-studio/bookshelf"
-          className="text-sm text-indigo-500 hover:underline"
+          className="text-sm text-[#3D6AF2] hover:underline"
         >
           Back to Bookshelf
         </Link>
@@ -301,7 +301,7 @@ export function JobDetailView({ jobId }: JobDetailViewProps) {
           <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ease-out ${
-                isFailed ? 'bg-red-500' : 'bg-gradient-to-r from-indigo-500 to-purple-500'
+                isFailed ? 'bg-red-500' : 'bg-gradient-to-r from-[#3D6AF2] to-purple-500'
               }`}
               style={{ width: `${progressPercent}%` }}
             />
@@ -375,7 +375,7 @@ export function JobDetailView({ jobId }: JobDetailViewProps) {
                   step.status === 'completed'
                     ? 'bg-emerald-500'
                     : step.status === 'active'
-                      ? 'bg-indigo-500 animate-pulse'
+                      ? 'bg-[#3D6AF2] animate-pulse'
                       : step.status === 'failed'
                         ? 'bg-red-500'
                         : 'bg-slate-200 dark:bg-slate-700'
@@ -408,7 +408,7 @@ export function JobDetailView({ jobId }: JobDetailViewProps) {
                     step.status === 'completed'
                       ? 'text-slate-700 dark:text-slate-300'
                       : step.status === 'active'
-                        ? 'text-indigo-700 dark:text-indigo-300'
+                        ? 'text-[#3D6AF2] dark:text-[#93aaff]'
                         : step.status === 'failed'
                           ? 'text-red-700 dark:text-red-400'
                           : 'text-slate-400 dark:text-slate-500'

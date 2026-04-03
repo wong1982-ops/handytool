@@ -38,7 +38,7 @@ export function PageStrip({ totalPages, activePage, onSelectPage, onAddPage, sho
             onClick={() => onSelectPage(page)}
             className={`shrink-0 w-9 h-9 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
               isActive
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-[#3D6AF2] text-white'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
@@ -49,7 +49,7 @@ export function PageStrip({ totalPages, activePage, onSelectPage, onAddPage, sho
       <button
         onClick={onAddPage}
         className="shrink-0 w-9 h-9 rounded-lg bg-slate-50 dark:bg-slate-800/50
-          text-slate-400 hover:text-indigo-500 hover:bg-slate-100 dark:hover:bg-slate-700
+          text-slate-400 hover:text-[#3D6AF2] hover:bg-slate-100 dark:hover:bg-slate-700
           transition-colors cursor-pointer flex items-center justify-center"
         title="Add page (2 credits)"
       >

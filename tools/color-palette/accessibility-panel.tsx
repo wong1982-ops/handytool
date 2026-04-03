@@ -34,16 +34,16 @@ function CollapsibleSection({
   const [open, setOpen] = useState(defaultOpen)
 
   return (
-    <div className="border border-[var(--tk-color-border)] rounded-xl overflow-hidden">
+    <div className="border border-[#1e2631] rounded-xl overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 min-h-[44px] text-sm font-semibold text-[var(--tk-color-text)] hover:bg-[var(--tk-color-hover)] transition-colors cursor-pointer"
+        className="w-full flex items-center justify-between px-4 py-3 min-h-[44px] text-sm font-semibold text-white hover:bg-[#1e2631] transition-colors cursor-pointer"
         aria-expanded={open}
       >
         {title}
         <svg
-          className={`w-4 h-4 text-[var(--tk-color-text-muted)] transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-[#70767f] transition-transform ${open ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -80,7 +80,7 @@ export function AccessibilityPanel({ colors }: AccessibilityPanelProps) {
 
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="text-sm font-semibold text-[var(--tk-color-text)]">
+      <h3 className="text-sm font-semibold text-white">
         Accessibility
       </h3>
 
@@ -92,13 +92,13 @@ export function AccessibilityPanel({ colors }: AccessibilityPanelProps) {
             <table className="w-full border-collapse text-xs">
               <thead>
                 <tr>
-                  <th className="p-1 text-[var(--tk-color-text-muted)] font-medium text-left">
+                  <th className="p-1 text-[#70767f] font-medium text-left">
                     FG / BG
                   </th>
                   {colors.map((c, i) => (
                     <th key={i} className="p-1">
                       <div
-                        className="w-6 h-6 rounded border border-[var(--tk-color-border)] mx-auto"
+                        className="w-6 h-6 rounded border border-[#1e2631] mx-auto"
                         style={{ backgroundColor: c.hex }}
                         title={c.hex}
                       />
@@ -111,7 +111,7 @@ export function AccessibilityPanel({ colors }: AccessibilityPanelProps) {
                   <tr key={ri}>
                     <td className="p-1">
                       <div
-                        className="w-6 h-6 rounded border border-[var(--tk-color-border)]"
+                        className="w-6 h-6 rounded border border-[#1e2631]"
                         style={{ backgroundColor: fg.hex }}
                         title={fg.hex}
                       />
@@ -119,7 +119,7 @@ export function AccessibilityPanel({ colors }: AccessibilityPanelProps) {
                     {colors.map((bg, ci) => {
                       if (ri === ci) {
                         return (
-                          <td key={ci} className="p-1 text-center text-[var(--tk-color-text-muted)]">
+                          <td key={ci} className="p-1 text-center text-[#70767f]">
                             —
                           </td>
                         )
@@ -139,7 +139,7 @@ export function AccessibilityPanel({ colors }: AccessibilityPanelProps) {
                               Aa
                             </div>
                             {/* Ratio */}
-                            <span className="text-[10px] font-mono text-[var(--tk-color-text-muted)]">
+                            <span className="text-[10px] font-mono text-[#70767f]">
                               {ratio.toFixed(1)}
                             </span>
                             {/* Badges */}
@@ -175,7 +175,7 @@ export function AccessibilityPanel({ colors }: AccessibilityPanelProps) {
 
           {/* Suggested text colors */}
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-medium text-[var(--tk-color-text-muted)]">
+            <span className="text-xs font-medium text-[#70767f]">
               Suggested text colors
             </span>
             <div className="flex gap-2">
@@ -184,7 +184,7 @@ export function AccessibilityPanel({ colors }: AccessibilityPanelProps) {
                 return (
                   <div
                     key={i}
-                    className="flex-1 h-10 rounded-lg flex items-center justify-center text-xs font-bold border border-[var(--tk-color-border)]"
+                    className="flex-1 h-10 rounded-lg flex items-center justify-center text-xs font-bold border border-[#1e2631]"
                     style={{ backgroundColor: c.hex, color: textCol }}
                   >
                     Aa
@@ -214,7 +214,7 @@ export function AccessibilityPanel({ colors }: AccessibilityPanelProps) {
             return (
               <div key={type} className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-[var(--tk-color-text)]">
+                  <span className="text-xs font-medium text-white">
                     {label}
                   </span>
                   {warnings.length > 0 && (
@@ -243,7 +243,7 @@ export function AccessibilityPanel({ colors }: AccessibilityPanelProps) {
                         className={`w-full aspect-square rounded-lg border ${
                           warnings.includes(i) || warnings.includes(i - 1)
                             ? 'border-amber-500 border-2'
-                            : 'border-[var(--tk-color-border)]'
+                            : 'border-[#1e2631]'
                         }`}
                         style={{ backgroundColor: hex }}
                         title={`Simulated: ${hex}`}
@@ -257,7 +257,7 @@ export function AccessibilityPanel({ colors }: AccessibilityPanelProps) {
                   {colors.map((c, i) => (
                     <div key={i} className="flex-1 flex flex-col items-center gap-1">
                       <div
-                        className="w-full aspect-square rounded-lg border border-[var(--tk-color-border)] opacity-60"
+                        className="w-full aspect-square rounded-lg border border-[#1e2631] opacity-60"
                         style={{ backgroundColor: c.hex }}
                         title={`Original: ${c.hex}`}
                       />

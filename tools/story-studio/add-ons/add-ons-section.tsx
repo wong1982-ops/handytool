@@ -24,7 +24,7 @@ export function AddOnsSection({ illustrationsDone, narratedDone, totalPages, onO
         {/* Illustrations card */}
         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-4">
           <div className="flex items-center gap-2 mb-2">
-            <svg className="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <svg className="w-4 h-4 text-[#3D6AF2]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
             </svg>
             <span className="font-semibold text-slate-800 dark:text-slate-200">Illustrations</span>
@@ -32,13 +32,13 @@ export function AddOnsSection({ illustrationsDone, narratedDone, totalPages, onO
           <p className="text-slate-500 dark:text-slate-400 mb-2">{ill.text}</p>
           <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mb-3">
             <div
-              className="h-full rounded-full bg-indigo-500 transition-all duration-300"
+              className="h-full rounded-full bg-[#3D6AF2] transition-all duration-300"
               style={{ width: totalPages > 0 ? `${(illustrationsDone / totalPages) * 100}%` : '0%' }}
             />
           </div>
           <button
             onClick={onOpenIllustrations}
-            className="w-full py-2 rounded-lg border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors cursor-pointer"
+            className="w-full py-2 rounded-lg border border-[#1e2631] dark:border-[#1e2631] text-[#3D6AF2] dark:text-[#93aaff] font-semibold hover:bg-[#3D6AF2]/10 dark:hover:bg-[#3D6AF2]/15 transition-colors cursor-pointer"
             style={{ minHeight: '44px' }}
           >
             {ill.button}

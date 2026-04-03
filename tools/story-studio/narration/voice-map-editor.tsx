@@ -35,7 +35,7 @@ export function VoiceMapEditor({ characters, voiceMap, onChange }: VoiceMapEdito
                 onChange={e => onChange({ ...voiceMap, [char.name]: e.target.value })}
                 className="flex-1 px-2 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600
                   bg-white dark:bg-slate-800 text-sm
-                  focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
               >
                 <option value="">Select voice...</option>
                 {GEMINI_VOICES.map(v => (

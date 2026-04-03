@@ -68,7 +68,7 @@ export function TabNavigation() {
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors
               border-b-2 ${
                 isActive
-                  ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                  ? 'border-[#3D6AF2] text-[#3D6AF2]'
                   : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
               }`}
             style={{ minHeight: '44px' }}
