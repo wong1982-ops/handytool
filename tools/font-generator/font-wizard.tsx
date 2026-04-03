@@ -193,9 +193,9 @@ export default function FontWizard() {
   return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Title */}
-      <h1 className="text-2xl sm:text-4xl font-extrabold text-white text-center mb-2 tracking-tight">
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-white text-center mb-2 tracking-tight">
         Font{' '}
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#32A9D9]">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED]">
           Generator
         </span>
       </h1>
