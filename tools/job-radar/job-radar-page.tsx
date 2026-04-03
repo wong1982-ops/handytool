@@ -22,7 +22,8 @@ function JobRadarContent() {
 
   return (
     <>
-      {/* Tabs */}
+      {/* Tabs — sticky on mobile with solid bg */}
+      <div className="sticky top-0 z-40 -mx-4 px-4 py-2 bg-[#090f16] lg:static lg:mx-0 lg:px-0 lg:py-0 lg:bg-transparent lg:z-auto">
       <div
         role="tablist"
         aria-label="Job categories"
@@ -44,6 +45,7 @@ function JobRadarContent() {
             {tab.label}
           </button>
         ))}
+      </div>
       </div>
 
       {/* Gallery */}

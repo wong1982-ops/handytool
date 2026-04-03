@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useAuth } from '@/lib/hooks/use-auth'
+import { signInWithOAuth } from '@/lib/supabase/auth'
 import type { FlightOffer } from './types'
 
 interface SetAlertModalProps {
@@ -10,6 +12,7 @@ interface SetAlertModalProps {
 }
 
 export function SetAlertModal({ offer, onClose, onCreated }: SetAlertModalProps) {
+  const { user, loading: authLoading } = useAuth()
   const suggestedPrice = Math.round(offer.price * 0.8)
   const [targetPrice, setTargetPrice] = useState(suggestedPrice)
   const [loading, setLoading] = useState(false)
@@ -45,6 +48,23 @@ export function SetAlertModal({ offer, onClose, onCreated }: SetAlertModalProps)
     } finally {
       setLoading(false)
     }
+  }
+
+  // Auth gate — show sign-in if not logged in
+  if (!authLoading && !user) {
+    return (
+      <div className="rounded-xl bg-[#0c1219] border border-[#1e2631] p-4 mt-2 text-center">
+        <p className="text-sm text-[#a6abb5] mb-3">Sign in to create price alerts</p>
+        <button
+          type="button"
+          onClick={() => signInWithOAuth('google')}
+          className="rounded-lg bg-gradient-to-r from-[#3D6AF2] to-[#3D9DF2] text-white text-sm font-medium px-6 py-2.5 hover:opacity-90 transition-opacity cursor-pointer"
+          style={{ minHeight: '44px' }}
+        >
+          Sign in with Google
+        </button>
+      </div>
+    )
   }
 
   return (

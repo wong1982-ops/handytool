@@ -250,9 +250,9 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
         />
       </div>
 
-      <div className={`grid grid-cols-1 ${tripType === 'return' ? 'sm:grid-cols-[1fr_1fr_auto_auto]' : 'sm:grid-cols-[1fr_auto_auto]'} gap-3 mt-3 items-end`}>
+      <div className={`grid grid-cols-2 ${tripType === 'return' ? 'sm:grid-cols-[1fr_1fr_auto_auto]' : 'sm:grid-cols-[1fr_auto_auto]'} gap-3 mt-3 items-end`}>
         {/* Departure date */}
-        <div>
+        <div className="min-w-0">
           <label className="block text-xs font-medium text-[#a6abb5] mb-1.5">Departure</label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#70767f]">

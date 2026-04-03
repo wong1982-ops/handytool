@@ -9,6 +9,37 @@ interface JobDetailModalProps {
   onClose: () => void
 }
 
+/** Simple markdown → HTML for job descriptions. Handles headers, bold, lists, links, line breaks. */
+function formatDescription(text: string): string {
+  return text
+    // Escape HTML
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    // Headers (### → h3, ## → h2, # → h1)
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    // Bold (**text** or __text__)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.+?)__/g, '<strong>$1</strong>')
+    // Italic (*text* or _text_)
+    .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
+    // Links [text](url)
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    // Unordered lists (- item or * item)
+    .replace(/^[\-\*] (.+)$/gm, '<li>$1</li>')
+    // Wrap consecutive <li> in <ul>
+    .replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>')
+    // Line breaks (double newline → paragraph, single → br)
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br/>')
+    // Wrap in paragraph
+    .replace(/^/, '<p>').replace(/$/, '</p>')
+    // Clean up empty paragraphs
+    .replace(/<p><\/p>/g, '')
+    .replace(/<p><(h[123]|ul|ol)/g, '<$1')
+    .replace(/<\/(h[123]|ul|ol)><\/p>/g, '</$1>')
+}
+
 const COUNTRY_FLAG: Record<string, string> = { AU: '\u{1F1E6}\u{1F1FA}', NZ: '\u{1F1F3}\u{1F1FF}' }
 
 function formatSalaryFull(job: Job): string {
@@ -115,9 +146,17 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
           {job.description && (
             <div>
               <h3 className="text-sm font-semibold text-white mb-2">Description</h3>
-              <p className="text-sm text-[#a6abb5] whitespace-pre-line leading-relaxed">
-                {job.description}
-              </p>
+              <div
+                className="text-sm text-[#a6abb5] leading-relaxed max-w-none
+                  [&_h1]:text-base [&_h1]:font-bold [&_h1]:text-white [&_h1]:mt-4 [&_h1]:mb-2
+                  [&_h2]:text-sm [&_h2]:font-bold [&_h2]:text-white [&_h2]:mt-3 [&_h2]:mb-1.5
+                  [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-white [&_h3]:mt-2 [&_h3]:mb-1
+                  [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
+                  [&_li]:my-0.5 [&_p]:my-1.5
+                  [&_strong]:text-white [&_strong]:font-semibold
+                  [&_a]:text-[#3D6AF2] [&_a]:underline"
+                dangerouslySetInnerHTML={{ __html: formatDescription(job.description) }}
+              />
             </div>
           )}
 
