@@ -46,33 +46,33 @@ export function JobCard({ job, onClick }: JobCardProps) {
     <button
       type="button"
       onClick={() => onClick(job)}
-      className="w-full text-left p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-[var(--tk-color-primary-500)]/50 hover:shadow-md transition-all cursor-pointer group"
+      className="job-card w-full text-left p-5 rounded-xl border border-[#1e2631] bg-[#131a23] hover:border-[rgba(61,106,242,0.55)] hover:shadow-[0_4px_20px_rgba(61,106,242,0.08)] hover:bg-[#1e2631] transition-all cursor-pointer group"
       aria-label={`View details for ${job.title} at ${job.company}`}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-2">
-        <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white group-hover:text-[var(--tk-color-primary-500)] transition-colors line-clamp-2">
+        <h3 className="text-sm font-semibold text-white group-hover:text-[#3D6AF2] transition-colors line-clamp-2">
           {job.title}
         </h3>
-        <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap shrink-0">
+        <span className="text-xs text-[#70767f] whitespace-nowrap shrink-0 mt-0.5">
           {formatRelativeDate(job.posted_at)}
         </span>
       </div>
 
       {/* Company + Location */}
-      <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+      <p className="text-xs text-[#a6abb5] mb-3">
         {job.company} · {COUNTRY_FLAG[job.country]} {job.location}
       </p>
 
       {/* Badges */}
       <div className="flex flex-wrap gap-1.5 mb-3">
         {job.employment_type && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[rgba(61,106,242,0.15)] text-[#3D6AF2]">
             {EMPLOYMENT_TYPE_LABELS[job.employment_type]}
           </span>
         )}
         {job.work_mode && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[rgba(16,185,129,0.15)] text-[#10B981]">
             {WORK_MODE_LABELS[job.work_mode]}
           </span>
         )}
@@ -80,10 +80,10 @@ export function JobCard({ job, onClick }: JobCardProps) {
 
       {/* Salary + Source */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-slate-900 dark:text-white">
+        <span className="text-sm font-semibold text-white">
           {formatSalary(job)}
         </span>
-        <span className="text-xs text-slate-400 dark:text-slate-500">
+        <span className="text-xs text-[#70767f]">
           {SOURCE_LABELS[job.source]}
         </span>
       </div>

@@ -9,15 +9,15 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <main className="flex-1 flex flex-col items-center py-10 px-4">
+    <main className="flex-1 flex flex-col items-center py-8 px-4 sm:px-6">
       <div className="w-full max-w-[1200px] flex flex-col gap-6">
         <ToolBreadcrumb toolName="Job Radar" toolSlug="job-radar" />
 
-        <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+        <div className="space-y-1.5">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
             Job Radar
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-[#a6abb5]">
             IT & French language jobs across Australia and New Zealand — updated daily
           </p>
         </div>

@@ -31,15 +31,15 @@ export function JobPagination({ pagination, onPageChange }: JobPaginationProps) 
 
   return (
     <nav aria-label="Job results pagination" className="flex flex-col items-center gap-3 mt-6">
-      <p className="text-sm text-slate-500 dark:text-slate-400">
-        {total} job{total !== 1 ? 's' : ''} found
+      <p className="text-sm text-[#a6abb5]">
+        <span className="font-semibold text-white">{total}</span> job{total !== 1 ? 's' : ''} found
       </p>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         <button
           type="button"
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          className="px-3 h-10 rounded-lg text-sm border border-[#1e2631] bg-[#131a23] text-[#a6abb5] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#1e2631] transition-colors cursor-pointer min-w-[44px]"
           aria-label="Previous page"
         >
           Prev
@@ -47,17 +47,17 @@ export function JobPagination({ pagination, onPageChange }: JobPaginationProps) 
 
         {pages.map((p, i) =>
           p === 'ellipsis' ? (
-            <span key={`ellipsis-${i}`} className="px-2 text-slate-400">...</span>
+            <span key={`ellipsis-${i}`} className="px-2 text-[#70767f] text-sm">...</span>
           ) : (
             <button
               key={p}
               type="button"
               onClick={() => onPageChange(p)}
               aria-current={p === page ? 'page' : undefined}
-              className={`min-w-[40px] h-[40px] flex items-center justify-center text-sm rounded-lg border transition-colors cursor-pointer ${
+              className={`min-w-[40px] h-10 flex items-center justify-center text-sm rounded-lg border transition-colors cursor-pointer ${
                 p === page
-                  ? 'bg-[var(--tk-color-primary-500)] text-white border-transparent'
-                  : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  ? 'bg-[#3D6AF2] text-white border-transparent font-medium'
+                  : 'border-[#1e2631] bg-[#131a23] text-[#a6abb5] hover:bg-[#1e2631]'
               }`}
             >
               {p}
@@ -69,7 +69,7 @@ export function JobPagination({ pagination, onPageChange }: JobPaginationProps) 
           type="button"
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          className="px-3 h-10 rounded-lg text-sm border border-[#1e2631] bg-[#131a23] text-[#a6abb5] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#1e2631] transition-colors cursor-pointer min-w-[44px]"
           aria-label="Next page"
         >
           Next

@@ -56,57 +56,57 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
       onClick={(e) => {
         if (e.target === dialogRef.current) onClose()
       }}
-      className={`fixed inset-0 z-50 m-0 p-0 w-full h-full max-w-none max-h-none bg-transparent backdrop:bg-black/50 lg:flex lg:items-center lg:justify-center ${!job ? 'pointer-events-none hidden' : ''}`}
+      className={`fixed inset-0 z-50 m-0 p-0 w-full h-full max-w-none max-h-none bg-transparent backdrop:bg-black/65 lg:flex lg:items-center lg:justify-center lg:p-6 ${!job ? 'pointer-events-none hidden' : ''}`}
     >
       {job && (
-      <div className="absolute bottom-0 left-0 right-0 lg:static lg:w-full lg:max-w-2xl max-h-[85vh] overflow-y-auto rounded-t-2xl lg:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-2xl">
+      <div className="absolute bottom-0 left-0 right-0 lg:static lg:w-full lg:max-w-2xl overflow-y-auto rounded-t-2xl lg:rounded-2xl border border-[#1e2631] bg-[#131a23] shadow-[0_-8px_40px_rgba(0,0,0,0.5)]" style={{ maxHeight: '88vh' }}>
         {/* Header */}
-        <div className="sticky top-0 flex items-start justify-between gap-4 p-5 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+        <div className="sticky top-0 z-[1] flex items-start justify-between gap-4 p-5 bg-[#131a23] border-b border-[#1e2631]">
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
+            <h2 className="text-lg font-bold text-white mb-1">
               {job.title}
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-sm text-[#a6abb5]">
               {job.company} · {COUNTRY_FLAG[job.country]} {job.location}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0 cursor-pointer"
+            className="flex items-center justify-center w-10 h-10 rounded-lg text-[#a6abb5] hover:bg-[#1e2631] transition-colors shrink-0 cursor-pointer"
             aria-label="Close"
           >
-            <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-5 space-y-5">
+        <div className="p-5 flex flex-col gap-5">
           {/* Badges */}
           <div className="flex flex-wrap gap-2">
             {job.employment_type && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-[rgba(61,106,242,0.15)] text-[#3D6AF2]">
                 {EMPLOYMENT_TYPE_LABELS[job.employment_type]}
               </span>
             )}
             {job.work_mode && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-[rgba(16,185,129,0.15)] text-[#10B981]">
                 {WORK_MODE_LABELS[job.work_mode]}
               </span>
             )}
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-[#1e2631] text-[#a6abb5]">
               {SOURCE_LABELS[job.source]}
             </span>
           </div>
 
           {/* Salary */}
-          <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">
+          <div className="p-4 rounded-xl bg-[#0d1520] border border-[#1e2631]">
+            <p className="text-[10px] font-semibold text-[#70767f] uppercase tracking-widest mb-1.5">
               Compensation
             </p>
-            <p className="text-lg font-semibold text-slate-900 dark:text-white">
+            <p className="text-xl font-bold text-white">
               {formatSalaryFull(job)}
             </p>
           </div>
@@ -114,8 +114,8 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
           {/* Description */}
           {job.description && (
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Description</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line leading-relaxed">
+              <h3 className="text-sm font-semibold text-white mb-2">Description</h3>
+              <p className="text-sm text-[#a6abb5] whitespace-pre-line leading-relaxed">
                 {job.description}
               </p>
             </div>
@@ -124,12 +124,12 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
           {/* Tags */}
           {job.tags.length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Skills & Tags</h3>
+              <h3 className="text-sm font-semibold text-white mb-2">Skills & Tags</h3>
               <div className="flex flex-wrap gap-1.5">
                 {job.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[var(--tk-color-primary-500)]/10 text-[var(--tk-color-primary-500)]"
+                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[rgba(61,106,242,0.1)] text-[#3D6AF2]"
                   >
                     {tag}
                   </span>
@@ -139,18 +139,18 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
           )}
 
           {/* Posted date */}
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-[#70767f]">
             Posted {new Date(job.posted_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 flex gap-3 p-5 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+        <div className="sticky bottom-0 flex gap-3 p-5 bg-[#131a23] border-t border-[#1e2631]">
           <a
             href={job.source_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 h-12 rounded-xl bg-[var(--tk-color-primary-500)] hover:bg-[var(--tk-color-primary-600)] text-white font-medium text-sm transition-colors cursor-pointer"
+            className="flex-1 flex items-center justify-center gap-2 h-12 rounded-xl bg-[#3D6AF2] hover:bg-[#3D79F2] hover:shadow-[0_4px_16px_rgba(61,106,242,0.35)] text-white font-medium text-sm transition-all cursor-pointer"
           >
             Apply on {SOURCE_LABELS[job.source]}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -162,7 +162,7 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
             onClick={() => {
               navigator.clipboard.writeText(job.source_url)
             }}
-            className="h-12 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+            className="h-12 px-5 rounded-xl border border-[#1e2631] bg-[#1e2631] hover:bg-[#252e3d] text-sm font-medium text-[#a6abb5] transition-colors cursor-pointer"
             aria-label="Copy job link"
           >
             Share

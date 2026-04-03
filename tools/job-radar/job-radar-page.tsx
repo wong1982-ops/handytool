@@ -23,7 +23,11 @@ function JobRadarContent() {
   return (
     <>
       {/* Tabs */}
-      <div role="tablist" aria-label="Job categories" className="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800 w-fit">
+      <div
+        role="tablist"
+        aria-label="Job categories"
+        className="flex gap-1 p-1 rounded-xl w-fit border border-[#1e2631] bg-[#131a23]"
+      >
         {TABS.map((tab) => (
           <button
             key={tab.value}
@@ -31,10 +35,10 @@ function JobRadarContent() {
             type="button"
             aria-selected={activeCategory === tab.value}
             onClick={() => switchTab(tab.value)}
-            className={`px-4 sm:px-6 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+            className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer min-h-[44px] ${
               activeCategory === tab.value
-                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                ? 'bg-[#090f16] text-white shadow-[0_1px_4px_rgba(0,0,0,0.4)]'
+                : 'text-[#70767f] hover:text-[#a6abb5]'
             }`}
           >
             {tab.label}
@@ -52,11 +56,11 @@ export function JobRadarPage() {
   return (
     <Suspense fallback={
       <div className="space-y-4">
-        <div className="h-11 w-64 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
-        <div className="h-12 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+        <div className="h-11 w-64 rounded-xl bg-[#131a23] animate-pulse" />
+        <div className="h-12 rounded-xl bg-[#131a23] animate-pulse" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-36 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+            <div key={i} className="h-36 rounded-xl bg-[#131a23] animate-pulse" />
           ))}
         </div>
       </div>

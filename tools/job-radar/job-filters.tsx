@@ -22,14 +22,14 @@ function FilterSelect({
   onChange: (value: string) => void
 }) {
   return (
-    <div className="flex flex-col gap-1">
-      <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[10px] font-semibold text-[#70767f] uppercase tracking-widest">
         {label}
       </label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]/50"
+        className="h-10 px-3 rounded-lg border border-[#1e2631] bg-[#090f16] text-sm text-white focus:outline-none focus:border-[rgba(61,106,242,0.6)] focus:shadow-[0_0_0_3px_rgba(61,106,242,0.12)]"
       >
         <option value="">All</option>
         {options.map((opt) => (
@@ -68,7 +68,7 @@ export function JobFiltersPanel({ filters, onFilterChange, mode }: JobFiltersPro
     })
 
   const filterContent = (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-3 lg:gap-4">
       <FilterSelect
         label="Employment"
         value={filters.employment_type ?? ''}
@@ -98,8 +98,8 @@ export function JobFiltersPanel({ filters, onFilterChange, mode }: JobFiltersPro
       />
 
       {/* Salary range */}
-      <div className="col-span-2 sm:col-span-3 lg:col-span-1 flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+      <div className="col-span-2 sm:col-span-3 lg:col-span-1 flex flex-col gap-1.5">
+        <label className="text-[10px] font-semibold text-[#70767f] uppercase tracking-widest">
           Salary Range (Annual)
         </label>
         <div className="flex gap-2">
@@ -108,21 +108,21 @@ export function JobFiltersPanel({ filters, onFilterChange, mode }: JobFiltersPro
             placeholder="Min"
             value={filters.salary_min ?? ''}
             onChange={(e) => onFilterChange({ salary_min: e.target.value ? Number(e.target.value) : undefined, page: 1 })}
-            className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]/50"
+            className="w-full h-10 px-3 rounded-lg border border-[#1e2631] bg-[#090f16] text-sm text-white placeholder:text-[#70767f] focus:outline-none focus:border-[rgba(61,106,242,0.6)] focus:shadow-[0_0_0_3px_rgba(61,106,242,0.12)]"
           />
           <input
             type="number"
             placeholder="Max"
             value={filters.salary_max ?? ''}
             onChange={(e) => onFilterChange({ salary_max: e.target.value ? Number(e.target.value) : undefined, page: 1 })}
-            className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]/50"
+            className="w-full h-10 px-3 rounded-lg border border-[#1e2631] bg-[#090f16] text-sm text-white placeholder:text-[#70767f] focus:outline-none focus:border-[rgba(61,106,242,0.6)] focus:shadow-[0_0_0_3px_rgba(61,106,242,0.12)]"
           />
         </div>
       </div>
 
       {/* Hourly rate range */}
-      <div className="col-span-2 sm:col-span-3 lg:col-span-1 flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+      <div className="col-span-2 sm:col-span-3 lg:col-span-1 flex flex-col gap-1.5">
+        <label className="text-[10px] font-semibold text-[#70767f] uppercase tracking-widest">
           Hourly Rate (Contract)
         </label>
         <div className="flex gap-2">
@@ -131,14 +131,14 @@ export function JobFiltersPanel({ filters, onFilterChange, mode }: JobFiltersPro
             placeholder="Min"
             value={filters.hourly_min ?? ''}
             onChange={(e) => onFilterChange({ hourly_min: e.target.value ? Number(e.target.value) : undefined, page: 1 })}
-            className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]/50"
+            className="w-full h-10 px-3 rounded-lg border border-[#1e2631] bg-[#090f16] text-sm text-white placeholder:text-[#70767f] focus:outline-none focus:border-[rgba(61,106,242,0.6)] focus:shadow-[0_0_0_3px_rgba(61,106,242,0.12)]"
           />
           <input
             type="number"
             placeholder="Max"
             value={filters.hourly_max ?? ''}
             onChange={(e) => onFilterChange({ hourly_max: e.target.value ? Number(e.target.value) : undefined, page: 1 })}
-            className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)]/50"
+            className="w-full h-10 px-3 rounded-lg border border-[#1e2631] bg-[#090f16] text-sm text-white placeholder:text-[#70767f] focus:outline-none focus:border-[rgba(61,106,242,0.6)] focus:shadow-[0_0_0_3px_rgba(61,106,242,0.12)]"
           />
         </div>
       </div>
@@ -147,7 +147,7 @@ export function JobFiltersPanel({ filters, onFilterChange, mode }: JobFiltersPro
         <button
           type="button"
           onClick={clearAll}
-          className="col-span-2 sm:col-span-3 lg:col-span-1 h-10 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
+          className="col-span-2 sm:col-span-3 lg:col-span-1 h-10 rounded-lg text-sm font-medium text-[#EF4444] hover:bg-[rgba(239,68,68,0.08)] transition-colors cursor-pointer"
         >
           Clear all filters
         </button>
@@ -157,9 +157,11 @@ export function JobFiltersPanel({ filters, onFilterChange, mode }: JobFiltersPro
 
   if (mode === 'desktop') {
     return (
-      <aside className="w-64 shrink-0 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 h-fit sticky top-24">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Filters</h2>
-        {filterContent}
+      <aside className="w-60 shrink-0">
+        <div className="sticky top-24 p-4 rounded-xl border border-[#1e2631] bg-[#131a23]">
+          <h2 className="text-sm font-semibold text-white mb-4">Filters</h2>
+          {filterContent}
+        </div>
       </aside>
     )
   }
@@ -170,7 +172,7 @@ export function JobFiltersPanel({ filters, onFilterChange, mode }: JobFiltersPro
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+        className="w-full flex items-center justify-center gap-2 px-4 rounded-xl border border-[#1e2631] bg-[#131a23] text-sm font-medium text-[#a6abb5] hover:bg-[#1e2631] transition-colors cursor-pointer min-h-[44px]"
         aria-expanded={isOpen}
         aria-controls="job-filters-panel"
       >
@@ -179,12 +181,12 @@ export function JobFiltersPanel({ filters, onFilterChange, mode }: JobFiltersPro
         </svg>
         Filters
         {hasActiveFilters && (
-          <span className="w-2 h-2 rounded-full bg-[var(--tk-color-primary-500)]" />
+          <span className="w-2 h-2 rounded-full bg-[#3D6AF2]" />
         )}
       </button>
 
       {isOpen && (
-        <div id="job-filters-panel" className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+        <div id="job-filters-panel" className="mt-2 p-4 rounded-xl border border-[#1e2631] bg-[#131a23]">
           {filterContent}
         </div>
       )}

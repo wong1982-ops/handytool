@@ -105,9 +105,9 @@ export function JobGallery({ category }: JobGalleryProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Search + filter bar — sticky on mobile with solid bg to prevent content bleed-through */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-slate-950 pb-3 -mx-4 px-4 pt-2 border-b border-slate-200/50 dark:border-slate-800/50 lg:static lg:mx-0 lg:px-0 lg:pt-0 lg:pb-0 lg:bg-transparent lg:z-auto lg:border-b-0">
-        <div className="flex flex-col gap-3">
+      {/* Search + filter bar — sticky on mobile */}
+      <div className="sticky top-14 z-30 pb-3 -mx-4 px-4 pt-2 border-b border-[rgba(30,38,49,0.6)] bg-[#090f16] lg:static lg:mx-0 lg:px-0 lg:pt-0 lg:pb-0 lg:bg-transparent lg:z-auto lg:border-b-0">
+        <div className="flex flex-col gap-2 lg:gap-3">
           <JobSearchBar
             value={filters.q ?? ''}
             onChange={(q) => updateFilters({ q: q || undefined, page: 1 })}
@@ -126,12 +126,12 @@ export function JobGallery({ category }: JobGalleryProps) {
         {/* Main content */}
         <div className="flex-1 min-w-0">
           {state === 'error' && (
-            <div className="p-6 text-center rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
-              <p className="text-sm text-red-600 dark:text-red-400 mb-3">{error}</p>
+            <div className="p-6 text-center rounded-xl border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.08)]">
+              <p className="text-sm text-[#EF4444] mb-3">{error}</p>
               <button
                 type="button"
                 onClick={() => fetchJobs(filters)}
-                className="px-4 py-2 text-sm font-medium rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors cursor-pointer"
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-[rgba(239,68,68,0.15)] text-[#EF4444] hover:bg-[rgba(239,68,68,0.25)] transition-colors cursor-pointer min-h-[44px]"
               >
                 Retry
               </button>
@@ -141,7 +141,15 @@ export function JobGallery({ category }: JobGalleryProps) {
           {state === 'loading' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" aria-busy="true">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-36 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+                <div
+                  key={i}
+                  className="h-36 rounded-xl"
+                  style={{
+                    background: 'linear-gradient(90deg, #131a23 25%, #1e2631 50%, #131a23 75%)',
+                    backgroundSize: '800px 100%',
+                    animation: 'shimmer 1.5s infinite linear',
+                  }}
+                />
               ))}
             </div>
           )}
@@ -149,8 +157,8 @@ export function JobGallery({ category }: JobGalleryProps) {
           {state === 'success' && response && (
             <>
               {response.data.length === 0 ? (
-                <div className="p-10 text-center rounded-xl border border-slate-200 dark:border-slate-700">
-                  <p className="text-slate-500 dark:text-slate-400">No jobs found matching your filters.</p>
+                <div className="p-10 text-center rounded-xl border border-[#1e2631]">
+                  <p className="text-[#a6abb5]">No jobs found matching your filters.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
