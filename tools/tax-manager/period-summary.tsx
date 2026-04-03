@@ -70,7 +70,7 @@ export default function PeriodSummary({ transactions }: PeriodSummaryProps) {
         ))}
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
+      <div className="flex flex-col sm:flex-row gap-4">
         <div className="bg-[#131a23] rounded-xl p-4 border border-[#1e2631] flex-1">
           <p className="text-sm text-[#a6abb5] mb-1">GST Owing</p>
           <p className={`text-xl font-bold ${stats.gstOwing >= 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
