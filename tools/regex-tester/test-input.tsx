@@ -11,10 +11,10 @@ interface TestInputProps {
 }
 
 const HIGHLIGHT_COLORS = [
-  'rgba(250, 204, 21, 0.4)',  // yellow
-  'rgba(34, 211, 238, 0.4)',  // cyan
-  'rgba(244, 114, 182, 0.4)', // pink
-  'rgba(74, 222, 128, 0.4)',  // green
+  'rgba(250, 204, 21, 0.38)',  // yellow
+  'rgba(34, 211, 238, 0.38)',  // cyan
+  'rgba(244, 114, 182, 0.38)', // pink
+  'rgba(74, 222, 128, 0.38)',  // green
 ]
 
 const MAX_HIGHLIGHT_LENGTH = 50000
@@ -83,16 +83,17 @@ export function TestInput({ value, onChange, matches, disabled }: TestInputProps
 
   return (
     <div>
-      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+      <label className="block text-[10px] font-bold uppercase tracking-widest text-[#70767f] mb-2">
         Test String
       </label>
 
-      <div className="relative rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden focus-within:border-[var(--tk-color-primary-500)] focus-within:ring-2 focus-within:ring-[var(--tk-color-primary-500)]/30 transition-colors">
+      <div className="relative rounded-xl border border-[#1e2631] bg-[#131a23] overflow-hidden focus-within:border-[#3D6AF2] focus-within:ring-2 focus-within:ring-[rgba(61,106,242,0.3)] transition-colors">
         {/* Highlight layer */}
         {shouldHighlight && (
           <div
             ref={highlightRef}
             className="absolute inset-0 p-3 font-mono text-sm whitespace-pre-wrap break-words overflow-hidden pointer-events-none"
+            style={{ fontSize: '13px', lineHeight: 1.6 }}
             aria-hidden="true"
             dangerouslySetInnerHTML={{ __html: highlightHtml }}
           />
@@ -104,25 +105,26 @@ export function TestInput({ value, onChange, matches, disabled }: TestInputProps
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onScroll={handleScroll}
-          rows={8}
+          rows={6}
           disabled={disabled}
           placeholder="Enter test text here..."
           spellCheck={false}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
-          className={`relative w-full p-3 font-mono text-sm resize-y focus:outline-none min-h-[120px] ${
+          className={`relative w-full p-3 font-mono text-sm resize-y focus:outline-none min-h-[160px] ${
             shouldHighlight
-              ? 'text-transparent caret-slate-900 dark:caret-white bg-transparent'
-              : 'text-slate-900 dark:text-white bg-transparent'
-          } placeholder-slate-400 disabled:opacity-50 disabled:cursor-not-allowed`}
+              ? 'text-transparent caret-white bg-transparent'
+              : 'text-white bg-transparent'
+          } placeholder-[#70767f] disabled:opacity-50 disabled:cursor-not-allowed`}
+          style={{ fontSize: '13px', lineHeight: 1.6 }}
           aria-label="Test string input"
         />
       </div>
 
       {/* Warning for large input */}
       {value.length > MAX_HIGHLIGHT_LENGTH && (
-        <p className="mt-2 text-xs text-amber-600 dark:text-amber-400 font-medium">
+        <p className="mt-2 text-xs text-amber-400 font-medium">
           Highlighting disabled for large input ({(value.length / 1000).toFixed(0)}k chars). Matching still works.
         </p>
       )}

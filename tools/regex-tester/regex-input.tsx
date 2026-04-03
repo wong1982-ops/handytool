@@ -24,14 +24,14 @@ export function RegexInput({ value, onChange, flags, onFlagsChange, error }: Reg
   return (
     <div>
       <div
-        className={`flex items-center rounded-xl border bg-white dark:bg-slate-900 transition-colors ${
+        className={`flex items-center rounded-xl border bg-[#131a23] transition-colors min-h-[52px] ${
           hasError
-            ? 'border-red-400 dark:border-red-500 ring-2 ring-red-400/30'
-            : 'border-slate-200 dark:border-slate-800 focus-within:border-[var(--tk-color-primary-500)] focus-within:ring-2 focus-within:ring-[var(--tk-color-primary-500)]/30'
+            ? 'border-[#EF4444] ring-2 ring-[rgba(239,68,68,0.3)]'
+            : 'border-[#1e2631] focus-within:border-[#3D6AF2] focus-within:ring-2 focus-within:ring-[rgba(61,106,242,0.3)]'
         }`}
       >
         {/* Leading slash */}
-        <span className="pl-4 pr-1 text-slate-400 font-mono text-lg select-none" aria-hidden="true">
+        <span className="pl-4 pr-1 text-[#70767f] font-mono text-lg select-none" aria-hidden="true">
           /
         </span>
 
@@ -45,29 +45,30 @@ export function RegexInput({ value, onChange, flags, onFlagsChange, error }: Reg
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
-          className="flex-1 py-3 font-mono text-sm text-slate-900 dark:text-white bg-transparent placeholder-slate-400 focus:outline-none min-w-0"
+          className="flex-1 py-3 font-mono text-sm text-white bg-transparent placeholder-[#70767f] focus:outline-none min-w-0"
+          style={{ fontSize: '13.5px' }}
           aria-label="Regular expression pattern"
           aria-invalid={hasError}
           aria-describedby={hasError ? 'regex-error' : undefined}
         />
 
         {/* Trailing slash */}
-        <span className="pr-1 text-slate-400 font-mono text-lg select-none" aria-hidden="true">
+        <span className="pr-1 text-[#70767f] font-mono text-lg select-none" aria-hidden="true">
           /
         </span>
 
         {/* Flag toggles */}
-        <div className="flex items-center border-l border-slate-200 dark:border-slate-800 pl-1 pr-2 gap-0.5">
+        <div className="flex items-center border-l border-[#1e2631] pl-1 pr-2 gap-0.5 min-h-[52px]">
           {FLAG_OPTIONS.map((flag) => {
             const active = flags.includes(flag)
             return (
               <button
                 key={flag}
                 onClick={() => toggleFlag(flag)}
-                className={`w-8 h-8 rounded-md text-xs font-mono font-bold transition-colors cursor-pointer ${
+                className={`w-8 h-8 rounded-md text-xs font-mono font-bold transition-colors cursor-pointer flex items-center justify-center ${
                   active
-                    ? 'bg-[var(--tk-color-primary-500)] text-white'
-                    : 'text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300'
+                    ? 'bg-[#3D6AF2] text-white'
+                    : 'text-[#70767f] hover:bg-[#1e2631] hover:text-[#a6abb5]'
                 }`}
                 aria-label={`Toggle ${flag} flag`}
                 aria-pressed={active}
@@ -82,7 +83,7 @@ export function RegexInput({ value, onChange, flags, onFlagsChange, error }: Reg
 
       {/* Error message */}
       {hasError && (
-        <p id="regex-error" role="alert" className="mt-2 text-xs text-red-500 dark:text-red-400 font-medium">
+        <p id="regex-error" role="alert" className="mt-2 text-xs text-[#EF4444] font-medium">
           {error}
         </p>
       )}

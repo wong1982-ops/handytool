@@ -35,15 +35,15 @@ export function MatchResults({ matches, matchCount, groupCount, hasRegex, hasInp
     <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#70767f]">
           Matches
         </h3>
-        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <span className="px-2 py-0.5 rounded-full bg-[var(--tk-color-primary-500)]/10 text-[var(--tk-color-primary-600)] dark:text-[var(--tk-color-primary-400)] font-semibold">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[rgba(61,106,242,0.12)] text-[#3D6AF2]">
             {matchCount} match{matchCount !== 1 ? 'es' : ''}
           </span>
           {groupCount > 0 && (
-            <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 font-medium">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium text-[#70767f] bg-[#1e2631]">
               {groupCount} group{groupCount !== 1 ? 's' : ''}
             </span>
           )}
@@ -51,13 +51,13 @@ export function MatchResults({ matches, matchCount, groupCount, hasRegex, hasInp
       </div>
 
       {/* Match list */}
-      <div className="max-h-[400px] overflow-y-auto space-y-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2">
+      <div className="rounded-xl border border-[#1e2631] bg-[#131a23] p-2 space-y-1" style={{ maxHeight: 340, overflowY: 'auto' }}>
         {matches.map((match) => (
           <MatchRow key={match.index} match={match} />
         ))}
 
         {truncated && (
-          <p className="text-xs text-amber-600 dark:text-amber-400 font-medium text-center py-2">
+          <p className="text-xs text-amber-400 font-medium text-center py-2">
             Showing first {matches.length} of {matchCount} matches.
           </p>
         )}
@@ -75,33 +75,33 @@ function MatchRow({ match }: { match: RegexMatch }) {
   }, [hasGroups])
 
   return (
-    <div className="rounded-lg border border-slate-100 dark:border-slate-800 overflow-hidden">
+    <div className="rounded-lg border border-[#1e2631] overflow-hidden">
       <button
         onClick={toggle}
-        className={`w-full flex items-center gap-3 px-3 py-2 text-left text-sm transition-colors min-h-[44px] ${
-          hasGroups ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50' : 'cursor-default'
+        className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors min-h-[44px] ${
+          hasGroups ? 'cursor-pointer hover:bg-[rgba(255,255,255,0.03)]' : 'cursor-default'
         }`}
         aria-expanded={hasGroups ? expanded : undefined}
       >
         {/* Index */}
-        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 w-6 shrink-0 text-right">
+        <span className="font-mono text-[10px] text-[#70767f] w-6 shrink-0 text-right">
           #{match.index}
         </span>
 
         {/* Value */}
-        <span className="font-mono text-xs text-slate-900 dark:text-white truncate flex-1">
+        <span className="font-mono text-xs text-white truncate flex-1">
           &ldquo;{match.value}&rdquo;
         </span>
 
         {/* Position */}
-        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono shrink-0">
-          {match.start}-{match.end}
+        <span className="font-mono text-[10px] text-[#70767f] shrink-0">
+          {match.start}&ndash;{match.end}
         </span>
 
         {/* Expand indicator */}
         {hasGroups && (
           <svg
-            className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-[#70767f] shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -114,16 +114,16 @@ function MatchRow({ match }: { match: RegexMatch }) {
 
       {/* Groups */}
       {expanded && hasGroups && (
-        <div className="px-3 pb-2 pt-0">
+        <div className="px-3 pb-3 pt-1 border-t border-[#1e2631] bg-[#0d1420]">
           <table className="w-full text-xs">
             <tbody>
               {Object.entries(match.groups).map(([key, val]) => (
-                <tr key={key} className="border-t border-slate-100 dark:border-slate-800">
-                  <td className="py-1 pr-3 font-mono font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                <tr key={key} className="border-t border-[#1e2631]">
+                  <td className="py-1 pr-4 font-mono font-semibold text-[#70767f] whitespace-nowrap">
                     {key}
                   </td>
-                  <td className="py-1 font-mono text-slate-700 dark:text-slate-300 break-all">
-                    {val ?? <span className="text-slate-400 italic">undefined</span>}
+                  <td className="py-1 font-mono text-[#a6abb5] break-all">
+                    {val ?? <span className="text-[#70767f] italic">undefined</span>}
                   </td>
                 </tr>
               ))}
@@ -137,9 +137,9 @@ function MatchRow({ match }: { match: RegexMatch }) {
 
 function EmptyState({ icon, message }: { icon: React.ReactNode; message: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-      <div className="w-10 h-10 mb-3 text-slate-300 dark:text-slate-600">{icon}</div>
-      <p className="text-sm text-slate-400 dark:text-slate-500">{message}</p>
+    <div className="flex flex-col items-center justify-center py-12 text-center rounded-xl border border-[#1e2631] bg-[#131a23]">
+      <div className="w-10 h-10 mb-3 text-[#1e2631]">{icon}</div>
+      <p className="text-sm text-[#70767f]">{message}</p>
     </div>
   )
 }

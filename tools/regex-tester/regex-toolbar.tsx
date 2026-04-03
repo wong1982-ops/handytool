@@ -28,23 +28,23 @@ export function RegexToolbar({ mode, onModeChange, state, onHistoryOpen, onClear
   return (
     <div className="flex flex-wrap items-center justify-between gap-2">
       {/* Mode toggle */}
-      <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
+      <div className="flex p-1 bg-[#131a23] rounded-lg">
         <button
           onClick={() => onModeChange('match')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer min-h-[44px] ${
+          className={`px-5 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer min-h-[44px] ${
             mode === 'match'
-              ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white'
-              : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+              ? 'bg-[#1e2631] text-white font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.4)]'
+              : 'text-[#70767f] hover:text-[#a6abb5]'
           }`}
         >
           Match
         </button>
         <button
           onClick={() => onModeChange('replace')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer min-h-[44px] ${
+          className={`px-5 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer min-h-[44px] ${
             mode === 'replace'
-              ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white'
-              : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+              ? 'bg-[#1e2631] text-white font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.4)]'
+              : 'text-[#70767f] hover:text-[#a6abb5]'
           }`}
         >
           Replace
@@ -52,11 +52,11 @@ export function RegexToolbar({ mode, onModeChange, state, onHistoryOpen, onClear
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5">
         {/* History */}
         <button
           onClick={onHistoryOpen}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer min-h-[44px]"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-[#70767f] hover:bg-[#1e2631] hover:text-[#a6abb5] transition-colors cursor-pointer min-h-[44px]"
           aria-label="Open history"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -68,11 +68,11 @@ export function RegexToolbar({ mode, onModeChange, state, onHistoryOpen, onClear
         {/* Share */}
         <button
           onClick={handleShare}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer min-h-[44px]"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-[#70767f] hover:bg-[#1e2631] hover:text-[#a6abb5] transition-colors cursor-pointer min-h-[44px]"
           aria-label={copied ? 'Link copied' : 'Share regex'}
         >
           {copied ? (
-            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-4 h-4 text-[#10B981]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           ) : (
@@ -86,7 +86,7 @@ export function RegexToolbar({ mode, onModeChange, state, onHistoryOpen, onClear
         {/* Clear */}
         <button
           onClick={onClear}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors cursor-pointer min-h-[44px]"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-[#70767f] hover:bg-[rgba(239,68,68,0.08)] hover:text-[#EF4444] transition-colors cursor-pointer min-h-[44px]"
           aria-label="Clear all"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
