@@ -1,0 +1,217 @@
+'use client'
+
+import { Sparkline } from './sparkline'
+import type { FlightDeal } from './types'
+
+interface DealCardProps {
+  deal: FlightDeal
+  onSetAlert: (origin: string, destination: string) => void
+  onSearch: (origin: string, destination: string) => void
+}
+
+const CITY_NAMES: Record<string, string> = {
+  SYD: 'Sydney',
+  MEL: 'Melbourne',
+  BNE: 'Brisbane',
+  PER: 'Perth',
+  ADL: 'Adelaide',
+  NRT: 'Tokyo',
+  HND: 'Tokyo Haneda',
+  ICN: 'Seoul',
+  HKG: 'Hong Kong',
+  SIN: 'Singapore',
+  BKK: 'Bangkok',
+  DPS: 'Bali',
+  DXB: 'Dubai',
+  LHR: 'London',
+  CDG: 'Paris',
+  JFK: 'New York',
+  LAX: 'Los Angeles',
+  SFO: 'San Francisco',
+  ORD: 'Chicago',
+  MIA: 'Miami',
+  AMS: 'Amsterdam',
+  FRA: 'Frankfurt',
+  MUC: 'Munich',
+  ZRH: 'Zurich',
+  MAD: 'Madrid',
+  BCN: 'Barcelona',
+  FCO: 'Rome',
+  ATH: 'Athens',
+  IST: 'Istanbul',
+  DOH: 'Doha',
+  KUL: 'Kuala Lumpur',
+  CGK: 'Jakarta',
+  MNL: 'Manila',
+  TPE: 'Taipei',
+  PVG: 'Shanghai',
+  PEK: 'Beijing',
+  DEL: 'Delhi',
+  BOM: 'Mumbai',
+  DEN: 'Denver',
+  SEA: 'Seattle',
+  YYZ: 'Toronto',
+  YVR: 'Vancouver',
+  MEX: 'Mexico City',
+  GRU: 'São Paulo',
+  EZE: 'Buenos Aires',
+  JNB: 'Johannesburg',
+  CPT: 'Cape Town',
+  NBO: 'Nairobi',
+  CAI: 'Cairo',
+  ADD: 'Addis Ababa',
+  AKL: 'Auckland',
+}
+
+function getCityName(iata: string): string {
+  return CITY_NAMES[iata.toUpperCase()] ?? iata
+}
+
+function formatPrice(price: number): string {
+  return `$${price.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`
+}
+
+export function DealCard({ deal, onSetAlert, onSearch }: DealCardProps) {
+  const originCity = getCityName(deal.origin)
+  const destCity = getCityName(deal.destination)
+  const discountLabel = `-${Math.round(deal.discount_pct)}%`
+
+  return (
+    <article className="rounded-xl bg-[#131a23] border border-[#1e2631] p-5 hover:border-[#10B981]/40 transition-colors">
+      {/* Header row: route + discount badge */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2 flex-wrap min-w-0">
+          <span className="text-white font-bold text-base leading-tight truncate">
+            {originCity}
+          </span>
+          <ArrowRightIcon />
+          <span className="text-white font-bold text-base leading-tight truncate">
+            {destCity}
+          </span>
+        </div>
+
+        {/* Discount badge */}
+        <span className="inline-flex items-center shrink-0 rounded-full bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 text-xs font-semibold px-2.5 py-1">
+          {discountLabel}
+        </span>
+      </div>
+
+      {/* Subtitle */}
+      <p className="text-[#70767f] text-xs mt-1">
+        {deal.origin} → {deal.destination} · Multiple airlines
+      </p>
+
+      {/* Price section */}
+      <div className="mt-4 flex items-end justify-between gap-4 flex-wrap">
+        {/* Current price */}
+        <div>
+          <p className="text-[#70767f] text-xs mb-0.5">Current price</p>
+          <p className="text-2xl font-bold text-white leading-none">
+            {formatPrice(deal.current_price)}
+          </p>
+        </div>
+
+        {/* Average price */}
+        <div className="text-right">
+          <p className="text-[#70767f] text-xs mb-0.5">30-day avg</p>
+          <p className="text-base font-medium text-[#a6abb5] line-through">
+            {formatPrice(deal.avg_price)}
+          </p>
+        </div>
+      </div>
+
+      {/* Sparkline */}
+      {deal.priceHistory && deal.priceHistory.length > 0 && (
+        <div className="mt-4">
+          <Sparkline data={deal.priceHistory} height={24} highlightDrop />
+        </div>
+      )}
+
+      {/* Action buttons */}
+      <div className="mt-4 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => onSetAlert(deal.origin, deal.destination)}
+          className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-[#3D6AF2]/10 border border-[#3D6AF2]/20 text-[#3D6AF2] text-sm font-medium px-3 hover:bg-[#3D6AF2]/20 transition-colors"
+          style={{ minHeight: '44px' }}
+          aria-label={`Set alert for ${originCity} to ${destCity}`}
+        >
+          <BellIcon />
+          Set Alert
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onSearch(deal.origin, deal.destination)}
+          className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-[#1e2631] border border-[#1e2631] text-[#a6abb5] text-sm font-medium px-3 hover:bg-[#1e2631]/70 hover:text-white transition-colors"
+          style={{ minHeight: '44px' }}
+          aria-label={`Search flights from ${originCity} to ${destCity}`}
+        >
+          <SearchIcon />
+          Search
+        </button>
+      </div>
+    </article>
+  )
+}
+
+function ArrowRightIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#70767f"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="shrink-0"
+    >
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  )
+}
+
+function BellIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  )
+}
+
+function SearchIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
+    </svg>
+  )
+}
