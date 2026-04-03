@@ -61,6 +61,7 @@ const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   'resume': 'interactive',
   'job-radar': 'interactive',
   'ai-radar': 'interactive',
+  'flight-monitor': 'utility',
 }
 
 export function getToolCategory(slug: string): ToolCategory {
