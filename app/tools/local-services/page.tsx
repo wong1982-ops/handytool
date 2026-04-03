@@ -16,7 +16,7 @@ function LocalServicesInner() {
   const selectedResult = state.results.find(r => r.id === state.selectedPlaceId)
 
   return (
-    <div className="fixed inset-0 z-[70] bg-slate-100">
+    <div className="fixed inset-0 z-[70]" style={{ background: '#090f16' }}>
       {/* Full-screen map */}
       <div className="absolute inset-0">
         <ResultsMap />
@@ -31,7 +31,7 @@ function LocalServicesInner() {
 
       {/* Results panel — left side desktop, bottom sheet mobile */}
       {state.results.length > 0 && !selectedResult && (
-        <div className="absolute left-0 top-[120px] bottom-0 z-10 pointer-events-none flex">
+        <div className="absolute left-0 top-[108px] bottom-0 z-10 pointer-events-none flex">
           <div className="pointer-events-auto h-full">
             <ResultsPanel onSuggest={() => setShowSuggest(true)} />
           </div>
@@ -40,7 +40,7 @@ function LocalServicesInner() {
 
       {/* Detail panel — replaces results when a place is selected */}
       {selectedResult && (
-        <div className="absolute left-0 top-[120px] bottom-0 z-10 pointer-events-none flex">
+        <div className="absolute left-0 top-[108px] bottom-0 z-10 pointer-events-none flex">
           <div className="pointer-events-auto h-full">
             <DetailPanel
               result={selectedResult}
@@ -54,10 +54,11 @@ function LocalServicesInner() {
       <div className="absolute right-4 bottom-8 z-10 flex flex-col gap-2 max-lg:bottom-20">
         <button
           onClick={() => dispatch({ type: 'TOGGLE_LOCATION_MODAL' })}
-          className="w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center text-slate-600 hover:bg-slate-50"
+          className="w-11 h-11 rounded-full flex items-center justify-center shadow-xl"
+          style={{ background: '#131a23', border: '1px solid #1e2631' }}
           aria-label="My location"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg className="w-5 h-5" style={{ color: '#a6abb5' }} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
           </svg>

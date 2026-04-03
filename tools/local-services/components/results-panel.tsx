@@ -15,20 +15,29 @@ export function ResultsPanel({ onSuggest }: ResultsPanelProps) {
   const isFav = (id: string) => state.favourites.some(f => f.id === id)
 
   return (
-    <div className="w-[380px] max-lg:w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[50vh] h-full bg-white shadow-2xl flex flex-col rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none">
+    <div
+      className="w-[380px] max-lg:w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[50vh] h-full shadow-2xl flex flex-col rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none"
+      style={{ background: '#131a23', borderRight: '1px solid #1e2631' }}
+    >
       {/* Header — sticky */}
-      <div className="shrink-0 bg-white z-10 px-4 py-3 border-b border-slate-100 rounded-t-2xl lg:rounded-t-none lg:rounded-tr-none">
+      <div
+        className="shrink-0 z-10 px-4 py-3"
+        style={{ borderBottom: '1px solid #1e2631' }}
+      >
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-900">
+          <h2 className="text-sm font-bold" style={{ color: '#ffffff' }}>
             {state.results.length} results nearby
           </h2>
           {state.resultsLoading && (
-            <div className="w-4 h-4 border-2 border-[var(--tk-color-primary-500)] border-t-transparent rounded-full animate-spin" />
+            <div
+              className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"
+              style={{ borderColor: '#3D6AF2', borderTopColor: 'transparent' }}
+            />
           )}
         </div>
         {/* Mobile drag handle */}
         <div className="lg:hidden flex justify-center pt-1">
-          <div className="w-10 h-1 rounded-full bg-slate-300" />
+          <div className="w-10 h-1 rounded-full" style={{ background: '#1e2631' }} />
         </div>
       </div>
 
@@ -37,7 +46,10 @@ export function ResultsPanel({ onSuggest }: ResultsPanelProps) {
         {/* Community results */}
         {communityResults.length > 0 && (
           <div className="px-3 pt-3">
-            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-2 px-1">
+            <p
+              className="text-[10px] font-bold uppercase tracking-wider mb-2 px-1"
+              style={{ color: '#10B981', letterSpacing: '0.08em' }}
+            >
               Community Recommended 社区推荐
             </p>
             <div className="space-y-2">
@@ -62,7 +74,10 @@ export function ResultsPanel({ onSuggest }: ResultsPanelProps) {
         {googleResults.length > 0 && (
           <div className="px-3 pt-3 pb-3">
             {communityResults.length > 0 && (
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">
+              <p
+                className="text-[10px] font-bold uppercase tracking-wider mb-2 px-1"
+                style={{ color: '#70767f', letterSpacing: '0.08em' }}
+              >
                 Google Places
               </p>
             )}
@@ -86,10 +101,14 @@ export function ResultsPanel({ onSuggest }: ResultsPanelProps) {
       </div>
 
       {/* Suggest a provider — sticky footer */}
-      <div className="shrink-0 px-4 py-3 border-t border-slate-100 bg-white">
+      <div
+        className="shrink-0 px-4 py-3"
+        style={{ borderTop: '1px solid #1e2631', background: '#131a23' }}
+      >
         <button
           onClick={onSuggest}
-          className="w-full py-2 rounded-xl border-2 border-dashed border-slate-300 text-xs font-semibold text-slate-500 hover:border-[var(--tk-color-primary-500)] hover:text-[var(--tk-color-primary-500)] transition-colors"
+          className="w-full h-11 rounded-xl text-xs font-semibold transition-colors"
+          style={{ border: '2px dashed #1e2631', color: '#70767f' }}
         >
           + Suggest a local provider
         </button>

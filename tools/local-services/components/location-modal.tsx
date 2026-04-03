@@ -42,30 +42,22 @@ export function LocationModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0"
+        style={{ background: 'rgba(9,15,22,0.85)' }}
         onClick={handleClose}
         aria-hidden
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-        {/* Close button */}
-        <button
-          type="button"
-          onClick={handleClose}
-          className="absolute right-3 top-3 rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600:bg-white/10:text-gray-300"
-          aria-label="Close"
-        >
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path d="M6 18 18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        <h2 className="text-lg font-bold text-gray-900">
+      <div
+        className="relative w-full max-w-sm rounded-2xl p-6 z-10"
+        style={{ background: '#131a23', border: '1px solid #1e2631', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}
+      >
+        <h2 className="text-lg font-bold" style={{ color: '#ffffff' }}>
           {t.location.title}
         </h2>
 
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm" style={{ color: '#a6abb5' }}>
           GPS is used to detect your current location. Tap the button below to re-detect.
         </p>
 
@@ -74,7 +66,8 @@ export function LocationModal() {
           <button
             type="button"
             onClick={handleUseGps}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-600"
+            className="flex w-full items-center justify-center gap-2 rounded-xl h-12 text-sm font-semibold transition-colors"
+            style={{ background: '#3D6AF2', color: '#ffffff' }}
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -83,9 +76,18 @@ export function LocationModal() {
             {t.location.useGps}
           </button>
 
-          <p className="text-center text-xs text-gray-400">
+          <p className="text-center text-xs" style={{ color: '#70767f' }}>
             Address search will be available in a future update.
           </p>
+
+          <button
+            type="button"
+            onClick={handleClose}
+            className="w-full text-xs text-center py-2"
+            style={{ color: '#70767f' }}
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </div>
