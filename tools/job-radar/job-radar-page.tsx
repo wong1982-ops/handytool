@@ -23,11 +23,11 @@ function JobRadarContent() {
   return (
     <>
       {/* Tabs — sticky on mobile with solid bg */}
-      <div className="sticky top-0 z-40 -mx-4 px-4 py-2 bg-[#090f16] lg:static lg:mx-0 lg:px-0 lg:py-0 lg:bg-transparent lg:z-auto">
+      <div className="sticky top-0 z-40 -mx-4 px-4 py-2 bg-white dark:bg-[#090f16] lg:static lg:mx-0 lg:px-0 lg:py-0 lg:bg-transparent lg:z-auto">
       <div
         role="tablist"
         aria-label="Job categories"
-        className="flex gap-1 p-1 rounded-xl w-fit border border-[#1e2631] bg-[#131a23]"
+        className="flex gap-1 p-1 rounded-xl w-fit border border-slate-200 dark:border-[#1e2631] bg-slate-50 dark:bg-[#131a23]"
       >
         {TABS.map((tab) => (
           <button
@@ -38,8 +38,8 @@ function JobRadarContent() {
             onClick={() => switchTab(tab.value)}
             className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer min-h-[44px] ${
               activeCategory === tab.value
-                ? 'bg-[#090f16] text-white shadow-[0_1px_4px_rgba(0,0,0,0.4)]'
-                : 'text-[#70767f] hover:text-[#a6abb5]'
+                ? 'bg-white dark:bg-[#090f16] text-white shadow-[0_1px_4px_rgba(0,0,0,0.4)]'
+                : 'text-slate-400 dark:text-[#70767f] hover:text-slate-500 dark:hover:text-[#a6abb5]'
             }`}
           >
             {tab.label}
@@ -58,11 +58,11 @@ export function JobRadarPage() {
   return (
     <Suspense fallback={
       <div className="space-y-4">
-        <div className="h-11 w-64 rounded-xl bg-[#131a23] animate-pulse" />
-        <div className="h-12 rounded-xl bg-[#131a23] animate-pulse" />
+        <div className="h-11 w-64 rounded-xl bg-slate-50 dark:bg-[#131a23] animate-pulse" />
+        <div className="h-12 rounded-xl bg-slate-50 dark:bg-[#131a23] animate-pulse" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-36 rounded-xl bg-[#131a23] animate-pulse" />
+            <div key={i} className="h-36 rounded-xl bg-slate-50 dark:bg-[#131a23] animate-pulse" />
           ))}
         </div>
       </div>

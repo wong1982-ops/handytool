@@ -138,26 +138,26 @@ export default function LogoWizard() {
   return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Title */}
-      <h1 className="text-3xl sm:text-4xl font-extrabold text-white text-center mb-2 tracking-tight">
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white text-center mb-2 tracking-tight">
         Logo{' '}
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#32A9D9]">
           Generator
         </span>
       </h1>
-      <p className="text-sm text-[#a6abb5] text-center max-w-sm mx-auto mb-6">
+      <p className="text-sm text-slate-500 dark:text-[#a6abb5] text-center max-w-sm mx-auto mb-6">
         {activeTab === 'history' ? 'Your generated logos' : STEP_SUBTITLES[project.step]}
       </p>
 
       {/* Tab toggle */}
       <div className="flex justify-center mb-6">
-        <div className="bg-[#131a23] rounded-xl p-1 flex gap-1 w-full max-w-xs">
+        <div className="bg-slate-50 dark:bg-[#131a23] rounded-xl p-1 flex gap-1 w-full max-w-xs">
           <button
             type="button"
             onClick={() => setActiveTab('create')}
             className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-all cursor-pointer min-h-[44px] ${
               activeTab === 'create'
                 ? 'bg-[#3D6AF2] text-white shadow-lg'
-                : 'text-[#70767f] hover:text-white'
+                : 'text-slate-400 dark:text-[#70767f] hover:text-white'
             }`}
           >
             Create
@@ -168,7 +168,7 @@ export default function LogoWizard() {
             className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-all cursor-pointer min-h-[44px] ${
               activeTab === 'history'
                 ? 'bg-[#3D6AF2] text-white shadow-lg'
-                : 'text-[#70767f] hover:text-white'
+                : 'text-slate-400 dark:text-[#70767f] hover:text-white'
             }`}
           >
             My Logos
@@ -196,7 +196,7 @@ export default function LogoWizard() {
                         ? 'bg-[#3D6AF2] border-[#3D6AF2]'
                         : isCurrent
                         ? 'border-[#3D6AF2] bg-[#3D6AF2]/20 shadow-[0_0_15px_rgba(61,106,242,0.4)]'
-                        : 'border-[#1e2631] bg-transparent'
+                        : 'border-slate-200 dark:border-[#1e2631] bg-transparent'
                     }`}
                   >
                     {isCompleted ? (
@@ -212,7 +212,7 @@ export default function LogoWizard() {
                     ) : (
                       <span
                         className={`text-xs font-bold ${
-                          isCurrent ? 'text-[#3D6AF2]' : 'text-[#70767f]'
+                          isCurrent ? 'text-[#3D6AF2]' : 'text-slate-400 dark:text-[#70767f]'
                         }`}
                       >
                         {s}
@@ -221,7 +221,7 @@ export default function LogoWizard() {
                   </div>
                   <span
                     className={`mt-1.5 text-[11px] font-medium transition-colors ${
-                      isCompleted || isCurrent ? 'text-[#a6abb5]' : 'text-[#70767f]'
+                      isCompleted || isCurrent ? 'text-slate-500 dark:text-[#a6abb5]' : 'text-slate-400 dark:text-[#70767f]'
                     }`}
                   >
                     {STEP_LABELS[i]}
@@ -230,7 +230,7 @@ export default function LogoWizard() {
                 {i < STEPS.length - 1 && (
                   <div
                     className={`w-12 lg:w-20 h-0.5 mx-2 rounded-full transition-colors duration-300 ${
-                      s < project.step ? 'bg-[#3D6AF2]' : 'bg-[#1e2631]'
+                      s < project.step ? 'bg-[#3D6AF2]' : 'bg-slate-200 dark:bg-[#1e2631]'
                     }`}
                   />
                 )}
@@ -252,7 +252,7 @@ export default function LogoWizard() {
                       ? 'bg-[#3D6AF2] text-white'
                       : isCurrent
                       ? 'bg-[#3D6AF2]/15 text-[#3D6AF2] ring-1 ring-[#3D6AF2]/30'
-                      : 'bg-[#131a23] text-[#70767f]'
+                      : 'bg-slate-50 dark:bg-[#131a23] text-slate-400 dark:text-[#70767f]'
                   }`}
                 >
                   {isCompleted ? (
@@ -273,7 +273,7 @@ export default function LogoWizard() {
                 {i < STEPS.length - 1 && (
                   <div
                     className={`w-3 h-0.5 rounded-full ${
-                      s < project.step ? 'bg-[#3D6AF2]' : 'bg-[#1e2631]'
+                      s < project.step ? 'bg-[#3D6AF2]' : 'bg-slate-200 dark:bg-[#1e2631]'
                     }`}
                   />
                 )}

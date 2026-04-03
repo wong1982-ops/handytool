@@ -282,13 +282,13 @@ export function CropResizeEditor({ imageMeta, onConfirm, onSkip }: CropResizeEdi
         <div className="flex items-center gap-2">
           <button
             onClick={onSkip}
-            className="px-4 py-1.5 text-xs font-medium text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg transition-colors cursor-pointer min-h-[36px]"
+            className="px-4 py-1.5 text-xs font-medium text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg transition-colors cursor-pointer min-h-[44px]"
           >
             Skip
           </button>
           <button
             onClick={handleConfirm}
-            className="px-4 py-1.5 text-xs font-bold text-white bg-[var(--tk-color-secondary-500)] hover:bg-[var(--tk-color-secondary-500)]/80 rounded-lg transition-colors cursor-pointer min-h-[36px]"
+            className="px-4 py-1.5 text-xs font-bold text-white bg-[var(--tk-color-secondary-500)] hover:bg-[var(--tk-color-secondary-500)]/80 rounded-lg transition-colors cursor-pointer min-h-[44px]"
           >
             Continue to Vectorize
           </button>

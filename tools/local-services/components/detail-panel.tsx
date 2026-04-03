@@ -43,7 +43,7 @@ export function DetailPanel({ result, onBack }: DetailPanelProps) {
 
   return (
     <div
-      className="w-[380px] max-lg:w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[50vh] h-full shadow-2xl overflow-y-auto rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none"
+      className="w-[380px] max-w-[calc(100vw-2rem)] max-lg:w-full max-lg:max-w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[50vh] h-full shadow-2xl overflow-y-auto rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none"
       style={{ background: '#131a23', borderRight: '1px solid #1e2631' }}
     >
       {/* Back + close */}
@@ -53,7 +53,7 @@ export function DetailPanel({ result, onBack }: DetailPanelProps) {
       >
         <button
           onClick={onBack}
-          className="w-9 h-9 rounded-full flex items-center justify-center"
+          className="w-11 h-11 rounded-full flex items-center justify-center"
           style={{ background: '#1e2631' }}
         >
           <svg className="w-4 h-4" style={{ color: '#a6abb5' }} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">

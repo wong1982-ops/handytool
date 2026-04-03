@@ -25,14 +25,14 @@ export function DailyBonus() {
       ? Math.max(0, Math.ceil((24 * 60 * 60 * 1000 - (Date.now() - new Date(player.lastDailyClaimAt).getTime())) / 3600000))
       : 0
     return (
-      <div className="mx-4 my-3 px-4 py-3 rounded-xl bg-[#131a23] border border-[#1e2631] text-center">
-        <p className="text-sm text-[#70767f]">Next bonus in {hoursLeft}h</p>
+      <div className="mx-4 my-3 px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-center">
+        <p className="text-sm text-slate-400 dark:text-[#70767f]">Next bonus in {hoursLeft}h</p>
       </div>
     )
   }
 
   return (
-    <div className="mx-4 my-2.5 px-3.5 py-3 rounded-xl bg-[#131a23] border border-[#3D6AF2]/40">
+    <div className="mx-4 my-2.5 px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-[#131a23] border border-[#3D6AF2]/40">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-[13px] font-semibold text-[#f0d080]">
@@ -42,7 +42,7 @@ export function DailyBonus() {
         </div>
         <button
           onClick={handleClaim}
-          className="px-[18px] py-2 min-h-[36px] rounded-lg text-[13px] font-bold bg-[#10B981] text-white hover:bg-[#0d9668] transition-colors"
+          className="px-[18px] py-2 min-h-[44px] rounded-lg text-[13px] font-bold bg-[#10B981] text-white hover:bg-[#0d9668] transition-colors"
         >
           Claim!
         </button>

@@ -124,6 +124,18 @@ body {
   background-image: radial-gradient(circle, #1e293b 1px, transparent 1px);
 }
 
+/* --- Hide scrollbars inside mobile shell tab panels --- */
+.mobile-tab-panel,
+.mobile-tab-panel * {
+  scrollbar-width: none !important;
+}
+.mobile-tab-panel::-webkit-scrollbar,
+.mobile-tab-panel *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 /* --- Global thin themed scrollbars --- */
 
 // Firefox
@@ -211,6 +223,12 @@ body {
   0% { transform: translateY(-20px); opacity: 0.5; }
   60% { transform: translateY(4px); }
   100% { transform: translateY(0); opacity: 1; }
+}
+
+/* ToolFrame — hide global header/footer when a tool uses ToolFrame */
+body.tool-frame-active > header,
+body.tool-frame-active > footer {
+  display: none !important;
 }
 
 /* Local Services — compact detail slide */

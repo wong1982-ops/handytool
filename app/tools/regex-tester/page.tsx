@@ -105,15 +105,15 @@ export default function RegexTesterPage() {
   }, [])
 
   return (
-    <main className="flex-1 flex flex-col items-center py-10 px-4 bg-[#090f16] min-h-screen">
+    <main className="flex-1 flex flex-col items-center py-10 px-4 bg-white dark:bg-[#090f16] min-h-screen">
       <div className="w-full max-w-[1200px] flex flex-col gap-6">
         <ToolBreadcrumb toolName="Regex Tester" toolSlug="regex-tester" />
 
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
             Regex Tester
           </h1>
-          <p className="text-sm text-[#a6abb5]">
+          <p className="text-sm text-slate-500 dark:text-[#a6abb5]">
             Test, match, and replace with regular expressions — 100% client-side with 30+ preset patterns.
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function RegexTesterPage() {
         <div className="lg:hidden">
           <button
             onClick={() => setDrawerOpen(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-[#1e2631] bg-[#131a23] text-sm font-medium text-[#a6abb5] hover:bg-[#1e2631] transition-colors cursor-pointer min-h-[44px]"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 dark:border-[#1e2631] bg-slate-50 dark:bg-[#131a23] text-sm font-medium text-slate-500 dark:text-[#a6abb5] hover:bg-slate-200 dark:hover:bg-[#1e2631] transition-colors cursor-pointer min-h-[44px]"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -178,7 +178,7 @@ export default function RegexTesterPage() {
             />
 
             {/* Status bar */}
-            <div className="flex flex-wrap items-center gap-3 px-3 py-2 rounded-lg bg-[#131a23] text-xs text-[#70767f] font-mono">
+            <div className="flex flex-wrap items-center gap-3 px-3 py-2 rounded-lg bg-slate-50 dark:bg-[#131a23] text-xs text-slate-400 dark:text-[#70767f] font-mono">
               <span>{matchCount} match{matchCount !== 1 ? 'es' : ''}</span>
               <span className="text-[#1e2631]" aria-hidden="true">|</span>
               <span>{groupCount} group{groupCount !== 1 ? 's' : ''}</span>

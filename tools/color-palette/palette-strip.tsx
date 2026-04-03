@@ -59,14 +59,14 @@ export function PaletteStrip({
                 className={`h-16 w-full rounded-xl transition-all cursor-pointer border-2 ${
                   isExpanded
                     ? 'border-[#3D6AF2] ring-2 ring-[#3D6AF2]/40'
-                    : 'border-transparent hover:border-[#1e2631]'
+                    : 'border-transparent hover:border-slate-200 dark:hover:border-[#1e2631]'
                 }`}
                 style={{ backgroundColor: pc.hex }}
               />
 
               {/* Hex label */}
               <span
-                className="text-xs font-mono text-center truncate text-[#a6abb5]"
+                className="text-xs font-mono text-center truncate text-slate-500 dark:text-[#a6abb5]"
                 title={pc.hex}
               >
                 {pc.hex}
@@ -80,7 +80,7 @@ export function PaletteStrip({
                   onClick={() => handleCopyHex(pc.hex, i)}
                   aria-label={copiedIndex === i ? 'Copied' : `Copy ${pc.hex}`}
                   title={copiedIndex === i ? 'Copied!' : 'Copy hex'}
-                  className={`p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-[#1e2631] transition-colors cursor-pointer ${copiedIndex === i ? 'text-[#10B981]' : 'text-[#70767f]'}`}
+                  className={`p-1.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-[#1e2631] transition-colors cursor-pointer ${copiedIndex === i ? 'text-[#10B981]' : 'text-slate-400 dark:text-[#70767f]'}`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {copiedIndex === i ? (
@@ -97,7 +97,7 @@ export function PaletteStrip({
                   onClick={() => onToggleLock(i)}
                   aria-label={pc.locked ? `Unlock ${pc.name}` : `Lock ${pc.name}`}
                   title={pc.locked ? 'Locked' : 'Lock'}
-                  className={`p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-[#1e2631] transition-colors cursor-pointer ${pc.locked ? 'text-[#3D6AF2]' : 'text-[#70767f]'}`}
+                  className={`p-1.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-[#1e2631] transition-colors cursor-pointer ${pc.locked ? 'text-[#3D6AF2]' : 'text-slate-400 dark:text-[#70767f]'}`}
                 >
                   <svg className="w-4 h-4" fill={pc.locked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                     {pc.locked ? (
@@ -114,7 +114,7 @@ export function PaletteStrip({
                   onClick={() => onExpandToggle(i)}
                   aria-label={isExpanded ? `Collapse ${pc.name} scale` : `Expand ${pc.name} scale`}
                   title={isExpanded ? 'Collapse' : 'Expand tints/shades'}
-                  className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-[#1e2631] transition-colors cursor-pointer text-[#70767f]"
+                  className="p-1.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-[#1e2631] transition-colors cursor-pointer text-slate-400 dark:text-[#70767f]"
                 >
                   <svg
                     className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
@@ -145,7 +145,7 @@ export function PaletteStrip({
           onClick={onShuffle}
           aria-label="Shuffle unlocked colors"
           title="Shuffle"
-          className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-xl border border-[#1e2631] hover:bg-[#1e2631] transition-colors cursor-pointer self-start text-[#70767f] hover:text-[#a6abb5]"
+          className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-xl border border-slate-200 dark:border-[#1e2631] hover:bg-slate-200 dark:hover:bg-[#1e2631] transition-colors cursor-pointer self-start text-slate-400 dark:text-[#70767f] hover:text-slate-500 dark:hover:text-[#a6abb5]"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -172,7 +172,7 @@ export function PaletteStrip({
                   className="flex flex-col items-center gap-1 cursor-pointer group"
                 >
                   <div
-                    className="w-12 h-12 rounded-lg border border-[#1e2631] transition-transform group-hover:scale-110 flex items-center justify-center"
+                    className="w-12 h-12 rounded-lg border border-slate-200 dark:border-[#1e2631] transition-transform group-hover:scale-110 flex items-center justify-center"
                     style={{ backgroundColor: step.hex }}
                   >
                     {isCopied && (
@@ -181,10 +181,10 @@ export function PaletteStrip({
                       </svg>
                     )}
                   </div>
-                  <span className="text-[10px] font-semibold text-[#70767f]">
+                  <span className="text-[10px] font-semibold text-slate-400 dark:text-[#70767f]">
                     {step.step}
                   </span>
-                  <span className="text-[10px] font-mono text-[#70767f] opacity-75">
+                  <span className="text-[10px] font-mono text-slate-400 dark:text-[#70767f] opacity-75">
                     {step.hex}
                   </span>
                 </button>

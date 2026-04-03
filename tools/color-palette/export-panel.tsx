@@ -149,7 +149,7 @@ export function ExportPanel({ colors }: ExportPanelProps) {
   const isTextFormat = format === 'CSS' || format === 'Tailwind' || format === 'SCSS' || format === 'JSON'
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-[#1e2631] bg-[#131a23] p-4">
+    <div className="flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-[#1e2631] bg-slate-50 dark:bg-[#131a23] p-4">
       <h3 className="text-sm font-semibold text-white">Export</h3>
 
       {/* Format pills */}
@@ -162,7 +162,7 @@ export function ExportPanel({ colors }: ExportPanelProps) {
             className={`px-3 py-2 min-h-[44px] rounded-full text-sm font-medium transition-colors cursor-pointer ${
               format === f
                 ? 'bg-[#3D6AF2] text-white'
-                : 'bg-[#1e2631] text-white hover:bg-[#1e2631]/80'
+                : 'bg-slate-200 dark:bg-[#1e2631] text-white hover:bg-slate-200 dark:hover:bg-[#1e2631]/80'
             }`}
           >
             {f}
@@ -173,13 +173,13 @@ export function ExportPanel({ colors }: ExportPanelProps) {
       {/* Text formats: code block + copy */}
       {isTextFormat && (
         <div className="relative">
-          <pre className="max-h-[300px] overflow-y-auto rounded-lg bg-[#090f16] border border-[#1e2631] p-3 text-xs font-mono text-white">
+          <pre className="max-h-[300px] overflow-y-auto rounded-lg bg-white dark:bg-[#090f16] border border-slate-200 dark:border-[#1e2631] p-3 text-xs font-mono text-white">
             <code>{getTextOutput()}</code>
           </pre>
           <button
             type="button"
             onClick={handleCopy}
-            className="absolute top-2 right-2 px-3 py-1.5 min-h-[36px] rounded-lg bg-[#1e2631] text-xs font-medium text-white hover:bg-[#1e2631]/80 transition-colors cursor-pointer"
+            className="absolute top-2 right-2 px-3 py-1.5 min-h-[36px] rounded-lg bg-slate-200 dark:bg-[#1e2631] text-xs font-medium text-white hover:bg-slate-200 dark:hover:bg-[#1e2631]/80 transition-colors cursor-pointer"
           >
             {copied ? 'Copied!' : 'Copy'}
           </button>
@@ -213,7 +213,7 @@ export function ExportPanel({ colors }: ExportPanelProps) {
             </svg>
             Download palette.png
           </button>
-          <p className="text-xs text-[#70767f] text-center">
+          <p className="text-xs text-slate-400 dark:text-[#70767f] text-center">
             1200 x 630 — optimized for social sharing
           </p>
           <canvas ref={canvasRef} className="hidden" />

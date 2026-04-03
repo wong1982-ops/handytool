@@ -59,7 +59,7 @@ export function StoryList({
             value={search}
             onChange={e => onSearchChange(e.target.value)}
             placeholder="Search stories..."
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
+            className="w-full pl-9 pr-3 py-2 min-h-[44px] rounded-lg border border-slate-300 dark:border-slate-600
               bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white
               focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
           />
@@ -69,7 +69,7 @@ export function StoryList({
         <select
           value={sortBy}
           onChange={e => onSortChange(e.target.value as SortOption)}
-          className="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
+          className="px-3 py-2 min-h-[44px] rounded-lg border border-slate-300 dark:border-slate-600
             bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white
             focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
         >
@@ -84,7 +84,7 @@ export function StoryList({
           <select
             value={filterSeries ?? ''}
             onChange={e => onFilterSeriesChange(e.target.value || null)}
-            className="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
+            className="px-3 py-2 min-h-[44px] rounded-lg border border-slate-300 dark:border-slate-600
               bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white
               focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
           >

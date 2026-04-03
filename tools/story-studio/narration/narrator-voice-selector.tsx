@@ -69,7 +69,7 @@ export function NarratorVoiceSelector({ selectedVoice, onSelect }: NarratorVoice
               <button
                 onClick={() => onSelect(voice.name)}
                 className="text-sm font-medium cursor-pointer"
-                style={{ minHeight: '36px' }}
+                style={{ minHeight: '44px' }}
               >
                 <span className={isSelected ? 'text-[#3D6AF2] dark:text-[#93aaff]' : 'text-slate-700 dark:text-slate-300'}>
                   {voice.name}

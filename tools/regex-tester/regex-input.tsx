@@ -24,14 +24,14 @@ export function RegexInput({ value, onChange, flags, onFlagsChange, error }: Reg
   return (
     <div>
       <div
-        className={`flex items-center rounded-xl border bg-[#131a23] transition-colors min-h-[52px] ${
+        className={`flex items-center rounded-xl border bg-slate-50 dark:bg-[#131a23] transition-colors min-h-[52px] ${
           hasError
             ? 'border-[#EF4444] ring-2 ring-[rgba(239,68,68,0.3)]'
-            : 'border-[#1e2631] focus-within:border-[#3D6AF2] focus-within:ring-2 focus-within:ring-[rgba(61,106,242,0.3)]'
+            : 'border-slate-200 dark:border-[#1e2631] focus-within:border-[#3D6AF2] focus-within:ring-2 focus-within:ring-[rgba(61,106,242,0.3)]'
         }`}
       >
         {/* Leading slash */}
-        <span className="pl-4 pr-1 text-[#70767f] font-mono text-lg select-none" aria-hidden="true">
+        <span className="pl-4 pr-1 text-slate-400 dark:text-[#70767f] font-mono text-lg select-none" aria-hidden="true">
           /
         </span>
 
@@ -53,12 +53,12 @@ export function RegexInput({ value, onChange, flags, onFlagsChange, error }: Reg
         />
 
         {/* Trailing slash */}
-        <span className="pr-1 text-[#70767f] font-mono text-lg select-none" aria-hidden="true">
+        <span className="pr-1 text-slate-400 dark:text-[#70767f] font-mono text-lg select-none" aria-hidden="true">
           /
         </span>
 
         {/* Flag toggles */}
-        <div className="flex items-center border-l border-[#1e2631] pl-1 pr-2 gap-0.5 min-h-[52px]">
+        <div className="flex items-center border-l border-slate-200 dark:border-[#1e2631] pl-1 pr-2 gap-0.5 min-h-[52px]">
           {FLAG_OPTIONS.map((flag) => {
             const active = flags.includes(flag)
             return (
@@ -68,7 +68,7 @@ export function RegexInput({ value, onChange, flags, onFlagsChange, error }: Reg
                 className={`w-8 h-8 rounded-md text-xs font-mono font-bold transition-colors cursor-pointer flex items-center justify-center ${
                   active
                     ? 'bg-[#3D6AF2] text-white'
-                    : 'text-[#70767f] hover:bg-[#1e2631] hover:text-[#a6abb5]'
+                    : 'text-slate-400 dark:text-[#70767f] hover:bg-slate-200 dark:hover:bg-[#1e2631] hover:text-slate-500 dark:hover:text-[#a6abb5]'
                 }`}
                 aria-label={`Toggle ${flag} flag`}
                 aria-pressed={active}

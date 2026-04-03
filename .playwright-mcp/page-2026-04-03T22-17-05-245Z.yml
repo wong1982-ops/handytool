@@ -1,0 +1,90 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Toolk1t" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Toolk1t" [ref=e5]
+      - generic [ref=e6]:
+        - switch "Switch to light mode" [checked] [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+          - img [ref=e10]
+        - button "Open menu" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+  - generic [ref=e16]:
+    - generic [ref=e22]:
+      - link "Home" [ref=e23] [cursor=pointer]:
+        - /url: /
+        - img [ref=e24]
+      - img [ref=e27]
+      - heading "Flight Monitor" [level=1] [ref=e30]
+    - navigation "Flight Monitor navigation" [ref=e32]:
+      - generic [ref=e33]:
+        - button "Search" [ref=e34] [cursor=pointer]:
+          - img [ref=e35]
+          - text: Search
+        - button "My Alerts" [ref=e37] [cursor=pointer]:
+          - img [ref=e38]
+          - text: My Alerts
+        - button "Deals" [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+          - text: Deals
+    - main [ref=e44]:
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - button "One Way" [ref=e47]
+          - button "Return" [ref=e48]
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - generic [ref=e51]: From
+            - generic [ref=e52]:
+              - img [ref=e54]
+              - textbox "From" [ref=e56]:
+                - /placeholder: City or airport
+          - button "Swap origin and destination" [ref=e58] [cursor=pointer]:
+            - img [ref=e59]
+          - generic [ref=e61]:
+            - generic [ref=e62]: To
+            - generic [ref=e63]:
+              - img [ref=e65]
+              - textbox "To" [ref=e68]:
+                - /placeholder: City or airport
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - generic [ref=e71]: Departure
+            - generic [ref=e72]:
+              - img [ref=e74]
+              - textbox "Departure date" [ref=e76]
+          - generic [ref=e77]:
+            - generic [ref=e78]: Passengers
+            - generic [ref=e79]:
+              - img [ref=e81]
+              - spinbutton "Number of passengers" [ref=e83]: "1"
+          - button "Search Flights" [disabled] [ref=e84]:
+            - generic [ref=e85]:
+              - img [ref=e86]
+              - text: Search Flights
+      - generic [ref=e89]:
+        - img [ref=e90]
+        - paragraph [ref=e92]: No flights found for this route.
+        - paragraph [ref=e93]: Try different dates or airports.
+  - contentinfo [ref=e94]:
+    - generic [ref=e95]:
+      - generic [ref=e96]:
+        - img [ref=e97]
+        - generic [ref=e99]: © 2026 Toolk1t
+      - generic [ref=e100]:
+        - link "Blog" [ref=e101] [cursor=pointer]:
+          - /url: /blog
+        - link "Pricing" [ref=e102] [cursor=pointer]:
+          - /url: /pricing
+        - link "Terms of Service" [ref=e103] [cursor=pointer]:
+          - /url: /terms
+        - link "Privacy Policy" [ref=e104] [cursor=pointer]:
+          - /url: /privacy
+        - link "Contact Support" [ref=e105] [cursor=pointer]:
+          - /url: /contact
+        - link "Shielded Site" [ref=e106] [cursor=pointer]:
+          - /url: "#"
+          - img "Shielded Site" [ref=e107]
+  - button "Open Next.js Dev Tools" [ref=e113] [cursor=pointer]:
+    - img [ref=e114]

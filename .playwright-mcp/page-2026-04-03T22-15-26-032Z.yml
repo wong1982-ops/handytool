@@ -1,0 +1,243 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Toolk1t" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Toolk1t" [ref=e5]
+      - generic [ref=e6]:
+        - switch "Switch to light mode" [checked] [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+          - img [ref=e10]
+        - button "Open menu" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+  - generic [ref=e16]:
+    - generic [ref=e17]:
+      - navigation "Breadcrumb" [ref=e18]:
+        - button "Back to Home" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+          - text: Home
+        - button "Add ECard Studio to favorites" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+      - generic [ref=e25]:
+        - button "Toggle template gallery" [ref=e26]:
+          - img [ref=e27]
+        - button "Open editor panel" [ref=e32]:
+          - img [ref=e33]
+          - text: Edit
+        - button "Preview" [ref=e36]
+        - button [ref=e37]:
+          - img [ref=e38]
+    - generic [ref=e42]:
+      - generic [ref=e47]:
+        - heading "Your Name" [level=2] [ref=e48]
+        - paragraph [ref=e49]: Chief Executive Officer
+        - paragraph [ref=e50]: Leading innovation with vision and purpose.
+        - paragraph [ref=e52]: Acme Corporation
+        - paragraph [ref=e53]: Excellence in every detail
+      - generic [ref=e56]:
+        - button "Undo" [disabled] [ref=e57]:
+          - img [ref=e58]
+        - button "Redo" [disabled] [ref=e61]:
+          - img [ref=e62]
+        - button "Zoom out" [ref=e66]:
+          - img [ref=e67]
+        - generic [ref=e68]: 100%
+        - button "Zoom in" [ref=e69]:
+          - img [ref=e70]
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - img [ref=e75]
+          - generic [ref=e77]: Similar templates you might like
+          - button "Dismiss recommendation" [ref=e78]:
+            - img [ref=e79]
+        - generic [ref=e81]:
+          - button "Midnight Pinstripe" [ref=e82] [cursor=pointer]:
+            - generic [ref=e84]: Midnight Pinstripe
+          - button "Tech Blueprint" [ref=e85] [cursor=pointer]:
+            - generic [ref=e87]: Tech Blueprint
+          - button "Aura Signature" [ref=e88] [cursor=pointer]:
+            - generic [ref=e90]: Aura Signature
+  - generic [ref=e91]:
+    - banner [ref=e92]:
+      - link "Toolk1t" [ref=e93] [cursor=pointer]:
+        - /url: /
+        - img "Toolk1t" [ref=e94]
+      - generic [ref=e95]:
+        - button "Search tools" [ref=e96] [cursor=pointer]:
+          - img [ref=e97]
+        - button "Switch to light mode" [ref=e99] [cursor=pointer]:
+          - img [ref=e100]
+    - generic [ref=e103]:
+      - generic [ref=e108]:
+        - generic [ref=e109]:
+          - navigation "Breadcrumb" [ref=e110]:
+            - button "Back to Home" [ref=e111] [cursor=pointer]:
+              - img [ref=e112]
+              - text: Home
+            - button "Add ECard Studio to favorites" [ref=e114] [cursor=pointer]:
+              - img [ref=e115]
+          - generic [ref=e117]:
+            - button "Toggle template gallery" [ref=e118]:
+              - img [ref=e119]
+            - button "Open editor panel" [ref=e124]:
+              - img [ref=e125]
+              - text: Edit
+            - button "Preview" [ref=e128]
+            - button [ref=e129]:
+              - img [ref=e130]
+        - generic [ref=e133]:
+          - generic:
+            - generic [ref=e137]:
+              - heading "Your Name" [level=2] [ref=e138]
+              - paragraph [ref=e139]: Chief Executive Officer
+              - paragraph [ref=e140]: Leading innovation with vision and purpose.
+              - paragraph [ref=e142]: Acme Corporation
+              - paragraph [ref=e143]: Excellence in every detail
+            - generic [ref=e146]:
+              - button "Undo" [disabled] [ref=e147]:
+                - img [ref=e148]
+              - button "Redo" [disabled] [ref=e151]:
+                - img [ref=e152]
+              - button "Zoom out" [ref=e156]:
+                - img [ref=e157]
+              - generic [ref=e158]: 30%
+              - button "Zoom in" [ref=e159]:
+                - img [ref=e160]
+            - generic [ref=e163]:
+              - generic [ref=e164]:
+                - img [ref=e165]
+                - generic [ref=e167]: Similar templates you might like
+                - button "Dismiss recommendation" [ref=e168]:
+                  - img [ref=e169]
+              - generic [ref=e171]:
+                - button "Midnight Pinstripe" [ref=e172] [cursor=pointer]:
+                  - generic [ref=e174]: Midnight Pinstripe
+                - button "Tech Blueprint" [ref=e175] [cursor=pointer]:
+                  - generic [ref=e177]: Tech Blueprint
+                - button "Aura Signature" [ref=e178] [cursor=pointer]:
+                  - generic [ref=e180]: Aura Signature
+      - generic [ref=e183]:
+        - generic [ref=e184]: ⭐
+        - heading "No Favorites Yet" [level=2] [ref=e185]
+        - paragraph [ref=e186]: Star your most-used tools for quick access. Tap the star on any tool card.
+      - generic [ref=e190]:
+        - generic [ref=e191]:
+          - heading "Credits" [level=2] [ref=e192]
+          - generic [ref=e193]:
+            - generic [ref=e194]:
+              - generic [ref=e195]: Subscription
+              - generic [ref=e196]: ...
+            - generic [ref=e197]:
+              - generic [ref=e198]:
+                - text: Purchased
+                - paragraph [ref=e199]: Never expires
+              - generic [ref=e200]: ...
+            - generic [ref=e201]:
+              - generic [ref=e202]: Total Available
+              - generic [ref=e203]: ...
+          - generic [ref=e204]:
+            - button "Buy Credit Packs One-time purchases" [ref=e205] [cursor=pointer]:
+              - img [ref=e207]
+              - generic [ref=e209]:
+                - paragraph [ref=e210]: Buy Credit Packs
+                - paragraph [ref=e211]: One-time purchases
+              - img [ref=e212]
+            - button "Transaction History No transactions yet" [ref=e214] [cursor=pointer]:
+              - img [ref=e216]
+              - generic [ref=e218]:
+                - paragraph [ref=e219]: Transaction History
+                - paragraph [ref=e220]: No transactions yet
+              - img [ref=e221]
+        - button "Credits" [ref=e225] [cursor=pointer]:
+          - img [ref=e226]
+          - text: Credits
+      - generic [ref=e232]:
+        - generic [ref=e233]:
+          - heading "Settings" [level=2] [ref=e234]
+          - generic [ref=e235]:
+            - generic [ref=e236]: L
+            - generic [ref=e237]:
+              - paragraph [ref=e238]: Local Dev User
+              - paragraph [ref=e239]: loicwong1982@gmail.com
+            - button "Sign Out" [ref=e240] [cursor=pointer]
+          - generic [ref=e241]:
+            - generic [ref=e242]: Dark Mode
+            - switch "Toggle dark mode" [checked] [ref=e243] [cursor=pointer]
+          - generic [ref=e245]:
+            - button "Blog" [ref=e246] [cursor=pointer]:
+              - img [ref=e248]
+              - generic [ref=e250]: Blog
+              - img [ref=e251]
+            - button "Terms of Service" [ref=e253] [cursor=pointer]:
+              - img [ref=e255]
+              - generic [ref=e257]: Terms of Service
+              - img [ref=e258]
+            - button "Privacy Policy" [ref=e260] [cursor=pointer]:
+              - img [ref=e262]
+              - generic [ref=e264]: Privacy Policy
+              - img [ref=e265]
+            - button "Contact Support" [ref=e267] [cursor=pointer]:
+              - img [ref=e269]
+              - generic [ref=e271]: Contact Support
+              - img [ref=e272]
+        - button "Settings" [ref=e276] [cursor=pointer]:
+          - img [ref=e277]
+          - text: Settings
+    - navigation [ref=e280]:
+      - generic [ref=e281]:
+        - button "Home" [ref=e282] [cursor=pointer]:
+          - img [ref=e283]
+          - generic [ref=e285]: Home
+        - button "Favorites" [ref=e286] [cursor=pointer]:
+          - img [ref=e287]
+        - button "Credits" [ref=e289] [cursor=pointer]:
+          - img [ref=e290]
+        - button "Profile" [ref=e292] [cursor=pointer]:
+          - generic [ref=e294]: L
+  - button "Open Next.js Dev Tools" [ref=e300] [cursor=pointer]:
+    - img [ref=e301]
+  - alert [ref=e304]
+  - dialog "Pricing" [ref=e305]:
+    - generic [ref=e306]:
+      - generic [ref=e307]:
+        - heading "Pricing" [level=2] [ref=e308]
+        - paragraph [ref=e309]: Buy credit packs
+      - button "Close pricing" [ref=e310] [cursor=pointer]:
+        - img [ref=e311]
+    - generic [ref=e313]:
+      - generic [ref=e314]:
+        - generic [ref=e315]:
+          - paragraph [ref=e316]: Subscription
+          - paragraph [ref=e317]: ...
+        - generic [ref=e318]:
+          - paragraph [ref=e319]: Purchased
+          - paragraph [ref=e320]: ...
+        - generic [ref=e321]:
+          - paragraph [ref=e322]: Total
+          - paragraph [ref=e323]: ...
+      - generic [ref=e324]:
+        - heading "Credit Packs" [level=3] [ref=e325]
+        - generic [ref=e326]:
+          - generic [ref=e327]:
+            - generic [ref=e328]:
+              - img [ref=e330]
+              - generic [ref=e332]:
+                - paragraph [ref=e333]: 800 Credits
+                - paragraph [ref=e334]: $5.00 · $0.6/credit
+            - button "Buy" [ref=e335] [cursor=pointer]
+          - generic [ref=e336]:
+            - generic [ref=e337]:
+              - img [ref=e339]
+              - generic [ref=e341]:
+                - paragraph [ref=e342]: 3,550 Credits
+                - paragraph [ref=e343]: $20.00 · $0.6/credit
+            - button "Buy" [ref=e344] [cursor=pointer]
+          - generic [ref=e345]:
+            - generic [ref=e346]:
+              - img [ref=e348]
+              - generic [ref=e350]:
+                - paragraph [ref=e351]: 10,000 Credits
+                - paragraph [ref=e352]: $50.00 · $0.5/credit
+            - button "Buy" [ref=e353] [cursor=pointer]
+      - link "View Transaction History" [ref=e354] [cursor=pointer]:
+        - /url: /billing

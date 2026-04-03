@@ -362,14 +362,14 @@ export default function TaxDashboard() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-white">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
           NZ Tax{' '}
           <span className="bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] bg-clip-text text-transparent">
             Manager
           </span>
         </h1>
         <div className="flex items-center justify-center py-20">
-          <div className="text-[#a6abb5] text-sm">Loading...</div>
+          <div className="text-slate-500 dark:text-[#a6abb5] text-sm">Loading...</div>
         </div>
       </div>
     )
@@ -380,7 +380,7 @@ export default function TaxDashboard() {
   return (
     <div className="space-y-6">
       {/* ── Title ────────────────────────────────────────────────────── */}
-      <h1 className="text-2xl sm:text-3xl font-bold text-white">
+      <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
         NZ Tax{' '}
         <span className="bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] bg-clip-text text-transparent">
           Manager
@@ -394,7 +394,7 @@ export default function TaxDashboard() {
             value={selectedEntityId ?? ''}
             onChange={(e) => setSelectedEntityId(e.target.value)}
             aria-label="Select entity"
-            className="flex-1 min-w-0 rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-sm px-4 py-3 focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer min-h-[44px]"
+            className="flex-1 min-w-0 rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white text-sm px-4 py-3 focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer min-h-[44px]"
           >
             {entities.map((e) => (
               <option key={e.id} value={e.id}>
@@ -407,7 +407,7 @@ export default function TaxDashboard() {
             value={taxYear}
             onChange={(e) => setTaxYear(e.target.value)}
             aria-label="Select tax year"
-            className="rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-sm px-4 py-3 focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer min-h-[44px]"
+            className="rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white text-sm px-4 py-3 focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer min-h-[44px]"
           >
             {taxYearOptions.map((yr) => (
               <option key={yr} value={yr}>
@@ -420,7 +420,7 @@ export default function TaxDashboard() {
             type="button"
             onClick={() => setShowSettings(true)}
             aria-label="Open settings"
-            className="rounded-xl border border-[#1e2631] text-[#a6abb5] hover:text-white hover:border-[#3D6AF2] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+            className="rounded-xl border border-slate-200 dark:border-[#1e2631] text-slate-500 dark:text-[#a6abb5] hover:text-white hover:border-[#3D6AF2] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -450,7 +450,7 @@ export default function TaxDashboard() {
               className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer min-h-[44px] ${
                 activeTab === tab.id
                   ? 'bg-[#3D6AF2] text-white'
-                  : 'bg-[#131a23] text-[#70767f] hover:text-white hover:bg-[#1e2631]'
+                  : 'bg-slate-50 dark:bg-[#131a23] text-slate-400 dark:text-[#70767f] hover:text-white hover:bg-slate-200 dark:hover:bg-[#1e2631]'
               }`}
             >
               {TAB_ICONS[tab.id]}

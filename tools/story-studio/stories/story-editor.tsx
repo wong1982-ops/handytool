@@ -1055,7 +1055,7 @@ export function StoryEditor({ bookId, title, coverImageUrl: initialCoverUrl, art
             disabled={!dirty || saving}
             className="px-3 py-1.5 text-sm font-medium text-white bg-[#3D6AF2] hover:bg-[#3560d8]
               disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors cursor-pointer"
-            style={{ minHeight: '36px' }}
+            style={{ minHeight: '44px' }}
           >
             Save
           </button>

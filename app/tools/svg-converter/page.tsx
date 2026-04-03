@@ -259,7 +259,7 @@ export default function SvgConverterPage() {
           {imageMeta && (
             <button
               onClick={handleNewFile}
-              className="p-2 hover:bg-slate-800 rounded transition-colors text-slate-400 cursor-pointer"
+              className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-800 rounded transition-colors text-slate-400 cursor-pointer"
               title="New file (N)"
               aria-label="New file"
             >
@@ -278,7 +278,7 @@ export default function SvgConverterPage() {
           {editorPhase === 'vectorize' && imageMeta && (
             <button
               onClick={handleBackToCrop}
-              className="p-2 hover:bg-slate-800 rounded transition-colors text-slate-400 cursor-pointer"
+              className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-800 rounded transition-colors text-slate-400 cursor-pointer"
               title="Back to crop/resize"
               aria-label="Back to crop/resize"
             >
@@ -293,7 +293,7 @@ export default function SvgConverterPage() {
             <button
               onClick={reprocess}
               disabled={conversionState === 'processing'}
-              className="p-2 hover:bg-slate-800 rounded transition-colors text-slate-400 cursor-pointer disabled:opacity-40"
+              className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-800 rounded transition-colors text-slate-400 cursor-pointer disabled:opacity-40"
               title="Reprocess"
               aria-label="Reprocess"
             >
@@ -312,7 +312,7 @@ export default function SvgConverterPage() {
           {editorPhase === 'vectorize' && (
             <button
               onClick={() => setShowMobileSettings(!showMobileSettings)}
-              className="lg:hidden p-2 hover:bg-slate-800 rounded transition-colors text-slate-400 cursor-pointer"
+              className="lg:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-800 rounded transition-colors text-slate-400 cursor-pointer"
               aria-label="Toggle settings panel"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -410,12 +410,12 @@ export default function SvgConverterPage() {
               className="fixed inset-0 bg-black/40 z-30 lg:hidden"
               onClick={() => setShowMobileSettings(false)}
             />
-            <div className="fixed right-0 top-0 bottom-0 w-80 bg-[#1a2333] z-40 lg:hidden shadow-2xl overflow-y-auto flex flex-col">
+            <div className="fixed right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-[#1a2333] z-40 lg:hidden shadow-2xl overflow-y-auto flex flex-col">
               <div className="p-3 border-b border-slate-700 flex items-center justify-between shrink-0">
                 <span className="font-bold text-sm text-white">Settings</span>
                 <button
                   onClick={() => setShowMobileSettings(false)}
-                  className="p-1 hover:bg-slate-800 rounded cursor-pointer"
+                  className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-800 rounded cursor-pointer"
                   aria-label="Close settings"
                 >
                   <svg

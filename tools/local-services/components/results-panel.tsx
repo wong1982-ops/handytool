@@ -16,7 +16,7 @@ export function ResultsPanel({ onSuggest }: ResultsPanelProps) {
 
   return (
     <div
-      className="w-[380px] max-lg:w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[50vh] h-full shadow-2xl flex flex-col rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none"
+      className="w-[380px] max-w-[calc(100vw-2rem)] max-lg:w-full max-lg:max-w-full max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:max-h-[50vh] h-full shadow-2xl flex flex-col rounded-r-2xl max-lg:rounded-t-2xl max-lg:rounded-r-none"
       style={{ background: '#131a23', borderRight: '1px solid #1e2631' }}
     >
       {/* Header — sticky */}

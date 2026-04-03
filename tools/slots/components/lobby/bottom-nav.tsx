@@ -22,7 +22,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="flex items-center bg-[#131a23]/96 backdrop-blur-2xl border-t border-[#3D6AF2]/20 shrink-0" role="tablist" aria-label="Casino navigation">
+    <nav className="flex items-center bg-slate-50 dark:bg-[#131a23]/96 backdrop-blur-2xl border-t border-[#3D6AF2]/20 shrink-0" role="tablist" aria-label="Casino navigation">
       {TABS.map(({ id, icon }) => (
         <button
           key={id}
@@ -42,7 +42,7 @@ export function BottomNav() {
           <span className={`text-[10px] ${
             activeTab === id
               ? 'text-[#f0d080] font-semibold'
-              : 'text-[#70767f] font-medium'
+              : 'text-slate-400 dark:text-[#70767f] font-medium'
           }`}>{tabLabels[id]}</span>
         </button>
       ))}

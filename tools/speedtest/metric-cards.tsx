@@ -21,7 +21,7 @@ export function MetricCards({ download, upload, latency }: MetricCardsProps) {
           <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Download</h3>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-4xl md:text-3xl font-bold tabular-nums text-slate-900 dark:text-white">{download.speed.toFixed(1)}</span>
+          <span className="text-3xl md:text-4xl font-bold tabular-nums text-slate-900 dark:text-white">{download.speed.toFixed(1)}</span>
           <span className="text-lg text-slate-400">Mbps</span>
         </div>
         <div className="mt-4 h-1 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
@@ -49,7 +49,7 @@ export function MetricCards({ download, upload, latency }: MetricCardsProps) {
           <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Upload</h3>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-4xl md:text-3xl font-bold tabular-nums text-slate-900 dark:text-white">{upload.speed.toFixed(1)}</span>
+          <span className="text-3xl md:text-4xl font-bold tabular-nums text-slate-900 dark:text-white">{upload.speed.toFixed(1)}</span>
           <span className="text-lg text-slate-400">Mbps</span>
         </div>
         <div className="mt-4 h-1 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
@@ -75,7 +75,7 @@ export function MetricCards({ download, upload, latency }: MetricCardsProps) {
         </div>
         <div className="flex justify-between items-end">
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl md:text-3xl font-bold tabular-nums text-slate-900 dark:text-white">{latency.ping}</span>
+            <span className="text-3xl md:text-4xl font-bold tabular-nums text-slate-900 dark:text-white">{latency.ping}</span>
             <span className="text-lg text-slate-400">ms</span>
           </div>
           <div className="text-right pb-1">

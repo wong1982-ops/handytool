@@ -63,7 +63,7 @@ export function BoardToolbar({
     }
   }, [canvasRef, title])
 
-  const toolbarBtnClass = 'min-h-[36px] bg-[#131a23] border border-[#1e2631] hover:bg-[#1e2631] hover:text-white rounded-lg px-3 py-0 text-[13px] text-[#a6abb5] transition-colors flex items-center gap-1.5 cursor-pointer'
+  const toolbarBtnClass = 'min-h-[44px] bg-[#131a23] border border-[#1e2631] hover:bg-[#1e2631] hover:text-white rounded-lg px-3 py-0 text-[13px] text-[#a6abb5] transition-colors flex items-center gap-1.5 cursor-pointer'
 
   return (
     <div className="sticky top-0 z-20 bg-[#090f16] border-b border-[#1e2631]">

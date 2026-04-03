@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { useMobileShell } from '@/lib/hooks/use-mobile-shell'
 import { useAuth } from '@/lib/hooks/use-auth'
@@ -52,6 +52,17 @@ export function MobileShell({ children }: MobileShellProps) {
       return next
     })
   }, [])
+
+  // Lock html+body scroll when MobileShell is active to prevent scrollbar bleed-through
+  useEffect(() => {
+    if (!isMobile) return
+    document.documentElement.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+    }
+  }, [isMobile])
 
   if (!isMobile) return null
 

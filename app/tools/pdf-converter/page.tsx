@@ -422,7 +422,7 @@ export default function PdfConverterPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowMobileNav(!showMobileNav)}
-            className="lg:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 cursor-pointer"
+            className="lg:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 cursor-pointer"
             aria-label="Toggle tools menu"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -452,7 +452,7 @@ export default function PdfConverterPage() {
             <div className="fixed left-0 top-0 bottom-0 w-56 bg-white dark:bg-slate-900 z-40 lg:hidden shadow-2xl">
               <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <span className="font-bold text-sm text-slate-900 dark:text-white">Tools</span>
-                <button onClick={() => setShowMobileNav(false)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded cursor-pointer" aria-label="Close">
+                <button onClick={() => setShowMobileNav(false)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded cursor-pointer" aria-label="Close">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>

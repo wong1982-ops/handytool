@@ -410,7 +410,7 @@ export function SideDrawer({
                 <button
                   key={id}
                   onClick={() => onToggle(id)}
-                  className={`p-2 rounded-lg transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center ${
+                  className={`p-2 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center ${
                     activeSection === id
                       ? 'bg-[#3D6AF2]/20 text-[#3D9DF2]'
                       : 'text-[#a6abb5] hover:bg-[#1e2631] hover:text-white'
@@ -425,7 +425,7 @@ export function SideDrawer({
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-[#a6abb5] hover:bg-[#1e2631] hover:text-white transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
+              className="p-2 rounded-lg text-[#a6abb5] hover:bg-[#1e2631] hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label="Close tools panel"
             >
               <CloseIcon />

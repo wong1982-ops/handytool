@@ -31,7 +31,7 @@ export function LeaderboardTab() {
           <button
             key={p}
             onClick={() => setPeriod(p)}
-            className={`px-[18px] py-2 min-h-[36px] rounded-lg text-[13px] font-medium transition-colors ${
+            className={`px-[18px] py-2 min-h-[44px] rounded-lg text-[13px] font-medium transition-colors ${
               period === p ? 'bg-[#3D6AF2] text-white font-semibold' : 'bg-[#131a23] text-[#70767f] border border-[#1e2631] hover:bg-[#1e2631]'
             }`}
           >

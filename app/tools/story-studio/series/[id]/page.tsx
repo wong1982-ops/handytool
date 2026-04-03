@@ -435,14 +435,14 @@ function CharacterCard({
               <button
                 onClick={handleSaveEdit}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-500 transition-colors cursor-pointer"
-                style={{ minHeight: '36px' }}
+                style={{ minHeight: '44px' }}
               >
                 Save
               </button>
               <button
                 onClick={() => { setEditing(false); setEditName(character.name); setEditDesc(character.description) }}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                style={{ minHeight: '36px' }}
+                style={{ minHeight: '44px' }}
               >
                 Cancel
               </button>
@@ -454,7 +454,7 @@ function CharacterCard({
                   onClick={handleGeneratePortrait}
                   disabled={refining}
                   className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-500 hover:to-purple-500 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
-                  style={{ minHeight: '36px' }}
+                  style={{ minHeight: '44px' }}
                 >
                   {refining ? (
                     <>
@@ -478,7 +478,7 @@ function CharacterCard({
                   onClick={() => setShowFeedback(true)}
                   disabled={refining}
                   className="px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors cursor-pointer disabled:opacity-50"
-                  style={{ minHeight: '36px' }}
+                  style={{ minHeight: '44px' }}
                 >
                   Refine Portrait (free)
                 </button>
@@ -488,7 +488,7 @@ function CharacterCard({
                 <button
                   onClick={() => onApprove(character.id)}
                   className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors cursor-pointer"
-                  style={{ minHeight: '36px' }}
+                  style={{ minHeight: '44px' }}
                 >
                   Approve
                 </button>
@@ -497,7 +497,7 @@ function CharacterCard({
               <button
                 onClick={() => setEditing(true)}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                style={{ minHeight: '36px' }}
+                style={{ minHeight: '44px' }}
               >
                 Edit
               </button>
@@ -505,7 +505,7 @@ function CharacterCard({
               <button
                 onClick={() => onDelete(character.id)}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
-                style={{ minHeight: '36px' }}
+                style={{ minHeight: '44px' }}
               >
                 Remove
               </button>
@@ -769,7 +769,7 @@ export default function SeriesDetailPage() {
                     <button
                       onClick={startEditSeries}
                       className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                      style={{ minHeight: '36px' }}
+                      style={{ minHeight: '44px' }}
                     >
                       Edit
                     </button>
@@ -837,7 +837,7 @@ export default function SeriesDetailPage() {
                   <button
                     onClick={() => setShowImport(true)}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 border border-amber-200 dark:border-amber-800 transition-colors cursor-pointer"
-                    style={{ minHeight: '36px' }}
+                    style={{ minHeight: '44px' }}
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
@@ -848,7 +848,7 @@ export default function SeriesDetailPage() {
                 <button
                   onClick={() => setShowAddChar(true)}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors cursor-pointer"
-                  style={{ minHeight: '36px' }}
+                  style={{ minHeight: '44px' }}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

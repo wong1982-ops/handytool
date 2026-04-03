@@ -81,7 +81,7 @@ export function AIHelpMenu({ field, onAction, loading }: AIHelpMenuProps) {
               onClick={() => { onAction(action); setOpen(false) }}
               className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300
                 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
-              style={{ minHeight: '36px' }}
+              style={{ minHeight: '44px' }}
             >
               <span className="mr-2">{icon}</span>
               {label}

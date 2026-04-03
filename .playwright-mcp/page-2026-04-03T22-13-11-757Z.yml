@@ -1,0 +1,413 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Toolk1t" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Toolk1t" [ref=e5]
+      - generic [ref=e6]:
+        - switch "Switch to light mode" [checked] [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+          - img [ref=e10]
+        - button "Open menu" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - navigation "Breadcrumb" [ref=e18]:
+        - button "Back to Home" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+          - text: Home
+        - button "Add Color Palette to favorites" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+      - generic [ref=e25]:
+        - heading "Color Palette Generator" [level=1] [ref=e26]
+        - paragraph [ref=e27]: Harmony rules · Image extraction · AI generation · Accessibility checker
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - 'button "Edit primary color: #3D6AF2" [ref=e31] [cursor=pointer]'
+          - generic "#3D6AF2" [ref=e32]
+          - generic [ref=e33]:
+            - 'button "Copy #3D6AF2" [ref=e34] [cursor=pointer]':
+              - img [ref=e35]
+            - button "Lock primary" [ref=e37] [cursor=pointer]:
+              - img [ref=e38]
+            - button "Expand primary scale" [ref=e40] [cursor=pointer]:
+              - img [ref=e41]
+        - generic [ref=e43]:
+          - 'button "Edit secondary color: #8B5CF6" [ref=e44] [cursor=pointer]'
+          - generic "#8B5CF6" [ref=e45]
+          - generic [ref=e46]:
+            - 'button "Copy #8B5CF6" [ref=e47] [cursor=pointer]':
+              - img [ref=e48]
+            - button "Lock secondary" [ref=e50] [cursor=pointer]:
+              - img [ref=e51]
+            - button "Expand secondary scale" [ref=e53] [cursor=pointer]:
+              - img [ref=e54]
+        - generic [ref=e56]:
+          - 'button "Edit accent color: #EC4899" [ref=e57] [cursor=pointer]'
+          - generic "#EC4899" [ref=e58]
+          - generic [ref=e59]:
+            - 'button "Copy #EC4899" [ref=e60] [cursor=pointer]':
+              - img [ref=e61]
+            - button "Lock accent" [ref=e63] [cursor=pointer]:
+              - img [ref=e64]
+            - button "Expand accent scale" [ref=e66] [cursor=pointer]:
+              - img [ref=e67]
+        - generic [ref=e69]:
+          - 'button "Edit neutral color: #F59E0B" [ref=e70] [cursor=pointer]'
+          - generic "#F59E0B" [ref=e71]
+          - generic [ref=e72]:
+            - 'button "Copy #F59E0B" [ref=e73] [cursor=pointer]':
+              - img [ref=e74]
+            - button "Lock neutral" [ref=e76] [cursor=pointer]:
+              - img [ref=e77]
+            - button "Expand neutral scale" [ref=e79] [cursor=pointer]:
+              - img [ref=e80]
+        - generic [ref=e82]:
+          - 'button "Edit highlight color: #10B981" [ref=e83] [cursor=pointer]'
+          - generic "#10B981" [ref=e84]
+          - generic [ref=e85]:
+            - 'button "Copy #10B981" [ref=e86] [cursor=pointer]':
+              - img [ref=e87]
+            - button "Lock highlight" [ref=e89] [cursor=pointer]:
+              - img [ref=e90]
+            - button "Expand highlight scale" [ref=e92] [cursor=pointer]:
+              - img [ref=e93]
+        - button "Shuffle unlocked colors" [ref=e95] [cursor=pointer]:
+          - img [ref=e96]
+      - generic [ref=e98]:
+        - generic [ref=e99]:
+          - tablist [ref=e100]:
+            - tab "Wheel" [selected] [ref=e101] [cursor=pointer]
+            - tab "Image" [ref=e102] [cursor=pointer]
+            - tab "AI" [ref=e103] [cursor=pointer]
+            - tab "Saved" [ref=e104] [cursor=pointer]
+          - generic [ref=e105]:
+            - generic [ref=e114]:
+              - button "Complementary" [ref=e115] [cursor=pointer]
+              - button "Analogous" [ref=e116] [cursor=pointer]
+              - button "Triadic" [ref=e117] [cursor=pointer]
+              - button "Split-Comp" [ref=e118] [cursor=pointer]
+              - button "Tetradic" [ref=e119] [cursor=pointer]
+              - button "Mono" [ref=e120] [cursor=pointer]
+              - button "Square" [ref=e121] [cursor=pointer]
+              - button "Custom" [ref=e122] [cursor=pointer]
+            - generic [ref=e123]:
+              - heading "Base Color" [level=3] [ref=e124]
+              - generic [ref=e127]:
+                - generic: "#"
+                - textbox "Base hex color" [ref=e128]: 3D6AF2
+              - generic [ref=e129]:
+                - generic [ref=e130]: Hue
+                - slider "Hue slider" [ref=e133] [cursor=pointer]: "225"
+                - generic [ref=e134]: "225"
+              - generic [ref=e135]:
+                - generic [ref=e136]: Sat
+                - slider "Sat slider" [ref=e139] [cursor=pointer]: "87"
+                - generic [ref=e140]: "87"
+              - generic [ref=e141]:
+                - generic [ref=e142]: Light
+                - slider "Light slider" [ref=e145] [cursor=pointer]: "59"
+                - generic [ref=e146]: "59"
+              - button "Generate Palette" [ref=e147] [cursor=pointer]
+        - generic [ref=e148]:
+          - button "Copy Share URL" [ref=e149] [cursor=pointer]:
+            - img [ref=e150]
+            - text: Copy Share URL
+          - generic [ref=e152]:
+            - heading "Export" [level=3] [ref=e153]
+            - generic [ref=e154]:
+              - button "CSS" [ref=e155] [cursor=pointer]
+              - button "Tailwind" [ref=e156] [cursor=pointer]
+              - button "SCSS" [ref=e157] [cursor=pointer]
+              - button "JSON" [ref=e158] [cursor=pointer]
+              - button "ASE" [ref=e159] [cursor=pointer]
+              - button "PNG" [ref=e160] [cursor=pointer]
+            - generic [ref=e161]:
+              - code [ref=e163]: ":root { --color-primary-50: #B2EEFF; --color-primary-100: #A5E0FF; --color-primary-200: #93CCFF; --color-primary-300: #77AEFF; --color-primary-400: #5A8DFF; --color-primary-500: #3D6AF2; --color-primary-600: #254BD2; --color-primary-700: #142FB6; --color-primary-800: #0A089B; --color-primary-900: #0D007D; --color-primary-950: #130063; --color-secondary-50: #FCD5FF; --color-secondary-100: #EFC7FF; --color-secondary-200: #DBB3FF; --color-secondary-300: #BF95FF; --color-secondary-400: #A174FF; --color-secondary-500: #8B5CF6; --color-secondary-600: #6830CA; --color-secondary-700: #5406AF; --color-secondary-800: #410094; --color-secondary-900: #2E0077; --color-secondary-950: #20005D; --color-accent-50: #FFB2FE; --color-accent-100: #FFA5F1; --color-accent-200: #FF91DD; --color-accent-300: #FF73C0; --color-accent-400: #F551A0; --color-accent-500: #EC4899; --color-accent-600: #AD0065; --color-accent-700: #91004F; --color-accent-800: #750039; --color-accent-900: #560023; --color-accent-950: #3A0010; --color-neutral-50: #FFE06C; --color-neutral-100: #FFD35D; --color-neutral-200: #FFBF46; --color-neutral-300: #F9A217; --color-neutral-400: #D78200; --color-neutral-500: #F59E0B; --color-neutral-600: #954500; --color-neutral-700: #7B2C00; --color-neutral-800: #621100; --color-neutral-900: #470000; --color-neutral-950: #2E0000; --color-highlight-50: #8BFFD7; --color-highlight-100: #7DFFCA; --color-highlight-200: #67F2B7; --color-highlight-300: #42D49B; --color-highlight-400: #00B47C; --color-highlight-500: #10B981; --color-highlight-600: #007643; --color-highlight-700: #005E2E; --color-highlight-800: #004719; --color-highlight-900: #002E02; --color-highlight-950: #001800; }"
+              - button "Copy" [ref=e164] [cursor=pointer]
+          - generic [ref=e165]:
+            - heading "Accessibility" [level=3] [ref=e166]
+            - button "Contrast Checker" [ref=e168] [cursor=pointer]:
+              - text: Contrast Checker
+              - img [ref=e169]
+            - button "Color Blindness Simulation" [ref=e172] [cursor=pointer]:
+              - text: Color Blindness Simulation
+              - img [ref=e173]
+  - contentinfo [ref=e175]:
+    - generic [ref=e176]:
+      - generic [ref=e177]:
+        - img [ref=e178]
+        - generic [ref=e180]: © 2026 Toolk1t
+      - generic [ref=e181]:
+        - link "Blog" [ref=e182] [cursor=pointer]:
+          - /url: /blog
+        - link "Pricing" [ref=e183] [cursor=pointer]:
+          - /url: /pricing
+        - link "Terms of Service" [ref=e184] [cursor=pointer]:
+          - /url: /terms
+        - link "Privacy Policy" [ref=e185] [cursor=pointer]:
+          - /url: /privacy
+        - link "Contact Support" [ref=e186] [cursor=pointer]:
+          - /url: /contact
+        - link "Shielded Site" [ref=e187] [cursor=pointer]:
+          - /url: "#"
+          - img "Shielded Site" [ref=e188]
+  - generic [ref=e189]:
+    - banner [ref=e190]:
+      - link "Toolk1t" [ref=e191] [cursor=pointer]:
+        - /url: /
+        - img "Toolk1t" [ref=e192]
+      - generic [ref=e193]:
+        - button "Search tools" [ref=e194] [cursor=pointer]:
+          - img [ref=e195]
+        - button "Switch to light mode" [ref=e197] [cursor=pointer]:
+          - img [ref=e198]
+    - generic [ref=e201]:
+      - main [ref=e206]:
+        - generic [ref=e207]:
+          - navigation "Breadcrumb" [ref=e208]:
+            - button "Back to Home" [ref=e209] [cursor=pointer]:
+              - img [ref=e210]
+              - text: Home
+            - button "Add Color Palette to favorites" [ref=e212] [cursor=pointer]:
+              - img [ref=e213]
+          - generic [ref=e215]:
+            - heading "Color Palette Generator" [level=1] [ref=e216]
+            - paragraph [ref=e217]: Harmony rules · Image extraction · AI generation · Accessibility checker
+          - generic [ref=e219]:
+            - generic [ref=e220]:
+              - 'button "Edit primary color: #3D6AF2" [ref=e221] [cursor=pointer]'
+              - generic "#3D6AF2" [ref=e222]
+              - generic [ref=e223]:
+                - 'button "Copy #3D6AF2" [ref=e224] [cursor=pointer]':
+                  - img [ref=e225]
+                - button "Lock primary" [ref=e227] [cursor=pointer]:
+                  - img [ref=e228]
+                - button "Expand primary scale" [ref=e230] [cursor=pointer]:
+                  - img [ref=e231]
+            - generic [ref=e233]:
+              - 'button "Edit secondary color: #8B5CF6" [ref=e234] [cursor=pointer]'
+              - generic "#8B5CF6" [ref=e235]
+              - generic [ref=e236]:
+                - 'button "Copy #8B5CF6" [ref=e237] [cursor=pointer]':
+                  - img [ref=e238]
+                - button "Lock secondary" [ref=e240] [cursor=pointer]:
+                  - img [ref=e241]
+                - button "Expand secondary scale" [ref=e243] [cursor=pointer]:
+                  - img [ref=e244]
+            - generic [ref=e246]:
+              - 'button "Edit accent color: #EC4899" [ref=e247] [cursor=pointer]'
+              - generic "#EC4899" [ref=e248]
+              - generic [ref=e249]:
+                - 'button "Copy #EC4899" [ref=e250] [cursor=pointer]':
+                  - img [ref=e251]
+                - button "Lock accent" [ref=e253] [cursor=pointer]:
+                  - img [ref=e254]
+                - button "Expand accent scale" [ref=e256] [cursor=pointer]:
+                  - img [ref=e257]
+            - generic [ref=e259]:
+              - 'button "Edit neutral color: #F59E0B" [ref=e260] [cursor=pointer]'
+              - generic "#F59E0B" [ref=e261]
+              - generic [ref=e262]:
+                - 'button "Copy #F59E0B" [ref=e263] [cursor=pointer]':
+                  - img [ref=e264]
+                - button "Lock neutral" [ref=e266] [cursor=pointer]:
+                  - img [ref=e267]
+                - button "Expand neutral scale" [ref=e269] [cursor=pointer]:
+                  - img [ref=e270]
+            - generic [ref=e272]:
+              - 'button "Edit highlight color: #10B981" [ref=e273] [cursor=pointer]'
+              - generic "#10B981" [ref=e274]
+              - generic [ref=e275]:
+                - 'button "Copy #10B981" [ref=e276] [cursor=pointer]':
+                  - img [ref=e277]
+                - button "Lock highlight" [ref=e279] [cursor=pointer]:
+                  - img [ref=e280]
+                - button "Expand highlight scale" [ref=e282] [cursor=pointer]:
+                  - img [ref=e283]
+            - button "Shuffle unlocked colors" [ref=e285] [cursor=pointer]:
+              - img [ref=e286]
+          - generic [ref=e288]:
+            - generic [ref=e289]:
+              - tablist [ref=e290]:
+                - tab "Wheel" [selected] [ref=e291] [cursor=pointer]
+                - tab "Image" [ref=e292] [cursor=pointer]
+                - tab "AI" [ref=e293] [cursor=pointer]
+                - tab "Saved" [ref=e294] [cursor=pointer]
+              - generic [ref=e295]:
+                - generic [ref=e304]:
+                  - button "Complementary" [ref=e305] [cursor=pointer]
+                  - button "Analogous" [ref=e306] [cursor=pointer]
+                  - button "Triadic" [ref=e307] [cursor=pointer]
+                  - button "Split-Comp" [ref=e308] [cursor=pointer]
+                  - button "Tetradic" [ref=e309] [cursor=pointer]
+                  - button "Mono" [ref=e310] [cursor=pointer]
+                  - button "Square" [ref=e311] [cursor=pointer]
+                  - button "Custom" [ref=e312] [cursor=pointer]
+                - generic [ref=e313]:
+                  - heading "Base Color" [level=3] [ref=e314]
+                  - generic [ref=e317]:
+                    - generic: "#"
+                    - textbox "Base hex color" [ref=e318]: 3D6AF2
+                  - generic [ref=e319]:
+                    - generic [ref=e320]: Hue
+                    - slider "Hue slider" [ref=e323] [cursor=pointer]: "225"
+                    - generic [ref=e324]: "225"
+                  - generic [ref=e325]:
+                    - generic [ref=e326]: Sat
+                    - slider "Sat slider" [ref=e329] [cursor=pointer]: "87"
+                    - generic [ref=e330]: "87"
+                  - generic [ref=e331]:
+                    - generic [ref=e332]: Light
+                    - slider "Light slider" [ref=e335] [cursor=pointer]: "59"
+                    - generic [ref=e336]: "59"
+                  - button "Generate Palette" [ref=e337] [cursor=pointer]
+            - generic [ref=e338]:
+              - button "Copy Share URL" [ref=e339] [cursor=pointer]:
+                - img [ref=e340]
+                - text: Copy Share URL
+              - generic [ref=e342]:
+                - heading "Export" [level=3] [ref=e343]
+                - generic [ref=e344]:
+                  - button "CSS" [ref=e345] [cursor=pointer]
+                  - button "Tailwind" [ref=e346] [cursor=pointer]
+                  - button "SCSS" [ref=e347] [cursor=pointer]
+                  - button "JSON" [ref=e348] [cursor=pointer]
+                  - button "ASE" [ref=e349] [cursor=pointer]
+                  - button "PNG" [ref=e350] [cursor=pointer]
+                - generic [ref=e351]:
+                  - code [ref=e353]: ":root { --color-primary-50: #B2EEFF; --color-primary-100: #A5E0FF; --color-primary-200: #93CCFF; --color-primary-300: #77AEFF; --color-primary-400: #5A8DFF; --color-primary-500: #3D6AF2; --color-primary-600: #254BD2; --color-primary-700: #142FB6; --color-primary-800: #0A089B; --color-primary-900: #0D007D; --color-primary-950: #130063; --color-secondary-50: #FCD5FF; --color-secondary-100: #EFC7FF; --color-secondary-200: #DBB3FF; --color-secondary-300: #BF95FF; --color-secondary-400: #A174FF; --color-secondary-500: #8B5CF6; --color-secondary-600: #6830CA; --color-secondary-700: #5406AF; --color-secondary-800: #410094; --color-secondary-900: #2E0077; --color-secondary-950: #20005D; --color-accent-50: #FFB2FE; --color-accent-100: #FFA5F1; --color-accent-200: #FF91DD; --color-accent-300: #FF73C0; --color-accent-400: #F551A0; --color-accent-500: #EC4899; --color-accent-600: #AD0065; --color-accent-700: #91004F; --color-accent-800: #750039; --color-accent-900: #560023; --color-accent-950: #3A0010; --color-neutral-50: #FFE06C; --color-neutral-100: #FFD35D; --color-neutral-200: #FFBF46; --color-neutral-300: #F9A217; --color-neutral-400: #D78200; --color-neutral-500: #F59E0B; --color-neutral-600: #954500; --color-neutral-700: #7B2C00; --color-neutral-800: #621100; --color-neutral-900: #470000; --color-neutral-950: #2E0000; --color-highlight-50: #8BFFD7; --color-highlight-100: #7DFFCA; --color-highlight-200: #67F2B7; --color-highlight-300: #42D49B; --color-highlight-400: #00B47C; --color-highlight-500: #10B981; --color-highlight-600: #007643; --color-highlight-700: #005E2E; --color-highlight-800: #004719; --color-highlight-900: #002E02; --color-highlight-950: #001800; }"
+                  - button "Copy" [ref=e354] [cursor=pointer]
+              - generic [ref=e355]:
+                - heading "Accessibility" [level=3] [ref=e356]
+                - button "Contrast Checker" [ref=e358] [cursor=pointer]:
+                  - text: Contrast Checker
+                  - img [ref=e359]
+                - button "Color Blindness Simulation" [ref=e362] [cursor=pointer]:
+                  - text: Color Blindness Simulation
+                  - img [ref=e363]
+      - generic [ref=e367]:
+        - generic [ref=e368]: ⭐
+        - heading "No Favorites Yet" [level=2] [ref=e369]
+        - paragraph [ref=e370]: Star your most-used tools for quick access. Tap the star on any tool card.
+      - generic [ref=e374]:
+        - generic [ref=e375]:
+          - heading "Credits" [level=2] [ref=e376]
+          - generic [ref=e377]:
+            - generic [ref=e378]:
+              - generic [ref=e379]: Subscription
+              - generic [ref=e380]: ...
+            - generic [ref=e381]:
+              - generic [ref=e382]:
+                - text: Purchased
+                - paragraph [ref=e383]: Never expires
+              - generic [ref=e384]: ...
+            - generic [ref=e385]:
+              - generic [ref=e386]: Total Available
+              - generic [ref=e387]: ...
+          - generic [ref=e388]:
+            - button "Buy Credit Packs One-time purchases" [ref=e389] [cursor=pointer]:
+              - img [ref=e391]
+              - generic [ref=e393]:
+                - paragraph [ref=e394]: Buy Credit Packs
+                - paragraph [ref=e395]: One-time purchases
+              - img [ref=e396]
+            - button "Transaction History No transactions yet" [ref=e398] [cursor=pointer]:
+              - img [ref=e400]
+              - generic [ref=e402]:
+                - paragraph [ref=e403]: Transaction History
+                - paragraph [ref=e404]: No transactions yet
+              - img [ref=e405]
+        - button "Credits" [ref=e409] [cursor=pointer]:
+          - img [ref=e410]
+          - text: Credits
+      - generic [ref=e416]:
+        - generic [ref=e417]:
+          - heading "Settings" [level=2] [ref=e418]
+          - generic [ref=e419]:
+            - generic [ref=e420]: L
+            - generic [ref=e421]:
+              - paragraph [ref=e422]: Local Dev User
+              - paragraph [ref=e423]: loicwong1982@gmail.com
+            - button "Sign Out" [ref=e424] [cursor=pointer]
+          - generic [ref=e425]:
+            - generic [ref=e426]: Dark Mode
+            - switch "Toggle dark mode" [checked] [ref=e427] [cursor=pointer]
+          - generic [ref=e429]:
+            - button "Blog" [ref=e430] [cursor=pointer]:
+              - img [ref=e432]
+              - generic [ref=e434]: Blog
+              - img [ref=e435]
+            - button "Terms of Service" [ref=e437] [cursor=pointer]:
+              - img [ref=e439]
+              - generic [ref=e441]: Terms of Service
+              - img [ref=e442]
+            - button "Privacy Policy" [ref=e444] [cursor=pointer]:
+              - img [ref=e446]
+              - generic [ref=e448]: Privacy Policy
+              - img [ref=e449]
+            - button "Contact Support" [ref=e451] [cursor=pointer]:
+              - img [ref=e453]
+              - generic [ref=e455]: Contact Support
+              - img [ref=e456]
+        - button "Settings" [ref=e460] [cursor=pointer]:
+          - img [ref=e461]
+          - text: Settings
+    - navigation [ref=e464]:
+      - generic [ref=e465]:
+        - button "Home" [ref=e466] [cursor=pointer]:
+          - img [ref=e467]
+          - generic [ref=e469]: Home
+        - button "Favorites" [ref=e470] [cursor=pointer]:
+          - img [ref=e471]
+        - button "Credits" [ref=e473] [cursor=pointer]:
+          - img [ref=e474]
+        - button "Profile" [ref=e476] [cursor=pointer]:
+          - generic [ref=e478]: L
+  - button "Open Next.js Dev Tools" [ref=e484] [cursor=pointer]:
+    - img [ref=e485]
+  - alert [ref=e488]
+  - dialog "Pricing" [ref=e489]:
+    - generic [ref=e490]:
+      - generic [ref=e491]:
+        - heading "Pricing" [level=2] [ref=e492]
+        - paragraph [ref=e493]: Buy credit packs
+      - button "Close pricing" [ref=e494] [cursor=pointer]:
+        - img [ref=e495]
+    - generic [ref=e497]:
+      - generic [ref=e498]:
+        - generic [ref=e499]:
+          - paragraph [ref=e500]: Subscription
+          - paragraph [ref=e501]: ...
+        - generic [ref=e502]:
+          - paragraph [ref=e503]: Purchased
+          - paragraph [ref=e504]: ...
+        - generic [ref=e505]:
+          - paragraph [ref=e506]: Total
+          - paragraph [ref=e507]: ...
+      - generic [ref=e508]:
+        - heading "Credit Packs" [level=3] [ref=e509]
+        - generic [ref=e510]:
+          - generic [ref=e511]:
+            - generic [ref=e512]:
+              - img [ref=e514]
+              - generic [ref=e516]:
+                - paragraph [ref=e517]: 800 Credits
+                - paragraph [ref=e518]: $5.00 · $0.6/credit
+            - button "Buy" [ref=e519] [cursor=pointer]
+          - generic [ref=e520]:
+            - generic [ref=e521]:
+              - img [ref=e523]
+              - generic [ref=e525]:
+                - paragraph [ref=e526]: 3,550 Credits
+                - paragraph [ref=e527]: $20.00 · $0.6/credit
+            - button "Buy" [ref=e528] [cursor=pointer]
+          - generic [ref=e529]:
+            - generic [ref=e530]:
+              - img [ref=e532]
+              - generic [ref=e534]:
+                - paragraph [ref=e535]: 10,000 Credits
+                - paragraph [ref=e536]: $50.00 · $0.5/credit
+            - button "Buy" [ref=e537] [cursor=pointer]
+      - link "View Transaction History" [ref=e538] [cursor=pointer]:
+        - /url: /billing

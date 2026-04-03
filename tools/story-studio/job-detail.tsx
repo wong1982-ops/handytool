@@ -354,7 +354,7 @@ export function JobDetailView({ jobId }: JobDetailViewProps) {
             <Link
               href={`/tools/story-studio/book/${job.state.slug}`}
               className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors"
-              style={{ minHeight: '36px' }}
+              style={{ minHeight: '44px' }}
             >
               Read
             </Link>

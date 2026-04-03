@@ -183,11 +183,11 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       {/* Left: Creation Hub sidebar */}
       <div className="lg:col-span-4 space-y-4">
-        <div className="rounded-2xl bg-[#131a23] p-5 space-y-3">
+        <div className="rounded-2xl bg-slate-50 dark:bg-[#131a23] p-5 space-y-3">
           {/* Header */}
           <div className="flex items-center gap-2.5 mb-4">
             <svg className="w-5 h-5 text-[#af88ff]" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
-            <h3 className="font-bold text-lg text-white">Creation Hub</h3>
+            <h3 className="font-bold text-lg text-slate-900 dark:text-white">Creation Hub</h3>
           </div>
 
           {/* Upload option */}
@@ -197,7 +197,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
             className={`w-full flex items-center gap-3 rounded-xl p-3 transition-colors text-left ${
               activeTab === 'upload'
                 ? 'bg-[#3D6AF2]/15 ring-1 ring-[#3D6AF2]/40'
-                : 'hover:bg-[#1e2631]'
+                : 'hover:bg-slate-200 dark:hover:bg-[#1e2631]'
             }`}
           >
             <div className="w-10 h-10 rounded-lg bg-[#3D6AF2]/20 flex items-center justify-center shrink-0">
@@ -218,8 +218,8 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
               </svg>
             </div>
             <div>
-              <p className="font-bold text-sm text-white">Upload</p>
-              <p className="text-xs text-[#a6abb5]">Import your PNG/JPG</p>
+              <p className="font-bold text-sm text-slate-900 dark:text-white">Upload</p>
+              <p className="text-xs text-slate-500 dark:text-[#a6abb5]">Import your PNG/JPG</p>
             </div>
           </button>
 
@@ -230,7 +230,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
             className={`w-full flex items-center gap-3 rounded-xl p-3 transition-colors text-left ${
               activeTab === 'draw'
                 ? 'bg-[#7C3AED]/15 ring-1 ring-[#7C3AED]/40'
-                : 'hover:bg-[#1e2631]'
+                : 'hover:bg-slate-200 dark:hover:bg-[#1e2631]'
             }`}
           >
             <div className="w-10 h-10 rounded-lg bg-[#7C3AED]/20 flex items-center justify-center shrink-0">
@@ -252,15 +252,15 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
               </svg>
             </div>
             <div>
-              <p className="font-bold text-sm text-white">Canvas Draw</p>
-              <p className="text-xs text-[#a6abb5]">Sketch in real-time</p>
+              <p className="font-bold text-sm text-slate-900 dark:text-white">Canvas Draw</p>
+              <p className="text-xs text-slate-500 dark:text-[#a6abb5]">Sketch in real-time</p>
             </div>
           </button>
 
           {/* Quick Tips */}
-          <div className="pt-4 mt-2 border-t border-[#1e2631]">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#70767f] mb-3">Quick Tips</p>
-            <ul className="space-y-2 text-xs text-[#a6abb5]">
+          <div className="pt-4 mt-2 border-t border-slate-200 dark:border-[#1e2631]">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-[#70767f] mb-3">Quick Tips</p>
+            <ul className="space-y-2 text-xs text-slate-500 dark:text-[#a6abb5]">
               <li className="flex gap-2">
                 <span className="text-[#3D6AF2] shrink-0" aria-hidden="true">•</span>
                 High contrast sketches work best.
@@ -280,10 +280,10 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
 
       {/* Right: Main workspace */}
       <div className="lg:col-span-8">
-        <div className="rounded-2xl bg-[#131a23] p-4 lg:p-6">
+        <div className="rounded-2xl bg-slate-50 dark:bg-[#131a23] p-4 lg:p-6">
           {/* Internal tab bar (hidden when preview is shown) */}
           {!preview && (
-            <div className="flex items-center gap-5 mb-5 pb-4 border-b border-[#1e2631]">
+            <div className="flex items-center gap-5 mb-5 pb-4 border-b border-slate-200 dark:border-[#1e2631]">
               <button
                 type="button"
                 role="tab"
@@ -292,7 +292,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                 className={`text-sm font-bold pb-1 transition-colors ${
                   activeTab === 'upload'
                     ? 'border-b-2 border-[#3D6AF2] text-white'
-                    : 'text-[#70767f] hover:text-white'
+                    : 'text-slate-400 dark:text-[#70767f] hover:text-white'
                 }`}
               >
                 Upload
@@ -305,7 +305,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                 className={`text-sm font-bold pb-1 transition-colors ${
                   activeTab === 'draw'
                     ? 'border-b-2 border-[#3D6AF2] text-white'
-                    : 'text-[#70767f] hover:text-white'
+                    : 'text-slate-400 dark:text-[#70767f] hover:text-white'
                 }`}
               >
                 Draw
@@ -319,7 +319,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
               className={`relative flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-10 transition-colors ${
                 dragOver
                   ? 'border-[#3D6AF2] bg-[#3D6AF2]/5'
-                  : 'border-[#1e2631] hover:border-[#3D6AF2]/50'
+                  : 'border-slate-200 dark:border-[#1e2631] hover:border-[#3D6AF2]/50'
               }`}
               onDragOver={(e) => {
                 e.preventDefault()
@@ -337,7 +337,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
               </div>
 
               {/* Upload icon */}
-              <div className="relative z-10 w-14 h-14 rounded-2xl bg-[#1e2631] flex items-center justify-center">
+              <div className="relative z-10 w-14 h-14 rounded-2xl bg-slate-200 dark:bg-[#1e2631] flex items-center justify-center">
                 <svg
                   width="28"
                   height="28"
@@ -356,10 +356,10 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
               </div>
 
               <div className="relative z-10 text-center space-y-1">
-                <p className="font-semibold text-white">
+                <p className="font-semibold text-slate-900 dark:text-white">
                   {isFun ? 'Drop your awesome sketch here!' : 'Drag & drop your sketch here'}
                 </p>
-                <p className="text-xs text-[#70767f]">PNG, JPG, or WebP — max 10 MB</p>
+                <p className="text-xs text-slate-400 dark:text-[#70767f]">PNG, JPG, or WebP — max 10 MB</p>
               </div>
 
               <input
@@ -393,8 +393,8 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
           {activeTab === 'camera' && !preview && (
             <div className="flex flex-col items-center gap-4">
               {cameraError ? (
-                <div className="flex flex-col items-center gap-3 rounded-xl bg-[#1e2631] p-8 text-center">
-                  <p className="text-[#a6abb5]">{cameraError}</p>
+                <div className="flex flex-col items-center gap-3 rounded-xl bg-slate-200 dark:bg-[#1e2631] p-8 text-center">
+                  <p className="text-slate-500 dark:text-[#a6abb5]">{cameraError}</p>
                   <button
                     type="button"
                     className="min-h-[44px] px-6 rounded-xl bg-[#3D6AF2] text-white font-semibold hover:bg-[#3D6AF2]/85 transition-colors"
@@ -438,7 +438,7 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                     </button>
                     <button
                       type="button"
-                      className="min-h-[44px] px-6 rounded-xl font-medium bg-[#1e2631] text-[#a6abb5] hover:bg-[#1e2631]/80 transition-colors"
+                      className="min-h-[44px] px-6 rounded-xl font-medium bg-slate-200 dark:bg-[#1e2631] text-slate-500 dark:text-[#a6abb5] hover:bg-slate-200 dark:hover:bg-[#1e2631]/80 transition-colors"
                       onClick={stopCamera}
                     >
                       Cancel
@@ -470,13 +470,13 @@ export default function SketchInput({ onSketchReady, mode }: SketchInputProps) {
                     <img
                       src={preview}
                       alt="Sketch preview"
-                      className="w-full aspect-square rounded-xl object-contain border-2 border-[#1e2631] bg-[#0d1117]"
+                      className="w-full aspect-square rounded-xl object-contain border-2 border-slate-200 dark:border-[#1e2631] bg-[#0d1117]"
                     />
                   </div>
                   <div className="flex gap-2 w-full max-w-[512px]">
                     <button
                       type="button"
-                      className="min-h-[44px] flex-1 rounded-xl font-medium bg-[#1e2631] text-[#a6abb5] hover:bg-[#1e2631]/80 transition-colors"
+                      className="min-h-[44px] flex-1 rounded-xl font-medium bg-slate-200 dark:bg-[#1e2631] text-slate-500 dark:text-[#a6abb5] hover:bg-slate-200 dark:hover:bg-[#1e2631]/80 transition-colors"
                       onClick={handleClearPreview}
                     >
                       {isFun ? 'Try Again' : 'Change'}

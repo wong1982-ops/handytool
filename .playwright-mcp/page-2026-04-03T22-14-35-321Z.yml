@@ -1,0 +1,737 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Toolk1t" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Toolk1t" [ref=e5]
+      - generic [ref=e6]:
+        - switch "Switch to light mode" [checked] [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+          - img [ref=e10]
+        - button "Open menu" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+  - generic [ref=e16]:
+    - generic [ref=e17]:
+      - heading "What's the occasion?" [level=1] [ref=e18]
+      - paragraph [ref=e19]: Choose a template to get started
+      - button "Create Business Card with AI 1 credit" [ref=e20] [cursor=pointer]:
+        - img [ref=e21]
+        - text: Create Business Card with AI
+        - generic [ref=e23]: 1 credit
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - img [ref=e28]
+          - textbox "Search by name, style, or occasion..." [ref=e31]
+        - generic [ref=e32]:
+          - button "All 30" [ref=e33] [cursor=pointer]:
+            - text: All
+            - generic [ref=e34]: "30"
+          - button "E-Cards 20" [ref=e35] [cursor=pointer]:
+            - text: E-Cards
+            - generic [ref=e36]: "20"
+          - button "Business 10" [ref=e37] [cursor=pointer]:
+            - text: Business
+            - generic [ref=e38]: "10"
+      - generic [ref=e39]:
+        - button "Product Launch" [ref=e40] [cursor=pointer]:
+          - generic [ref=e41]: 🚀
+          - text: Product Launch
+        - button "Client Anniversary" [ref=e42] [cursor=pointer]:
+          - generic [ref=e43]: 🎉
+          - text: Client Anniversary
+        - button "Employee Welcome" [ref=e44] [cursor=pointer]:
+          - generic [ref=e45]: 👋
+          - text: Employee Welcome
+        - button "Quarterly Milestone" [ref=e46] [cursor=pointer]:
+          - generic [ref=e47]: 📊
+          - text: Quarterly Milestone
+        - button "Holiday Greetings" [ref=e48] [cursor=pointer]:
+          - generic [ref=e49]: 🎄
+          - text: Holiday Greetings
+        - button "Thank You Note" [ref=e50] [cursor=pointer]:
+          - generic [ref=e51]: 💝
+          - text: Thank You Note
+    - generic [ref=e52]:
+      - generic [ref=e53]:
+        - button "E-Card The Executive The Executive Classic marble elegance with golden arcs and refined typography Personalize" [ref=e54] [cursor=pointer]:
+          - generic [ref=e55]:
+            - generic [ref=e56]: E-Card
+            - generic [ref=e59]: The Executive
+          - generic [ref=e60]:
+            - heading "The Executive" [level=3] [ref=e61]
+            - paragraph [ref=e62]: Classic marble elegance with golden arcs and refined typography
+            - generic [ref=e63]: Personalize
+        - button "E-Card Midnight Pinstripe Midnight Pinstripe Corporate authority with deep navy and crisp pinstripe accents Personalize" [ref=e64] [cursor=pointer]:
+          - generic [ref=e65]:
+            - generic [ref=e66]: E-Card
+            - generic [ref=e69]: Midnight Pinstripe
+          - generic [ref=e70]:
+            - heading "Midnight Pinstripe" [level=3] [ref=e71]
+            - paragraph [ref=e72]: Corporate authority with deep navy and crisp pinstripe accents
+            - generic [ref=e73]: Personalize
+        - button "E-Card Tech Blueprint Tech Blueprint Modernist precision with light tones and technical grid overlay Personalize" [ref=e74] [cursor=pointer]:
+          - generic [ref=e75]:
+            - generic [ref=e76]: E-Card
+            - generic [ref=e79]: Tech Blueprint
+          - generic [ref=e80]:
+            - heading "Tech Blueprint" [level=3] [ref=e81]
+            - paragraph [ref=e82]: Modernist precision with light tones and technical grid overlay
+            - generic [ref=e83]: Personalize
+        - button "E-Card Aura Signature Aura Signature Ethereal warmth with earthy gradients and organic copper tones Personalize" [ref=e84] [cursor=pointer]:
+          - generic [ref=e85]:
+            - generic [ref=e86]: E-Card
+            - generic [ref=e89]: Aura Signature
+          - generic [ref=e90]:
+            - heading "Aura Signature" [level=3] [ref=e91]
+            - paragraph [ref=e92]: Ethereal warmth with earthy gradients and organic copper tones
+            - generic [ref=e93]: Personalize
+        - button "E-Card Black Tie Matte Black Tie Matte Noir sophistication with matte black and subtle silver accents Personalize" [ref=e94] [cursor=pointer]:
+          - generic [ref=e95]:
+            - generic [ref=e96]: E-Card
+            - generic [ref=e99]: Black Tie Matte
+          - generic [ref=e100]:
+            - heading "Black Tie Matte" [level=3] [ref=e101]
+            - paragraph [ref=e102]: Noir sophistication with matte black and subtle silver accents
+            - generic [ref=e103]: Personalize
+        - button "E-Card Product Launch Product Launch Bold announcement card with dynamic energy for unveiling new products Personalize" [ref=e104] [cursor=pointer]:
+          - generic [ref=e105]:
+            - generic [ref=e106]: E-Card
+            - generic [ref=e109]: Product Launch
+          - generic [ref=e110]:
+            - heading "Product Launch" [level=3] [ref=e111]
+            - paragraph [ref=e112]: Bold announcement card with dynamic energy for unveiling new products
+            - generic [ref=e113]: Personalize
+        - button "E-Card Client Anniversary Client Anniversary Elegant anniversary card celebrating lasting client relationships Personalize" [ref=e114] [cursor=pointer]:
+          - generic [ref=e115]:
+            - generic [ref=e116]: E-Card
+            - generic [ref=e119]: Client Anniversary
+          - generic [ref=e120]:
+            - heading "Client Anniversary" [level=3] [ref=e121]
+            - paragraph [ref=e122]: Elegant anniversary card celebrating lasting client relationships
+            - generic [ref=e123]: Personalize
+        - button "E-Card Employee Welcome Employee Welcome Warm and inviting card to welcome new team members aboard Personalize" [ref=e124] [cursor=pointer]:
+          - generic [ref=e125]:
+            - generic [ref=e126]: E-Card
+            - generic [ref=e129]: Employee Welcome
+          - generic [ref=e130]:
+            - heading "Employee Welcome" [level=3] [ref=e131]
+            - paragraph [ref=e132]: Warm and inviting card to welcome new team members aboard
+            - generic [ref=e133]: Personalize
+        - button "E-Card Quarterly Milestone Quarterly Milestone Professional milestone card to celebrate quarterly achievements Personalize" [ref=e134] [cursor=pointer]:
+          - generic [ref=e135]:
+            - generic [ref=e136]: E-Card
+            - generic [ref=e139]: Quarterly Milestone
+          - generic [ref=e140]:
+            - heading "Quarterly Milestone" [level=3] [ref=e141]
+            - paragraph [ref=e142]: Professional milestone card to celebrate quarterly achievements
+            - generic [ref=e143]: Personalize
+        - button "E-Card Holiday Greetings Holiday Greetings Festive holiday card with warm seasonal charm and elegance Personalize" [ref=e144] [cursor=pointer]:
+          - generic [ref=e145]:
+            - generic [ref=e146]: E-Card
+            - generic [ref=e149]: Holiday Greetings
+          - generic [ref=e150]:
+            - heading "Holiday Greetings" [level=3] [ref=e151]
+            - paragraph [ref=e152]: Festive holiday card with warm seasonal charm and elegance
+            - generic [ref=e153]: Personalize
+        - button "E-Card Thank You Note Thank You Note Heartfelt gratitude card with a refined and sincere tone Personalize" [ref=e154] [cursor=pointer]:
+          - generic [ref=e155]:
+            - generic [ref=e156]: E-Card
+            - generic [ref=e159]: Thank You Note
+          - generic [ref=e160]:
+            - heading "Thank You Note" [level=3] [ref=e161]
+            - paragraph [ref=e162]: Heartfelt gratitude card with a refined and sincere tone
+            - generic [ref=e163]: Personalize
+        - button "E-Card New Year New Year Sparkling New Year card to ring in fresh beginnings with style Personalize" [ref=e164] [cursor=pointer]:
+          - generic [ref=e165]:
+            - generic [ref=e166]: E-Card
+            - generic [ref=e169]: New Year
+          - generic [ref=e170]:
+            - heading "New Year" [level=3] [ref=e171]
+            - paragraph [ref=e172]: Sparkling New Year card to ring in fresh beginnings with style
+            - generic [ref=e173]: Personalize
+        - button "E-Card Congratulations Congratulations Vibrant celebratory card for recognizing outstanding achievements Personalize" [ref=e174] [cursor=pointer]:
+          - generic [ref=e175]:
+            - generic [ref=e176]: E-Card
+            - generic [ref=e179]: Congratulations
+          - generic [ref=e180]:
+            - heading "Congratulations" [level=3] [ref=e181]
+            - paragraph [ref=e182]: Vibrant celebratory card for recognizing outstanding achievements
+            - generic [ref=e183]: Personalize
+        - button "E-Card Partnership Announce Partnership Announce Professional announcement card for new strategic partnerships Personalize" [ref=e184] [cursor=pointer]:
+          - generic [ref=e185]:
+            - generic [ref=e186]: E-Card
+            - generic [ref=e189]: Partnership Announce
+          - generic [ref=e190]:
+            - heading "Partnership Announce" [level=3] [ref=e191]
+            - paragraph [ref=e192]: Professional announcement card for new strategic partnerships
+            - generic [ref=e193]: Personalize
+        - button "E-Card Team Appreciation Team Appreciation Warm recognition card to honor and appreciate your team Personalize" [ref=e194] [cursor=pointer]:
+          - generic [ref=e195]:
+            - generic [ref=e196]: E-Card
+            - generic [ref=e199]: Team Appreciation
+          - generic [ref=e200]:
+            - heading "Team Appreciation" [level=3] [ref=e201]
+            - paragraph [ref=e202]: Warm recognition card to honor and appreciate your team
+            - generic [ref=e203]: Personalize
+        - button "E-Card Grand Opening Grand Opening Eye-catching card to announce a grand opening with flair Personalize" [ref=e204] [cursor=pointer]:
+          - generic [ref=e205]:
+            - generic [ref=e206]: E-Card
+            - generic [ref=e209]: Grand Opening
+          - generic [ref=e210]:
+            - heading "Grand Opening" [level=3] [ref=e211]
+            - paragraph [ref=e212]: Eye-catching card to announce a grand opening with flair
+            - generic [ref=e213]: Personalize
+        - button "E-Card Event Invite Event Invite Polished invitation card for corporate events and gatherings Personalize" [ref=e214] [cursor=pointer]:
+          - generic [ref=e215]:
+            - generic [ref=e216]: E-Card
+            - generic [ref=e219]: Event Invite
+          - generic [ref=e220]:
+            - heading "Event Invite" [level=3] [ref=e221]
+            - paragraph [ref=e222]: Polished invitation card for corporate events and gatherings
+            - generic [ref=e223]: Personalize
+        - button "E-Card Spring Fresh Spring Fresh Light and breezy seasonal card capturing the spirit of spring renewal Personalize" [ref=e224] [cursor=pointer]:
+          - generic [ref=e225]:
+            - generic [ref=e226]: E-Card
+            - generic [ref=e229]: Spring Fresh
+          - generic [ref=e230]:
+            - heading "Spring Fresh" [level=3] [ref=e231]
+            - paragraph [ref=e232]: Light and breezy seasonal card capturing the spirit of spring renewal
+            - generic [ref=e233]: Personalize
+        - button "E-Card Summer Vibes Summer Vibes Warm and vibrant card radiating the energy of summer sunshine Personalize" [ref=e234] [cursor=pointer]:
+          - generic [ref=e235]:
+            - generic [ref=e236]: E-Card
+            - generic [ref=e239]: Summer Vibes
+          - generic [ref=e240]:
+            - heading "Summer Vibes" [level=3] [ref=e241]
+            - paragraph [ref=e242]: Warm and vibrant card radiating the energy of summer sunshine
+            - generic [ref=e243]: Personalize
+        - button "E-Card Winter Frost Winter Frost Cool and elegant winter card with icy tones and crystalline accents Personalize" [ref=e244] [cursor=pointer]:
+          - generic [ref=e245]:
+            - generic [ref=e246]: E-Card
+            - generic [ref=e249]: Winter Frost
+          - generic [ref=e250]:
+            - heading "Winter Frost" [level=3] [ref=e251]
+            - paragraph [ref=e252]: Cool and elegant winter card with icy tones and crystalline accents
+            - generic [ref=e253]: Personalize
+        - button "Business Classic Business Classic Business Clean navy and gold palette with timeless centered typography Personalize" [ref=e254] [cursor=pointer]:
+          - generic [ref=e255]:
+            - generic [ref=e256]: Business
+            - generic [ref=e259]: Classic Business
+          - generic [ref=e260]:
+            - heading "Classic Business" [level=3] [ref=e261]
+            - paragraph [ref=e262]: Clean navy and gold palette with timeless centered typography
+            - generic [ref=e263]: Personalize
+        - button "Business Modern Minimal Modern Minimal Crisp white and black with clean left-aligned modern typography Personalize" [ref=e264] [cursor=pointer]:
+          - generic [ref=e265]:
+            - generic [ref=e266]: Business
+            - generic [ref=e269]: Modern Minimal
+          - generic [ref=e270]:
+            - heading "Modern Minimal" [level=3] [ref=e271]
+            - paragraph [ref=e272]: Crisp white and black with clean left-aligned modern typography
+            - generic [ref=e273]: Personalize
+        - button "Business Creative Studio Creative Studio Deep purple and coral split layout for creative professionals Personalize" [ref=e274] [cursor=pointer]:
+          - generic [ref=e275]:
+            - generic [ref=e276]: Business
+            - generic [ref=e279]: Creative Studio
+          - generic [ref=e280]:
+            - heading "Creative Studio" [level=3] [ref=e281]
+            - paragraph [ref=e282]: Deep purple and coral split layout for creative professionals
+            - generic [ref=e283]: Personalize
+        - button "Business Tech Startup Tech Startup Dark slate and teal with a sharp left-aligned developer aesthetic Personalize" [ref=e284] [cursor=pointer]:
+          - generic [ref=e285]:
+            - generic [ref=e286]: Business
+            - generic [ref=e289]: Tech Startup
+          - generic [ref=e290]:
+            - heading "Tech Startup" [level=3] [ref=e291]
+            - paragraph [ref=e292]: Dark slate and teal with a sharp left-aligned developer aesthetic
+            - generic [ref=e293]: Personalize
+        - button "Business Elegant Elegant Charcoal and rose gold centered design with refined serif typography Personalize" [ref=e294] [cursor=pointer]:
+          - generic [ref=e295]:
+            - generic [ref=e296]: Business
+            - generic [ref=e299]: Elegant
+          - generic [ref=e300]:
+            - heading "Elegant" [level=3] [ref=e301]
+            - paragraph [ref=e302]: Charcoal and rose gold centered design with refined serif typography
+            - generic [ref=e303]: Personalize
+        - button "Business Bold Statement Bold Statement High-contrast black and bright red for a fearless minimal presence Personalize" [ref=e304] [cursor=pointer]:
+          - generic [ref=e305]:
+            - generic [ref=e306]: Business
+            - generic [ref=e309]: Bold Statement
+          - generic [ref=e310]:
+            - heading "Bold Statement" [level=3] [ref=e311]
+            - paragraph [ref=e312]: High-contrast black and bright red for a fearless minimal presence
+            - generic [ref=e313]: Personalize
+        - button "Business Nature Inspired Nature Inspired Forest green and amber right-banner layout with organic warmth Personalize" [ref=e314] [cursor=pointer]:
+          - generic [ref=e315]:
+            - generic [ref=e316]: Business
+            - generic [ref=e319]: Nature Inspired
+          - generic [ref=e320]:
+            - heading "Nature Inspired" [level=3] [ref=e321]
+            - paragraph [ref=e322]: Forest green and amber right-banner layout with organic warmth
+            - generic [ref=e323]: Personalize
+        - button "Business Gradient Flow Gradient Flow Deep indigo to sky blue split layout with smooth modern energy Personalize" [ref=e324] [cursor=pointer]:
+          - generic [ref=e325]:
+            - generic [ref=e326]: Business
+            - generic [ref=e329]: Gradient Flow
+          - generic [ref=e330]:
+            - heading "Gradient Flow" [level=3] [ref=e331]
+            - paragraph [ref=e332]: Deep indigo to sky blue split layout with smooth modern energy
+            - generic [ref=e333]: Personalize
+        - button "Business Dark Professional Dark Professional Near-black and silver centered design with commanding serif presence Personalize" [ref=e334] [cursor=pointer]:
+          - generic [ref=e335]:
+            - generic [ref=e336]: Business
+            - generic [ref=e339]: Dark Professional
+          - generic [ref=e340]:
+            - heading "Dark Professional" [level=3] [ref=e341]
+            - paragraph [ref=e342]: Near-black and silver centered design with commanding serif presence
+            - generic [ref=e343]: Personalize
+        - button "Business Ultra Minimal Ultra Minimal Pure white and dark gray with restrained minimal typography Personalize" [ref=e344] [cursor=pointer]:
+          - generic [ref=e345]:
+            - generic [ref=e346]: Business
+            - generic [ref=e349]: Ultra Minimal
+          - generic [ref=e350]:
+            - heading "Ultra Minimal" [level=3] [ref=e351]
+            - paragraph [ref=e352]: Pure white and dark gray with restrained minimal typography
+            - generic [ref=e353]: Personalize
+      - paragraph [ref=e354]: 30 of 30 templates
+  - contentinfo [ref=e355]:
+    - generic [ref=e356]:
+      - generic [ref=e357]:
+        - img [ref=e358]
+        - generic [ref=e360]: © 2026 Toolk1t
+      - generic [ref=e361]:
+        - link "Blog" [ref=e362] [cursor=pointer]:
+          - /url: /blog
+        - link "Pricing" [ref=e363] [cursor=pointer]:
+          - /url: /pricing
+        - link "Terms of Service" [ref=e364] [cursor=pointer]:
+          - /url: /terms
+        - link "Privacy Policy" [ref=e365] [cursor=pointer]:
+          - /url: /privacy
+        - link "Contact Support" [ref=e366] [cursor=pointer]:
+          - /url: /contact
+        - link "Shielded Site" [ref=e367] [cursor=pointer]:
+          - /url: "#"
+          - img "Shielded Site" [ref=e368]
+  - generic [ref=e369]:
+    - banner [ref=e370]:
+      - link "Toolk1t" [ref=e371] [cursor=pointer]:
+        - /url: /
+        - img "Toolk1t" [ref=e372]
+      - generic [ref=e373]:
+        - button "Search tools" [ref=e374] [cursor=pointer]:
+          - img [ref=e375]
+        - button "Switch to light mode" [ref=e377] [cursor=pointer]:
+          - img [ref=e378]
+    - generic [ref=e381]:
+      - generic [ref=e386]:
+        - generic [ref=e387]:
+          - heading "What's the occasion?" [level=1] [ref=e388]
+          - paragraph [ref=e389]: Choose a template to get started
+          - button "Create Business Card with AI 1 credit" [ref=e390] [cursor=pointer]:
+            - img [ref=e391]
+            - text: Create Business Card with AI
+            - generic [ref=e393]: 1 credit
+        - generic [ref=e395]:
+          - generic [ref=e396]:
+            - generic [ref=e397]:
+              - img [ref=e398]
+              - textbox "Search by name, style, or occasion..." [ref=e401]
+            - generic [ref=e402]:
+              - button "All 30" [ref=e403] [cursor=pointer]:
+                - text: All
+                - generic [ref=e404]: "30"
+              - button "E-Cards 20" [ref=e405] [cursor=pointer]:
+                - text: E-Cards
+                - generic [ref=e406]: "20"
+              - button "Business 10" [ref=e407] [cursor=pointer]:
+                - text: Business
+                - generic [ref=e408]: "10"
+          - generic [ref=e409]:
+            - button "Product Launch" [ref=e410] [cursor=pointer]:
+              - generic [ref=e411]: 🚀
+              - text: Product Launch
+            - button "Client Anniversary" [ref=e412] [cursor=pointer]:
+              - generic [ref=e413]: 🎉
+              - text: Client Anniversary
+            - button "Employee Welcome" [ref=e414] [cursor=pointer]:
+              - generic [ref=e415]: 👋
+              - text: Employee Welcome
+            - button "Quarterly Milestone" [ref=e416] [cursor=pointer]:
+              - generic [ref=e417]: 📊
+              - text: Quarterly Milestone
+            - button "Holiday Greetings" [ref=e418] [cursor=pointer]:
+              - generic [ref=e419]: 🎄
+              - text: Holiday Greetings
+            - button "Thank You Note" [ref=e420] [cursor=pointer]:
+              - generic [ref=e421]: 💝
+              - text: Thank You Note
+        - generic [ref=e422]:
+          - generic [ref=e423]:
+            - button "E-Card The Executive The Executive Classic marble elegance with golden arcs and refined typography Personalize" [ref=e424] [cursor=pointer]:
+              - generic [ref=e425]:
+                - generic [ref=e426]: E-Card
+                - generic [ref=e429]: The Executive
+              - generic [ref=e430]:
+                - heading "The Executive" [level=3] [ref=e431]
+                - paragraph [ref=e432]: Classic marble elegance with golden arcs and refined typography
+                - generic [ref=e433]: Personalize
+            - button "E-Card Midnight Pinstripe Midnight Pinstripe Corporate authority with deep navy and crisp pinstripe accents Personalize" [ref=e434] [cursor=pointer]:
+              - generic [ref=e435]:
+                - generic [ref=e436]: E-Card
+                - generic [ref=e439]: Midnight Pinstripe
+              - generic [ref=e440]:
+                - heading "Midnight Pinstripe" [level=3] [ref=e441]
+                - paragraph [ref=e442]: Corporate authority with deep navy and crisp pinstripe accents
+                - generic [ref=e443]: Personalize
+            - button "E-Card Tech Blueprint Tech Blueprint Modernist precision with light tones and technical grid overlay Personalize" [ref=e444] [cursor=pointer]:
+              - generic [ref=e445]:
+                - generic [ref=e446]: E-Card
+                - generic [ref=e449]: Tech Blueprint
+              - generic [ref=e450]:
+                - heading "Tech Blueprint" [level=3] [ref=e451]
+                - paragraph [ref=e452]: Modernist precision with light tones and technical grid overlay
+                - generic [ref=e453]: Personalize
+            - button "E-Card Aura Signature Aura Signature Ethereal warmth with earthy gradients and organic copper tones Personalize" [ref=e454] [cursor=pointer]:
+              - generic [ref=e455]:
+                - generic [ref=e456]: E-Card
+                - generic [ref=e459]: Aura Signature
+              - generic [ref=e460]:
+                - heading "Aura Signature" [level=3] [ref=e461]
+                - paragraph [ref=e462]: Ethereal warmth with earthy gradients and organic copper tones
+                - generic [ref=e463]: Personalize
+            - button "E-Card Black Tie Matte Black Tie Matte Noir sophistication with matte black and subtle silver accents Personalize" [ref=e464] [cursor=pointer]:
+              - generic [ref=e465]:
+                - generic [ref=e466]: E-Card
+                - generic [ref=e469]: Black Tie Matte
+              - generic [ref=e470]:
+                - heading "Black Tie Matte" [level=3] [ref=e471]
+                - paragraph [ref=e472]: Noir sophistication with matte black and subtle silver accents
+                - generic [ref=e473]: Personalize
+            - button "E-Card Product Launch Product Launch Bold announcement card with dynamic energy for unveiling new products Personalize" [ref=e474] [cursor=pointer]:
+              - generic [ref=e475]:
+                - generic [ref=e476]: E-Card
+                - generic [ref=e479]: Product Launch
+              - generic [ref=e480]:
+                - heading "Product Launch" [level=3] [ref=e481]
+                - paragraph [ref=e482]: Bold announcement card with dynamic energy for unveiling new products
+                - generic [ref=e483]: Personalize
+            - button "E-Card Client Anniversary Client Anniversary Elegant anniversary card celebrating lasting client relationships Personalize" [ref=e484] [cursor=pointer]:
+              - generic [ref=e485]:
+                - generic [ref=e486]: E-Card
+                - generic [ref=e489]: Client Anniversary
+              - generic [ref=e490]:
+                - heading "Client Anniversary" [level=3] [ref=e491]
+                - paragraph [ref=e492]: Elegant anniversary card celebrating lasting client relationships
+                - generic [ref=e493]: Personalize
+            - button "E-Card Employee Welcome Employee Welcome Warm and inviting card to welcome new team members aboard Personalize" [ref=e494] [cursor=pointer]:
+              - generic [ref=e495]:
+                - generic [ref=e496]: E-Card
+                - generic [ref=e499]: Employee Welcome
+              - generic [ref=e500]:
+                - heading "Employee Welcome" [level=3] [ref=e501]
+                - paragraph [ref=e502]: Warm and inviting card to welcome new team members aboard
+                - generic [ref=e503]: Personalize
+            - button "E-Card Quarterly Milestone Quarterly Milestone Professional milestone card to celebrate quarterly achievements Personalize" [ref=e504] [cursor=pointer]:
+              - generic [ref=e505]:
+                - generic [ref=e506]: E-Card
+                - generic [ref=e509]: Quarterly Milestone
+              - generic [ref=e510]:
+                - heading "Quarterly Milestone" [level=3] [ref=e511]
+                - paragraph [ref=e512]: Professional milestone card to celebrate quarterly achievements
+                - generic [ref=e513]: Personalize
+            - button "E-Card Holiday Greetings Holiday Greetings Festive holiday card with warm seasonal charm and elegance Personalize" [ref=e514] [cursor=pointer]:
+              - generic [ref=e515]:
+                - generic [ref=e516]: E-Card
+                - generic [ref=e519]: Holiday Greetings
+              - generic [ref=e520]:
+                - heading "Holiday Greetings" [level=3] [ref=e521]
+                - paragraph [ref=e522]: Festive holiday card with warm seasonal charm and elegance
+                - generic [ref=e523]: Personalize
+            - button "E-Card Thank You Note Thank You Note Heartfelt gratitude card with a refined and sincere tone Personalize" [ref=e524] [cursor=pointer]:
+              - generic [ref=e525]:
+                - generic [ref=e526]: E-Card
+                - generic [ref=e529]: Thank You Note
+              - generic [ref=e530]:
+                - heading "Thank You Note" [level=3] [ref=e531]
+                - paragraph [ref=e532]: Heartfelt gratitude card with a refined and sincere tone
+                - generic [ref=e533]: Personalize
+            - button "E-Card New Year New Year Sparkling New Year card to ring in fresh beginnings with style Personalize" [ref=e534] [cursor=pointer]:
+              - generic [ref=e535]:
+                - generic [ref=e536]: E-Card
+                - generic [ref=e539]: New Year
+              - generic [ref=e540]:
+                - heading "New Year" [level=3] [ref=e541]
+                - paragraph [ref=e542]: Sparkling New Year card to ring in fresh beginnings with style
+                - generic [ref=e543]: Personalize
+            - button "E-Card Congratulations Congratulations Vibrant celebratory card for recognizing outstanding achievements Personalize" [ref=e544] [cursor=pointer]:
+              - generic [ref=e545]:
+                - generic [ref=e546]: E-Card
+                - generic [ref=e549]: Congratulations
+              - generic [ref=e550]:
+                - heading "Congratulations" [level=3] [ref=e551]
+                - paragraph [ref=e552]: Vibrant celebratory card for recognizing outstanding achievements
+                - generic [ref=e553]: Personalize
+            - button "E-Card Partnership Announce Partnership Announce Professional announcement card for new strategic partnerships Personalize" [ref=e554] [cursor=pointer]:
+              - generic [ref=e555]:
+                - generic [ref=e556]: E-Card
+                - generic [ref=e559]: Partnership Announce
+              - generic [ref=e560]:
+                - heading "Partnership Announce" [level=3] [ref=e561]
+                - paragraph [ref=e562]: Professional announcement card for new strategic partnerships
+                - generic [ref=e563]: Personalize
+            - button "E-Card Team Appreciation Team Appreciation Warm recognition card to honor and appreciate your team Personalize" [ref=e564] [cursor=pointer]:
+              - generic [ref=e565]:
+                - generic [ref=e566]: E-Card
+                - generic [ref=e569]: Team Appreciation
+              - generic [ref=e570]:
+                - heading "Team Appreciation" [level=3] [ref=e571]
+                - paragraph [ref=e572]: Warm recognition card to honor and appreciate your team
+                - generic [ref=e573]: Personalize
+            - button "E-Card Grand Opening Grand Opening Eye-catching card to announce a grand opening with flair Personalize" [ref=e574] [cursor=pointer]:
+              - generic [ref=e575]:
+                - generic [ref=e576]: E-Card
+                - generic [ref=e579]: Grand Opening
+              - generic [ref=e580]:
+                - heading "Grand Opening" [level=3] [ref=e581]
+                - paragraph [ref=e582]: Eye-catching card to announce a grand opening with flair
+                - generic [ref=e583]: Personalize
+            - button "E-Card Event Invite Event Invite Polished invitation card for corporate events and gatherings Personalize" [ref=e584] [cursor=pointer]:
+              - generic [ref=e585]:
+                - generic [ref=e586]: E-Card
+                - generic [ref=e589]: Event Invite
+              - generic [ref=e590]:
+                - heading "Event Invite" [level=3] [ref=e591]
+                - paragraph [ref=e592]: Polished invitation card for corporate events and gatherings
+                - generic [ref=e593]: Personalize
+            - button "E-Card Spring Fresh Spring Fresh Light and breezy seasonal card capturing the spirit of spring renewal Personalize" [ref=e594] [cursor=pointer]:
+              - generic [ref=e595]:
+                - generic [ref=e596]: E-Card
+                - generic [ref=e599]: Spring Fresh
+              - generic [ref=e600]:
+                - heading "Spring Fresh" [level=3] [ref=e601]
+                - paragraph [ref=e602]: Light and breezy seasonal card capturing the spirit of spring renewal
+                - generic [ref=e603]: Personalize
+            - button "E-Card Summer Vibes Summer Vibes Warm and vibrant card radiating the energy of summer sunshine Personalize" [ref=e604] [cursor=pointer]:
+              - generic [ref=e605]:
+                - generic [ref=e606]: E-Card
+                - generic [ref=e609]: Summer Vibes
+              - generic [ref=e610]:
+                - heading "Summer Vibes" [level=3] [ref=e611]
+                - paragraph [ref=e612]: Warm and vibrant card radiating the energy of summer sunshine
+                - generic [ref=e613]: Personalize
+            - button "E-Card Winter Frost Winter Frost Cool and elegant winter card with icy tones and crystalline accents Personalize" [ref=e614] [cursor=pointer]:
+              - generic [ref=e615]:
+                - generic [ref=e616]: E-Card
+                - generic [ref=e619]: Winter Frost
+              - generic [ref=e620]:
+                - heading "Winter Frost" [level=3] [ref=e621]
+                - paragraph [ref=e622]: Cool and elegant winter card with icy tones and crystalline accents
+                - generic [ref=e623]: Personalize
+            - button "Business Classic Business Classic Business Clean navy and gold palette with timeless centered typography Personalize" [ref=e624] [cursor=pointer]:
+              - generic [ref=e625]:
+                - generic [ref=e626]: Business
+                - generic [ref=e629]: Classic Business
+              - generic [ref=e630]:
+                - heading "Classic Business" [level=3] [ref=e631]
+                - paragraph [ref=e632]: Clean navy and gold palette with timeless centered typography
+                - generic [ref=e633]: Personalize
+            - button "Business Modern Minimal Modern Minimal Crisp white and black with clean left-aligned modern typography Personalize" [ref=e634] [cursor=pointer]:
+              - generic [ref=e635]:
+                - generic [ref=e636]: Business
+                - generic [ref=e639]: Modern Minimal
+              - generic [ref=e640]:
+                - heading "Modern Minimal" [level=3] [ref=e641]
+                - paragraph [ref=e642]: Crisp white and black with clean left-aligned modern typography
+                - generic [ref=e643]: Personalize
+            - button "Business Creative Studio Creative Studio Deep purple and coral split layout for creative professionals Personalize" [ref=e644] [cursor=pointer]:
+              - generic [ref=e645]:
+                - generic [ref=e646]: Business
+                - generic [ref=e649]: Creative Studio
+              - generic [ref=e650]:
+                - heading "Creative Studio" [level=3] [ref=e651]
+                - paragraph [ref=e652]: Deep purple and coral split layout for creative professionals
+                - generic [ref=e653]: Personalize
+            - button "Business Tech Startup Tech Startup Dark slate and teal with a sharp left-aligned developer aesthetic Personalize" [ref=e654] [cursor=pointer]:
+              - generic [ref=e655]:
+                - generic [ref=e656]: Business
+                - generic [ref=e659]: Tech Startup
+              - generic [ref=e660]:
+                - heading "Tech Startup" [level=3] [ref=e661]
+                - paragraph [ref=e662]: Dark slate and teal with a sharp left-aligned developer aesthetic
+                - generic [ref=e663]: Personalize
+            - button "Business Elegant Elegant Charcoal and rose gold centered design with refined serif typography Personalize" [ref=e664] [cursor=pointer]:
+              - generic [ref=e665]:
+                - generic [ref=e666]: Business
+                - generic [ref=e669]: Elegant
+              - generic [ref=e670]:
+                - heading "Elegant" [level=3] [ref=e671]
+                - paragraph [ref=e672]: Charcoal and rose gold centered design with refined serif typography
+                - generic [ref=e673]: Personalize
+            - button "Business Bold Statement Bold Statement High-contrast black and bright red for a fearless minimal presence Personalize" [ref=e674] [cursor=pointer]:
+              - generic [ref=e675]:
+                - generic [ref=e676]: Business
+                - generic [ref=e679]: Bold Statement
+              - generic [ref=e680]:
+                - heading "Bold Statement" [level=3] [ref=e681]
+                - paragraph [ref=e682]: High-contrast black and bright red for a fearless minimal presence
+                - generic [ref=e683]: Personalize
+            - button "Business Nature Inspired Nature Inspired Forest green and amber right-banner layout with organic warmth Personalize" [ref=e684] [cursor=pointer]:
+              - generic [ref=e685]:
+                - generic [ref=e686]: Business
+                - generic [ref=e689]: Nature Inspired
+              - generic [ref=e690]:
+                - heading "Nature Inspired" [level=3] [ref=e691]
+                - paragraph [ref=e692]: Forest green and amber right-banner layout with organic warmth
+                - generic [ref=e693]: Personalize
+            - button "Business Gradient Flow Gradient Flow Deep indigo to sky blue split layout with smooth modern energy Personalize" [ref=e694] [cursor=pointer]:
+              - generic [ref=e695]:
+                - generic [ref=e696]: Business
+                - generic [ref=e699]: Gradient Flow
+              - generic [ref=e700]:
+                - heading "Gradient Flow" [level=3] [ref=e701]
+                - paragraph [ref=e702]: Deep indigo to sky blue split layout with smooth modern energy
+                - generic [ref=e703]: Personalize
+            - button "Business Dark Professional Dark Professional Near-black and silver centered design with commanding serif presence Personalize" [ref=e704] [cursor=pointer]:
+              - generic [ref=e705]:
+                - generic [ref=e706]: Business
+                - generic [ref=e709]: Dark Professional
+              - generic [ref=e710]:
+                - heading "Dark Professional" [level=3] [ref=e711]
+                - paragraph [ref=e712]: Near-black and silver centered design with commanding serif presence
+                - generic [ref=e713]: Personalize
+            - button "Business Ultra Minimal Ultra Minimal Pure white and dark gray with restrained minimal typography Personalize" [ref=e714] [cursor=pointer]:
+              - generic [ref=e715]:
+                - generic [ref=e716]: Business
+                - generic [ref=e719]: Ultra Minimal
+              - generic [ref=e720]:
+                - heading "Ultra Minimal" [level=3] [ref=e721]
+                - paragraph [ref=e722]: Pure white and dark gray with restrained minimal typography
+                - generic [ref=e723]: Personalize
+          - paragraph [ref=e724]: 30 of 30 templates
+      - generic [ref=e727]:
+        - generic [ref=e728]: ⭐
+        - heading "No Favorites Yet" [level=2] [ref=e729]
+        - paragraph [ref=e730]: Star your most-used tools for quick access. Tap the star on any tool card.
+      - generic [ref=e734]:
+        - generic [ref=e735]:
+          - heading "Credits" [level=2] [ref=e736]
+          - generic [ref=e737]:
+            - generic [ref=e738]:
+              - generic [ref=e739]: Subscription
+              - generic [ref=e740]: ...
+            - generic [ref=e741]:
+              - generic [ref=e742]:
+                - text: Purchased
+                - paragraph [ref=e743]: Never expires
+              - generic [ref=e744]: ...
+            - generic [ref=e745]:
+              - generic [ref=e746]: Total Available
+              - generic [ref=e747]: ...
+          - generic [ref=e748]:
+            - button "Buy Credit Packs One-time purchases" [ref=e749] [cursor=pointer]:
+              - img [ref=e751]
+              - generic [ref=e753]:
+                - paragraph [ref=e754]: Buy Credit Packs
+                - paragraph [ref=e755]: One-time purchases
+              - img [ref=e756]
+            - button "Transaction History No transactions yet" [ref=e758] [cursor=pointer]:
+              - img [ref=e760]
+              - generic [ref=e762]:
+                - paragraph [ref=e763]: Transaction History
+                - paragraph [ref=e764]: No transactions yet
+              - img [ref=e765]
+        - button "Credits" [ref=e769] [cursor=pointer]:
+          - img [ref=e770]
+          - text: Credits
+      - generic [ref=e776]:
+        - generic [ref=e777]:
+          - heading "Settings" [level=2] [ref=e778]
+          - generic [ref=e779]:
+            - generic [ref=e780]: L
+            - generic [ref=e781]:
+              - paragraph [ref=e782]: Local Dev User
+              - paragraph [ref=e783]: loicwong1982@gmail.com
+            - button "Sign Out" [ref=e784] [cursor=pointer]
+          - generic [ref=e785]:
+            - generic [ref=e786]: Dark Mode
+            - switch "Toggle dark mode" [checked] [ref=e787] [cursor=pointer]
+          - generic [ref=e789]:
+            - button "Blog" [ref=e790] [cursor=pointer]:
+              - img [ref=e792]
+              - generic [ref=e794]: Blog
+              - img [ref=e795]
+            - button "Terms of Service" [ref=e797] [cursor=pointer]:
+              - img [ref=e799]
+              - generic [ref=e801]: Terms of Service
+              - img [ref=e802]
+            - button "Privacy Policy" [ref=e804] [cursor=pointer]:
+              - img [ref=e806]
+              - generic [ref=e808]: Privacy Policy
+              - img [ref=e809]
+            - button "Contact Support" [ref=e811] [cursor=pointer]:
+              - img [ref=e813]
+              - generic [ref=e815]: Contact Support
+              - img [ref=e816]
+        - button "Settings" [ref=e820] [cursor=pointer]:
+          - img [ref=e821]
+          - text: Settings
+    - navigation [ref=e824]:
+      - generic [ref=e825]:
+        - button "Home" [ref=e826] [cursor=pointer]:
+          - img [ref=e827]
+          - generic [ref=e829]: Home
+        - button "Favorites" [ref=e830] [cursor=pointer]:
+          - img [ref=e831]
+        - button "Credits" [ref=e833] [cursor=pointer]:
+          - img [ref=e834]
+        - button "Profile" [ref=e836] [cursor=pointer]:
+          - generic [ref=e838]: L
+  - button "Open Next.js Dev Tools" [ref=e844] [cursor=pointer]:
+    - img [ref=e845]
+  - alert [ref=e848]
+  - dialog "Pricing" [ref=e849]:
+    - generic [ref=e850]:
+      - generic [ref=e851]:
+        - heading "Pricing" [level=2] [ref=e852]
+        - paragraph [ref=e853]: Buy credit packs
+      - button "Close pricing" [ref=e854] [cursor=pointer]:
+        - img [ref=e855]
+    - generic [ref=e857]:
+      - generic [ref=e858]:
+        - generic [ref=e859]:
+          - paragraph [ref=e860]: Subscription
+          - paragraph [ref=e861]: ...
+        - generic [ref=e862]:
+          - paragraph [ref=e863]: Purchased
+          - paragraph [ref=e864]: ...
+        - generic [ref=e865]:
+          - paragraph [ref=e866]: Total
+          - paragraph [ref=e867]: ...
+      - generic [ref=e868]:
+        - heading "Credit Packs" [level=3] [ref=e869]
+        - generic [ref=e870]:
+          - generic [ref=e871]:
+            - generic [ref=e872]:
+              - img [ref=e874]
+              - generic [ref=e876]:
+                - paragraph [ref=e877]: 800 Credits
+                - paragraph [ref=e878]: $5.00 · $0.6/credit
+            - button "Buy" [ref=e879] [cursor=pointer]
+          - generic [ref=e880]:
+            - generic [ref=e881]:
+              - img [ref=e883]
+              - generic [ref=e885]:
+                - paragraph [ref=e886]: 3,550 Credits
+                - paragraph [ref=e887]: $20.00 · $0.6/credit
+            - button "Buy" [ref=e888] [cursor=pointer]
+          - generic [ref=e889]:
+            - generic [ref=e890]:
+              - img [ref=e892]
+              - generic [ref=e894]:
+                - paragraph [ref=e895]: 10,000 Credits
+                - paragraph [ref=e896]: $50.00 · $0.5/credit
+            - button "Buy" [ref=e897] [cursor=pointer]
+      - link "View Transaction History" [ref=e898] [cursor=pointer]:
+        - /url: /billing

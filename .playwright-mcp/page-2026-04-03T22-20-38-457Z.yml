@@ -1,0 +1,63 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Toolk1t" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Toolk1t" [ref=e5]
+      - generic [ref=e6]:
+        - switch "Switch to light mode" [checked] [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+          - img [ref=e10]
+        - button "Open menu" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+  - main [ref=e16]:
+    - navigation "Breadcrumb" [ref=e17]:
+      - button "Back to Home" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - text: Home
+      - button "Add Speed Test to favorites" [ref=e21] [cursor=pointer]:
+        - img [ref=e22]
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - img [ref=e27]
+        - generic [ref=e29]:
+          - paragraph [ref=e30]: Test Server
+          - paragraph [ref=e31]: Toolk1t Server
+      - generic [ref=e32]:
+        - img [ref=e34]
+        - generic [ref=e36]:
+          - paragraph [ref=e37]: Internet Service Provider
+          - paragraph [ref=e38]: Detecting...
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - img [ref=e41]
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - text: "0"
+            - generic [ref=e46]: Mbps
+          - button "Start speed test" [ref=e47] [cursor=pointer]:
+            - generic [ref=e48]: GO
+      - generic [ref=e49]:
+        - paragraph [ref=e50]: Test Status
+        - paragraph [ref=e52]: Press GO to start test
+  - contentinfo [ref=e53]:
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - img [ref=e56]
+        - generic [ref=e58]: © 2026 Toolk1t
+      - generic [ref=e59]:
+        - link "Blog" [ref=e60] [cursor=pointer]:
+          - /url: /blog
+        - link "Pricing" [ref=e61] [cursor=pointer]:
+          - /url: /pricing
+        - link "Terms of Service" [ref=e62] [cursor=pointer]:
+          - /url: /terms
+        - link "Privacy Policy" [ref=e63] [cursor=pointer]:
+          - /url: /privacy
+        - link "Contact Support" [ref=e64] [cursor=pointer]:
+          - /url: /contact
+        - link "Shielded Site" [ref=e65] [cursor=pointer]:
+          - /url: "#"
+          - img "Shielded Site" [ref=e66]
+  - button "Open Next.js Dev Tools" [ref=e72] [cursor=pointer]:
+    - img [ref=e73]

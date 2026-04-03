@@ -180,19 +180,19 @@ export default function ComponentLab() {
         <div className="flex items-center gap-1.5">
           <Link
             href="/tools/component-lab/library"
-            className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#a6abb5] hover:text-white hover:bg-[#1e2631] transition-colors min-h-[36px] flex items-center"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#a6abb5] hover:text-white hover:bg-[#1e2631] transition-colors min-h-[44px] flex items-center"
           >
             Library
           </Link>
           <Link
             href="/tools/component-lab/explore"
-            className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#a6abb5] hover:text-white hover:bg-[#1e2631] transition-colors min-h-[36px] flex items-center"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#a6abb5] hover:text-white hover:bg-[#1e2631] transition-colors min-h-[44px] flex items-center"
           >
             Explore
           </Link>
           <button
             type="button"
-            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white min-h-[36px] flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
+            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white min-h-[44px] flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
             disabled={!session.code.react && !session.code.html}
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

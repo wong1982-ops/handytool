@@ -125,7 +125,7 @@ export default function FlightMonitor() {
 
   return (
     <div
-      className="min-h-screen h-screen overflow-y-auto bg-[#090f16]"
+      className="min-h-screen h-screen overflow-y-auto bg-white dark:bg-[#090f16]"
       style={{ overscrollBehaviorX: 'none' }}
     >
       {/* Themed header */}

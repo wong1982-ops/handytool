@@ -50,10 +50,10 @@ function PresetList({
   return (
     <>
       {/* Search */}
-      <div className="p-3 border-b border-[#1e2631]">
+      <div className="p-3 border-b border-slate-200 dark:border-[#1e2631]">
         <div className="relative">
           <svg
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#70767f]"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[#70767f]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -71,7 +71,7 @@ function PresetList({
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search presets..."
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-[#1e2631] bg-[#0d1420] text-white placeholder-[#70767f] focus:outline-none focus:ring-2 focus:ring-[rgba(61,106,242,0.4)] focus:border-[#3D6AF2] transition-colors min-h-[44px]"
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-[#1e2631] bg-[#0d1420] text-white placeholder-[#70767f] focus:outline-none focus:ring-2 focus:ring-[rgba(61,106,242,0.4)] focus:border-[#3D6AF2] transition-colors min-h-[44px]"
           />
         </div>
       </div>
@@ -79,11 +79,11 @@ function PresetList({
       {/* Grouped list */}
       <div className="max-h-[calc(100vh-260px)] overflow-y-auto p-2">
         {grouped.size === 0 && (
-          <p className="text-xs text-[#70767f] text-center py-6">No presets found.</p>
+          <p className="text-xs text-slate-400 dark:text-[#70767f] text-center py-6">No presets found.</p>
         )}
         {Array.from(grouped.entries()).map(([category, presets]) => (
           <div key={category} className="mb-3">
-            <h3 className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#70767f]">
+            <h3 className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-[#70767f]">
               {PRESET_CATEGORY_LABELS[category]}
             </h3>
             <div className="space-y-0.5">
@@ -96,7 +96,7 @@ function PresetList({
                     className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer min-h-[44px] flex items-center gap-2 ${
                       isActive
                         ? 'bg-[rgba(61,106,242,0.12)] text-[#3D6AF2] font-semibold'
-                        : 'text-[#a6abb5] hover:bg-[#1e2631]'
+                        : 'text-slate-500 dark:text-[#a6abb5] hover:bg-slate-200 dark:hover:bg-[#1e2631]'
                     }`}
                   >
                     {preset.flag && <span className="text-base shrink-0">{preset.flag}</span>}
@@ -116,7 +116,7 @@ export function PresetSidebar({ onSelect, activePresetId }: PresetSidebarProps) 
   const [search, setSearch] = useState('')
 
   return (
-    <aside className="hidden lg:block w-64 shrink-0 h-fit sticky top-6 rounded-xl border border-[#1e2631] bg-[#131a23] overflow-hidden">
+    <aside className="hidden lg:block w-64 shrink-0 h-fit sticky top-6 rounded-xl border border-slate-200 dark:border-[#1e2631] bg-slate-50 dark:bg-[#131a23] overflow-hidden">
       <PresetList
         search={search}
         onSearchChange={setSearch}
@@ -142,13 +142,13 @@ export function PresetDrawer({ open, onClose, onSelect, activePresetId }: Preset
       />
 
       {/* Bottom sheet */}
-      <div className="absolute bottom-0 left-0 right-0 max-h-[70vh] rounded-t-2xl bg-[#131a23] border-t border-[#1e2631] flex flex-col animate-slide-up">
+      <div className="absolute bottom-0 left-0 right-0 max-h-[70vh] rounded-t-2xl bg-slate-50 dark:bg-[#131a23] border-t border-slate-200 dark:border-[#1e2631] flex flex-col animate-slide-up">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#1e2631]">
-          <h2 className="text-sm font-semibold text-white">Presets</h2>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-[#1e2631]">
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Presets</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[#70767f] hover:text-[#a6abb5] hover:bg-[#1e2631] transition-colors cursor-pointer"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 dark:text-[#70767f] hover:text-slate-500 dark:hover:text-[#a6abb5] hover:bg-slate-200 dark:hover:bg-[#1e2631] transition-colors cursor-pointer"
             aria-label="Close presets"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

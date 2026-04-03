@@ -1,9 +1,13 @@
 'use client'
 
+import { useEffect } from 'react'
 import { ToolHeader } from './tool-header'
 import { ToolTabs, type ToolTab } from './tool-tabs'
 import { ToolActionBar } from './tool-action-bar'
 import { getToolCategory, type ToolCategory } from './tool-categories'
+
+/** Class added to body when ToolFrame is active — hides global header/footer */
+const FRAME_ACTIVE_CLASS = 'tool-frame-active'
 
 interface ToolFrameProps {
   toolName: string
@@ -27,6 +31,12 @@ export function ToolFrame({
   children,
 }: ToolFrameProps) {
   const resolvedCategory = category || getToolCategory(toolSlug)
+
+  // Hide global header/footer when ToolFrame is mounted
+  useEffect(() => {
+    document.body.classList.add(FRAME_ACTIVE_CLASS)
+    return () => { document.body.classList.remove(FRAME_ACTIVE_CLASS) }
+  }, [])
 
   return (
     <div className="h-screen flex flex-col bg-slate-50 dark:bg-slate-950">

@@ -145,7 +145,7 @@ export function TabSwipeContainer({ activeTab, onTabChange: _onTabChange, childr
           <div
             key={TAB_ORDER[i]}
             ref={setPanelRef(i)}
-            className="w-full shrink-0 h-full overflow-y-auto"
+            className="mobile-tab-panel w-full shrink-0 h-full overflow-y-auto"
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
             {child}

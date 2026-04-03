@@ -16,9 +16,9 @@ function LobbyInner() {
   const { activeTab } = useSlots()
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-[#090f16]">
+    <div className="flex flex-col h-[100dvh] bg-white dark:bg-[#090f16]">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-2.5 border-b border-[#3D6AF2]/30 bg-[#131a23] shrink-0">
+      <header className="flex items-center justify-between px-4 py-2.5 border-b border-[#3D6AF2]/30 bg-slate-50 dark:bg-[#131a23] shrink-0">
         <div className="flex items-center gap-2.5">
           <BackButton />
           <h1 className="text-[15px] font-extrabold text-[#f0d080] tracking-[0.06em]">TOOLK1T CASINO</h1>
@@ -40,9 +40,9 @@ function LobbyInner() {
           <>
             <EventsBanner />
             <DailyBonus />
-            <div className="overflow-x-auto flex gap-4 snap-x snap-mandatory px-4 py-6">
+            <div className="overflow-x-auto flex gap-3 snap-x snap-mandatory px-4 py-6">
               {ALL_GAMES.map((game) => (
-                <div key={game.id} className="snap-center shrink-0 w-[200px] sm:w-[220px]">
+                <div key={game.id} className="snap-center shrink-0">
                   <GameCard game={game} />
                 </div>
               ))}

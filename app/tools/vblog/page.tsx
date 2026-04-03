@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function VBlogPage() {
   return (
-    <main className="flex-1 flex flex-col items-center py-10 px-4 bg-[#090f16]"
+    <main className="flex-1 flex flex-col items-center py-10 px-4 bg-white dark:bg-[#090f16]"
       style={{ overscrollBehaviorX: 'none' } as React.CSSProperties}>
       <div className="w-full max-w-4xl">
         <div className="mb-6">

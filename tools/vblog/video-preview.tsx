@@ -117,7 +117,7 @@ export function VideoPreview({ job }: VideoPreviewProps) {
                 <a
                   href={v.url}
                   download
-                  className="w-full bg-[#10B981] hover:bg-emerald-500 text-white font-semibold rounded-lg min-h-[36px] text-xs text-center cursor-pointer transition-colors inline-flex items-center justify-center"
+                  className="w-full bg-[#10B981] hover:bg-emerald-500 text-white font-semibold rounded-lg min-h-[44px] text-xs text-center cursor-pointer transition-colors inline-flex items-center justify-center"
                 >
                   Download
                 </a>

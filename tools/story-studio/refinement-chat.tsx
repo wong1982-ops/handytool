@@ -352,7 +352,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                         ? 'border-[#3D6AF2] dark:border-[#3D6AF2] bg-[#3D6AF2]/10 dark:bg-[#3D6AF2]/15 text-[#3D6AF2] dark:text-[#93aaff] shadow-sm'
                         : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
-                    style={{ minHeight: '36px' }}
+                    style={{ minHeight: '44px' }}
                   >
                     All On
                   </button>
@@ -364,7 +364,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                         ? 'border-amber-400 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 shadow-sm'
                         : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
-                    style={{ minHeight: '36px' }}
+                    style={{ minHeight: '44px' }}
                   >
                     Text Only
                   </button>

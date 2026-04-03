@@ -34,7 +34,7 @@ export default function JwtDecoderPage() {
               <h1 className="text-2xl font-bold text-white sm:text-3xl">
                 JWT Decoder
               </h1>
-              <p className="mt-1 text-sm text-[#a6abb5]">
+              <p className="mt-1 text-sm text-slate-500 dark:text-[#a6abb5]">
                 Decode, verify, and generate JSON Web Tokens — 100% client-side, your tokens stay in your browser.
               </p>
             </div>

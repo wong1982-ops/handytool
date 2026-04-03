@@ -1,0 +1,365 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Toolk1t" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Toolk1t" [ref=e5]
+      - generic [ref=e6]:
+        - switch "Switch to light mode" [checked] [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+          - img [ref=e10]
+        - button "Open menu" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+  - generic [ref=e16]:
+    - generic [ref=e17]:
+      - navigation "Breadcrumb" [ref=e19]:
+        - button "Back to Home" [ref=e20] [cursor=pointer]:
+          - img [ref=e21]
+          - text: Home
+        - button "Add Swagger Editor to favorites" [ref=e23] [cursor=pointer]:
+          - img [ref=e24]
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - button "Validate" [ref=e28] [cursor=pointer]:
+            - img [ref=e30]
+            - generic: Check OpenAPI spec validity
+          - button "Format" [ref=e32] [cursor=pointer]:
+            - img [ref=e34]
+            - generic: Auto-format YAML in place
+        - generic [ref=e37]:
+          - button "Export" [ref=e38] [cursor=pointer]:
+            - img [ref=e40]
+            - generic: Download as YAML file
+          - button "Copy" [ref=e42] [cursor=pointer]:
+            - img [ref=e44]
+            - generic: Copy YAML to clipboard
+      - generic [ref=e47]:
+        - button "editor" [ref=e48] [cursor=pointer]
+        - button "preview" [ref=e49] [cursor=pointer]
+        - button "problems" [ref=e50] [cursor=pointer]
+    - main [ref=e51]:
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - generic [ref=e59]: "1"
+            - generic [ref=e60]: "2"
+            - generic [ref=e61]: "3"
+            - generic [ref=e62]: "4"
+            - generic [ref=e63]: "5"
+            - generic [ref=e64]: "6"
+            - generic [ref=e65]: "7"
+            - generic [ref=e66]: "8"
+            - generic [ref=e67]: "9"
+            - generic [ref=e68]: "10"
+            - generic [ref=e69]: "11"
+            - generic [ref=e70]: "12"
+            - generic [ref=e71]: "13"
+            - generic [ref=e72]: "14"
+            - generic [ref=e73]: "15"
+            - generic [ref=e74]: "16"
+            - generic [ref=e75]: "17"
+            - generic [ref=e76]: "18"
+            - generic [ref=e77]: "19"
+            - generic [ref=e78]: "20"
+            - generic [ref=e79]: "21"
+            - generic [ref=e80]: "22"
+            - generic [ref=e81]: "23"
+            - generic [ref=e82]: "24"
+            - generic [ref=e83]: "25"
+            - generic [ref=e84]: "26"
+            - generic [ref=e85]: "27"
+          - generic [ref=e86]:
+            - generic [ref=e88]: ⌄
+            - generic [ref=e89]: ⌄
+            - generic [ref=e90]: ⌄
+            - generic [ref=e91]: ⌄
+            - generic [ref=e92]: ⌄
+            - generic [ref=e93]: ⌄
+            - generic [ref=e94]: ⌄
+            - generic [ref=e95]: ⌄
+            - generic [ref=e96]: ⌄
+            - generic [ref=e97]: ⌄
+            - generic [ref=e98]: ⌄
+            - generic [ref=e99]: ⌄
+        - textbox [ref=e100]:
+          - generic [ref=e101]: "openapi: \"3.0.1\""
+          - generic [ref=e102]: "info:"
+          - generic [ref=e103]: "title: \"Petstore API\""
+          - generic [ref=e104]: "description: |-"
+          - generic [ref=e105]: This is a sample server Petstore server.
+          - generic [ref=e106]: You can find out more about Swagger at http://swagger.io
+          - generic [ref=e107]: "or on irc.freenode.net, #swagger."
+          - generic [ref=e108]: "version: \"1.0.0\""
+          - generic [ref=e109]: "servers:"
+          - generic [ref=e110]: "- url: \"http://petstore.swagger.io/v1\""
+          - generic [ref=e111]: "paths:"
+          - generic [ref=e112]: "/pets:"
+          - generic [ref=e113]: "get:"
+          - generic [ref=e114]: "summary: \"List all pets\""
+          - generic [ref=e115]: "operationId: \"listPets\""
+          - generic [ref=e116]: "tags:"
+          - generic [ref=e117]: "- \"pets\""
+          - generic [ref=e118]: "parameters:"
+          - generic [ref=e119]: "- name: \"limit\""
+          - generic [ref=e120]: "in: \"query\""
+          - generic [ref=e121]: "description: \"How many items to return at one time\""
+          - generic [ref=e122]: "required: false"
+          - generic [ref=e123]: "schema:"
+          - generic [ref=e124]: "type: \"integer\""
+          - generic [ref=e125]: "format: \"int32\""
+          - generic [ref=e126]: "responses:"
+          - generic [ref=e127]: "\"200\":"
+  - contentinfo [ref=e129]:
+    - generic [ref=e130]:
+      - generic [ref=e131]:
+        - img [ref=e132]
+        - generic [ref=e134]: © 2026 Toolk1t
+      - generic [ref=e135]:
+        - link "Blog" [ref=e136] [cursor=pointer]:
+          - /url: /blog
+        - link "Pricing" [ref=e137] [cursor=pointer]:
+          - /url: /pricing
+        - link "Terms of Service" [ref=e138] [cursor=pointer]:
+          - /url: /terms
+        - link "Privacy Policy" [ref=e139] [cursor=pointer]:
+          - /url: /privacy
+        - link "Contact Support" [ref=e140] [cursor=pointer]:
+          - /url: /contact
+        - link "Shielded Site" [ref=e141] [cursor=pointer]:
+          - /url: "#"
+          - img "Shielded Site" [ref=e142]
+  - generic [ref=e143]:
+    - banner [ref=e144]:
+      - link "Toolk1t" [ref=e145] [cursor=pointer]:
+        - /url: /
+        - img "Toolk1t" [ref=e146]
+      - generic [ref=e147]:
+        - button "Search tools" [ref=e148] [cursor=pointer]:
+          - img [ref=e149]
+        - button "Switch to light mode" [ref=e151] [cursor=pointer]:
+          - img [ref=e152]
+    - generic [ref=e155]:
+      - generic [ref=e160]:
+        - generic [ref=e161]:
+          - navigation "Breadcrumb" [ref=e163]:
+            - button "Back to Home" [ref=e164] [cursor=pointer]:
+              - img [ref=e165]
+              - text: Home
+            - button "Add Swagger Editor to favorites" [ref=e167] [cursor=pointer]:
+              - img [ref=e168]
+          - generic [ref=e170]:
+            - generic [ref=e171]:
+              - button "Validate" [ref=e172] [cursor=pointer]:
+                - img [ref=e174]
+                - generic: Check OpenAPI spec validity
+              - button "Format" [ref=e176] [cursor=pointer]:
+                - img [ref=e178]
+                - generic: Auto-format YAML in place
+            - generic [ref=e181]:
+              - button "Export" [ref=e182] [cursor=pointer]:
+                - img [ref=e184]
+                - generic: Download as YAML file
+              - button "Copy" [ref=e186] [cursor=pointer]:
+                - img [ref=e188]
+                - generic: Copy YAML to clipboard
+          - generic [ref=e191]:
+            - button "editor" [ref=e192] [cursor=pointer]
+            - button "preview" [ref=e193] [cursor=pointer]
+            - button "problems" [ref=e194] [cursor=pointer]
+        - main [ref=e195]:
+          - generic [ref=e200]:
+            - generic [ref=e201]:
+              - generic [ref=e202]:
+                - generic [ref=e203]: "1"
+                - generic [ref=e204]: "2"
+                - generic [ref=e205]: "3"
+                - generic [ref=e206]: "4"
+                - generic [ref=e207]: "5"
+                - generic [ref=e208]: "6"
+                - generic [ref=e209]: "7"
+                - generic [ref=e210]: "8"
+                - generic [ref=e211]: "9"
+                - generic [ref=e212]: "10"
+                - generic [ref=e213]: "11"
+                - generic [ref=e214]: "12"
+                - generic [ref=e215]: "13"
+                - generic [ref=e216]: "14"
+                - generic [ref=e217]: "15"
+                - generic [ref=e218]: "16"
+                - generic [ref=e219]: "17"
+                - generic [ref=e220]: "18"
+                - generic [ref=e221]: "19"
+                - generic [ref=e222]: "20"
+                - generic [ref=e223]: "21"
+                - generic [ref=e224]: "22"
+                - generic [ref=e225]: "23"
+                - generic [ref=e226]: "24"
+                - generic [ref=e227]: "25"
+                - generic [ref=e228]: "26"
+                - generic [ref=e229]: "27"
+              - generic [ref=e230]:
+                - generic [ref=e232]: ⌄
+                - generic [ref=e233]: ⌄
+                - generic [ref=e234]: ⌄
+                - generic [ref=e235]: ⌄
+                - generic [ref=e236]: ⌄
+                - generic [ref=e237]: ⌄
+                - generic [ref=e238]: ⌄
+                - generic [ref=e239]: ⌄
+                - generic [ref=e240]: ⌄
+                - generic [ref=e241]: ⌄
+                - generic [ref=e242]: ⌄
+                - generic [ref=e243]: ⌄
+            - textbox [ref=e244]:
+              - generic [ref=e245]: "openapi: \"3.0.1\""
+              - generic [ref=e246]: "info:"
+              - generic [ref=e247]: "title: \"Petstore API\""
+              - generic [ref=e248]: "description: |-"
+              - generic [ref=e249]: This is a sample server Petstore server.
+              - generic [ref=e250]: You can find out more about Swagger at http://swagger.io
+              - generic [ref=e251]: "or on irc.freenode.net, #swagger."
+              - generic [ref=e252]: "version: \"1.0.0\""
+              - generic [ref=e253]: "servers:"
+              - generic [ref=e254]: "- url: \"http://petstore.swagger.io/v1\""
+              - generic [ref=e255]: "paths:"
+              - generic [ref=e256]: "/pets:"
+              - generic [ref=e257]: "get:"
+              - generic [ref=e258]: "summary: \"List all pets\""
+              - generic [ref=e259]: "operationId: \"listPets\""
+              - generic [ref=e260]: "tags:"
+              - generic [ref=e261]: "- \"pets\""
+              - generic [ref=e262]: "parameters:"
+              - generic [ref=e263]: "- name: \"limit\""
+              - generic [ref=e264]: "in: \"query\""
+              - generic [ref=e265]: "description: \"How many items to return at one time\""
+              - generic [ref=e266]: "required: false"
+              - generic [ref=e267]: "schema:"
+              - generic [ref=e268]: "type: \"integer\""
+              - generic [ref=e269]: "format: \"int32\""
+              - generic [ref=e270]: "responses:"
+              - generic [ref=e271]: "\"200\":"
+      - generic [ref=e275]:
+        - generic [ref=e276]: ⭐
+        - heading "No Favorites Yet" [level=2] [ref=e277]
+        - paragraph [ref=e278]: Star your most-used tools for quick access. Tap the star on any tool card.
+      - generic [ref=e282]:
+        - generic [ref=e283]:
+          - heading "Credits" [level=2] [ref=e284]
+          - generic [ref=e285]:
+            - generic [ref=e286]:
+              - generic [ref=e287]: Subscription
+              - generic [ref=e288]: ...
+            - generic [ref=e289]:
+              - generic [ref=e290]:
+                - text: Purchased
+                - paragraph [ref=e291]: Never expires
+              - generic [ref=e292]: ...
+            - generic [ref=e293]:
+              - generic [ref=e294]: Total Available
+              - generic [ref=e295]: ...
+          - generic [ref=e296]:
+            - button "Buy Credit Packs One-time purchases" [ref=e297] [cursor=pointer]:
+              - img [ref=e299]
+              - generic [ref=e301]:
+                - paragraph [ref=e302]: Buy Credit Packs
+                - paragraph [ref=e303]: One-time purchases
+              - img [ref=e304]
+            - button "Transaction History No transactions yet" [ref=e306] [cursor=pointer]:
+              - img [ref=e308]
+              - generic [ref=e310]:
+                - paragraph [ref=e311]: Transaction History
+                - paragraph [ref=e312]: No transactions yet
+              - img [ref=e313]
+        - button "Credits" [ref=e317] [cursor=pointer]:
+          - img [ref=e318]
+          - text: Credits
+      - generic [ref=e324]:
+        - generic [ref=e325]:
+          - heading "Settings" [level=2] [ref=e326]
+          - generic [ref=e327]:
+            - generic [ref=e328]: L
+            - generic [ref=e329]:
+              - paragraph [ref=e330]: Local Dev User
+              - paragraph [ref=e331]: loicwong1982@gmail.com
+            - button "Sign Out" [ref=e332] [cursor=pointer]
+          - generic [ref=e333]:
+            - generic [ref=e334]: Dark Mode
+            - switch "Toggle dark mode" [checked] [ref=e335] [cursor=pointer]
+          - generic [ref=e337]:
+            - button "Blog" [ref=e338] [cursor=pointer]:
+              - img [ref=e340]
+              - generic [ref=e342]: Blog
+              - img [ref=e343]
+            - button "Terms of Service" [ref=e345] [cursor=pointer]:
+              - img [ref=e347]
+              - generic [ref=e349]: Terms of Service
+              - img [ref=e350]
+            - button "Privacy Policy" [ref=e352] [cursor=pointer]:
+              - img [ref=e354]
+              - generic [ref=e356]: Privacy Policy
+              - img [ref=e357]
+            - button "Contact Support" [ref=e359] [cursor=pointer]:
+              - img [ref=e361]
+              - generic [ref=e363]: Contact Support
+              - img [ref=e364]
+        - button "Settings" [ref=e368] [cursor=pointer]:
+          - img [ref=e369]
+          - text: Settings
+    - navigation [ref=e372]:
+      - generic [ref=e373]:
+        - button "Home" [ref=e374] [cursor=pointer]:
+          - img [ref=e375]
+          - generic [ref=e377]: Home
+        - button "Favorites" [ref=e378] [cursor=pointer]:
+          - img [ref=e379]
+        - button "Credits" [ref=e381] [cursor=pointer]:
+          - img [ref=e382]
+        - button "Profile" [ref=e384] [cursor=pointer]:
+          - generic [ref=e386]: L
+  - button "Open Next.js Dev Tools" [ref=e392] [cursor=pointer]:
+    - img [ref=e393]
+  - alert [ref=e396]
+  - dialog "Pricing" [ref=e397]:
+    - generic [ref=e398]:
+      - generic [ref=e399]:
+        - heading "Pricing" [level=2] [ref=e400]
+        - paragraph [ref=e401]: Buy credit packs
+      - button "Close pricing" [ref=e402] [cursor=pointer]:
+        - img [ref=e403]
+    - generic [ref=e405]:
+      - generic [ref=e406]:
+        - generic [ref=e407]:
+          - paragraph [ref=e408]: Subscription
+          - paragraph [ref=e409]: ...
+        - generic [ref=e410]:
+          - paragraph [ref=e411]: Purchased
+          - paragraph [ref=e412]: ...
+        - generic [ref=e413]:
+          - paragraph [ref=e414]: Total
+          - paragraph [ref=e415]: ...
+      - generic [ref=e416]:
+        - heading "Credit Packs" [level=3] [ref=e417]
+        - generic [ref=e418]:
+          - generic [ref=e419]:
+            - generic [ref=e420]:
+              - img [ref=e422]
+              - generic [ref=e424]:
+                - paragraph [ref=e425]: 800 Credits
+                - paragraph [ref=e426]: $5.00 · $0.6/credit
+            - button "Buy" [ref=e427] [cursor=pointer]
+          - generic [ref=e428]:
+            - generic [ref=e429]:
+              - img [ref=e431]
+              - generic [ref=e433]:
+                - paragraph [ref=e434]: 3,550 Credits
+                - paragraph [ref=e435]: $20.00 · $0.6/credit
+            - button "Buy" [ref=e436] [cursor=pointer]
+          - generic [ref=e437]:
+            - generic [ref=e438]:
+              - img [ref=e440]
+              - generic [ref=e442]:
+                - paragraph [ref=e443]: 10,000 Credits
+                - paragraph [ref=e444]: $50.00 · $0.5/credit
+            - button "Buy" [ref=e445] [cursor=pointer]
+      - link "View Transaction History" [ref=e446] [cursor=pointer]:
+        - /url: /billing

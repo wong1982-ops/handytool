@@ -46,7 +46,7 @@ export function JobCard({ job, onClick }: JobCardProps) {
     <button
       type="button"
       onClick={() => onClick(job)}
-      className="job-card w-full text-left p-5 rounded-xl border border-[#1e2631] bg-[#131a23] hover:border-[rgba(61,106,242,0.55)] hover:shadow-[0_4px_20px_rgba(61,106,242,0.08)] hover:bg-[#1e2631] transition-all cursor-pointer group"
+      className="job-card w-full text-left p-5 rounded-xl border border-slate-200 dark:border-[#1e2631] bg-slate-50 dark:bg-[#131a23] hover:border-[rgba(61,106,242,0.55)] hover:shadow-[0_4px_20px_rgba(61,106,242,0.08)] hover:bg-slate-200 dark:hover:bg-[#1e2631] transition-all cursor-pointer group"
       aria-label={`View details for ${job.title} at ${job.company}`}
     >
       {/* Header */}
@@ -54,13 +54,13 @@ export function JobCard({ job, onClick }: JobCardProps) {
         <h3 className="text-sm font-semibold text-white group-hover:text-[#3D6AF2] transition-colors line-clamp-2">
           {job.title}
         </h3>
-        <span className="text-xs text-[#70767f] whitespace-nowrap shrink-0 mt-0.5">
+        <span className="text-xs text-slate-400 dark:text-[#70767f] whitespace-nowrap shrink-0 mt-0.5">
           {formatRelativeDate(job.posted_at)}
         </span>
       </div>
 
       {/* Company + Location */}
-      <p className="text-xs text-[#a6abb5] mb-3">
+      <p className="text-xs text-slate-500 dark:text-[#a6abb5] mb-3">
         {job.company} · {COUNTRY_FLAG[job.country]} {job.location}
       </p>
 
@@ -83,7 +83,7 @@ export function JobCard({ job, onClick }: JobCardProps) {
         <span className="text-sm font-semibold text-white">
           {formatSalary(job)}
         </span>
-        <span className="text-xs text-[#70767f]">
+        <span className="text-xs text-slate-400 dark:text-[#70767f]">
           {SOURCE_LABELS[job.source]}
         </span>
       </div>

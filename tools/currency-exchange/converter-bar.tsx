@@ -128,7 +128,7 @@ export function ConverterBar({
           <button
             onClick={handleSwap}
             aria-label="Swap currencies"
-            className="bg-[var(--tk-color-primary-500)]/10 hover:bg-[var(--tk-color-primary-500)]/20 text-[var(--tk-color-primary-500)] p-3 rounded-full transition-all duration-300 cursor-pointer"
+            className="bg-[var(--tk-color-primary-500)]/10 hover:bg-[var(--tk-color-primary-500)]/20 text-[var(--tk-color-primary-500)] p-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full transition-all duration-300 cursor-pointer"
             style={{ transform: `rotate(${swapRotation}deg)`, transition: 'transform 0.3s ease' }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -219,7 +219,7 @@ export function ConverterBar({
                 )}
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-400 hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                  className="flex items-center gap-1 px-3 py-2 min-h-[44px] text-xs font-medium text-slate-400 hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
                   aria-label="Copy conversion result"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -229,7 +229,7 @@ export function ConverterBar({
                 </button>
                 <button
                   onClick={handleShare}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-400 hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                  className="flex items-center gap-1 px-3 py-2 min-h-[44px] text-xs font-medium text-slate-400 hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
                   aria-label="Copy share link"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

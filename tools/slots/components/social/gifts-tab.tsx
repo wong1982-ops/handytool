@@ -33,7 +33,7 @@ export function GiftsTab() {
         {gifts.length > 0 && (
           <button
             onClick={handleClaimAll}
-            className="px-4 py-2 min-h-[36px] rounded-lg text-[13px] font-semibold bg-[#3D6AF2] text-white hover:bg-[#3D79F2] transition-colors"
+            className="px-4 py-2 min-h-[44px] rounded-lg text-[13px] font-semibold bg-[#3D6AF2] text-white hover:bg-[#3D79F2] transition-colors"
           >
             {t.social.claimAll} ({gifts.length})
           </button>

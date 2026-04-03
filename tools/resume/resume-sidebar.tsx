@@ -31,7 +31,7 @@ export function ResumeSidebar() {
           <button
             key={mode}
             onClick={() => dispatch({ type: 'SET_SIDEBAR_MODE', payload: mode })}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left
+            className={`flex items-center gap-3 px-3 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-colors text-left
               ${sidebarMode === mode
                 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
                 : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
@@ -52,7 +52,7 @@ export function ResumeSidebar() {
               <button
                 key={mod}
                 onClick={() => dispatch({ type: 'SET_ACTIVE_MODULE', payload: mod })}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors text-left
+                className={`flex items-center gap-2 px-3 py-2 min-h-[44px] rounded-lg text-sm transition-colors text-left
                   ${activeModule === mod
                     ? 'bg-gray-100 text-gray-900 font-medium dark:bg-gray-800 dark:text-gray-100'
                     : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800/50'
@@ -71,7 +71,7 @@ export function ResumeSidebar() {
         {/* Save to cloud */}
         <button
           onClick={() => saveToCloudManual()}
-          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+          className={`w-full flex items-center gap-2 px-3 py-2 min-h-[44px] rounded-lg text-sm transition-colors ${
             cloudSaveStatus === 'saved'
               ? 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400'
               : cloudSaveStatus === 'error'

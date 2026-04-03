@@ -1,0 +1,147 @@
+[     189ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/52cf4_next_dist_8fb39be2._.js:2297
+[    3499ms] [WARNING] The resource http://localhost:3000/_next/static/chunks/app_not-found_module_scss_module_90d14cdd.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/tools/color-palette:0
+[    6697ms] [LOG] [Fast Refresh] done in 6526ms @ http://localhost:3000/_next/static/chunks/52cf4_next_dist_8fb39be2._.js:2297
+[    7029ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/52cf4_next_dist_8fb39be2._.js:2297
+[    7069ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/52cf4_next_dist_8fb39be2._.js:2297
+[    7373ms] Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <RedirectBoundary>
+      <RedirectErrorBoundary router={{...}}>
+        <InnerLayoutRouter url="/tools/cur..." tree={[...]} params={{}} cacheNode={{rsc:<Fragment>, ...}} ...>
+          <SegmentViewNode type="page" pagePath="tools/curr...">
+            <SegmentTrieNode>
+            <ClientPageRoot Component={function CurrencyExchangePage} serverProvidedParams={{...}}>
+              <CurrencyExchangePage params={Promise} searchParams={Promise}>
+                <main className="max-w-7xl ...">
+                  <ToolBreadcrumb>
+                  <div>
+                  <div>
+                  <PanelGrid panels={[...]} onReorder={function usePanelLayout.useCallback[reorderPanels]} ...>
+                    <div className="space-y-3">
+                      <div className="grid grid-...">
+                        <div>
+                        <div>
+                        <div>
+                        <div>
+                        <div>
+                        <div>
+                          <RateAlerts from="USD" to="EUR">
+                            <div className="bg-white/7...">
+                              <h3>
++                             <button
++                               onClick={function useRateAlerts.useCallback[requestPermission]}
++                               className="w-full mb-3 px-3 py-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border bo..."
++                             >
+-                             <div
+-                               className="mb-3 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate..."
+-                             >
+                              ...
+          ...
+        ...
+
+    at throwOnHydrationMismatch (http://localhost:3000/_next/static/chunks/52cf4_next_dist_compiled_react-dom_82f08a28._.js:3348:56)
+    at beginWork (http://localhost:3000/_next/static/chunks/52cf4_next_dist_compiled_react-dom_82f08a28._.js:6775:918)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/52cf4_next_dist_compiled_react-dom_82f08a28._.js:965:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/52cf4_next_dist_compiled_react-dom_82f08a28._.js:9562:97)
+    at workLoopConcurrentByScheduler (http://localhost:3000/_next/static/chunks/52cf4_next_dist_compiled_react-dom_82f08a28._.js:9558:58)
+    at renderRootConcurrent (http://localhost:3000/_next/static/chunks/52cf4_next_dist_compiled_react-dom_82f08a28._.js:9541:71)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/52cf4_next_dist_compiled_react-dom_82f08a28._.js:9068:150)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/52cf4_next_dist_compiled_react-dom_82f08a28._.js:10230:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/52cf4_next_dist_compiled_17f05296._.js:2647:64)
+[    7639ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/52cf4_next_dist_8fb39be2._.js:2297
+[    7654ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/notifications/prefs:0
+[    7674ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/notifications/prefs:0
+[    8070ms] [ERROR] Failed to load resource: the server responded with a status of 406 () @ https://wgrcfnumbozvtmhcavnm.supabase.co/rest/v1/user_profiles?select=profile_completed%2Cprompt_dismiss_count%2Cprompt_last_dismissed&id=eq.10776ca1-8687-4e05-92dc-5df0db8900bc:0
+[    8091ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/currencies' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8091ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/currencies:0
+[    8091ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=GBP&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8091ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=GBP&to=USD:0
+[    8104ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=EUR&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8104ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=EUR&to=USD:0
+[    8104ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=USD&to=JPY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8104ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=USD&to=JPY:0
+[    8104ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=USD&to=JPY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8104ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=USD&to=JPY:0
+[    8104ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=AUD&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8104ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=AUD&to=USD:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=EUR&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=EUR&to=USD:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=AUD&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=AUD&to=USD:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,AUD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,AUD:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=GBP&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=GBP&to=USD:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/currencies' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/currencies:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=GBP&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=GBP&to=USD:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=EUR&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=EUR&to=USD:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=USD&to=JPY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=USD&to=JPY:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=USD&to=JPY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=USD&to=JPY:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=AUD&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=AUD&to=USD:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=EUR&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=EUR&to=USD:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=AUD&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=AUD&to=USD:0
+[    8105ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,AUD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8105ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,AUD:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=GBP&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=GBP&to=USD:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/currencies' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/currencies:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=GBP&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=GBP&to=USD:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=EUR&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=EUR&to=USD:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=USD&to=JPY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=USD&to=JPY:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=USD&to=JPY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=USD&to=JPY:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=AUD&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=AUD&to=USD:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=EUR&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=EUR&to=USD:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=AUD&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=AUD&to=USD:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=GBP&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=GBP&to=USD:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/currencies' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/currencies:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=GBP&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=GBP&to=USD:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=EUR&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8106ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=EUR&to=USD:0
+[    8106ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=USD&to=JPY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8107ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=USD&to=JPY:0
+[    8107ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=USD&to=JPY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8107ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=USD&to=JPY:0
+[    8107ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=AUD&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8107ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=AUD&to=USD:0
+[    8107ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/latest?from=EUR&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8107ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/latest?from=EUR&to=USD:0
+[    8107ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=AUD&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8107ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=AUD&to=USD:0
+[    8107ms] [ERROR] Access to fetch at 'https://api.frankfurter.app/2026-04-02?from=GBP&to=USD' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3000/tools/currency-exchange:0
+[    8107ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://api.frankfurter.app/2026-04-02?from=GBP&to=USD:0
+[    8342ms] [ERROR] Failed to load resource: the server responded with a status of 406 () @ https://wgrcfnumbozvtmhcavnm.supabase.co/rest/v1/user_profiles?select=profile_completed%2Cprompt_dismiss_count%2Cprompt_last_dismissed&id=eq.10776ca1-8687-4e05-92dc-5df0db8900bc:0
+[   12029ms] [WARNING] The resource http://localhost:3000/_next/static/chunks/app_not-found_module_scss_module_90d14cdd.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/tools/currency-exchange:0
+[   13062ms] [LOG] [Fast Refresh] done in 5591ms @ http://localhost:3000/_next/static/chunks/52cf4_next_dist_8fb39be2._.js:2297
+[   16131ms] [WARNING] The resource http://localhost:3000/_next/static/chunks/app_not-found_module_scss_module_90d14cdd.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/tools/currency-exchange:0
+[   18507ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/52cf4_next_dist_8fb39be2._.js:2297
+[   23503ms] [LOG] [Fast Refresh] done in 5098ms @ http://localhost:3000/_next/static/chunks/52cf4_next_dist_8fb39be2._.js:2297

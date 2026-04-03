@@ -90,21 +90,21 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
       className={`fixed inset-0 z-50 m-0 p-0 w-full h-full max-w-none max-h-none bg-transparent backdrop:bg-black/65 lg:flex lg:items-center lg:justify-center lg:p-6 ${!job ? 'pointer-events-none hidden' : ''}`}
     >
       {job && (
-      <div className="absolute bottom-0 left-0 right-0 lg:static lg:w-full lg:max-w-2xl overflow-y-auto rounded-t-2xl lg:rounded-2xl border border-[#1e2631] bg-[#131a23] shadow-[0_-8px_40px_rgba(0,0,0,0.5)]" style={{ maxHeight: '88vh' }}>
+      <div className="absolute bottom-0 left-0 right-0 lg:static lg:w-full lg:max-w-2xl overflow-y-auto rounded-t-2xl lg:rounded-2xl border border-slate-200 dark:border-[#1e2631] bg-slate-50 dark:bg-[#131a23] shadow-[0_-8px_40px_rgba(0,0,0,0.5)]" style={{ maxHeight: '88vh' }}>
         {/* Header */}
-        <div className="sticky top-0 z-[1] flex items-start justify-between gap-4 p-5 bg-[#131a23] border-b border-[#1e2631]">
+        <div className="sticky top-0 z-[1] flex items-start justify-between gap-4 p-5 bg-slate-50 dark:bg-[#131a23] border-b border-slate-200 dark:border-[#1e2631]">
           <div className="flex-1 min-w-0">
             <h2 className="text-lg font-bold text-white mb-1">
               {job.title}
             </h2>
-            <p className="text-sm text-[#a6abb5]">
+            <p className="text-sm text-slate-500 dark:text-[#a6abb5]">
               {job.company} · {COUNTRY_FLAG[job.country]} {job.location}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center justify-center w-10 h-10 rounded-lg text-[#a6abb5] hover:bg-[#1e2631] transition-colors shrink-0 cursor-pointer"
+            className="flex items-center justify-center w-10 h-10 rounded-lg text-slate-500 dark:text-[#a6abb5] hover:bg-slate-200 dark:hover:bg-[#1e2631] transition-colors shrink-0 cursor-pointer"
             aria-label="Close"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -127,14 +127,14 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
                 {WORK_MODE_LABELS[job.work_mode]}
               </span>
             )}
-            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-[#1e2631] text-[#a6abb5]">
+            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-slate-200 dark:bg-[#1e2631] text-slate-500 dark:text-[#a6abb5]">
               {SOURCE_LABELS[job.source]}
             </span>
           </div>
 
           {/* Salary */}
-          <div className="p-4 rounded-xl bg-[#0d1520] border border-[#1e2631]">
-            <p className="text-[10px] font-semibold text-[#70767f] uppercase tracking-widest mb-1.5">
+          <div className="p-4 rounded-xl bg-[#0d1520] border border-slate-200 dark:border-[#1e2631]">
+            <p className="text-[10px] font-semibold text-slate-400 dark:text-[#70767f] uppercase tracking-widest mb-1.5">
               Compensation
             </p>
             <p className="text-xl font-bold text-white">
@@ -147,7 +147,7 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
             <div>
               <h3 className="text-sm font-semibold text-white mb-2">Description</h3>
               <div
-                className="text-sm text-[#a6abb5] leading-relaxed max-w-none
+                className="text-sm text-slate-500 dark:text-[#a6abb5] leading-relaxed max-w-none
                   [&_h1]:text-base [&_h1]:font-bold [&_h1]:text-white [&_h1]:mt-4 [&_h1]:mb-2
                   [&_h2]:text-sm [&_h2]:font-bold [&_h2]:text-white [&_h2]:mt-3 [&_h2]:mb-1.5
                   [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-white [&_h3]:mt-2 [&_h3]:mb-1
@@ -178,13 +178,13 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
           )}
 
           {/* Posted date */}
-          <p className="text-xs text-[#70767f]">
+          <p className="text-xs text-slate-400 dark:text-[#70767f]">
             Posted {new Date(job.posted_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 flex gap-3 p-5 bg-[#131a23] border-t border-[#1e2631]">
+        <div className="sticky bottom-0 flex gap-3 p-5 bg-slate-50 dark:bg-[#131a23] border-t border-slate-200 dark:border-[#1e2631]">
           <a
             href={job.source_url}
             target="_blank"
@@ -201,7 +201,7 @@ export function JobDetailModal({ job, onClose }: JobDetailModalProps) {
             onClick={() => {
               navigator.clipboard.writeText(job.source_url)
             }}
-            className="h-12 px-5 rounded-xl border border-[#1e2631] bg-[#1e2631] hover:bg-[#252e3d] text-sm font-medium text-[#a6abb5] transition-colors cursor-pointer"
+            className="h-12 px-5 rounded-xl border border-slate-200 dark:border-[#1e2631] bg-slate-200 dark:bg-[#1e2631] hover:bg-[#252e3d] text-sm font-medium text-slate-500 dark:text-[#a6abb5] transition-colors cursor-pointer"
             aria-label="Copy job link"
           >
             Share

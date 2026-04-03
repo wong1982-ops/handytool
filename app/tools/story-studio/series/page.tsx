@@ -221,14 +221,14 @@ export default function SeriesListPage() {
                   <Link
                     href={`/tools/story-studio?seriesId=${s.id}`}
                     className="flex-1 py-1.5 rounded-lg text-xs font-medium text-center bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
-                    style={{ minHeight: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     New Book
                   </Link>
                   <button
                     onClick={() => setDeleteConfirm(s.id)}
                     className="py-1.5 px-3 rounded-lg text-xs font-medium border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
-                    style={{ minHeight: '36px' }}
+                    style={{ minHeight: '44px' }}
                   >
                     Delete
                   </button>

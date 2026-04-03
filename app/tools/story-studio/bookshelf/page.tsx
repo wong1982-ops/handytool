@@ -259,21 +259,21 @@ export default function BookshelfPage() {
                     <button
                       onClick={() => handleShare(book)}
                       className="flex-1 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                      style={{ minHeight: '36px' }}
+                      style={{ minHeight: '44px' }}
                     >
                       {book.isPublic ? 'Unshare' : 'Share'}
                     </button>
                     <button
                       onClick={() => router.push(`/tools/story-studio/edit/${book.id}`)}
                       className="flex-1 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                      style={{ minHeight: '36px' }}
+                      style={{ minHeight: '44px' }}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => setDeleteConfirm(book.id)}
                       className="flex-1 py-1.5 rounded-lg text-xs font-medium border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
-                      style={{ minHeight: '36px' }}
+                      style={{ minHeight: '44px' }}
                     >
                       Delete
                     </button>
@@ -282,7 +282,7 @@ export default function BookshelfPage() {
                     onClick={() => handleDownloadPdf(book)}
                     disabled={pdfLoading === book.id}
                     className="w-full py-1.5 rounded-lg text-xs font-medium border border-[#3D6AF2]/30 text-[#3D6AF2] dark:text-blue-400 hover:bg-[#3D6AF2]/5 dark:hover:bg-blue-900/20 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
-                    style={{ minHeight: '36px' }}
+                    style={{ minHeight: '44px' }}
                   >
                     {pdfLoading === book.id ? (
                       <>

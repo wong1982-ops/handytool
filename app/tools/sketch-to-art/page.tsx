@@ -223,7 +223,7 @@ export default function SketchToArtPage() {
 
   return (
     <div
-      className="min-h-screen h-screen overflow-y-auto bg-[#090f16]"
+      className="min-h-screen h-screen overflow-y-auto bg-white dark:bg-[#090f16]"
       style={{ overscrollBehaviorX: 'none' }}
     >
       {/* Themed header — matching Story Studio pattern */}
@@ -270,7 +270,7 @@ export default function SketchToArtPage() {
                 </svg>
                 <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#af88ff] rounded-full animate-pulse" />
               </div>
-              <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+              <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Sketch to Art
               </h1>
             </div>
@@ -298,7 +298,7 @@ export default function SketchToArtPage() {
           )}
 
           {/* Subtitle */}
-          <p className="text-sm text-[#a6abb5] text-center mb-6">
+          <p className="text-sm text-slate-500 dark:text-[#a6abb5] text-center mb-6">
             {isFun ? 'Upload a sketch and watch AI transform it into art' : 'Step ' + state.step + ': ' + ['Upload your sketch', 'Choose a style', 'Generating art', 'Refine your art', 'Save and share'][state.step - 1]}
           </p>
 
@@ -323,7 +323,7 @@ export default function SketchToArtPage() {
                               ? 'bg-[#3D6AF2] border-[#3D6AF2]'
                               : isCurrent
                               ? 'border-[#3D6AF2] bg-[#3D6AF2]/20 shadow-[0_0_15px_rgba(61,106,242,0.4)]'
-                              : 'border-[#1e2631] bg-transparent'
+                              : 'border-slate-200 dark:border-[#1e2631] bg-transparent'
                           }`}>
                             {isCompleted ? (
                               <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -331,7 +331,7 @@ export default function SketchToArtPage() {
                               </svg>
                             ) : (
                               <span className={`text-xs font-bold ${
-                                isCurrent ? 'text-[#93aaff]' : 'text-[#70767f]'
+                                isCurrent ? 'text-[#93aaff]' : 'text-slate-400 dark:text-[#70767f]'
                               }`}>{s}</span>
                             )}
                           </div>
@@ -339,7 +339,7 @@ export default function SketchToArtPage() {
                           <span className={`mt-1.5 text-[11px] font-medium transition-colors ${
                             isCompleted || isCurrent
                               ? 'text-[#93aaff]'
-                              : 'text-[#70767f]'
+                              : 'text-slate-400 dark:text-[#70767f]'
                           }`}>
                             {stepLabels[i]}
                           </span>
@@ -347,7 +347,7 @@ export default function SketchToArtPage() {
                         {/* Connector line */}
                         {i < STEPS.length - 1 && (
                           <div className={`w-12 lg:w-20 h-0.5 mx-2 rounded-full transition-colors duration-300 ${
-                            s < state.step ? 'bg-gradient-to-r from-[#3D6AF2] to-[#3D6AF2]' : 'bg-[#1e2631]'
+                            s < state.step ? 'bg-gradient-to-r from-[#3D6AF2] to-[#3D6AF2]' : 'bg-slate-200 dark:bg-[#1e2631]'
                           }`} />
                         )}
                       </li>
@@ -367,7 +367,7 @@ export default function SketchToArtPage() {
                             ? 'bg-[#3D6AF2] text-white'
                             : isCurrent
                             ? 'bg-[#3D6AF2]/15 text-[#93aaff] ring-1 ring-[#3D6AF2]/30'
-                            : 'bg-[#131a23] text-[#70767f]'
+                            : 'bg-slate-50 dark:bg-[#131a23] text-slate-400 dark:text-[#70767f]'
                         }`}>
                           {isCompleted ? (
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -380,7 +380,7 @@ export default function SketchToArtPage() {
                         </div>
                         {i < STEPS.length - 1 && (
                           <div className={`w-3 h-0.5 rounded-full ${
-                            s < state.step ? 'bg-[#3D6AF2]' : 'bg-[#1e2631]'
+                            s < state.step ? 'bg-[#3D6AF2]' : 'bg-slate-200 dark:bg-[#1e2631]'
                           }`} />
                         )}
                       </div>
@@ -420,7 +420,7 @@ export default function SketchToArtPage() {
               {/* Auth gate */}
               {!user && !authLoading ? (
                 <div className="mt-6 text-center">
-                  <p className="text-sm text-[#a6abb5] mb-3">
+                  <p className="text-sm text-slate-500 dark:text-[#a6abb5] mb-3">
                     Sign in to generate art
                   </p>
                   <button
@@ -486,12 +486,12 @@ export default function SketchToArtPage() {
 
           {/* Sticky action footer — Prev / Next */}
           {state.step > 1 && state.step < 5 && (
-            <div className="sticky bottom-0 z-20 mt-6 -mx-4 px-4 py-3 bg-[#090f16]/90 backdrop-blur-lg border-t border-[#1e2631]">
+            <div className="sticky bottom-0 z-20 mt-6 -mx-4 px-4 py-3 bg-white dark:bg-[#090f16]/90 backdrop-blur-lg border-t border-slate-200 dark:border-[#1e2631]">
               <div className="flex items-center justify-between max-w-4xl mx-auto">
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="min-h-[44px] px-5 py-2 rounded-xl text-sm font-medium text-[#a6abb5] hover:text-white bg-[#131a23] hover:bg-[#1e2631] transition-colors cursor-pointer inline-flex items-center gap-2"
+                  className="min-h-[44px] px-5 py-2 rounded-xl text-sm font-medium text-slate-500 dark:text-[#a6abb5] hover:text-white bg-slate-50 dark:bg-[#131a23] hover:bg-slate-200 dark:hover:bg-[#1e2631] transition-colors cursor-pointer inline-flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -500,7 +500,7 @@ export default function SketchToArtPage() {
                     ? ['', 'Sketch', 'Style', 'Magic', 'Refine'][state.step - 1]
                     : 'Previous'}
                 </button>
-                <span className="text-xs text-[#70767f]">
+                <span className="text-xs text-slate-400 dark:text-[#70767f]">
                   Step {state.step} of 5
                 </span>
                 {state.step === 1 && (

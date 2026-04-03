@@ -83,9 +83,9 @@ function AirportInput({
 
   return (
     <div ref={wrapperRef} className="relative flex-1">
-      <label className="block text-xs font-medium text-[#a6abb5] mb-1.5">{label}</label>
+      <label className="block text-xs font-medium text-slate-500 dark:text-[#a6abb5] mb-1.5">{label}</label>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#70767f]">{icon}</span>
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#70767f]">{icon}</span>
         <input
           type="text"
           value={query}
@@ -96,7 +96,7 @@ function AirportInput({
           }}
           onFocus={() => suggestions.length > 0 && setOpen(true)}
           placeholder={placeholder}
-          className="w-full rounded-lg bg-[#131a23] border border-[#1e2631] text-white placeholder:text-[#70767f]
+          className="w-full rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white placeholder:text-slate-400 dark:text-[#70767f]
             pl-10 pr-3 py-2.5 text-sm outline-none focus:border-[#3D6AF2]/50 focus:ring-1 focus:ring-[#3D6AF2]/30 transition-colors"
           style={{ minHeight: '44px' }}
           autoComplete="off"
@@ -105,7 +105,7 @@ function AirportInput({
       </div>
       {open && suggestions.length > 0 && (
         <ul
-          className="absolute z-50 left-0 right-0 mt-1 rounded-lg bg-[#131a23] border border-[#1e2631] shadow-xl overflow-hidden"
+          className="absolute z-50 left-0 right-0 mt-1 rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] shadow-xl overflow-hidden"
           role="listbox"
         >
           {suggestions.map((s) => (
@@ -119,7 +119,7 @@ function AirportInput({
                   onChange(s.iataCode, display)
                   setOpen(false)
                 }}
-                className="w-full text-left px-3 py-2.5 text-sm text-[#a6abb5] hover:bg-[#1e2631] hover:text-white transition-colors cursor-pointer"
+                className="w-full text-left px-3 py-2.5 text-sm text-slate-500 dark:text-[#a6abb5] hover:bg-slate-200 dark:hover:bg-slate-200 dark:bg-[#1e2631] hover:text-white transition-colors cursor-pointer"
                 style={{ minHeight: '44px' }}
                 role="option"
                 aria-selected={false}
@@ -171,18 +171,18 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
   const today = new Date().toISOString().split('T')[0]
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl bg-[#131a23] border border-[#1e2631] p-4 sm:p-6">
+    <form onSubmit={handleSubmit} className="rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] p-4 sm:p-6">
       {/* Trip type toggle */}
-      <div className="flex gap-1 mb-4 p-1 rounded-lg bg-[#090f16] w-fit">
+      <div className="flex gap-1 mb-4 p-1 rounded-lg bg-white dark:bg-[#090f16] w-fit">
         <button
           type="button"
           onClick={() => { setTripType('oneway'); setReturnDate('') }}
           className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
             tripType === 'oneway'
-              ? 'bg-[#1e2631] text-white'
-              : 'text-[#70767f] hover:text-[#a6abb5]'
+              ? 'bg-slate-200 dark:bg-[#1e2631] text-white'
+              : 'text-slate-400 dark:text-[#70767f] hover:text-slate-500 dark:hover:text-slate-500 dark:text-[#a6abb5]'
           }`}
-          style={{ minHeight: '36px' }}
+          style={{ minHeight: '44px' }}
         >
           One Way
         </button>
@@ -191,10 +191,10 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
           onClick={() => setTripType('return')}
           className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
             tripType === 'return'
-              ? 'bg-[#1e2631] text-white'
-              : 'text-[#70767f] hover:text-[#a6abb5]'
+              ? 'bg-slate-200 dark:bg-[#1e2631] text-white'
+              : 'text-slate-400 dark:text-[#70767f] hover:text-slate-500 dark:hover:text-slate-500 dark:text-[#a6abb5]'
           }`}
-          style={{ minHeight: '36px' }}
+          style={{ minHeight: '44px' }}
         >
           Return
         </button>
@@ -222,7 +222,7 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
           <button
             type="button"
             onClick={handleSwap}
-            className="rounded-lg bg-[#1e2631] border border-[#2a3545] p-2.5 text-[#a6abb5] hover:text-white hover:border-[#3D6AF2]/30 transition-colors cursor-pointer"
+            className="rounded-lg bg-slate-200 dark:bg-[#1e2631] border border-[#2a3545] p-2.5 text-slate-500 dark:text-[#a6abb5] hover:text-white hover:border-[#3D6AF2]/30 transition-colors cursor-pointer"
             style={{ minHeight: '44px', minWidth: '44px' }}
             aria-label="Swap origin and destination"
           >
@@ -253,9 +253,9 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
       <div className={`grid grid-cols-2 ${tripType === 'return' ? 'sm:grid-cols-[1fr_1fr_auto_auto]' : 'sm:grid-cols-[1fr_auto_auto]'} gap-3 mt-3 items-end`}>
         {/* Departure date */}
         <div className="min-w-0">
-          <label className="block text-xs font-medium text-[#a6abb5] mb-1.5">Departure</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-[#a6abb5] mb-1.5">Departure</label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#70767f]">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#70767f]">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
               </svg>
@@ -265,7 +265,7 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
               value={departureDate}
               min={today}
               onChange={(e) => setDepartureDate(e.target.value)}
-              className="w-full rounded-lg bg-[#131a23] border border-[#1e2631] text-white
+              className="w-full rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white
                 pl-10 pr-3 py-2.5 text-sm outline-none focus:border-[#3D6AF2]/50 focus:ring-1 focus:ring-[#3D6AF2]/30 transition-colors
                 [color-scheme:dark]"
               style={{ minHeight: '44px' }}
@@ -277,9 +277,9 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
         {/* Return date (conditional) */}
         {tripType === 'return' && (
           <div>
-            <label className="block text-xs font-medium text-[#a6abb5] mb-1.5">Return</label>
+            <label className="block text-xs font-medium text-slate-500 dark:text-[#a6abb5] mb-1.5">Return</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#70767f]">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#70767f]">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
                 </svg>
@@ -289,7 +289,7 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
                 value={returnDate}
                 min={departureDate || today}
                 onChange={(e) => setReturnDate(e.target.value)}
-                className="w-full rounded-lg bg-[#131a23] border border-[#1e2631] text-white
+                className="w-full rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white
                   pl-10 pr-3 py-2.5 text-sm outline-none focus:border-[#3D6AF2]/50 focus:ring-1 focus:ring-[#3D6AF2]/30 transition-colors
                   [color-scheme:dark]"
                 style={{ minHeight: '44px' }}
@@ -301,9 +301,9 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
 
         {/* Passengers */}
         <div>
-          <label className="block text-xs font-medium text-[#a6abb5] mb-1.5">Passengers</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-[#a6abb5] mb-1.5">Passengers</label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#70767f]">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#70767f]">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
               </svg>
@@ -314,7 +314,7 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
               max={9}
               value={adults}
               onChange={(e) => setAdults(Math.max(1, Math.min(9, Number(e.target.value))))}
-              className="w-24 rounded-lg bg-[#131a23] border border-[#1e2631] text-white
+              className="w-24 rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white
                 pl-10 pr-3 py-2.5 text-sm outline-none focus:border-[#3D6AF2]/50 focus:ring-1 focus:ring-[#3D6AF2]/30 transition-colors"
               style={{ minHeight: '44px' }}
               aria-label="Number of passengers"

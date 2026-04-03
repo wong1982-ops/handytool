@@ -27,7 +27,7 @@ export default function VBlogDashboard() {
       const res = await fetch('/api/v1/vblog/jobs')
       if (!res.ok) throw new Error('Failed to fetch jobs')
       const data = await res.json()
-      setJobs(data.data ?? [])
+      setJobs(Array.isArray(data.data) ? data.data : [])
     } catch {
       // silent on poll failures
     } finally {
@@ -87,7 +87,7 @@ export default function VBlogDashboard() {
   return (
     <div className="space-y-6">
       {/* Title */}
-      <h1 className="text-3xl sm:text-4xl font-extrabold text-white">
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
         VBlog{' '}
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#32A9D9]">
           Studio
@@ -102,7 +102,7 @@ export default function VBlogDashboard() {
           className={`px-5 py-2 rounded-full text-sm font-semibold min-h-[44px] cursor-pointer transition-colors ${
             tab === 'videos'
               ? 'bg-[#3D6AF2] text-white'
-              : 'bg-[#131a23] text-[#a6abb5] hover:text-white border border-[#1e2631]'
+              : 'bg-slate-50 dark:bg-[#131a23] text-slate-500 dark:text-[#a6abb5] hover:text-white border border-slate-200 dark:border-[#1e2631]'
           }`}
         >
           Videos
@@ -113,7 +113,7 @@ export default function VBlogDashboard() {
           className={`px-5 py-2 rounded-full text-sm font-semibold min-h-[44px] cursor-pointer transition-colors ${
             tab === 'templates'
               ? 'bg-[#3D6AF2] text-white'
-              : 'bg-[#131a23] text-[#a6abb5] hover:text-white border border-[#1e2631]'
+              : 'bg-slate-50 dark:bg-[#131a23] text-slate-500 dark:text-[#a6abb5] hover:text-white border border-slate-200 dark:border-[#1e2631]'
           }`}
         >
           Templates
@@ -123,19 +123,19 @@ export default function VBlogDashboard() {
       {tab === 'videos' && (
         <>
           {/* New Video Form */}
-          <div className="bg-[#131a23] rounded-xl border border-[#1e2631] p-5 space-y-4">
-            <p className="text-xs font-medium text-[#a6abb5] uppercase tracking-wider">New Video</p>
+          <div className="bg-slate-50 dark:bg-[#131a23] rounded-xl border border-slate-200 dark:border-[#1e2631] p-5 space-y-4">
+            <p className="text-xs font-medium text-slate-500 dark:text-[#a6abb5] uppercase tracking-wider">New Video</p>
 
             {/* Tool dropdown */}
             <div>
-              <label htmlFor="vblog-tool" className="text-xs text-[#70767f] block mb-1.5">
+              <label htmlFor="vblog-tool" className="text-xs text-slate-400 dark:text-[#70767f] block mb-1.5">
                 Tool
               </label>
               <select
                 id="vblog-tool"
                 value={selectedTool}
                 onChange={(e) => setSelectedTool(e.target.value)}
-                className="w-full rounded-xl bg-[#090f16] border border-[#1e2631] text-white text-sm px-4 py-3 min-h-[44px] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
+                className="w-full rounded-xl bg-white dark:bg-[#090f16] border border-slate-200 dark:border-[#1e2631] text-white text-sm px-4 py-3 min-h-[44px] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
               >
                 {tools.map((t) => (
                   <option key={t.href} value={t.href.replace('/tools/', '')}>
@@ -147,7 +147,7 @@ export default function VBlogDashboard() {
 
             {/* Script Style */}
             <div>
-              <label className="text-xs text-[#70767f] block mb-2">Script Style</label>
+              <label className="text-xs text-slate-400 dark:text-[#70767f] block mb-2">Script Style</label>
               <div className="flex gap-3 flex-wrap">
                 {(['feature-walkthrough', 'problem-solution'] as const).map((style) => (
                   <button
@@ -157,7 +157,7 @@ export default function VBlogDashboard() {
                     className={`px-4 py-2 rounded-xl text-sm font-semibold min-h-[44px] cursor-pointer transition-all ${
                       scriptStyle === style
                         ? 'bg-[#3D6AF2]/15 text-[#3D6AF2] shadow-[0_0_0_2px_#3D6AF2]'
-                        : 'bg-[#131a23] text-[#a6abb5] border border-[#1e2631] hover:border-[#3D6AF2]/40 hover:text-white'
+                        : 'bg-slate-50 dark:bg-[#131a23] text-slate-500 dark:text-[#a6abb5] border border-slate-200 dark:border-[#1e2631] hover:border-[#3D6AF2]/40 hover:text-white'
                     }`}
                   >
                     {style === 'feature-walkthrough' ? 'Feature Walkthrough' : 'Problem-Solution'}
@@ -168,7 +168,7 @@ export default function VBlogDashboard() {
 
             {/* Voice Type */}
             <div>
-              <label className="text-xs text-[#70767f] block mb-2">Voice</label>
+              <label className="text-xs text-slate-400 dark:text-[#70767f] block mb-2">Voice</label>
               <div className="flex gap-3 flex-wrap">
                 {(['clone', 'ai'] as const).map((v) => (
                   <button
@@ -178,7 +178,7 @@ export default function VBlogDashboard() {
                     className={`px-4 py-2 rounded-xl text-sm font-semibold min-h-[44px] cursor-pointer transition-all ${
                       voiceType === v
                         ? 'bg-[#3D6AF2]/15 text-[#3D6AF2] shadow-[0_0_0_2px_#3D6AF2]'
-                        : 'bg-[#131a23] text-[#a6abb5] border border-[#1e2631] hover:border-[#3D6AF2]/40 hover:text-white'
+                        : 'bg-slate-50 dark:bg-[#131a23] text-slate-500 dark:text-[#a6abb5] border border-slate-200 dark:border-[#1e2631] hover:border-[#3D6AF2]/40 hover:text-white'
                     }`}
                   >
                     {v === 'clone' ? 'Clone' : 'AI'}
@@ -189,14 +189,14 @@ export default function VBlogDashboard() {
 
             {/* Duration */}
             <div>
-              <label htmlFor="vblog-duration" className="text-xs text-[#70767f] block mb-1.5">
+              <label htmlFor="vblog-duration" className="text-xs text-slate-400 dark:text-[#70767f] block mb-1.5">
                 Duration
               </label>
               <select
                 id="vblog-duration"
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full rounded-xl bg-[#090f16] border border-[#1e2631] text-white text-sm px-4 py-3 min-h-[44px] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
+                className="w-full rounded-xl bg-white dark:bg-[#090f16] border border-slate-200 dark:border-[#1e2631] text-white text-sm px-4 py-3 min-h-[44px] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
               >
                 {DURATION_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -232,11 +232,11 @@ export default function VBlogDashboard() {
               </div>
             ) : jobs.length === 0 ? (
               <div className="text-center py-16">
-                <svg className="w-12 h-12 mx-auto text-[#70767f] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-12 h-12 mx-auto text-slate-400 dark:text-[#70767f] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
                 </svg>
-                <p className="text-[#a6abb5] text-sm">No videos yet</p>
-                <p className="text-[#70767f] text-xs mt-1">Generate your first marketing video above</p>
+                <p className="text-slate-500 dark:text-[#a6abb5] text-sm">No videos yet</p>
+                <p className="text-slate-400 dark:text-[#70767f] text-xs mt-1">Generate your first marketing video above</p>
               </div>
             ) : (
               jobs.map((job) => (

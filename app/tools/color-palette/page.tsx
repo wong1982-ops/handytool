@@ -115,10 +115,10 @@ export default function ColorPalettePage() {
         <ToolBreadcrumb toolName="Color Palette" toolSlug="color-palette" />
 
         <div className="space-y-1">
-          <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+          <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             Color Palette Generator
           </h1>
-          <p className="text-xs text-[#70767f]">
+          <p className="text-xs text-slate-400 dark:text-[#70767f]">
             Harmony rules &middot; Image extraction &middot; AI generation &middot; Accessibility checker
           </p>
         </div>
@@ -140,7 +140,7 @@ export default function ColorPalettePage() {
             {/* Tab buttons */}
             <div
               role="tablist"
-              className="flex gap-1 p-1 rounded-xl bg-[#131a23] border border-[#1e2631] mb-5 w-fit"
+              className="flex gap-1 p-1 rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] mb-5 w-fit"
             >
               {TABS.map((tab) => (
                 <button
@@ -151,8 +151,8 @@ export default function ColorPalettePage() {
                   onClick={() => setActiveTab(tab.value)}
                   className={`px-4 py-2 min-h-[44px] rounded-lg text-sm font-medium transition-all cursor-pointer ${
                     activeTab === tab.value
-                      ? 'bg-[#1e2631] shadow-sm text-white'
-                      : 'text-[#70767f] hover:text-[#a6abb5]'
+                      ? 'bg-slate-200 dark:bg-[#1e2631] shadow-sm text-white'
+                      : 'text-slate-400 dark:text-[#70767f] hover:text-slate-500 dark:hover:text-[#a6abb5]'
                   }`}
                 >
                   {tab.label}
@@ -188,7 +188,7 @@ export default function ColorPalettePage() {
             <button
               type="button"
               onClick={handleShareCopy}
-              className="w-full py-3 min-h-[44px] rounded-xl border border-[#1e2631] hover:bg-[#1e2631] transition-colors cursor-pointer flex items-center justify-center gap-2 text-sm font-semibold text-[#a6abb5]"
+              className="w-full py-3 min-h-[44px] rounded-xl border border-slate-200 dark:border-[#1e2631] hover:bg-slate-200 dark:hover:bg-[#1e2631] transition-colors cursor-pointer flex items-center justify-center gap-2 text-sm font-semibold text-slate-500 dark:text-[#a6abb5]"
             >
               <svg
                 className="w-4 h-4"

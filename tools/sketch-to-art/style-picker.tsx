@@ -27,8 +27,8 @@ function StyleCard({
       onClick={() => onSelect(style.id)}
       className={`group relative flex flex-col items-center gap-2 rounded-2xl p-2 transition-all duration-300 cursor-pointer hover:scale-[1.03] ${
         isSelected
-          ? 'shadow-[0_0_0_3px_#3D6AF2,0_0_20px_rgba(61,106,242,0.4)] bg-[#131a23]'
-          : 'hover:bg-[#131a23]/60'
+          ? 'shadow-[0_0_0_3px_#3D6AF2,0_0_20px_rgba(61,106,242,0.4)] bg-slate-50 dark:bg-[#131a23]'
+          : 'hover:bg-slate-50 dark:hover:bg-[#131a23]/60'
       }`}
     >
       {/* Image card */}
@@ -61,7 +61,7 @@ function StyleCard({
       <span className={`text-center leading-tight text-xs ${
         isFun
           ? 'font-medium text-white'
-          : isSelected ? 'font-medium text-white' : 'text-[#a6abb5]'
+          : isSelected ? 'font-medium text-white' : 'text-slate-500 dark:text-[#a6abb5]'
       }`}>
         {isFun ? style.funLabel : style.name}
       </span>
@@ -127,7 +127,7 @@ export default function StylePicker({
         }
         return (
           <section key={category.id}>
-            <h3 className="flex items-center gap-2 mb-4 text-sm font-semibold uppercase tracking-wider text-[#a6abb5]">
+            <h3 className="flex items-center gap-2 mb-4 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-[#a6abb5]">
               {categoryIconMap[category.id]}
               {category.label}
             </h3>
@@ -151,7 +151,7 @@ export default function StylePicker({
         <label
           htmlFor="custom-style-input"
           className={`mb-2 block font-medium ${
-            isFun ? 'text-sm text-white' : 'text-[11px] uppercase tracking-wider text-[#a6abb5]'
+            isFun ? 'text-sm text-white' : 'text-[11px] uppercase tracking-wider text-slate-500 dark:text-[#a6abb5]'
           }`}
         >
           {isFun ? 'Or describe your own style' : 'Custom style'}
@@ -162,10 +162,10 @@ export default function StylePicker({
           value={customStyle}
           onChange={(e) => handleCustomChange(e.target.value)}
           placeholder="e.g. 'underwater kingdom', 'retro 80s poster'..."
-          className={`w-full min-h-[44px] rounded-xl border px-4 py-3 text-sm transition-colors bg-[#0d1520] text-white placeholder:text-[#70767f] ${
+          className={`w-full min-h-[44px] rounded-xl border px-4 py-3 text-sm transition-colors bg-[#0d1520] text-white placeholder:text-slate-400 dark:text-[#70767f] ${
             customStyle.trim()
               ? 'border-[#3D6AF2] shadow-[0_0_0_2px_rgba(61,106,242,0.25)]'
-              : 'border-[#1e2631]'
+              : 'border-slate-200 dark:border-[#1e2631]'
           } focus:outline-none focus:border-[#3D6AF2] focus:shadow-[0_0_0_2px_rgba(61,106,242,0.25)]`}
         />
       </div>

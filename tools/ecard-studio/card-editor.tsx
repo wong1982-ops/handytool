@@ -67,9 +67,9 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
       {/* Fullscreen lock: editor needs body overflow hidden + no footer */}
       <style dangerouslySetInnerHTML={{ __html: 'html, body { height: 100dvh !important; min-height: 100dvh !important; overflow: hidden !important; } body > footer { display: none !important; }' }} />
       {/* Top Bar */}
-      <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between flex-shrink-0">
+      <div className="bg-slate-900 border-b border-slate-800 px-3 sm:px-4 py-2 flex items-center justify-between gap-2 flex-shrink-0 overflow-x-auto">
         {/* Left: Back / Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 shrink-0">
           <BackButton />
           <ol className="hidden md:flex items-center gap-1.5 text-sm text-slate-400">
             <li><a href="/tools" className="hover:text-white transition-colors">Tools</a></li>
@@ -80,12 +80,12 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
         </nav>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 shrink-0">
           {/* Mobile: Templates toggle */}
           <button
             type="button"
             onClick={() => setShowMobileTemplates((v) => !v)}
-            className={`lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 text-sm border rounded-md transition-colors ${
+            className={`lg:hidden flex items-center gap-1.5 px-3 py-2 min-h-[44px] text-sm border rounded-md transition-colors ${
               showMobileTemplates
                 ? 'text-blue-400 border-blue-500/50 bg-blue-500/10'
                 : 'text-slate-300 hover:text-white border-slate-700 hover:border-slate-500'
@@ -103,7 +103,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
           <button
             type="button"
             onClick={() => setShowMobilePanel(true)}
-            className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-slate-300 hover:text-white border border-slate-700 hover:border-slate-500 rounded-md transition-colors"
+            className="lg:hidden flex items-center gap-1.5 px-2.5 py-2 min-h-[44px] text-sm text-slate-300 hover:text-white border border-slate-700 hover:border-slate-500 rounded-md transition-colors"
             aria-label="Open editor panel"
           >
             <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -115,13 +115,13 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
                 strokeLinecap="round"
               />
             </svg>
-            Edit
+            <span className="hidden sm:inline">Edit</span>
           </button>
           <button
             type="button"
             onClick={undo}
             disabled={!canUndo}
-            className="hidden sm:block p-2 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="hidden sm:flex items-center justify-center min-w-[44px] min-h-[44px] p-2 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Undo"
             title="Undo (Ctrl+Z)"
           >
@@ -134,7 +134,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
             type="button"
             onClick={redo}
             disabled={!canRedo}
-            className="hidden sm:block p-2 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="hidden sm:flex items-center justify-center min-w-[44px] min-h-[44px] p-2 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Redo"
             title="Redo (Ctrl+Shift+Z)"
           >
@@ -146,14 +146,18 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
           <button
             type="button"
             onClick={() => setShowPreview(true)}
-            className="px-3 py-1.5 text-sm border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 rounded-md transition-colors"
+            className="px-2.5 py-2 min-h-[44px] text-sm border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 rounded-md transition-colors flex items-center gap-1.5"
           >
-            Preview
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="sm:hidden shrink-0" aria-hidden="true">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+            <span className="hidden sm:inline">Preview</span>
           </button>
           <button
             type="button"
             onClick={handleDownload}
-            className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-500 text-white rounded-md transition-colors flex items-center gap-1.5"
+            className="px-3 py-2 min-h-[44px] text-sm bg-blue-600 hover:bg-blue-500 text-white rounded-md transition-colors flex items-center gap-1.5"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path
@@ -227,7 +231,7 @@ export function CardEditor({ initialTemplate }: { initialTemplate?: TemplateId }
               <button
                 type="button"
                 onClick={() => setShowMobilePanel(false)}
-                className="p-1 text-slate-400 hover:text-white"
+                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-white"
                 aria-label="Close editor panel"
               >
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">

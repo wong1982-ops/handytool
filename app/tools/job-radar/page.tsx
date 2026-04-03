@@ -14,10 +14,10 @@ export default function Page() {
         <ToolBreadcrumb toolName="Job Radar" toolSlug="job-radar" />
 
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
             Job Radar
           </h1>
-          <p className="text-sm text-[#a6abb5]">
+          <p className="text-sm text-slate-500 dark:text-[#a6abb5]">
             IT & French language jobs across Australia and New Zealand — updated daily
           </p>
         </div>

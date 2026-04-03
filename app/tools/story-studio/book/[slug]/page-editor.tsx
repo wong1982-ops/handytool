@@ -213,7 +213,7 @@ export function PageEditor({ bookId, page, characters, onSave, onCancel }: PageE
                 onClick={handleEnrich}
                 disabled={enriching || narrativeText.trim().length < 5}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default"
-                style={{ minHeight: '36px' }}
+                style={{ minHeight: '44px' }}
               >
                 {enriching ? (
                   <>
@@ -246,7 +246,7 @@ export function PageEditor({ bookId, page, characters, onSave, onCancel }: PageE
               <button
                 onClick={addDialogue}
                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                style={{ minHeight: '36px' }}
+                style={{ minHeight: '44px' }}
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

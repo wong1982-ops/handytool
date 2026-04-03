@@ -280,7 +280,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
               className="w-full px-3 py-2 text-xs font-medium text-amber-600 dark:text-amber-400
                 border border-amber-200 dark:border-amber-800 hover:bg-amber-50 dark:hover:bg-amber-900/20
                 rounded-lg transition-colors cursor-pointer"
-              style={{ minHeight: '36px' }}
+              style={{ minHeight: '44px' }}
             >
               Set as Primary Portrait
             </button>

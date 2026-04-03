@@ -70,7 +70,7 @@ export default function ChatBar({
           <button
             type="button"
             onClick={() => setLogOpen((v) => !v)}
-            className="w-full flex items-center justify-between px-4 py-2 text-xs text-[#70767f] hover:text-[#a6abb5] transition-colors cursor-pointer min-h-[36px]"
+            className="w-full flex items-center justify-between px-4 py-2 text-xs text-[#70767f] hover:text-[#a6abb5] transition-colors cursor-pointer min-h-[44px]"
           >
             <span className="flex items-center gap-1.5">
               <svg

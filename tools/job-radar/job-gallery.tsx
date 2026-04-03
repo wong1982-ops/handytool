@@ -106,7 +106,7 @@ export function JobGallery({ category }: JobGalleryProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* Search + filter bar — sticky on mobile */}
-      <div className="sticky top-14 z-30 pb-3 -mx-4 px-4 pt-2 border-b border-[rgba(30,38,49,0.6)] bg-[#090f16] lg:static lg:mx-0 lg:px-0 lg:pt-0 lg:pb-0 lg:bg-transparent lg:z-auto lg:border-b-0">
+      <div className="sticky top-14 z-30 pb-3 -mx-4 px-4 pt-2 border-b border-[rgba(30,38,49,0.6)] bg-white dark:bg-[#090f16] lg:static lg:mx-0 lg:px-0 lg:pt-0 lg:pb-0 lg:bg-transparent lg:z-auto lg:border-b-0">
         <div className="flex flex-col gap-2 lg:gap-3">
           <JobSearchBar
             value={filters.q ?? ''}
@@ -157,8 +157,8 @@ export function JobGallery({ category }: JobGalleryProps) {
           {state === 'success' && response && (
             <>
               {response.data.length === 0 ? (
-                <div className="p-10 text-center rounded-xl border border-[#1e2631]">
-                  <p className="text-[#a6abb5]">No jobs found matching your filters.</p>
+                <div className="p-10 text-center rounded-xl border border-slate-200 dark:border-[#1e2631]">
+                  <p className="text-slate-500 dark:text-[#a6abb5]">No jobs found matching your filters.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

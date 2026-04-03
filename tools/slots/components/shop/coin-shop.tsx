@@ -41,7 +41,7 @@ export function CoinShop() {
           const badge = badges[pack.id]
 
           return (
-            <div key={pack.id} className="relative flex items-center justify-between px-4 py-3.5 rounded-xl bg-[#131a23] border border-[#1e2631]">
+            <div key={pack.id} className="relative flex items-center justify-between px-4 py-3.5 rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631]">
               {badge && (
                 <span className="absolute -top-2.5 right-3 px-2 py-[3px] text-[9px] font-extrabold tracking-[0.05em] rounded-full" style={{
                   background: pack.id === 'best-value' ? '#10B981' : '#F59E0B',
@@ -51,12 +51,12 @@ export function CoinShop() {
                 </span>
               )}
               <div>
-                <div className="text-xs font-medium text-[#a6abb5]">{pack.name}</div>
+                <div className="text-xs font-medium text-slate-500 dark:text-[#a6abb5]">{pack.name}</div>
                 <div className="text-lg font-extrabold text-[#f0d080] mt-0.5" style={{ fontFamily: '"SF Mono", monospace' }}>{totalCoins.toLocaleString()}</div>
                 {pack.bonusPercent > 0 ? (
                   <div className="text-[10px] font-semibold text-[#10B981] mt-px">+{pack.bonusPercent}% bonus</div>
                 ) : (
-                  <div className="text-[10px] text-[#70767f] mt-px">coins</div>
+                  <div className="text-[10px] text-slate-400 dark:text-[#70767f] mt-px">coins</div>
                 )}
               </div>
               <button
