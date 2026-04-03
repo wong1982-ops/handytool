@@ -421,20 +421,26 @@ const bentoItems = [
     gridClass: '',
     glowClass: 'from-pink-500/10',
     category: 'ai' as const,
-    preview: (() => {
-      const styles = ['watercolor', 'anime', 'ghibli', 'cyberpunk', 'van-gogh', 'cartoon']
-      const base = 'https://pub-8feef024ac6a4d26b109ddfe22f033c1.r2.dev/sketch-art/showcase'
-      return (
-        <div className="w-full h-full grid grid-cols-3 gap-1 p-0.5">
-          {styles.map((id) => (
-            <div key={id} className="relative rounded-md overflow-hidden aspect-square">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`${base}/mermaid-${id}.png`} alt="" className="w-full h-full object-cover" loading="lazy" />
-            </div>
-          ))}
+    preview: (
+      <div className="w-full h-full flex items-center justify-center gap-3 px-3">
+        {/* Sketch side */}
+        <div className="w-12 h-14 rounded-lg border-2 border-dashed border-pink-400/30 bg-pink-400/5 flex items-center justify-center">
+          <svg className="w-6 h-6 text-pink-400/50" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Z" />
+          </svg>
         </div>
-      )
-    })(),
+        {/* Arrow */}
+        <svg className="w-4 h-4 text-pink-400/40 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        </svg>
+        {/* Art side */}
+        <div className="w-12 h-14 rounded-lg border border-fuchsia-400/30 bg-gradient-to-br from-pink-500/15 via-violet-500/15 to-fuchsia-500/15 flex items-center justify-center">
+          <svg className="w-6 h-6 text-fuchsia-400/60" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+          </svg>
+        </div>
+      </div>
+    ),
   },
   {
     name: 'Logo Generator',
