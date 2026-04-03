@@ -77,7 +77,7 @@ export function BlueMinimalLayout({ resume, t }: ThemeLayoutProps) {
         className="flex flex-col"
         style={{ width: '35%', backgroundColor: `${color}12`, flexShrink: 0 }}
       >
-        <div className="px-5 pt-7 pb-5 flex flex-col items-center">
+        <div className="px-5 pt-7 pb-5 flex flex-col items-center" data-module="baseInfo">
           {/* Photo */}
           {baseInfo.photo && (
             <div
@@ -161,7 +161,7 @@ export function BlueMinimalLayout({ resume, t }: ThemeLayoutProps) {
             const content = renderLeftSection(mod, resume, color)
             if (content === null) return null
             return (
-              <div key={mod} style={{ breakInside: 'avoid' }}>
+              <div key={mod} data-module={mod} style={{ breakInside: 'avoid' }}>
                 <h2
                   className="text-[10px] font-bold uppercase tracking-[0.12em] mb-2 pb-1.5"
                   style={{ color, borderBottom: `1px solid ${color}25` }}
@@ -182,7 +182,7 @@ export function BlueMinimalLayout({ resume, t }: ThemeLayoutProps) {
             const content = renderRightSection(mod, resume, t, color)
             if (content === null) return null
             return (
-              <div key={mod} style={{ breakInside: 'avoid' }}>
+              <div key={mod} data-module={mod} style={{ breakInside: 'avoid' }}>
                 <h2
                   className="text-[10px] font-bold uppercase tracking-[0.12em] mb-2.5 pb-1.5"
                   style={{ color, borderBottom: `1px solid ${color}20` }}

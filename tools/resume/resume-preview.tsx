@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useResume } from './resume-provider'
 import { ClassicLayout } from './themes/classic-layout'
 import { BlueMinimalLayout } from './themes/blue-minimal-layout'
@@ -16,7 +16,7 @@ const A4_HEIGHT = 842
 const PAGE_MARGIN = 40 // top/bottom margin for page 2+
 
 export function ResumePreview() {
-  const { state, t } = useResume()
+  const { state, dispatch, t } = useResume()
   const { resume } = state
   const { theme } = resume
   const measureRef = useRef<HTMLDivElement>(null)
@@ -36,6 +36,17 @@ export function ResumePreview() {
 
   // Font scale applied via CSS zoom — scales all hardcoded px values in layouts proportionally
   const fontZoom = theme.fontSize === 'sm' ? 0.85 : theme.fontSize === 'lg' ? 1.15 : 1
+
+  // Click-to-edit: clicking a section in the preview switches to that module's editor
+  const handlePreviewClick = useCallback((e: React.MouseEvent) => {
+    const target = e.target as HTMLElement
+    const moduleEl = target.closest('[data-module]')
+    if (!moduleEl) return
+    const mod = moduleEl.getAttribute('data-module') as Parameters<typeof dispatch>[0]['payload'] | null
+    if (!mod) return
+    dispatch({ type: 'SET_SIDEBAR_MODE', payload: 'edit' })
+    dispatch({ type: 'SET_ACTIVE_MODULE', payload: mod as 'baseInfo' })
+  }, [dispatch])
 
   useEffect(() => {
     const measure = () => {
@@ -71,8 +82,12 @@ export function ResumePreview() {
         </div>
       )}
 
-      {/* Visible paginated preview */}
-      <div className="w-full max-w-[595px] flex flex-col gap-4 print:gap-0">
+      {/* Visible paginated preview — click a section to edit it */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+      <div
+        className="w-full max-w-[595px] flex flex-col gap-4 print:gap-0 [&_[data-module]]:cursor-pointer [&_[data-module]:hover]:outline [&_[data-module]:hover]:outline-2 [&_[data-module]:hover]:outline-blue-400/30 [&_[data-module]:hover]:outline-offset-2 [&_[data-module]:hover]:rounded print:[&_[data-module]:hover]:outline-none"
+        onClick={handlePreviewClick}
+      >
         {hasContent ? (
           Array.from({ length: pageCount }, (_, pageIdx) => (
             <div

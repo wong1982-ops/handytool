@@ -64,7 +64,7 @@ export function YellowMinimalLayout({ resume, t }: ThemeLayoutProps) {
     <div className="min-h-full" style={{ color: '#1a1a2e' }}>
       {/* ── Header band ───────────────────────────────────── */}
       <div className="relative" style={{ backgroundColor: color }}>
-        <div className="px-8 pt-6 pb-10">
+        <div className="px-8 pt-6 pb-10" data-module="baseInfo">
           <div className="flex items-start gap-5">
             {/* Name & contact on left */}
             <div className="flex-1 min-w-0">
@@ -136,7 +136,7 @@ export function YellowMinimalLayout({ resume, t }: ThemeLayoutProps) {
               const sectionContent = renderSection(mod, resume, t, color)
               if (sectionContent === null) return null
               return (
-                <div key={mod} style={{ breakInside: 'avoid' }}>
+                <div key={mod} data-module={mod} style={{ breakInside: 'avoid' }}>
                   {/* Section header as accent pill */}
                   <div className="mb-3 flex items-center gap-3">
                     <span

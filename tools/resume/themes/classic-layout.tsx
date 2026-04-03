@@ -66,7 +66,7 @@ export function ClassicLayout({ resume, t }: ThemeLayoutProps) {
       <div style={{ height: 4, backgroundColor: color }} />
 
       {/* ── Header ──────────────────────────────────────────── */}
-      <div className="px-8 pt-6 pb-5">
+      <div className="px-8 pt-6 pb-5" data-module="baseInfo">
         <div className="flex items-start gap-5">
           {/* Photo */}
           {baseInfo.photo && (
@@ -124,7 +124,7 @@ export function ClassicLayout({ resume, t }: ThemeLayoutProps) {
             const sectionContent = renderSection(mod, resume, t, color)
             if (sectionContent === null) return null
             return (
-              <div key={mod} style={{ breakInside: 'avoid' }}>
+              <div key={mod} data-module={mod} style={{ breakInside: 'avoid' }}>
                 {/* Section header with left accent border */}
                 <div className="flex items-center gap-2 mb-3">
                   <div
