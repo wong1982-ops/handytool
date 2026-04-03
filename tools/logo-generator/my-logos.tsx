@@ -85,66 +85,73 @@ export function MyLogos({ onLoadProject }: MyLogosProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {entries.map((entry) => {
         const preview = entry.selected_index !== null
           ? entry.concepts[entry.selected_index]
           : entry.concepts[0]
-        const thumbnails = entry.concepts.slice(0, 4)
 
         return (
           <button
             key={entry.id}
             type="button"
             onClick={() => onLoadProject(entry)}
-            className="w-full rounded-xl bg-[#131a23] hover:bg-[#1e2631] border border-[#1e2631] hover:border-[#3D6AF2]/30 transition-all p-4 text-left cursor-pointer group"
+            className="bg-[#131a23] rounded-2xl overflow-hidden border border-[#1e2631] hover:border-[#3D6AF2]/40 transition-all group cursor-pointer text-left"
           >
-            <div className="flex gap-4">
-              {/* Main preview */}
-              {preview?.imageUrl && (
+            {/* Preview image area */}
+            <div
+              className="h-32 flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #0d1829 0%, #1a1040 100%)' }}
+            >
+              {preview?.imageUrl ? (
                 <img
                   src={preview.imageUrl}
                   alt={entry.business_name}
-                  className="w-16 h-16 rounded-lg object-cover shrink-0 bg-white"
+                  className="w-20 h-20 rounded-xl object-contain bg-white"
                   loading="lazy"
                 />
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="text-white font-semibold text-sm truncate group-hover:text-[#3D6AF2] transition-colors">
-                  {entry.business_name}
-                </p>
-                <p className="text-[#70767f] text-xs mt-0.5">
-                  {entry.style} &middot; {entry.concepts.length} concepts &middot;{' '}
-                  {new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                </p>
-                {/* Color dots */}
-                <div className="flex gap-1 mt-2">
-                  {(entry.colors || []).slice(0, 5).map((c, i) => (
-                    <span key={i} className="w-4 h-4 rounded-full shrink-0" style={{ backgroundColor: c }} />
-                  ))}
+              ) : (
+                <div className="w-20 h-20 rounded-xl bg-[#3D6AF2]/20 flex items-center justify-center">
+                  <svg className="w-9 h-9 text-[#3D6AF2]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21z" />
+                  </svg>
                 </div>
-              </div>
+              )}
             </div>
 
-            {/* Thumbnail strip */}
-            {thumbnails.length > 1 && (
-              <div className="flex gap-1.5 mt-3">
-                {thumbnails.map((concept, i) => (
-                  <img
-                    key={i}
-                    src={concept.imageUrl}
-                    alt=""
-                    className="w-10 h-10 rounded-md object-cover bg-white opacity-60 group-hover:opacity-100 transition-opacity"
-                    loading="lazy"
-                  />
-                ))}
-                {entry.concepts.length > 4 && (
-                  <span className="w-10 h-10 rounded-md bg-[#1e2631] flex items-center justify-center text-[10px] text-[#70767f] font-bold">
-                    +{entry.concepts.length - 4}
-                  </span>
-                )}
+            {/* Card content */}
+            <div className="p-4">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="min-w-0">
+                  <p className="text-white font-semibold text-sm truncate">
+                    {entry.business_name}
+                  </p>
+                  {entry.tagline && (
+                    <p className="text-[#70767f] text-xs truncate">{entry.tagline}</p>
+                  )}
+                </div>
+                <span
+                  className="shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full text-[#3D6AF2] capitalize"
+                  style={{ background: 'rgba(61,106,242,0.15)', border: '1px solid rgba(61,106,242,0.3)' }}
+                >
+                  {entry.style}
+                </span>
               </div>
-            )}
+              <div className="flex items-center justify-between mt-3">
+                <span className="text-[10px] text-[#70767f] flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+                <span className="text-xs font-medium text-[#3D6AF2] group-hover:text-white transition-colors flex items-center gap-1 min-h-[32px]">
+                  Load
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </span>
+              </div>
+            </div>
           </button>
         )
       })}

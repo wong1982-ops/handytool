@@ -189,7 +189,7 @@ export function LogoEditor({
 
             {/* Colors */}
             <section>
-              <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-3">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#70767f] mb-3">
                 Logo Colors
               </h3>
               <div className="flex gap-2 flex-wrap">
@@ -218,13 +218,13 @@ export function LogoEditor({
 
             {/* Typography */}
             <section>
-              <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-3">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#70767f] mb-3">
                 Font
               </h3>
               <div className="space-y-3">
                 {Object.entries(GOOGLE_FONTS).map(([category, fonts]) => (
                   <div key={category}>
-                    <p className="text-xs text-white/40 mb-1.5 capitalize">{category}</p>
+                    <p className="text-[10px] text-white/40 mb-1.5 capitalize">{category}</p>
                     <div className="grid grid-cols-2 gap-1.5">
                       {fonts.map((font) => (
                         <button
@@ -250,7 +250,7 @@ export function LogoEditor({
               <div className="mt-4">
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="text-xs text-white/60">Font Weight</label>
-                  <span className="text-xs text-white/60">{fontWeight}</span>
+                  <span className="text-xs text-[#3D6AF2] font-medium">{fontWeight}</span>
                 </div>
                 <input
                   type="range"
@@ -268,7 +268,7 @@ export function LogoEditor({
               <div className="mt-3">
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="text-xs text-white/60">Letter Spacing</label>
-                  <span className="text-xs text-white/60">{letterSpacing}px</span>
+                  <span className="text-xs text-[#3D6AF2] font-medium">{letterSpacing}px</span>
                 </div>
                 <input
                   type="range"
@@ -285,7 +285,7 @@ export function LogoEditor({
 
             {/* Layout */}
             <section>
-              <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-3">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#70767f] mb-3">
                 Layout
               </h3>
               <div className="flex gap-2">
@@ -310,7 +310,7 @@ export function LogoEditor({
 
             {/* Text */}
             <section>
-              <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-3">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#70767f] mb-3">
                 Text
               </h3>
               <div className="space-y-3">
@@ -346,7 +346,7 @@ export function LogoEditor({
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1e2631] text-white/70 hover:text-white hover:bg-[#253040] transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1e2631] text-white/70 hover:text-white hover:bg-[#253040] transition-colors text-sm font-medium min-h-[44px] focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
         >
           <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
             <path
@@ -361,7 +361,7 @@ export function LogoEditor({
         <button
           type="button"
           onClick={onNext}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#3D6AF2] text-white hover:bg-[#3D79F2] active:bg-[#3D5FE0] transition-colors text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] focus:ring-offset-2 focus:ring-offset-[#0d1117]"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#3D6AF2] text-white hover:bg-[#3D79F2] active:bg-[#3D5FE0] transition-colors text-sm font-semibold min-h-[44px] focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] focus:ring-offset-2 focus:ring-offset-[#090f16]"
         >
           <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
             <path

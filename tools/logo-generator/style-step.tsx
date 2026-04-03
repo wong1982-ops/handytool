@@ -73,18 +73,18 @@ export function StyleStep({
                 type="button"
                 onClick={() => onStyleChange(s.id)}
                 className={[
-                  'relative rounded-xl overflow-hidden cursor-pointer transition-transform hover:scale-[1.03] text-left',
+                  'relative rounded-xl overflow-hidden cursor-pointer transition-transform hover:scale-[1.02] text-left',
                   isSelected
                     ? 'shadow-[0_0_0_3px_#3D6AF2,0_0_20px_rgba(61,106,242,0.4)]'
-                    : '',
+                    : 'border border-[#1e2631]',
                 ].join(' ')}
               >
                 {/* Gradient background */}
                 <div className={`bg-gradient-to-br ${s.gradient} h-16 w-full`} />
                 {/* Card info */}
-                <div className="bg-[#131a23] px-3 py-2">
-                  <p className="text-white text-sm font-semibold leading-tight">{s.name}</p>
-                  <p className="text-[#70767f] text-xs mt-0.5 leading-snug line-clamp-2">
+                <div className="bg-[#131a23] px-3 py-2.5">
+                  <p className="text-white text-sm font-semibold leading-tight mb-0.5">{s.name}</p>
+                  <p className="text-[#70767f] text-xs leading-snug line-clamp-2">
                     {s.description}
                   </p>
                 </div>
@@ -106,9 +106,10 @@ export function StyleStep({
             className={[
               'flex-1 rounded-xl min-h-[44px] text-sm font-medium transition-all',
               colorMode === 'ai-suggested'
-                ? 'bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white'
-                : 'bg-[#131a23] text-[#a6abb5] hover:text-white',
+                ? 'text-white'
+                : 'bg-[#131a23] text-[#a6abb5] hover:text-white border border-[#1e2631]',
             ].join(' ')}
+            style={colorMode === 'ai-suggested' ? { background: 'linear-gradient(135deg, #3D6AF2, #7C3AED)' } : undefined}
           >
             Let AI decide
           </button>
@@ -118,9 +119,10 @@ export function StyleStep({
             className={[
               'flex-1 rounded-xl min-h-[44px] text-sm font-medium transition-all',
               colorMode === 'custom'
-                ? 'bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white'
-                : 'bg-[#131a23] text-[#a6abb5] hover:text-white',
+                ? 'text-white'
+                : 'bg-[#131a23] text-[#a6abb5] hover:text-white border border-[#1e2631]',
             ].join(' ')}
+            style={colorMode === 'custom' ? { background: 'linear-gradient(135deg, #3D6AF2, #7C3AED)' } : undefined}
           >
             Choose palette
           </button>
@@ -137,10 +139,10 @@ export function StyleStep({
                   type="button"
                   onClick={() => handlePaletteSelect(palette.colors)}
                   className={[
-                    'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 cursor-pointer transition-all',
+                    'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 min-h-[44px] cursor-pointer transition-all',
                     isSelected
                       ? 'shadow-[0_0_0_3px_#3D6AF2,0_0_20px_rgba(61,106,242,0.4)] bg-[#131a23]'
-                      : 'bg-[#131a23] hover:bg-[#1e2631]',
+                      : 'bg-[#131a23] hover:bg-[#1e2631] border border-[#1e2631]',
                   ].join(' ')}
                 >
                   <span className="text-xs font-medium text-[#a6abb5] w-20 text-left shrink-0">
@@ -174,10 +176,10 @@ export function StyleStep({
                       type="button"
                       onClick={() => handlePaletteSelect(paletteColors)}
                       className={[
-                        'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 cursor-pointer transition-all mb-1.5',
+                        'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 min-h-[44px] cursor-pointer transition-all mb-1.5',
                         isSelected
                           ? 'shadow-[0_0_0_3px_#3D6AF2,0_0_20px_rgba(61,106,242,0.4)] bg-[#131a23]'
-                          : 'bg-[#131a23] hover:bg-[#1e2631]',
+                          : 'bg-[#131a23] hover:bg-[#1e2631] border border-[#1e2631]',
                       ].join(' ')}
                     >
                       <span className="text-xs font-medium text-[#a6abb5] w-20 text-left shrink-0 truncate">
@@ -271,9 +273,10 @@ export function StyleStep({
           type="button"
           onClick={onNext}
           disabled={!isNextEnabled}
-          className="flex-1 bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white font-semibold rounded-xl min-h-[44px] cursor-pointer transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex-1 flex items-center justify-center gap-2 text-white font-semibold rounded-xl min-h-[44px] cursor-pointer transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ background: 'linear-gradient(135deg, #3D6AF2, #7C3AED)', boxShadow: '0 4px 20px rgba(61,106,242,0.3)' }}
         >
-          Next
+          Generate Logos
         </button>
       </div>
     </div>

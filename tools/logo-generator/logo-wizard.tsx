@@ -138,40 +138,42 @@ export default function LogoWizard() {
   return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Title */}
-      <h1 className="text-2xl sm:text-4xl font-extrabold text-white text-center mb-2 tracking-tight">
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-white text-center mb-2 tracking-tight">
         Logo{' '}
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#32A9D9]">
           Generator
         </span>
       </h1>
-      <p className="text-sm text-[#a6abb5] text-center mb-6">
+      <p className="text-sm text-[#a6abb5] text-center max-w-sm mx-auto mb-6">
         {activeTab === 'history' ? 'Your generated logos' : STEP_SUBTITLES[project.step]}
       </p>
 
       {/* Tab toggle */}
-      <div className="flex justify-center gap-1 mb-6 bg-[#131a23] rounded-xl p-1 max-w-xs mx-auto">
-        <button
-          type="button"
-          onClick={() => setActiveTab('create')}
-          className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
-            activeTab === 'create'
-              ? 'bg-[#3D6AF2] text-white shadow-lg'
-              : 'text-[#70767f] hover:text-white'
-          }`}
-        >
-          Create
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('history')}
-          className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
-            activeTab === 'history'
-              ? 'bg-[#3D6AF2] text-white shadow-lg'
-              : 'text-[#70767f] hover:text-white'
-          }`}
-        >
-          My Logos
-        </button>
+      <div className="flex justify-center mb-6">
+        <div className="bg-[#131a23] rounded-xl p-1 flex gap-1 w-full max-w-xs">
+          <button
+            type="button"
+            onClick={() => setActiveTab('create')}
+            className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-all cursor-pointer min-h-[44px] ${
+              activeTab === 'create'
+                ? 'bg-[#3D6AF2] text-white shadow-lg'
+                : 'text-[#70767f] hover:text-white'
+            }`}
+          >
+            Create
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('history')}
+            className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-all cursor-pointer min-h-[44px] ${
+              activeTab === 'history'
+                ? 'bg-[#3D6AF2] text-white shadow-lg'
+                : 'text-[#70767f] hover:text-white'
+            }`}
+          >
+            My Logos
+          </button>
+        </div>
       </div>
 
       {activeTab === 'history' ? (
@@ -179,7 +181,7 @@ export default function LogoWizard() {
       ) : (
       <>
       {/* Step indicator */}
-      <nav aria-label="Wizard progress" className="mb-8">
+      <nav aria-label="Wizard progress" className="mb-10">
         {/* Desktop */}
         <ol className="hidden sm:flex items-center justify-center gap-0">
           {STEPS.map((s, i) => {
@@ -210,7 +212,7 @@ export default function LogoWizard() {
                     ) : (
                       <span
                         className={`text-xs font-bold ${
-                          isCurrent ? 'text-[#93aaff]' : 'text-[#70767f]'
+                          isCurrent ? 'text-[#3D6AF2]' : 'text-[#70767f]'
                         }`}
                       >
                         {s}
@@ -219,7 +221,7 @@ export default function LogoWizard() {
                   </div>
                   <span
                     className={`mt-1.5 text-[11px] font-medium transition-colors ${
-                      isCompleted || isCurrent ? 'text-[#93aaff]' : 'text-[#70767f]'
+                      isCompleted || isCurrent ? 'text-[#a6abb5]' : 'text-[#70767f]'
                     }`}
                   >
                     {STEP_LABELS[i]}
