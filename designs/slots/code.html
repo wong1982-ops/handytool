@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <title>Toolk1t Slots — UI Redesign</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Material Symbols -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'page-bg':   '#090f16',
+            'card-bg':   '#131a23',
+            'border':    '#1e2631',
+            'primary':   '#3D6AF2',
+            'txt':       '#ffffff',
+            'txt-sec':   '#a6abb5',
+            'txt-muted': '#70767f',
+            'success':   '#10B981',
+            'warning':   '#F59E0B',
+            'gold-light':'#f0d080',
+            'gold-mid':  '#d4a052',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"SF Mono"', '"Cascadia Code"', '"Consolas"', 'monospace'],
+          },
+          keyframes: {
+            spinPulse: {
+              '0%, 100%': { boxShadow: '0 4px 0 #0f7a2f, 0 6px 16px rgba(34,197,94,0.4), inset 0 1px 0 rgba(255,255,255,0.2)' },
+              '50%':      { boxShadow: '0 4px 0 #0f7a2f, 0 6px 28px rgba(34,197,94,0.65), 0 0 36px rgba(34,197,94,0.3), inset 0 1px 0 rgba(255,255,255,0.2)' },
+            },
+            tickUp: {
+              from: { opacity: '0', transform: 'translateY(4px)' },
+              to:   { opacity: '1', transform: 'translateY(0)' },
+            },
+          },
+          animation: {
+            spinPulse: 'spinPulse 2s ease-in-out infinite',
+            tickUp: 'tickUp 0.2s ease-out',
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #040810;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #1e2631; border-radius: 4px; }
+
+    /* Material Symbols sizing */
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+    /* Screen layout */
+    .screen-wrap {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      max-height: 812px;
+      width: 375px;
+      overflow: hidden;
+      background: #090f16;
+      border-radius: 16px;
+      border: 1px solid #1e2631;
+    }
+
+    /* Horizontal snap scroll */
+    .snap-x-scroll {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px 16px;
+      scrollbar-width: none;
+    }
+    .snap-x-scroll::-webkit-scrollbar { display: none; }
+    .snap-item { scroll-snap-align: center; flex-shrink: 0; }
+
+    /* LCD scanlines */
+    .lcd-scanlines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.07;
+      background-image: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.4) 2px, rgba(0,0,0,0.4) 4px
+      );
+    }
+
+    /* Jackpot ticker counter animation */
+    @keyframes counterFlicker {
+      0%, 98% { opacity: 1; }
+      99%      { opacity: 0.6; }
+      100%     { opacity: 1; }
+    }
+    .ticker-val { animation: counterFlicker 2.3s ease-in-out infinite; }
+
+    /* Win glow on reel cell */
+    .reel-win {
+      box-shadow: 0 0 0 2px #3D6AF2, 0 0 12px rgba(61,106,242,0.6);
+      background: rgba(61,106,242,0.15) !important;
+    }
+
+    /* Spin button pulse when idle */
+    .spin-btn-idle {
+      animation: spinPulse 2s ease-in-out infinite;
+    }
+    @keyframes spinPulse {
+      0%, 100% { box-shadow: 0 4px 0 #0f7a2f, 0 6px 16px rgba(34,197,94,0.4), inset 0 1px 0 rgba(255,255,255,0.2); }
+      50%       { box-shadow: 0 4px 0 #0f7a2f, 0 6px 28px rgba(34,197,94,0.65), 0 0 36px rgba(34,197,94,0.3), inset 0 1px 0 rgba(255,255,255,0.2); }
+    }
+
+    /* Nav active dot */
+    .nav-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #f0d080;
+      margin: 0 auto 2px;
+    }
+
+    /* Tab content visibility */
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Progress bar */
+    .bonus-bar-fill {
+      height: 100%;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #3D6AF2, #3D9DF2);
+      width: 62%;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 gap-8 flex-wrap">
+
+  <!-- ============================================================
+       ANNOTATION LABELS
+  ============================================================ -->
+  <style>
+    .label-tag {
+      font-size: 10px;
+      font-family: Inter, sans-serif;
+      background: #3D6AF2;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      display: inline-block;
+    }
+  </style>
+
+  <!-- ============================================================
+       SCREEN 1 — LOBBY (active: Lobby tab)
+  ============================================================ -->
+  <div>
+    <div class="label-tag">Screen 1 — Casino Lobby</div>
+    <div class="screen-wrap" id="screen-lobby">
+
+      <!-- Header -->
+      <header style="background:#131a23; border-bottom:1px solid rgba(61,106,242,0.3); flex-shrink:0;"
+              class="flex items-center justify-between px-4 py-2.5">
+        <div class="flex items-center gap-2.5">
+          <button style="width:36px;height:36px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(61,106,242,0.12);border:1px solid rgba(61,106,242,0.25);"
+                  aria-label="Back">
+            <span class="material-symbols-outlined" style="color:#a6abb5;font-size:18px;">arrow_back</span>
+          </button>
+          <h1 style="color:#f0d080;font-size:15px;font-weight:800;letter-spacing:0.06em;">TOOLK1T CASINO</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <!-- Coin balance -->
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:9999px;background:rgba(61,106,242,0.1);border:1px solid rgba(61,106,242,0.3);">
+            <span style="font-size:14px;">🪙</span>
+            <span style="color:#f0d080;font-size:13px;font-weight:700;font-family:'SF Mono',monospace;">1,250,000</span>
+          </div>
+          <!-- Store button -->
+          <button style="padding:6px 12px;min-height:32px;border-radius:8px;background:#10B981;color:#fff;font-size:11px;font-weight:700;letter-spacing:0.04em;">
+            Store
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable content -->
+      <div style="flex:1;overflow-y:auto;">
+
+        <!-- Events Banner -->
+        <div style="margin:12px 16px 0;padding:12px 14px;border-radius:12px;background:#131a23;border:1px solid rgba(61,106,242,0.3);">
+          <div class="flex items-center gap-3">
+            <span style="font-size:18px;">🏆</span>
+            <div>
+              <p style="color:#f0d080;font-size:13px;font-weight:600;">Weekend Tournament</p>
+              <p style="color:#70767f;font-size:11px;margin-top:1px;">Ends: Apr 6, 2026</p>
+            </div>
+            <div style="margin-left:auto;">
+              <span style="background:rgba(61,106,242,0.15);color:#3D9DF2;font-size:10px;font-weight:600;padding:3px 8px;border-radius:9999px;border:1px solid rgba(61,106,242,0.3);">LIVE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Daily Bonus -->
+        <div style="margin:10px 16px 0;padding:12px 14px;border-radius:12px;background:#131a23;border:1px solid rgba(61,106,242,0.4);">
+          <div class="flex items-center justify-between">
+            <div>
+              <p style="color:#f0d080;font-size:13px;font-weight:600;">Daily Bonus — Day 3</p>
+              <p style="color:#d4a052;font-size:11px;margin-top:2px;">25,000 coins ready</p>
+            </div>
+            <button style="padding:8px 18px;min-height:36px;border-radius:8px;background:#10B981;color:#fff;font-size:13px;font-weight:700;">
+              Claim!
+            </button>
+          </div>
+        </div>
+
+        <!-- Game Cards Carousel -->
+        <div class="snap-x-scroll">
+          <!-- Card 1 — Wild Stampede -->
+          <div class="snap-item" style="width:160px;">
+            <div style="position:relative;border-radius:12px;overflow:hidden;border:2px solid rgba(61,106,242,0.35);aspect-ratio:3/4;background:linear-gradient(135deg,#1a3a10,#2d6b1a);">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px;">🦬</div>
+              <div style="position:absolute;inset-x:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 60%,transparent 100%);padding:10px 10px 12px;">
+                <p style="color:#fff;font-size:13px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.8);">Wild Stampede</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 — Nile Queen -->
+          <div class="snap-item" style="width:160px;">
+            <div style="position:relative;border-radius:12px;overflow:hidden;border:2px solid rgba(61,106,242,0.35);aspect-ratio:3/4;background:linear-gradient(135deg,#2a1a00,#7a5500);">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px;">👸</div>
+              <div style="position:absolute;inset-x:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 60%,transparent 100%);padding:10px 10px 12px;">
+                <p style="color:#fff;font-size:13px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.8);">Nile Queen</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 — Golden Dragon (selected/active) -->
+          <div class="snap-item" style="width:160px;">
+            <div style="position:relative;border-radius:12px;overflow:hidden;border:2px solid rgba(61,106,242,0.85);aspect-ratio:3/4;background:linear-gradient(135deg,#8B0000,#DC143C);box-shadow:0 0 16px rgba(61,106,242,0.35);">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px;">🐉</div>
+              <div style="position:absolute;inset-x:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 60%,transparent 100%);padding:10px 10px 12px;">
+                <p style="color:#fff;font-size:13px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.8);">Golden Dragon</p>
+              </div>
+              <!-- NEW badge -->
+              <div style="position:absolute;top:8px;right:8px;background:#F59E0B;color:#000;font-size:9px;font-weight:800;padding:2px 6px;border-radius:9999px;letter-spacing:0.05em;">HOT</div>
+            </div>
+          </div>
+
+          <!-- Card 4 — Tiki Fire -->
+          <div class="snap-item" style="width:160px;">
+            <div style="position:relative;border-radius:12px;overflow:hidden;border:2px solid rgba(61,106,242,0.35);aspect-ratio:3/4;background:linear-gradient(135deg,#4a1a00,#cc5500);">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px;">🌺</div>
+              <div style="position:absolute;inset-x:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 60%,transparent 100%);padding:10px 10px 12px;">
+                <p style="color:#fff;font-size:13px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.8);">Tiki Fire</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 5 — Ocean Treasure -->
+          <div class="snap-item" style="width:160px;">
+            <div style="position:relative;border-radius:12px;overflow:hidden;border:2px solid rgba(61,106,242,0.35);aspect-ratio:3/4;background:linear-gradient(135deg,#001a3a,#006699);">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px;">🌊</div>
+              <div style="position:absolute;inset-x:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 60%,transparent 100%);padding:10px 10px 12px;">
+                <p style="color:#fff;font-size:13px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.8);">Ocean Treasure</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spacer -->
+        <div style="height:8px;"></div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <nav style="background:rgba(19,26,35,0.96);border-top:1px solid rgba(61,106,242,0.2);backdrop-filter:blur(16px);flex-shrink:0;display:flex;" role="tablist">
+        <!-- Lobby (active) -->
+        <button role="tab" aria-selected="true" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 10px;gap:1px;min-height:56px;">
+          <div class="nav-dot"></div>
+          <span style="font-size:18px;line-height:1.2;">🎰</span>
+          <span style="color:#f0d080;font-size:10px;font-weight:600;">Lobby</span>
+        </button>
+        <button role="tab" aria-selected="false" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;line-height:1.2;">👥</span>
+          <span style="color:#70767f;font-size:10px;font-weight:500;">Friends</span>
+        </button>
+        <button role="tab" aria-selected="false" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;line-height:1.2;">🏆</span>
+          <span style="color:#70767f;font-size:10px;font-weight:500;">Leaderboard</span>
+        </button>
+        <button role="tab" aria-selected="false" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;line-height:1.2;">🎁</span>
+          <span style="color:#70767f;font-size:10px;font-weight:500;">Gifts</span>
+        </button>
+        <button role="tab" aria-selected="false" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;line-height:1.2;">🛒</span>
+          <span style="color:#70767f;font-size:10px;font-weight:500;">Shop</span>
+        </button>
+      </nav>
+
+    </div><!-- /screen-lobby -->
+  </div>
+
+
+  <!-- ============================================================
+       SCREEN 2 — LEADERBOARD TAB
+  ============================================================ -->
+  <div>
+    <div class="label-tag">Screen 2 — Leaderboard Tab</div>
+    <div class="screen-wrap">
+
+      <!-- Header (same) -->
+      <header style="background:#131a23;border-bottom:1px solid rgba(61,106,242,0.3);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
+        <div class="flex items-center gap-2.5">
+          <button style="width:36px;height:36px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(61,106,242,0.12);border:1px solid rgba(61,106,242,0.25);">
+            <span class="material-symbols-outlined" style="color:#a6abb5;font-size:18px;">arrow_back</span>
+          </button>
+          <h1 style="color:#f0d080;font-size:15px;font-weight:800;letter-spacing:0.06em;">TOOLK1T CASINO</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:9999px;background:rgba(61,106,242,0.1);border:1px solid rgba(61,106,242,0.3);">
+          <span style="font-size:14px;">🪙</span>
+          <span style="color:#f0d080;font-size:13px;font-weight:700;font-family:'SF Mono',monospace;">1,250,000</span>
+        </div>
+      </header>
+
+      <!-- Leaderboard content -->
+      <div style="flex:1;overflow-y:auto;padding:16px;">
+        <h2 style="color:#fff;font-size:17px;font-weight:700;margin-bottom:14px;">Leaderboard</h2>
+
+        <!-- Period toggle -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button style="padding:8px 18px;min-height:36px;border-radius:8px;background:#3D6AF2;color:#fff;font-size:13px;font-weight:600;">Weekly</button>
+          <button style="padding:8px 18px;min-height:36px;border-radius:8px;background:#131a23;color:#70767f;font-size:13px;font-weight:500;border:1px solid #1e2631;">All Time</button>
+        </div>
+
+        <!-- Rankings -->
+        <div style="display:flex;flex-direction:column;gap:6px;">
+
+          <!-- Rank 1 -->
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:#131a23;border:1px solid #1e2631;border-left:3px solid #f0d080;">
+            <span style="width:28px;text-align:center;font-size:15px;font-weight:800;color:#f0d080;">1</span>
+            <div style="flex:1;min-width:0;">
+              <span style="color:#fff;font-size:13px;font-weight:600;">SpinMaster_77</span>
+              <div style="display:flex;align-items:center;gap:4px;margin-top:1px;">
+                <span style="color:#70767f;font-size:10px;">Lv 48</span>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="color:#f0d080;font-size:13px;font-weight:700;font-family:'SF Mono',monospace;">8,420,000</div>
+              <div style="color:#70767f;font-size:10px;margin-top:1px;">Best: 1,200,000</div>
+            </div>
+          </div>
+
+          <!-- Rank 2 -->
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:#131a23;border:1px solid #1e2631;border-left:3px solid #d1d5db;">
+            <span style="width:28px;text-align:center;font-size:15px;font-weight:800;color:#d1d5db;">2</span>
+            <div style="flex:1;min-width:0;">
+              <span style="color:#fff;font-size:13px;font-weight:600;">LuckyDragon99</span>
+              <div style="margin-top:1px;"><span style="color:#70767f;font-size:10px;">Lv 35</span></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="color:#f0d080;font-size:13px;font-weight:700;font-family:'SF Mono',monospace;">6,180,000</div>
+              <div style="color:#70767f;font-size:10px;margin-top:1px;">Best: 950,000</div>
+            </div>
+          </div>
+
+          <!-- Rank 3 -->
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:#131a23;border:1px solid #1e2631;border-left:3px solid #d4a052;">
+            <span style="width:28px;text-align:center;font-size:15px;font-weight:800;color:#d4a052;">3</span>
+            <div style="flex:1;min-width:0;">
+              <span style="color:#fff;font-size:13px;font-weight:600;">NileQueen_x</span>
+              <div style="margin-top:1px;"><span style="color:#70767f;font-size:10px;">Lv 29</span></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="color:#f0d080;font-size:13px;font-weight:700;font-family:'SF Mono',monospace;">4,750,000</div>
+              <div style="color:#70767f;font-size:10px;margin-top:1px;">Best: 720,000</div>
+            </div>
+          </div>
+
+          <!-- Rank 4 -->
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:#131a23;border:1px solid #1e2631;">
+            <span style="width:28px;text-align:center;font-size:15px;font-weight:800;color:#70767f;">4</span>
+            <div style="flex:1;min-width:0;">
+              <span style="color:#fff;font-size:13px;font-weight:600;">GoldenSpins22</span>
+              <div style="margin-top:1px;"><span style="color:#70767f;font-size:10px;">Lv 21</span></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="color:#f0d080;font-size:13px;font-weight:700;font-family:'SF Mono',monospace;">2,340,000</div>
+              <div style="color:#70767f;font-size:10px;margin-top:1px;">Best: 480,000</div>
+            </div>
+          </div>
+
+          <!-- Rank 5 -->
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:#131a23;border:1px solid #1e2631;">
+            <span style="width:28px;text-align:center;font-size:15px;font-weight:800;color:#70767f;">5</span>
+            <div style="flex:1;min-width:0;">
+              <span style="color:#fff;font-size:13px;font-weight:600;">TikiKing_2k</span>
+              <div style="margin-top:1px;"><span style="color:#70767f;font-size:10px;">Lv 18</span></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="color:#f0d080;font-size:13px;font-weight:700;font-family:'SF Mono',monospace;">1,890,000</div>
+              <div style="color:#70767f;font-size:10px;margin-top:1px;">Best: 310,000</div>
+            </div>
+          </div>
+
+        </div><!-- /rankings -->
+
+        <!-- "You" row -->
+        <div style="margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(61,106,242,0.08);border:1px solid rgba(61,106,242,0.3);">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="width:28px;text-align:center;font-size:13px;font-weight:700;color:#a6abb5;">#14</span>
+            <span style="flex:1;color:#a6abb5;font-size:12px;">You</span>
+            <span style="color:#f0d080;font-size:12px;font-weight:700;font-family:'SF Mono',monospace;">430,000</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Nav -->
+      <nav style="background:rgba(19,26,35,0.96);border-top:1px solid rgba(61,106,242,0.2);backdrop-filter:blur(16px);flex-shrink:0;display:flex;" role="tablist">
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🎰</span><span style="color:#70767f;font-size:10px;">Lobby</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">👥</span><span style="color:#70767f;font-size:10px;">Friends</span>
+        </button>
+        <button role="tab" aria-selected="true" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0 10px;gap:1px;min-height:56px;">
+          <div class="nav-dot"></div>
+          <span style="font-size:18px;">🏆</span><span style="color:#f0d080;font-size:10px;font-weight:600;">Leaderboard</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🎁</span><span style="color:#70767f;font-size:10px;">Gifts</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🛒</span><span style="color:#70767f;font-size:10px;">Shop</span>
+        </button>
+      </nav>
+
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       SCREEN 3 — COIN SHOP TAB
+  ============================================================ -->
+  <div>
+    <div class="label-tag">Screen 3 — Coin Shop</div>
+    <div class="screen-wrap">
+
+      <!-- Header -->
+      <header style="background:#131a23;border-bottom:1px solid rgba(61,106,242,0.3);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
+        <div class="flex items-center gap-2.5">
+          <button style="width:36px;height:36px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(61,106,242,0.12);border:1px solid rgba(61,106,242,0.25);">
+            <span class="material-symbols-outlined" style="color:#a6abb5;font-size:18px;">arrow_back</span>
+          </button>
+          <h1 style="color:#f0d080;font-size:15px;font-weight:800;letter-spacing:0.06em;">TOOLK1T CASINO</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:9999px;background:rgba(61,106,242,0.1);border:1px solid rgba(61,106,242,0.3);">
+          <span style="font-size:14px;">🪙</span>
+          <span style="color:#f0d080;font-size:13px;font-weight:700;font-family:'SF Mono',monospace;">1,250,000</span>
+        </div>
+      </header>
+
+      <!-- Shop content -->
+      <div style="flex:1;overflow-y:auto;padding:16px;">
+        <h2 style="color:#fff;font-size:17px;font-weight:700;margin-bottom:16px;">Coin Shop</h2>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+
+          <!-- Starter pack -->
+          <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:12px;background:#131a23;border:1px solid #1e2631;">
+            <div>
+              <p style="color:#a6abb5;font-size:12px;font-weight:500;">Starter</p>
+              <p style="color:#f0d080;font-size:18px;font-weight:800;font-family:'SF Mono',monospace;margin-top:2px;">100,000</p>
+              <p style="color:#70767f;font-size:10px;margin-top:1px;">coins</p>
+            </div>
+            <button style="padding:10px 20px;min-height:44px;border-radius:8px;background:#10B981;color:#fff;font-size:14px;font-weight:700;">$0.99</button>
+          </div>
+
+          <!-- Popular pack (badge) -->
+          <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:12px;background:#131a23;border:1px solid rgba(61,106,242,0.4);box-shadow:0 0 0 1px rgba(61,106,242,0.15);">
+            <span style="position:absolute;top:-10px;right:12px;background:#F59E0B;color:#000;font-size:9px;font-weight:800;padding:3px 8px;border-radius:9999px;letter-spacing:0.05em;">POPULAR</span>
+            <div>
+              <p style="color:#a6abb5;font-size:12px;font-weight:500;">Popular</p>
+              <p style="color:#f0d080;font-size:18px;font-weight:800;font-family:'SF Mono',monospace;margin-top:2px;">550,000</p>
+              <p style="color:#10B981;font-size:10px;font-weight:600;margin-top:1px;">+10% bonus</p>
+            </div>
+            <button style="padding:10px 20px;min-height:44px;border-radius:8px;background:#10B981;color:#fff;font-size:14px;font-weight:700;">$3.99</button>
+          </div>
+
+          <!-- Best Value pack (badge) -->
+          <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:12px;background:#131a23;border:1px solid rgba(16,185,129,0.4);box-shadow:0 0 0 1px rgba(16,185,129,0.12);">
+            <span style="position:absolute;top:-10px;right:12px;background:#10B981;color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:9999px;letter-spacing:0.05em;">BEST VALUE</span>
+            <div>
+              <p style="color:#a6abb5;font-size:12px;font-weight:500;">Best Value</p>
+              <p style="color:#f0d080;font-size:18px;font-weight:800;font-family:'SF Mono',monospace;margin-top:2px;">1,800,000</p>
+              <p style="color:#10B981;font-size:10px;font-weight:600;margin-top:1px;">+20% bonus</p>
+            </div>
+            <button style="padding:10px 20px;min-height:44px;border-radius:8px;background:#10B981;color:#fff;font-size:14px;font-weight:700;">$9.99</button>
+          </div>
+
+          <!-- High Roller -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:12px;background:#131a23;border:1px solid #1e2631;">
+            <div>
+              <p style="color:#a6abb5;font-size:12px;font-weight:500;">High Roller</p>
+              <p style="color:#f0d080;font-size:18px;font-weight:800;font-family:'SF Mono',monospace;margin-top:2px;">6,500,000</p>
+              <p style="color:#10B981;font-size:10px;font-weight:600;margin-top:1px;">+30% bonus</p>
+            </div>
+            <button style="padding:10px 20px;min-height:44px;border-radius:8px;background:#10B981;color:#fff;font-size:14px;font-weight:700;">$24.99</button>
+          </div>
+
+          <!-- Whale -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:12px;background:#131a23;border:1px solid rgba(245,158,11,0.3);">
+            <div>
+              <p style="color:#a6abb5;font-size:12px;font-weight:500;">Whale 🐋</p>
+              <p style="color:#f0d080;font-size:18px;font-weight:800;font-family:'SF Mono',monospace;margin-top:2px;">22,500,000</p>
+              <p style="color:#10B981;font-size:10px;font-weight:600;margin-top:1px;">+50% bonus</p>
+            </div>
+            <button style="padding:10px 20px;min-height:44px;border-radius:8px;background:#10B981;color:#fff;font-size:14px;font-weight:700;">$49.99</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <nav style="background:rgba(19,26,35,0.96);border-top:1px solid rgba(61,106,242,0.2);backdrop-filter:blur(16px);flex-shrink:0;display:flex;" role="tablist">
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🎰</span><span style="color:#70767f;font-size:10px;">Lobby</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">👥</span><span style="color:#70767f;font-size:10px;">Friends</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🏆</span><span style="color:#70767f;font-size:10px;">Leaderboard</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🎁</span><span style="color:#70767f;font-size:10px;">Gifts</span>
+        </button>
+        <button role="tab" aria-selected="true" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0 10px;gap:1px;min-height:56px;">
+          <div class="nav-dot"></div>
+          <span style="font-size:18px;">🛒</span><span style="color:#f0d080;font-size:10px;font-weight:600;">Shop</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       SCREEN 4 — GAME MACHINE (Golden Dragon in-game)
+  ============================================================ -->
+  <div>
+    <div class="label-tag">Screen 4 — Game Machine (Golden Dragon)</div>
+    <div class="screen-wrap" style="background:linear-gradient(180deg,#1a0505 0%,#0a0202 100%);position:relative;overflow:hidden;">
+
+      <!-- Background texture -->
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 20%,rgba(220,20,60,0.12) 0%,transparent 60%);pointer-events:none;z-index:0;"></div>
+
+      <!-- HUD overlay -->
+      <div style="position:relative;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(0,0,0,0.35);backdrop-filter:blur(6px);flex-shrink:0;">
+        <!-- Left: back + level -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button style="width:36px;height:36px;min-height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);"
+                  aria-label="Back to lobby">
+            <span class="material-symbols-outlined" style="color:#fff;font-size:17px;">arrow_back</span>
+          </button>
+          <div style="padding:4px 10px;border-radius:9999px;background:rgba(61,106,242,0.6);border:1px solid rgba(61,106,242,0.8);">
+            <span style="color:#fff;font-size:10px;font-weight:700;letter-spacing:0.04em;">LV 12</span>
+          </div>
+        </div>
+        <!-- Right: coins + store -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:9999px;background:rgba(0,0,0,0.45);">
+            <span style="font-size:12px;">🪙</span>
+            <span style="color:#f0d080;font-size:12px;font-weight:700;font-family:'SF Mono',monospace;">1,250,000</span>
+          </div>
+          <button style="padding:5px 12px;min-height:32px;border-radius:9999px;background:#10B981;color:#fff;font-size:10px;font-weight:800;letter-spacing:0.05em;">STORE</button>
+        </div>
+      </div>
+
+      <!-- Game name -->
+      <div style="position:relative;z-index:20;text-align:center;padding:6px 0 4px;flex-shrink:0;">
+        <p style="color:#d4a052;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;text-shadow:0 0 8px rgba(212,160,82,0.5);">🐉 Golden Dragon</p>
+      </div>
+
+      <!-- Jackpot Tickers -->
+      <div style="position:relative;z-index:20;display:flex;gap:4px;padding:0 12px 8px;flex-shrink:0;">
+        <!-- GRAND -->
+        <div style="flex:1;border-radius:8px;overflow:hidden;background:linear-gradient(180deg,#8B0000,#cc0000);box-shadow:0 2px 8px rgba(0,0,0,0.5);">
+          <div style="padding:5px 6px;text-align:center;">
+            <div style="color:rgba(255,255,255,0.65);font-size:7px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;">GRAND</div>
+            <div class="ticker-val" style="color:#ffd700;font-size:12px;font-weight:700;font-family:'SF Mono',monospace;text-shadow:0 0 6px rgba(255,215,0,0.6);margin-top:1px;">1,427,832</div>
+          </div>
+        </div>
+        <!-- MAJOR -->
+        <div style="flex:1;border-radius:8px;overflow:hidden;background:linear-gradient(180deg,#1a1a5a,#3333cc);box-shadow:0 2px 8px rgba(0,0,0,0.5);">
+          <div style="padding:5px 6px;text-align:center;">
+            <div style="color:rgba(255,255,255,0.65);font-size:7px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;">MAJOR</div>
+            <div class="ticker-val" style="color:#ffd700;font-size:12px;font-weight:700;font-family:'SF Mono',monospace;text-shadow:0 0 6px rgba(255,215,0,0.6);margin-top:1px;">142,615</div>
+          </div>
+        </div>
+        <!-- MINOR -->
+        <div style="flex:1;border-radius:8px;overflow:hidden;background:linear-gradient(180deg,#0a3a1a,#1e7a3a);box-shadow:0 2px 8px rgba(0,0,0,0.5);">
+          <div style="padding:5px 6px;text-align:center;">
+            <div style="color:rgba(255,255,255,0.65);font-size:7px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;">MINOR</div>
+            <div class="ticker-val" style="color:#ffd700;font-size:12px;font-weight:700;font-family:'SF Mono',monospace;text-shadow:0 0 6px rgba(255,215,0,0.6);margin-top:1px;">14,284</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reel Board -->
+      <div style="position:relative;z-index:20;flex:1;display:flex;align-items:center;justify-content:center;padding:0 10px;">
+        <div style="width:100%;border-radius:16px;overflow:hidden;border:2px solid #cc3333;box-shadow:0 0 0 1px #5a0a0a,0 0 24px rgba(204,51,51,0.3);background:#2a0505;">
+          <!-- Reel border gradient top -->
+          <div style="height:4px;background:linear-gradient(90deg,#5a0a0a,#cc3333,#5a0a0a);"></div>
+
+          <!-- 5×3 grid -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:4px;background:#1a0505;">
+            <!-- Row 1 -->
+            <div style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🐲</div>
+            <div style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🔮</div>
+            <div class="reel-win" style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🐉</div>
+            <div style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">👑</div>
+            <div style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🃏</div>
+            <!-- Row 2 -->
+            <div class="reel-win" style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🐉</div>
+            <div class="reel-win" style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🐉</div>
+            <div class="reel-win" style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🐉</div>
+            <div class="reel-win" style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🐉</div>
+            <div class="reel-win" style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🐉</div>
+            <!-- Row 3 -->
+            <div style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🪙</div>
+            <div style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🐅</div>
+            <div style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🦚</div>
+            <div style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🪙</div>
+            <div style="background:#090f16;border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;">🅰️</div>
+          </div>
+
+          <!-- Reel border gradient bottom -->
+          <div style="height:4px;background:linear-gradient(90deg,#5a0a0a,#cc3333,#5a0a0a);"></div>
+        </div>
+      </div>
+
+      <!-- Win Banner -->
+      <div style="position:relative;z-index:20;text-align:center;padding:6px 16px;flex-shrink:0;">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(240,208,128,0.1);border:1px solid rgba(240,208,128,0.35);border-radius:9999px;padding:5px 16px;">
+          <span style="color:#f0d080;font-size:13px;font-weight:800;letter-spacing:0.05em;">BIG WIN!</span>
+          <span style="color:#f0d080;font-size:14px;font-weight:900;font-family:'SF Mono',monospace;">+50,000</span>
+        </div>
+      </div>
+
+      <!-- Bonus Meter -->
+      <div style="position:relative;z-index:20;padding:4px 14px 6px;flex-shrink:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <span style="color:#70767f;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Bonus Meter</span>
+          <span style="color:#d4a052;font-size:9px;font-weight:600;">2 / 3 scatters</span>
+        </div>
+        <div style="height:6px;border-radius:9999px;background:#1e2631;overflow:hidden;">
+          <div style="width:66%;height:100%;border-radius:9999px;background:linear-gradient(90deg,#DC143C,#ff6b6b);box-shadow:0 0 6px rgba(220,20,60,0.5);"></div>
+        </div>
+      </div>
+
+      <!-- Bet Controls Panel -->
+      <div style="position:relative;z-index:20;padding:8px 12px 12px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.6));flex-shrink:0;">
+
+        <!-- LED Display: Credit | Bet | Win -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;border-radius:10px;padding:2px;background:linear-gradient(180deg,#d4a052,#a07030);margin-bottom:10px;">
+          <!-- Credit -->
+          <div style="position:relative;border-radius:8px;overflow:hidden;background:linear-gradient(180deg,#050208,#0a0515,#050208);box-shadow:inset 0 1px 3px rgba(0,0,0,0.8);">
+            <div class="lcd-scanlines"></div>
+            <div style="padding:5px 4px;text-align:center;">
+              <div style="color:rgba(212,160,82,0.5);font-size:7px;text-transform:uppercase;letter-spacing:0.15em;font-weight:600;margin-bottom:1px;">Credit</div>
+              <div style="color:#f0d080;font-size:11px;font-weight:700;font-family:'SF Mono',monospace;text-shadow:0 0 6px rgba(240,208,128,0.35);">1,250,000</div>
+            </div>
+          </div>
+          <!-- Bet -->
+          <div style="position:relative;border-radius:8px;overflow:hidden;background:linear-gradient(180deg,#050208,#0a0515,#050208);box-shadow:inset 0 1px 3px rgba(0,0,0,0.8);">
+            <div class="lcd-scanlines"></div>
+            <div style="padding:5px 4px;text-align:center;">
+              <div style="color:rgba(212,160,82,0.5);font-size:7px;text-transform:uppercase;letter-spacing:0.15em;font-weight:600;margin-bottom:1px;">Bet</div>
+              <div style="color:#f0d080;font-size:11px;font-weight:700;font-family:'SF Mono',monospace;text-shadow:0 0 6px rgba(240,208,128,0.35);">1,250</div>
+            </div>
+          </div>
+          <!-- Win -->
+          <div style="position:relative;border-radius:8px;overflow:hidden;background:linear-gradient(180deg,#050208,#0a0515,#050208);box-shadow:inset 0 1px 3px rgba(0,0,0,0.8);">
+            <div class="lcd-scanlines"></div>
+            <div style="padding:5px 4px;text-align:center;">
+              <div style="color:rgba(212,160,82,0.5);font-size:7px;text-transform:uppercase;letter-spacing:0.15em;font-weight:600;margin-bottom:1px;">Win</div>
+              <div style="color:#fbbf24;font-size:11px;font-weight:700;font-family:'SF Mono',monospace;text-shadow:0 0 6px rgba(251,191,36,0.5);">50,000</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bet selector row -->
+        <div style="display:flex;align-items:center;justify-content:center;gap:14px;padding:8px 12px;border-radius:10px;background:#090f16;border:1px solid rgba(212,160,82,0.2);margin-bottom:10px;">
+          <button style="width:36px;height:36px;min-height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#d4a052;background:linear-gradient(180deg,#1e0a3e,#0d0519);border:1px solid rgba(212,160,82,0.3);box-shadow:0 2px 0 #060310;">◀</button>
+          <div style="text-align:center;min-width:90px;">
+            <div style="color:rgba(212,160,82,0.5);font-size:8px;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:2px;">25 Lines · Bet/Line</div>
+            <div style="color:#f0d080;font-size:20px;font-weight:800;font-family:'SF Mono',monospace;text-shadow:0 0 8px rgba(240,208,128,0.4);">50</div>
+          </div>
+          <button style="width:36px;height:36px;min-height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#d4a052;background:linear-gradient(180deg,#1e0a3e,#0d0519);border:1px solid rgba(212,160,82,0.3);box-shadow:0 2px 0 #060310;">▶</button>
+        </div>
+
+        <!-- Button row: Auto | SPIN | Max Bet -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <!-- Auto -->
+          <button style="flex:1;padding:10px 6px;min-height:44px;border-radius:10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#d4a052;background:linear-gradient(180deg,#2a1060,#1a0a3a);border:1px solid rgba(212,160,82,0.3);box-shadow:0 3px 0 #0d0519;">
+            Auto
+          </button>
+          <!-- SPIN (big, green) -->
+          <button class="spin-btn-idle" style="flex:2.5;padding:14px 10px;min-height:52px;border-radius:14px;font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#fff;background:linear-gradient(180deg,#34d058,#22c55e,#16a34a);border:1px solid rgba(255,255,255,0.15);">
+            ▶ SPIN
+          </button>
+          <!-- Max Bet -->
+          <button style="flex:1;padding:10px 6px;min-height:44px;border-radius:10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#0d0519;background:linear-gradient(180deg,#e8b230,#d4a052,#a07030);border:1px solid rgba(255,255,255,0.1);box-shadow:0 3px 0 #705020;">
+            Max Bet
+          </button>
+        </div>
+
+        <!-- Paytable info icon -->
+        <div style="display:flex;justify-content:flex-start;margin-top:8px;">
+          <button style="width:28px;height:28px;min-height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);"
+                  aria-label="Paytable">
+            <span style="color:#a6abb5;font-size:12px;font-weight:700;">i</span>
+          </button>
+        </div>
+
+      </div><!-- /bet controls -->
+
+    </div><!-- /game machine -->
+  </div>
+
+
+  <!-- ============================================================
+       SCREEN 5 — FRIENDS TAB
+  ============================================================ -->
+  <div>
+    <div class="label-tag">Screen 5 — Friends Tab</div>
+    <div class="screen-wrap">
+
+      <!-- Header -->
+      <header style="background:#131a23;border-bottom:1px solid rgba(61,106,242,0.3);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
+        <div class="flex items-center gap-2.5">
+          <button style="width:36px;height:36px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(61,106,242,0.12);border:1px solid rgba(61,106,242,0.25);">
+            <span class="material-symbols-outlined" style="color:#a6abb5;font-size:18px;">arrow_back</span>
+          </button>
+          <h1 style="color:#f0d080;font-size:15px;font-weight:800;letter-spacing:0.06em;">TOOLK1T CASINO</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:9999px;background:rgba(61,106,242,0.1);border:1px solid rgba(61,106,242,0.3);">
+          <span style="font-size:14px;">🪙</span>
+          <span style="color:#f0d080;font-size:13px;font-weight:700;font-family:'SF Mono',monospace;">1,250,000</span>
+        </div>
+      </header>
+
+      <div style="flex:1;overflow-y:auto;padding:16px;">
+        <h2 style="color:#fff;font-size:17px;font-weight:700;margin-bottom:14px;">Friends</h2>
+
+        <!-- Add friend -->
+        <div style="display:flex;gap:8px;margin-bottom:20px;">
+          <input placeholder="Enter username..."
+                 style="flex:1;padding:10px 12px;min-height:44px;border-radius:8px;background:#090f16;border:1px solid #1e2631;color:#fff;font-size:13px;outline:none;font-family:Inter,sans-serif;"
+                 onfocus="this.style.borderColor='rgba(61,106,242,0.7)'" onblur="this.style.borderColor='#1e2631'" />
+          <button style="padding:10px 14px;min-height:44px;border-radius:8px;background:#10B981;color:#fff;font-size:12px;font-weight:700;white-space:nowrap;">Send Request</button>
+        </div>
+
+        <!-- Pending requests -->
+        <div style="margin-bottom:16px;">
+          <h3 style="color:#F59E0B;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Pending (1)</h3>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:#131a23;border:1px solid rgba(245,158,11,0.3);">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:rgba(61,106,242,0.2);display:flex;align-items:center;justify-content:center;">
+                <span style="color:#a6abb5;font-size:14px;">👤</span>
+              </div>
+              <div>
+                <p style="color:#fff;font-size:13px;font-weight:600;">SakuraFan_88</p>
+                <p style="color:#70767f;font-size:10px;">Wants to be friends</p>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button style="padding:6px 12px;min-height:32px;border-radius:6px;background:#10B981;color:#fff;font-size:11px;font-weight:700;">Accept</button>
+              <button style="padding:6px 12px;min-height:32px;border-radius:6px;background:#131a23;color:#a6abb5;font-size:11px;font-weight:500;border:1px solid #1e2631;">Decline</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Friends list -->
+        <h3 style="color:#a6abb5;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Friends (3)</h3>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:#131a23;border:1px solid #1e2631;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="position:relative;">
+                <div style="width:32px;height:32px;border-radius:50%;background:rgba(61,106,242,0.2);display:flex;align-items:center;justify-content:center;">
+                  <span style="font-size:14px;">🦁</span>
+                </div>
+                <div style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:#10B981;border:2px solid #131a23;"></div>
+              </div>
+              <div>
+                <p style="color:#fff;font-size:13px;font-weight:600;">SafariKing_Pro</p>
+                <p style="color:#10B981;font-size:10px;">Online · Lv 34</p>
+              </div>
+            </div>
+            <button style="padding:5px 10px;min-height:32px;border-radius:6px;background:rgba(61,106,242,0.12);color:#3D9DF2;font-size:11px;font-weight:600;border:1px solid rgba(61,106,242,0.3);">Gift 🎁</button>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:#131a23;border:1px solid #1e2631;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="position:relative;">
+                <div style="width:32px;height:32px;border-radius:50%;background:rgba(61,106,242,0.2);display:flex;align-items:center;justify-content:center;">
+                  <span style="font-size:14px;">🌊</span>
+                </div>
+                <div style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:#10B981;border:2px solid #131a23;"></div>
+              </div>
+              <div>
+                <p style="color:#fff;font-size:13px;font-weight:600;">OceanDiver_22</p>
+                <p style="color:#10B981;font-size:10px;">Online · Lv 21</p>
+              </div>
+            </div>
+            <button style="padding:5px 10px;min-height:32px;border-radius:6px;background:rgba(61,106,242,0.12);color:#3D9DF2;font-size:11px;font-weight:600;border:1px solid rgba(61,106,242,0.3);">Gift 🎁</button>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:#131a23;border:1px solid #1e2631;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="position:relative;">
+                <div style="width:32px;height:32px;border-radius:50%;background:rgba(61,106,242,0.2);display:flex;align-items:center;justify-content:center;">
+                  <span style="font-size:14px;">🐉</span>
+                </div>
+                <div style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:#70767f;border:2px solid #131a23;"></div>
+              </div>
+              <div>
+                <p style="color:#fff;font-size:13px;font-weight:600;">DragonLady_X</p>
+                <p style="color:#70767f;font-size:10px;">Offline · Lv 29</p>
+              </div>
+            </div>
+            <button style="padding:5px 10px;min-height:32px;border-radius:6px;background:rgba(61,106,242,0.12);color:#3D9DF2;font-size:11px;font-weight:600;border:1px solid rgba(61,106,242,0.3);">Gift 🎁</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <nav style="background:rgba(19,26,35,0.96);border-top:1px solid rgba(61,106,242,0.2);backdrop-filter:blur(16px);flex-shrink:0;display:flex;" role="tablist">
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🎰</span><span style="color:#70767f;font-size:10px;">Lobby</span>
+        </button>
+        <button role="tab" aria-selected="true" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0 10px;gap:1px;min-height:56px;">
+          <div class="nav-dot"></div>
+          <span style="font-size:18px;">👥</span><span style="color:#f0d080;font-size:10px;font-weight:600;">Friends</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🏆</span><span style="color:#70767f;font-size:10px;">Leaderboard</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🎁</span><span style="color:#70767f;font-size:10px;">Gifts</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🛒</span><span style="color:#70767f;font-size:10px;">Shop</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       SCREEN 6 — GIFTS TAB
+  ============================================================ -->
+  <div>
+    <div class="label-tag">Screen 6 — Gifts Tab</div>
+    <div class="screen-wrap">
+
+      <!-- Header -->
+      <header style="background:#131a23;border-bottom:1px solid rgba(61,106,242,0.3);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
+        <div class="flex items-center gap-2.5">
+          <button style="width:36px;height:36px;min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(61,106,242,0.12);border:1px solid rgba(61,106,242,0.25);">
+            <span class="material-symbols-outlined" style="color:#a6abb5;font-size:18px;">arrow_back</span>
+          </button>
+          <h1 style="color:#f0d080;font-size:15px;font-weight:800;letter-spacing:0.06em;">TOOLK1T CASINO</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:9999px;background:rgba(61,106,242,0.1);border:1px solid rgba(61,106,242,0.3);">
+          <span style="font-size:14px;">🪙</span>
+          <span style="color:#f0d080;font-size:13px;font-weight:700;font-family:'SF Mono',monospace;">1,250,000</span>
+        </div>
+      </header>
+
+      <div style="flex:1;overflow-y:auto;padding:16px;">
+        <!-- Header row -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <h2 style="color:#fff;font-size:17px;font-weight:700;">Gifts</h2>
+          <button style="padding:8px 16px;min-height:36px;border-radius:8px;background:#d4a052;color:#000;font-size:12px;font-weight:800;">Claim All (3)</button>
+        </div>
+
+        <!-- Gift list -->
+        <div style="display:flex;flex-direction:column;gap:6px;">
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;background:#131a23;border:1px solid rgba(212,160,82,0.25);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:22px;">🎁</span>
+              <div>
+                <p style="color:#fff;font-size:13px;font-weight:600;">From: SafariKing_Pro</p>
+                <p style="color:#70767f;font-size:10px;margin-top:1px;">3 minutes ago</p>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <p style="color:#f0d080;font-size:14px;font-weight:800;font-family:'SF Mono',monospace;">+5,000</p>
+              <p style="color:#70767f;font-size:9px;">coins</p>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;background:#131a23;border:1px solid rgba(212,160,82,0.25);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:22px;">🎁</span>
+              <div>
+                <p style="color:#fff;font-size:13px;font-weight:600;">From: OceanDiver_22</p>
+                <p style="color:#70767f;font-size:10px;margin-top:1px;">1 hour ago</p>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <p style="color:#f0d080;font-size:14px;font-weight:800;font-family:'SF Mono',monospace;">+5,000</p>
+              <p style="color:#70767f;font-size:9px;">coins</p>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;background:#131a23;border:1px solid rgba(212,160,82,0.25);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:22px;">🎁</span>
+              <div>
+                <p style="color:#fff;font-size:13px;font-weight:600;">From: NileQueen_x</p>
+                <p style="color:#70767f;font-size:10px;margin-top:1px;">Yesterday</p>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <p style="color:#f0d080;font-size:14px;font-weight:800;font-family:'SF Mono',monospace;">+5,000</p>
+              <p style="color:#70767f;font-size:9px;">coins</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <nav style="background:rgba(19,26,35,0.96);border-top:1px solid rgba(61,106,242,0.2);backdrop-filter:blur(16px);flex-shrink:0;display:flex;" role="tablist">
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🎰</span><span style="color:#70767f;font-size:10px;">Lobby</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">👥</span><span style="color:#70767f;font-size:10px;">Friends</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🏆</span><span style="color:#70767f;font-size:10px;">Leaderboard</span>
+        </button>
+        <button role="tab" aria-selected="true" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0 10px;gap:1px;min-height:56px;">
+          <div class="nav-dot"></div>
+          <span style="font-size:18px;">🎁</span><span style="color:#f0d080;font-size:10px;font-weight:600;">Gifts</span>
+        </button>
+        <button role="tab" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0 10px;gap:2px;min-height:56px;">
+          <span style="font-size:18px;">🛒</span><span style="color:#70767f;font-size:10px;">Shop</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       COLOR TOKENS REFERENCE LEGEND
+  ============================================================ -->
+  <div style="width:375px;background:#0d1520;border:1px solid #1e2631;border-radius:12px;padding:20px;font-family:Inter,sans-serif;">
+    <p class="label-tag" style="margin-bottom:12px;">Design Tokens Reference</p>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:4px;background:#090f16;border:1px solid #1e2631;flex-shrink:0;"></div>
+        <code style="color:#a6abb5;font-size:11px;font-family:'SF Mono',monospace;">page-bg  #090f16</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:4px;background:#131a23;border:1px solid #1e2631;flex-shrink:0;"></div>
+        <code style="color:#a6abb5;font-size:11px;font-family:'SF Mono',monospace;">card-bg  #131a23</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:4px;background:#1e2631;flex-shrink:0;"></div>
+        <code style="color:#a6abb5;font-size:11px;font-family:'SF Mono',monospace;">border   #1e2631</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:4px;background:#3D6AF2;flex-shrink:0;"></div>
+        <code style="color:#a6abb5;font-size:11px;font-family:'SF Mono',monospace;">primary  #3D6AF2</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:4px;background:#10B981;flex-shrink:0;"></div>
+        <code style="color:#a6abb5;font-size:11px;font-family:'SF Mono',monospace;">success  #10B981</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:4px;background:#F59E0B;flex-shrink:0;"></div>
+        <code style="color:#a6abb5;font-size:11px;font-family:'SF Mono',monospace;">warning  #F59E0B</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:4px;background:#f0d080;flex-shrink:0;"></div>
+        <code style="color:#a6abb5;font-size:11px;font-family:'SF Mono',monospace;">gold-light #f0d080 (casino accent)</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:4px;background:#d4a052;flex-shrink:0;"></div>
+        <code style="color:#a6abb5;font-size:11px;font-family:'SF Mono',monospace;">gold-mid  #d4a052 (casino accent)</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:4px;background:#ffffff;flex-shrink:0;"></div>
+        <code style="color:#a6abb5;font-size:11px;font-family:'SF Mono',monospace;">txt-primary   #ffffff</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:4px;background:#a6abb5;flex-shrink:0;"></div>
+        <code style="color:#a6abb5;font-size:11px;font-family:'SF Mono',monospace;">txt-secondary #a6abb5</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:20px;height:20px;border-radius:4px;background:#70767f;flex-shrink:0;"></div>
+        <code style="color:#a6abb5;font-size:11px;font-family:'SF Mono',monospace;">txt-muted     #70767f</code>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid #1e2631;">
+      <p style="color:#70767f;font-size:10px;line-height:1.6;">
+        Key changes vs original:<br>
+        • Purple palette replaced with Toolk1t dark system<br>
+        • Border accents: <code style="color:#3D9DF2;">#3D6AF2</code> replaces purple<br>
+        • Gold casino accents retained for coin values &amp; active states<br>
+        • All interactive elements: min 44px touch targets<br>
+        • System font stack (Inter) — no external font loading<br>
+        • Consistent rounded-xl / rounded-lg radius system
+      </p>
+    </div>
+  </div>
+
+</body>
+</html>

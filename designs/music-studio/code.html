@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music Studio — Toolk1t</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            tk: {
+              primary: '#3D6AF2',
+              'page-bg': '#090f16',
+              'card-bg': '#131a23',
+              'card-hover': '#1e2631',
+              border: '#1e2631',
+              'text-primary': '#ffffff',
+              'text-secondary': '#a6abb5',
+              'text-muted': '#70767f',
+              success: '#10B981',
+              danger: '#EF4444',
+            },
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #090f16; color: #fff; margin: 0; }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 20px;
+      line-height: 1;
+      vertical-align: middle;
+      user-select: none;
+    }
+    .icon-fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+    /* Custom range slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      border-radius: 2px;
+      background: #1e2631;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #3D6AF2;
+      cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(61,106,242,0.25);
+      transition: box-shadow 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 5px rgba(61,106,242,0.35);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border: none;
+      border-radius: 50%;
+      background: #3D6AF2;
+      cursor: pointer;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #1e2631; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2a3441; }
+
+    /* Waveform canvas */
+    #waveform-canvas {
+      width: 100%;
+      height: 80px;
+      border-radius: 12px;
+      background: #0d1117;
+      display: block;
+    }
+
+    /* Launchpad active glow */
+    .pad-active {
+      box-shadow: 0 0 0 3px #3D6AF2, 0 0 18px rgba(61,106,242,0.4) !important;
+    }
+
+    /* Recording pulse */
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+      70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
+      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    }
+    .recording-pulse { animation: pulse-ring 1.4s ease-out infinite; }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .animate-spin { animation: spin 0.75s linear infinite; }
+
+    /* Waveform bar animation */
+    @keyframes barBounce {
+      0%, 100% { transform: scaleY(0.3); }
+      50% { transform: scaleY(1); }
+    }
+
+    /* Transition helpers */
+    .transition-fast { transition: all 0.15s ease; }
+
+    /* Drawer */
+    #mobile-drawer {
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+    }
+    #mobile-drawer.open {
+      transform: translateX(0);
+    }
+    #drawer-backdrop {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    #drawer-backdrop.open {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Download popover */
+    .download-popover {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 4px);
+      z-index: 50;
+      width: 160px;
+      border-radius: 10px;
+      background: #1a2232;
+      border: 1px solid #2a3441;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .download-popover.open { display: block; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#090f16] text-white">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 border-b border-[#1e2631] bg-[#090f16]/90 backdrop-blur-sm">
+    <div class="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
+      <div class="flex items-center gap-3">
+        <span class="text-lg font-bold tracking-tight text-white">Toolk1t</span>
+        <span class="text-[#1e2631]">/</span>
+        <span class="text-sm text-[#a6abb5]">Music Studio</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 rounded-full bg-[#131a23] border border-[#1e2631] px-3 py-1.5">
+          <span class="h-2 w-2 rounded-full bg-[#10B981]"></span>
+          <span class="text-xs font-medium text-[#a6abb5]">12 credits</span>
+        </div>
+        <button class="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-[#131a23] transition-fast">
+          <span class="material-symbols-outlined text-[#70767f]">dark_mode</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumb -->
+  <div class="mx-auto max-w-7xl px-4 pt-4 pb-1">
+    <nav class="flex items-center gap-1.5 text-xs text-[#70767f]">
+      <a href="#" class="hover:text-white transition-fast">Tools</a>
+      <span class="material-symbols-outlined text-[#1e2631]" style="font-size:14px">chevron_right</span>
+      <span class="text-[#a6abb5] font-medium">Music Studio</span>
+    </nav>
+  </div>
+
+  <!-- Main content -->
+  <main class="mx-auto max-w-7xl px-4 pt-3 pb-8">
+
+    <!-- Tab Switcher -->
+    <div class="mb-5 flex justify-center md:justify-start">
+      <div class="flex w-full max-w-xs gap-1 rounded-xl bg-[#131a23] p-1">
+        <button id="tab-studio" onclick="switchTab('studio')"
+          class="flex-1 min-h-[44px] rounded-lg px-4 py-2 text-sm font-semibold transition-fast bg-[#3D6AF2] text-white shadow-lg">
+          Studio
+        </button>
+        <button id="tab-clips" onclick="switchTab('clips')"
+          class="flex-1 min-h-[44px] rounded-lg px-4 py-2 text-sm font-semibold transition-fast text-[#70767f] hover:text-white">
+          My Clips
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════ STUDIO TAB ══════════════════════════════════ -->
+    <div id="view-studio">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-12">
+
+        <!-- Left Column -->
+        <div class="col-span-1 flex flex-col gap-4 md:col-span-8">
+
+          <!-- Launchpad -->
+          <div class="space-y-3">
+
+            <!-- Mode Selector -->
+            <div class="flex gap-1.5 rounded-xl bg-[#131a23] p-1">
+              <button id="mode-music" onclick="switchMode('music')"
+                class="min-h-[44px] flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition-fast bg-[#3D6AF2] text-white">
+                Music
+              </button>
+              <button id="mode-jingles" onclick="switchMode('jingles')"
+                class="min-h-[44px] flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition-fast text-[#70767f] hover:text-white">
+                Jingles
+              </button>
+              <button id="mode-sfx" onclick="switchMode('sfx')"
+                class="min-h-[44px] flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition-fast text-[#70767f] hover:text-white">
+                SFX
+              </button>
+            </div>
+
+            <!-- Genre/Mood Grid -->
+            <div id="pad-grid" class="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              <!-- rendered by JS -->
+            </div>
+
+            <!-- Instrument Chips -->
+            <div class="flex flex-wrap gap-2">
+              <button onclick="toggleInstrument(this, 'piano')"
+                class="instrument-chip min-h-[44px] cursor-pointer rounded-full bg-[#131a23] px-3.5 py-2 text-xs font-medium text-[#70767f] hover:text-white transition-fast">
+                🎹 Piano
+              </button>
+              <button onclick="toggleInstrument(this, 'guitar')"
+                class="instrument-chip min-h-[44px] cursor-pointer rounded-full bg-[#131a23] px-3.5 py-2 text-xs font-medium text-[#70767f] hover:text-white transition-fast">
+                🎸 Guitar
+              </button>
+              <button onclick="toggleInstrument(this, 'synth')"
+                class="instrument-chip min-h-[44px] cursor-pointer rounded-full bg-[#131a23] px-3.5 py-2 text-xs font-medium text-[#70767f] hover:text-white transition-fast active-inst">
+                🎛️ Synth
+              </button>
+              <button onclick="toggleInstrument(this, 'drums')"
+                class="instrument-chip min-h-[44px] cursor-pointer rounded-full bg-[#131a23] px-3.5 py-2 text-xs font-medium text-[#70767f] hover:text-white transition-fast active-inst">
+                🥁 Drums
+              </button>
+              <button onclick="toggleInstrument(this, 'bass')"
+                class="instrument-chip min-h-[44px] cursor-pointer rounded-full bg-[#131a23] px-3.5 py-2 text-xs font-medium text-[#70767f] hover:text-white transition-fast">
+                🎵 Bass
+              </button>
+              <button onclick="toggleInstrument(this, 'strings')"
+                class="instrument-chip min-h-[44px] cursor-pointer rounded-full bg-[#131a23] px-3.5 py-2 text-xs font-medium text-[#70767f] hover:text-white transition-fast">
+                🎻 Strings
+              </button>
+              <button onclick="toggleInstrument(this, 'brass')"
+                class="instrument-chip min-h-[44px] cursor-pointer rounded-full bg-[#131a23] px-3.5 py-2 text-xs font-medium text-[#70767f] hover:text-white transition-fast">
+                🎺 Brass
+              </button>
+              <button onclick="toggleInstrument(this, 'flute')"
+                class="instrument-chip min-h-[44px] cursor-pointer rounded-full bg-[#131a23] px-3.5 py-2 text-xs font-medium text-[#70767f] hover:text-white transition-fast">
+                🪈 Flute
+              </button>
+            </div>
+          </div>
+
+          <!-- Waveform Visualizer -->
+          <canvas id="waveform-canvas"></canvas>
+
+          <!-- Transport Bar -->
+          <div id="transport-bar">
+            <!-- idle state by default -->
+            <div id="transport-idle" class="flex items-center justify-center py-4">
+              <button onclick="startSession()"
+                class="min-h-[44px] cursor-pointer rounded-full bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] px-8 py-3 text-sm font-semibold text-white transition-fast hover:opacity-90 shadow-lg shadow-blue-900/30">
+                Start Session
+              </button>
+            </div>
+
+            <!-- connected state (hidden initially) -->
+            <div id="transport-connected" class="hidden items-center justify-between rounded-xl bg-[#131a23] border border-[#1e2631] px-4 py-3">
+              <!-- Status -->
+              <div class="flex items-center gap-2">
+                <span id="status-dot" class="h-2.5 w-2.5 rounded-full bg-[#10B981]"></span>
+                <span class="text-xs font-medium text-[#a6abb5]">Connected</span>
+              </div>
+
+              <!-- Controls -->
+              <div class="flex items-center gap-3">
+                <!-- Play/Pause -->
+                <button id="btn-play" onclick="togglePlay()"
+                  class="flex h-12 w-12 min-h-[44px] cursor-pointer items-center justify-center rounded-full bg-[#3D6AF2] text-white transition-fast hover:opacity-90">
+                  <span class="material-symbols-outlined icon-fill" style="font-size:22px">play_arrow</span>
+                </button>
+
+                <!-- Record -->
+                <button id="btn-record" onclick="toggleRecord()"
+                  class="relative flex h-12 w-12 min-h-[44px] cursor-pointer items-center justify-center rounded-full bg-[#EF4444]/20 text-[#EF4444] transition-fast hover:opacity-90">
+                  <span class="block h-4 w-4 rounded-full bg-[#EF4444]"></span>
+                </button>
+
+                <!-- Stop/Disconnect -->
+                <button onclick="stopSession()"
+                  class="flex h-12 w-12 min-h-[44px] cursor-pointer items-center justify-center rounded-full bg-[#131a23] hover:bg-[#1e2631] text-[#a6abb5] hover:text-white transition-fast">
+                  <span class="material-symbols-outlined icon-fill" style="font-size:20px">stop</span>
+                </button>
+              </div>
+
+              <!-- Timer + Clip count -->
+              <div class="flex items-center gap-3">
+                <span id="timer-display" class="font-mono text-sm text-[#a6abb5]">00:00</span>
+                <span class="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-[#a6abb5]">
+                  <span id="clip-count">2</span>/10
+                </span>
+              </div>
+            </div>
+
+            <!-- connecting state -->
+            <div id="transport-connecting" class="hidden items-center justify-center gap-2 py-5 text-sm text-[#a6abb5]">
+              <div class="h-5 w-5 rounded-full border-2 border-[#3D6AF2]/30 border-t-[#3D6AF2] animate-spin"></div>
+              <span>Connecting to Lyria...</span>
+            </div>
+          </div>
+
+          <!-- Session Clips -->
+          <div class="space-y-2">
+            <p class="text-xs font-semibold uppercase tracking-widest text-[#70767f]">Session Clips</p>
+
+            <!-- Clip rows (mock data) -->
+            <div class="relative rounded-xl bg-[#131a23] border border-[#1e2631] p-3 flex items-center gap-3">
+              <!-- Play -->
+              <button onclick="toggleClipPlay(this)"
+                class="w-9 h-9 shrink-0 rounded-lg bg-[#3D6AF2]/10 hover:bg-[#3D6AF2]/20 flex items-center justify-center transition-fast cursor-pointer">
+                <span class="material-symbols-outlined icon-fill text-[#3D6AF2]" style="font-size:18px">play_arrow</span>
+              </button>
+              <!-- Info -->
+              <div class="flex-1 min-w-0">
+                <p class="text-white text-sm font-medium truncate">Lo-fi Session #1</p>
+                <span class="font-mono text-[10px] text-[#70767f]">01:24</span>
+              </div>
+              <!-- Download -->
+              <div class="relative">
+                <button onclick="togglePopover('pop1')"
+                  class="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center transition-fast cursor-pointer">
+                  <span class="material-symbols-outlined text-[#70767f]" style="font-size:18px">download</span>
+                </button>
+                <div id="pop1" class="download-popover">
+                  <button class="w-full px-3 py-2.5 text-left text-sm text-white hover:bg-white/5 flex items-center justify-between">
+                    <span>MP3</span>
+                    <span class="text-[10px] text-[#70767f]">1 credit</span>
+                  </button>
+                  <div class="h-px bg-[#1e2631]"></div>
+                  <button class="w-full px-3 py-2.5 text-left text-sm text-white hover:bg-white/5 flex items-center justify-between">
+                    <span>WAV</span>
+                    <span class="text-[10px] text-[#70767f]">2 credits</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Remove -->
+              <button onclick="removeClip(this)"
+                class="w-8 h-8 rounded-lg hover:bg-[#EF4444]/10 flex items-center justify-center transition-fast cursor-pointer group">
+                <span class="material-symbols-outlined text-[#70767f] group-hover:text-[#EF4444] transition-fast" style="font-size:18px">close</span>
+              </button>
+            </div>
+
+            <div class="relative rounded-xl bg-[#131a23] border border-[#1e2631] p-3 flex items-center gap-3">
+              <button onclick="toggleClipPlay(this)"
+                class="w-9 h-9 shrink-0 rounded-lg bg-[#3D6AF2] flex items-center justify-center transition-fast cursor-pointer">
+                <span class="material-symbols-outlined icon-fill text-white" style="font-size:18px">pause</span>
+              </button>
+              <div class="flex-1 min-w-0">
+                <p class="text-white text-sm font-medium truncate">Electronic Synth Beat</p>
+                <span class="font-mono text-[10px] text-[#EF4444]">00:47</span>
+              </div>
+              <div class="relative">
+                <button onclick="togglePopover('pop2')"
+                  class="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center transition-fast cursor-pointer">
+                  <span class="material-symbols-outlined text-[#70767f]" style="font-size:18px">download</span>
+                </button>
+                <div id="pop2" class="download-popover">
+                  <button class="w-full px-3 py-2.5 text-left text-sm text-white hover:bg-white/5 flex items-center justify-between">
+                    <span>MP3</span>
+                    <span class="text-[10px] text-[#70767f]">1 credit</span>
+                  </button>
+                  <div class="h-px bg-[#1e2631]"></div>
+                  <button class="w-full px-3 py-2.5 text-left text-sm text-white hover:bg-white/5 flex items-center justify-between">
+                    <span>WAV</span>
+                    <span class="text-[10px] text-[#70767f]">2 credits</span>
+                  </button>
+                </div>
+              </div>
+              <button onclick="removeClip(this)"
+                class="w-8 h-8 rounded-lg hover:bg-[#EF4444]/10 flex items-center justify-center transition-fast cursor-pointer group">
+                <span class="material-symbols-outlined text-[#70767f] group-hover:text-[#EF4444] transition-fast" style="font-size:18px">close</span>
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /Left Column -->
+
+        <!-- Right Column: Controls Sidebar -->
+        <div class="hidden md:block md:col-span-4">
+          <div class="sticky top-20 max-h-[calc(100vh-5.5rem)] overflow-y-auto rounded-xl bg-[#131a23] border border-[#1e2631]">
+            <div class="border-b border-[#1e2631] px-4 py-3">
+              <p class="text-xs font-semibold uppercase tracking-widest text-[#70767f]">Controls</p>
+            </div>
+            <div class="space-y-5 p-4" id="controls-panel-content">
+              <!-- BPM -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-medium text-[#a6abb5]">BPM</label>
+                  <span id="bpm-val" class="text-xs font-semibold text-white">128</span>
+                </div>
+                <input type="range" min="60" max="200" value="128"
+                  oninput="document.getElementById('bpm-val').textContent = this.value"
+                  class="min-h-[44px] w-full" />
+                <div class="flex justify-between text-[10px] text-[#70767f]">
+                  <span>60</span><span>200</span>
+                </div>
+              </div>
+
+              <!-- Brightness -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-medium text-[#a6abb5]">Brightness</label>
+                  <span id="brightness-val" class="text-xs font-semibold text-white">65%</span>
+                </div>
+                <input type="range" min="0" max="100" value="65"
+                  oninput="document.getElementById('brightness-val').textContent = this.value + '%'"
+                  class="min-h-[44px] w-full" />
+                <div class="flex justify-between text-[10px] text-[#70767f]">
+                  <span>Dark</span><span>Bright</span>
+                </div>
+              </div>
+
+              <!-- Density -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-medium text-[#a6abb5]">Density</label>
+                  <span id="density-val" class="text-xs font-semibold text-white">50%</span>
+                </div>
+                <input type="range" min="0" max="100" value="50"
+                  oninput="document.getElementById('density-val').textContent = this.value + '%'"
+                  class="min-h-[44px] w-full" />
+                <div class="flex justify-between text-[10px] text-[#70767f]">
+                  <span>Sparse</span><span>Dense</span>
+                </div>
+              </div>
+
+              <!-- Scale -->
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-[#a6abb5]">Scale</label>
+                <select class="min-h-[44px] w-full rounded-lg border border-[#1e2631] bg-[#0d1117] px-3 py-2 text-sm text-white outline-none focus:border-[#3D6AF2] transition-fast cursor-pointer">
+                  <option>C Major</option>
+                  <option>C Minor</option>
+                  <option>D Major</option>
+                  <option>D Minor</option>
+                  <option>E Major</option>
+                  <option>E Minor</option>
+                  <option selected>F Major</option>
+                  <option>G Major</option>
+                  <option>A Minor</option>
+                  <option>B Minor</option>
+                </select>
+              </div>
+
+              <!-- Generation Mode -->
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-[#a6abb5]">Generation Mode</label>
+                <div class="flex gap-1 rounded-lg bg-[#0d1117] border border-[#1e2631] p-1">
+                  <button onclick="setGenMode(this)"
+                    class="gen-mode-btn flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition-fast bg-[#3D6AF2] text-white">Quality</button>
+                  <button onclick="setGenMode(this)"
+                    class="gen-mode-btn flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition-fast text-[#70767f] hover:text-white">Diversity</button>
+                  <button onclick="setGenMode(this)"
+                    class="gen-mode-btn flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition-fast text-[#70767f] hover:text-white">Vocal</button>
+                </div>
+              </div>
+
+              <!-- Custom Prompt -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-medium text-[#a6abb5]">Custom Prompt</label>
+                  <span id="prompt-count" class="text-[10px] text-[#70767f]">0/300</span>
+                </div>
+                <textarea
+                  oninput="document.getElementById('prompt-count').textContent = this.value.length + '/300'"
+                  maxlength="300"
+                  placeholder="Describe your sound..."
+                  rows="3"
+                  class="w-full resize-none rounded-lg border border-[#1e2631] bg-[#0d1117] px-3 py-2.5 text-sm text-white placeholder-[#70767f] outline-none focus:border-[#3D6AF2] transition-fast leading-relaxed"
+                ></textarea>
+              </div>
+
+              <!-- Mute toggles -->
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-[#a6abb5]">Mute</label>
+                <div class="flex gap-2">
+                  <button onclick="toggleMute(this)"
+                    class="mute-btn min-h-[44px] flex-1 rounded-lg border border-[#1e2631] bg-[#0d1117] px-3 py-2 text-xs font-medium text-[#70767f] hover:text-white transition-fast">
+                    🥁 Drums
+                  </button>
+                  <button onclick="toggleMute(this)"
+                    class="mute-btn min-h-[44px] flex-1 rounded-lg border border-[#1e2631] bg-[#0d1117] px-3 py-2 text-xs font-medium text-[#70767f] hover:text-white transition-fast">
+                    🎵 Bass
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /Right Column -->
+
+      </div><!-- /grid -->
+    </div><!-- /studio tab -->
+
+
+    <!-- ══════════════════════════════════ MY CLIPS TAB ══════════════════════════════════ -->
+    <div id="view-clips" class="hidden">
+      <div class="space-y-3 max-w-2xl">
+
+        <!-- Saved clip entries (mock data) -->
+        <div class="rounded-xl bg-[#131a23] border border-[#1e2631] p-4 flex items-center gap-3">
+          <button onclick="toggleClipPlay(this)"
+            class="w-10 h-10 shrink-0 rounded-lg bg-[#3D6AF2]/10 hover:bg-[#3D6AF2]/20 flex items-center justify-center transition-fast cursor-pointer">
+            <span class="material-symbols-outlined icon-fill text-[#3D6AF2]" style="font-size:18px">play_arrow</span>
+          </button>
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-sm font-medium truncate">Cinematic Sweep</p>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="font-mono text-[10px] text-[#70767f]">02:31</span>
+              <span class="inline-block rounded bg-[#3D6AF2]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#3D6AF2] capitalize">music</span>
+              <span class="text-[10px] text-[#70767f]">Apr 2</span>
+            </div>
+          </div>
+          <a href="#" class="w-8 h-8 shrink-0 rounded-lg hover:bg-white/5 flex items-center justify-center transition-fast">
+            <span class="material-symbols-outlined text-[#70767f]" style="font-size:18px">download</span>
+          </a>
+        </div>
+
+        <div class="rounded-xl bg-[#131a23] border border-[#1e2631] p-4 flex items-center gap-3">
+          <button onclick="toggleClipPlay(this)"
+            class="w-10 h-10 shrink-0 rounded-lg bg-[#3D6AF2] flex items-center justify-center transition-fast cursor-pointer">
+            <span class="material-symbols-outlined icon-fill text-white" style="font-size:18px">pause</span>
+          </button>
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-sm font-medium truncate">Upbeat Jingle v2</p>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="font-mono text-[10px] text-[#10B981]">00:18</span>
+              <span class="inline-block rounded bg-[#10B981]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#10B981] capitalize">jingles</span>
+              <span class="text-[10px] text-[#70767f]">Apr 1</span>
+            </div>
+          </div>
+          <a href="#" class="w-8 h-8 shrink-0 rounded-lg hover:bg-white/5 flex items-center justify-center transition-fast">
+            <span class="material-symbols-outlined text-[#70767f]" style="font-size:18px">download</span>
+          </a>
+        </div>
+
+        <div class="rounded-xl bg-[#131a23] border border-[#1e2631] p-4 flex items-center gap-3">
+          <button onclick="toggleClipPlay(this)"
+            class="w-10 h-10 shrink-0 rounded-lg bg-[#3D6AF2]/10 hover:bg-[#3D6AF2]/20 flex items-center justify-center transition-fast cursor-pointer">
+            <span class="material-symbols-outlined icon-fill text-[#3D6AF2]" style="font-size:18px">play_arrow</span>
+          </button>
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-sm font-medium truncate">Riser Drop SFX</p>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="font-mono text-[10px] text-[#70767f]">00:05</span>
+              <span class="inline-block rounded bg-[#EF4444]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#EF4444] capitalize">sfx</span>
+              <span class="text-[10px] text-[#70767f]">Mar 31</span>
+            </div>
+          </div>
+          <a href="#" class="w-8 h-8 shrink-0 rounded-lg hover:bg-white/5 flex items-center justify-center transition-fast">
+            <span class="material-symbols-outlined text-[#70767f]" style="font-size:18px">download</span>
+          </a>
+        </div>
+
+        <div class="rounded-xl bg-[#131a23] border border-[#1e2631] p-4 flex items-center gap-3">
+          <button onclick="toggleClipPlay(this)"
+            class="w-10 h-10 shrink-0 rounded-lg bg-[#3D6AF2]/10 hover:bg-[#3D6AF2]/20 flex items-center justify-center transition-fast cursor-pointer">
+            <span class="material-symbols-outlined icon-fill text-[#3D6AF2]" style="font-size:18px">play_arrow</span>
+          </button>
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-sm font-medium truncate">Lo-fi Study Session</p>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="font-mono text-[10px] text-[#70767f]">03:00</span>
+              <span class="inline-block rounded bg-[#3D6AF2]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#3D6AF2] capitalize">music</span>
+              <span class="text-[10px] text-[#70767f]">Mar 29</span>
+            </div>
+          </div>
+          <a href="#" class="w-8 h-8 shrink-0 rounded-lg hover:bg-white/5 flex items-center justify-center transition-fast">
+            <span class="material-symbols-outlined text-[#70767f]" style="font-size:18px">download</span>
+          </a>
+        </div>
+
+      </div>
+    </div><!-- /my clips tab -->
+
+  </main>
+
+  <!-- Mobile: Floating gear button -->
+  <button onclick="openDrawer()" id="fab-gear"
+    class="md:hidden fixed bottom-6 right-4 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-[#3D6AF2] text-white shadow-lg shadow-blue-900/40 transition-fast hover:opacity-90 cursor-pointer">
+    <span class="material-symbols-outlined" style="font-size:22px">tune</span>
+  </button>
+
+  <!-- Mobile Drawer Backdrop -->
+  <div id="drawer-backdrop" onclick="closeDrawer()"
+    class="fixed inset-0 z-40 bg-black/60 md:hidden backdrop-blur-sm"></div>
+
+  <!-- Mobile Controls Drawer -->
+  <div id="mobile-drawer"
+    class="fixed inset-y-0 right-0 z-50 w-80 max-w-[85vw] overflow-y-auto bg-[#131a23] border-l border-[#1e2631] md:hidden">
+    <div class="flex items-center justify-between border-b border-[#1e2631] px-4 py-3">
+      <p class="text-sm font-semibold text-white">Controls</p>
+      <button onclick="closeDrawer()"
+        class="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-white/5 transition-fast cursor-pointer">
+        <span class="material-symbols-outlined text-[#70767f]" style="font-size:20px">close</span>
+      </button>
+    </div>
+    <div class="space-y-5 p-4">
+      <!-- Duplicate controls for mobile drawer -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-medium text-[#a6abb5]">BPM</label>
+          <span id="bpm-val-m" class="text-xs font-semibold text-white">128</span>
+        </div>
+        <input type="range" min="60" max="200" value="128"
+          oninput="document.getElementById('bpm-val-m').textContent = this.value"
+          class="min-h-[44px] w-full" />
+      </div>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-medium text-[#a6abb5]">Brightness</label>
+          <span id="brightness-val-m" class="text-xs font-semibold text-white">65%</span>
+        </div>
+        <input type="range" min="0" max="100" value="65"
+          oninput="document.getElementById('brightness-val-m').textContent = this.value + '%'"
+          class="min-h-[44px] w-full" />
+      </div>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-medium text-[#a6abb5]">Density</label>
+          <span id="density-val-m" class="text-xs font-semibold text-white">50%</span>
+        </div>
+        <input type="range" min="0" max="100" value="50"
+          oninput="document.getElementById('density-val-m').textContent = this.value + '%'"
+          class="min-h-[44px] w-full" />
+      </div>
+      <div class="space-y-2">
+        <label class="text-xs font-medium text-[#a6abb5]">Scale</label>
+        <select class="min-h-[44px] w-full rounded-lg border border-[#1e2631] bg-[#0d1117] px-3 py-2 text-sm text-white outline-none focus:border-[#3D6AF2]">
+          <option>C Major</option><option>C Minor</option><option selected>F Major</option>
+        </select>
+      </div>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-medium text-[#a6abb5]">Custom Prompt</label>
+          <span id="prompt-count-m" class="text-[10px] text-[#70767f]">0/300</span>
+        </div>
+        <textarea
+          oninput="document.getElementById('prompt-count-m').textContent = this.value.length + '/300'"
+          maxlength="300"
+          placeholder="Describe your sound..."
+          rows="3"
+          class="w-full resize-none rounded-lg border border-[#1e2631] bg-[#0d1117] px-3 py-2.5 text-sm text-white placeholder-[#70767f] outline-none focus:border-[#3D6AF2] leading-relaxed"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Data ── */
+    const MODE_PRESETS = {
+      music: [
+        { id: 'lofi',       label: 'Lo-fi',      emoji: '🎧', gradient: 'from-purple-500 to-indigo-600' },
+        { id: 'electronic', label: 'Electronic',  emoji: '⚡', gradient: 'from-cyan-500 to-blue-600' },
+        { id: 'jazz',       label: 'Jazz',        emoji: '🎷', gradient: 'from-amber-500 to-orange-600' },
+        { id: 'classical',  label: 'Classical',   emoji: '🎻', gradient: 'from-rose-400 to-pink-600' },
+        { id: 'rock',       label: 'Rock',        emoji: '🎸', gradient: 'from-red-500 to-orange-700' },
+        { id: 'ambient',    label: 'Ambient',     emoji: '🌊', gradient: 'from-teal-400 to-emerald-600' },
+        { id: 'hiphop',     label: 'Hip-hop',     emoji: '🎤', gradient: 'from-yellow-400 to-amber-600' },
+        { id: 'cinematic',  label: 'Cinematic',   emoji: '🎬', gradient: 'from-slate-500 to-zinc-700' },
+      ],
+      jingles: [
+        { id: 'upbeat',    label: 'Upbeat',    emoji: '🎉', gradient: 'from-yellow-400 to-orange-500' },
+        { id: 'inspiring', label: 'Inspiring', emoji: '✨', gradient: 'from-blue-400 to-indigo-600' },
+        { id: 'playful',   label: 'Playful',   emoji: '🎈', gradient: 'from-pink-400 to-fuchsia-600' },
+        { id: 'corporate', label: 'Corporate', emoji: '💼', gradient: 'from-slate-400 to-blue-600' },
+        { id: 'epic',      label: 'Epic',      emoji: '🏔️', gradient: 'from-amber-600 to-red-700' },
+        { id: 'chill',     label: 'Chill',     emoji: '🧊', gradient: 'from-sky-300 to-blue-500' },
+        { id: 'retro',     label: 'Retro',     emoji: '📼', gradient: 'from-orange-400 to-pink-600' },
+        { id: 'dramatic',  label: 'Dramatic',  emoji: '🎭', gradient: 'from-purple-600 to-red-600' },
+      ],
+      sfx: [
+        { id: 'riser',      label: 'Riser',      emoji: '📈', gradient: 'from-green-400 to-emerald-600' },
+        { id: 'drop',       label: 'Drop',       emoji: '💥', gradient: 'from-red-500 to-orange-600' },
+        { id: 'hit',        label: 'Hit',        emoji: '🥁', gradient: 'from-amber-500 to-yellow-600' },
+        { id: 'stinger',    label: 'Stinger',    emoji: '⚔️', gradient: 'from-violet-500 to-purple-700' },
+        { id: 'whoosh',     label: 'Whoosh',     emoji: '💨', gradient: 'from-sky-400 to-cyan-600' },
+        { id: 'tension',    label: 'Tension',    emoji: '😰', gradient: 'from-gray-500 to-slate-700' },
+        { id: 'fanfare',    label: 'Fanfare',    emoji: '🎺', gradient: 'from-yellow-400 to-amber-600' },
+        { id: 'transition', label: 'Transition', emoji: '🔄', gradient: 'from-indigo-400 to-violet-600' },
+      ],
+    }
+
+    let currentMode = 'music'
+    let activeButtons = new Set()
+    let sessionState = 'idle' // idle | connecting | connected
+    let isPlaying = false
+    let isRecording = false
+    let timerInterval = null
+    let seconds = 0
+
+    /* ── Tab switching ── */
+    function switchTab(tab) {
+      document.getElementById('view-studio').classList.toggle('hidden', tab !== 'studio')
+      document.getElementById('view-clips').classList.toggle('hidden', tab !== 'clips')
+      document.getElementById('fab-gear').classList.toggle('hidden', tab !== 'studio')
+
+      document.getElementById('tab-studio').className = tab === 'studio'
+        ? 'flex-1 min-h-[44px] rounded-lg px-4 py-2 text-sm font-semibold transition-fast bg-[#3D6AF2] text-white shadow-lg'
+        : 'flex-1 min-h-[44px] rounded-lg px-4 py-2 text-sm font-semibold transition-fast text-[#70767f] hover:text-white'
+      document.getElementById('tab-clips').className = tab === 'clips'
+        ? 'flex-1 min-h-[44px] rounded-lg px-4 py-2 text-sm font-semibold transition-fast bg-[#3D6AF2] text-white shadow-lg'
+        : 'flex-1 min-h-[44px] rounded-lg px-4 py-2 text-sm font-semibold transition-fast text-[#70767f] hover:text-white'
+    }
+
+    /* ── Mode switching ── */
+    function switchMode(mode) {
+      currentMode = mode
+      activeButtons.clear()
+      renderPadGrid()
+      ;['music','jingles','sfx'].forEach(m => {
+        const btn = document.getElementById('mode-' + m)
+        btn.className = m === mode
+          ? 'min-h-[44px] flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition-fast bg-[#3D6AF2] text-white'
+          : 'min-h-[44px] flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition-fast text-[#70767f] hover:text-white'
+      })
+    }
+
+    /* ── Render pad grid ── */
+    function renderPadGrid() {
+      const grid = document.getElementById('pad-grid')
+      const presets = MODE_PRESETS[currentMode]
+      grid.innerHTML = ''
+      presets.forEach(btn => {
+        const el = document.createElement('button')
+        const isActive = activeButtons.has(btn.id)
+        el.type = 'button'
+        el.className = `relative h-12 min-h-[44px] cursor-pointer overflow-hidden rounded-xl bg-gradient-to-br ${btn.gradient} transition-all`
+        if (isActive) el.classList.add('pad-active')
+        el.innerHTML = `<span class="absolute inset-0 flex items-center justify-center gap-1.5 text-sm font-semibold text-white drop-shadow">
+          <span>${btn.emoji}</span><span>${btn.label}</span>
+        </span>`
+        el.onclick = () => togglePad(btn.id, el)
+        grid.appendChild(el)
+      })
+    }
+
+    function togglePad(id, el) {
+      if (activeButtons.has(id)) {
+        activeButtons.delete(id)
+        el.classList.remove('pad-active')
+      } else {
+        activeButtons.add(id)
+        el.classList.add('pad-active')
+      }
+    }
+
+    /* ── Instrument chips ── */
+    function toggleInstrument(btn) {
+      const isActive = btn.classList.contains('active-inst')
+      if (isActive) {
+        btn.classList.remove('active-inst', 'bg-[#3D6AF2]/20', 'text-[#3D6AF2]', 'ring-1', 'ring-[#3D6AF2]/30')
+        btn.classList.add('bg-[#131a23]', 'text-[#70767f]', 'hover:text-white')
+      } else {
+        btn.classList.add('active-inst', 'bg-[#3D6AF2]/20', 'text-[#3D6AF2]', 'ring-1', 'ring-[#3D6AF2]/30')
+        btn.classList.remove('bg-[#131a23]', 'text-[#70767f]', 'hover:text-white')
+      }
+    }
+
+    /* Apply active state to pre-selected instruments */
+    document.querySelectorAll('.active-inst').forEach(btn => {
+      btn.classList.add('bg-[#3D6AF2]/20', 'text-[#3D6AF2]', 'ring-1', 'ring-[#3D6AF2]/30')
+      btn.classList.remove('bg-[#131a23]', 'text-[#70767f]', 'hover:text-white')
+    })
+
+    /* ── Transport ── */
+    function startSession() {
+      // show connecting
+      document.getElementById('transport-idle').classList.add('hidden')
+      document.getElementById('transport-connecting').classList.remove('hidden')
+      document.getElementById('transport-connecting').classList.add('flex')
+
+      setTimeout(() => {
+        document.getElementById('transport-connecting').classList.add('hidden')
+        document.getElementById('transport-connecting').classList.remove('flex')
+        document.getElementById('transport-connected').classList.remove('hidden')
+        document.getElementById('transport-connected').classList.add('flex')
+        sessionState = 'connected'
+        isPlaying = true
+        updatePlayButton()
+        startTimer()
+      }, 1800)
+    }
+
+    function stopSession() {
+      sessionState = 'idle'
+      isPlaying = false
+      isRecording = false
+      clearInterval(timerInterval)
+      seconds = 0
+      document.getElementById('timer-display').textContent = '00:00'
+      document.getElementById('transport-connected').classList.add('hidden')
+      document.getElementById('transport-connected').classList.remove('flex')
+      document.getElementById('transport-idle').classList.remove('hidden')
+    }
+
+    function togglePlay() {
+      if (sessionState !== 'connected') return
+      isPlaying = !isPlaying
+      updatePlayButton()
+      const dot = document.getElementById('status-dot')
+      dot.className = `h-2.5 w-2.5 rounded-full ${isPlaying ? 'bg-[#10B981]' : 'bg-yellow-400'}`
+    }
+
+    function updatePlayButton() {
+      const btn = document.getElementById('btn-play')
+      const icon = btn.querySelector('.material-symbols-outlined')
+      icon.textContent = isPlaying ? 'pause' : 'play_arrow'
+    }
+
+    function toggleRecord() {
+      if (sessionState !== 'connected') return
+      isRecording = !isRecording
+      const btn = document.getElementById('btn-record')
+      if (isRecording) {
+        btn.className = 'recording-pulse relative flex h-12 w-12 min-h-[44px] cursor-pointer items-center justify-center rounded-full bg-[#EF4444] text-white transition-fast hover:opacity-90'
+        btn.querySelector('span').className = 'block h-4 w-4 rounded-sm bg-white'
+        document.getElementById('timer-display').classList.add('text-[#EF4444]')
+        document.getElementById('timer-display').classList.remove('text-[#a6abb5]')
+      } else {
+        btn.className = 'relative flex h-12 w-12 min-h-[44px] cursor-pointer items-center justify-center rounded-full bg-[#EF4444]/20 text-[#EF4444] transition-fast hover:opacity-90'
+        btn.querySelector('span').className = 'block h-4 w-4 rounded-full bg-[#EF4444]'
+        document.getElementById('timer-display').classList.remove('text-[#EF4444]')
+        document.getElementById('timer-display').classList.add('text-[#a6abb5]')
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval)
+      seconds = 0
+      timerInterval = setInterval(() => {
+        seconds++
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0')
+        const s = (seconds % 60).toString().padStart(2, '0')
+        document.getElementById('timer-display').textContent = `${m}:${s}`
+      }, 1000)
+    }
+
+    /* ── Clip actions ── */
+    function toggleClipPlay(btn) {
+      const icon = btn.querySelector('.material-symbols-outlined')
+      const isCurrentlyPlaying = icon && icon.textContent === 'pause'
+      if (isCurrentlyPlaying) {
+        icon.textContent = 'play_arrow'
+        btn.className = btn.className
+          .replace('bg-[#3D6AF2] ', 'bg-[#3D6AF2]/10 hover:bg-[#3D6AF2]/20 ')
+        const colorSpan = btn.querySelector('.material-symbols-outlined')
+        colorSpan.classList.remove('text-white')
+        colorSpan.classList.add('text-[#3D6AF2]')
+      } else {
+        icon.textContent = 'pause'
+        btn.classList.remove('bg-[#3D6AF2]/10', 'hover:bg-[#3D6AF2]/20')
+        btn.classList.add('bg-[#3D6AF2]')
+        const colorSpan = btn.querySelector('.material-symbols-outlined')
+        colorSpan.classList.remove('text-[#3D6AF2]')
+        colorSpan.classList.add('text-white')
+      }
+    }
+
+    function removeClip(btn) {
+      const row = btn.closest('.rounded-xl')
+      row.style.transition = 'opacity 0.2s, transform 0.2s'
+      row.style.opacity = '0'
+      row.style.transform = 'translateX(10px)'
+      setTimeout(() => row.remove(), 200)
+    }
+
+    /* ── Download popovers ── */
+    function togglePopover(id) {
+      const pop = document.getElementById(id)
+      const allPops = document.querySelectorAll('.download-popover')
+      allPops.forEach(p => { if (p.id !== id) p.classList.remove('open') })
+      pop.classList.toggle('open')
+    }
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('[onclick^="togglePopover"]') && !e.target.closest('.download-popover')) {
+        document.querySelectorAll('.download-popover').forEach(p => p.classList.remove('open'))
+      }
+    })
+
+    /* ── Mobile Drawer ── */
+    function openDrawer() {
+      document.getElementById('mobile-drawer').classList.add('open')
+      document.getElementById('drawer-backdrop').classList.add('open')
+      document.getElementById('drawer-backdrop').style.display = 'block'
+    }
+    function closeDrawer() {
+      document.getElementById('mobile-drawer').classList.remove('open')
+      document.getElementById('drawer-backdrop').classList.remove('open')
+      setTimeout(() => {
+        if (!document.getElementById('drawer-backdrop').classList.contains('open')) {
+          document.getElementById('drawer-backdrop').style.display = 'none'
+        }
+      }, 250)
+    }
+
+    /* ── Generation mode buttons ── */
+    function setGenMode(btn) {
+      document.querySelectorAll('.gen-mode-btn').forEach(b => {
+        b.className = 'gen-mode-btn flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition-fast text-[#70767f] hover:text-white'
+      })
+      btn.className = 'gen-mode-btn flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition-fast bg-[#3D6AF2] text-white'
+    }
+
+    /* ── Mute buttons ── */
+    function toggleMute(btn) {
+      const isActive = btn.dataset.muted === 'true'
+      if (isActive) {
+        btn.dataset.muted = 'false'
+        btn.className = 'mute-btn min-h-[44px] flex-1 rounded-lg border border-[#1e2631] bg-[#0d1117] px-3 py-2 text-xs font-medium text-[#70767f] hover:text-white transition-fast'
+      } else {
+        btn.dataset.muted = 'true'
+        btn.className = 'mute-btn min-h-[44px] flex-1 rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 px-3 py-2 text-xs font-medium text-[#EF4444] transition-fast'
+      }
+    }
+
+    /* ── Waveform Canvas ── */
+    const canvas = document.getElementById('waveform-canvas')
+    const ctx2d = canvas.getContext('2d')
+    let animFrame
+    let bars = Array.from({ length: 48 }, (_, i) => ({ height: 4 + Math.sin(i * 0.3) * 2, vel: 0 }))
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1
+      const rect = canvas.getBoundingClientRect()
+      canvas.width = rect.width * dpr
+      canvas.height = 80 * dpr
+      ctx2d.scale(dpr, dpr)
+    }
+
+    function drawWaveform() {
+      const w = canvas.getBoundingClientRect().width
+      const h = 80
+      ctx2d.clearRect(0, 0, w, h)
+
+      const gradient = ctx2d.createLinearGradient(0, h, 0, 0)
+      gradient.addColorStop(0, '#3D6AF2')
+      gradient.addColorStop(1, '#7C3AED')
+
+      const barCount = 48
+      const gap = 2
+      const barW = (w - gap * (barCount - 1)) / barCount
+
+      const playing = sessionState === 'connected' && isPlaying
+
+      ctx2d.globalAlpha = playing ? 1 : 0.22
+      bars.forEach((bar, i) => {
+        if (playing) {
+          // Animate bars dynamically
+          bar.vel += (Math.random() * 60 - 30)
+          bar.vel *= 0.7
+          bar.height = Math.max(4, Math.min(70, bar.height + bar.vel * 0.15))
+        } else {
+          bar.height = 4 + Math.sin(i * 0.3) * 2
+        }
+        const x = i * (barW + gap)
+        const bh = bar.height
+        const y = h - bh
+        ctx2d.fillStyle = gradient
+        ctx2d.beginPath()
+        ctx2d.roundRect(x, y, barW, bh, 2)
+        ctx2d.fill()
+      })
+      ctx2d.globalAlpha = 1
+
+      animFrame = requestAnimationFrame(drawWaveform)
+    }
+
+    new ResizeObserver(() => { resizeCanvas(); }).observe(canvas)
+    resizeCanvas()
+    drawWaveform()
+
+    /* ── Init ── */
+    renderPadGrid()
+  </script>
+</body>
+</html>

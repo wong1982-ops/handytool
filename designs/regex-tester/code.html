@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Regex Tester — Toolk1t</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'page':     '#090f16',
+            'card':     '#131a23',
+            'card-alt': '#0d1420',
+            'border':   '#1e2631',
+            'primary':  '#3D6AF2',
+            'primary-dim': 'rgba(61,106,242,0.12)',
+            'primary-ring': 'rgba(61,106,242,0.35)',
+            'success':  '#10B981',
+            'danger':   '#EF4444',
+            'txt':      '#ffffff',
+            'txt-sec':  '#a6abb5',
+            'txt-muted':'#70767f',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #090f16; font-family: 'Inter', system-ui, sans-serif; color: #ffffff; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #131a23; }
+    ::-webkit-scrollbar-thumb { background: #1e2631; border-radius: 4px; }
+
+    .material-symbols-rounded {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 18px;
+      line-height: 1;
+      vertical-align: middle;
+    }
+
+    /* Match highlights */
+    .highlight-layer {
+      position: absolute;
+      inset: 0;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow: hidden;
+      pointer-events: none;
+      color: transparent;
+    }
+    .highlight-layer mark {
+      border-radius: 2px;
+      color: transparent;
+    }
+    .match-yellow { background: rgba(250, 204, 21, 0.38); }
+    .match-cyan   { background: rgba(34, 211, 238, 0.38); }
+    .match-pink   { background: rgba(244, 114, 182, 0.38); }
+
+    textarea.transparent-caret {
+      color: transparent;
+      caret-color: #ffffff;
+      background: transparent;
+    }
+
+    /* Segment active tab */
+    .tab-active {
+      background: #1e2631;
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+    .tab-inactive {
+      color: #70767f;
+    }
+    .tab-inactive:hover {
+      color: #a6abb5;
+    }
+
+    /* Flag toggle */
+    .flag-active {
+      background: #3D6AF2;
+      color: #ffffff;
+    }
+    .flag-inactive {
+      color: #70767f;
+    }
+    .flag-inactive:hover {
+      background: #1e2631;
+      color: #a6abb5;
+    }
+
+    /* Preset item active */
+    .preset-active {
+      background: rgba(61, 106, 242, 0.12);
+      color: #3D6AF2;
+      font-weight: 600;
+    }
+    .preset-item:hover:not(.preset-active) {
+      background: #1e2631;
+    }
+
+    /* Expanded group row */
+    .group-table td { padding: 4px 0; }
+    .group-table td:first-child { padding-right: 16px; }
+
+    /* Match row hover */
+    .match-row:hover { background: rgba(255,255,255,0.03); }
+
+    /* Clear btn hover */
+    .btn-clear:hover { color: #EF4444; background: rgba(239, 68, 68, 0.08); }
+
+    /* Action buttons */
+    .action-btn:hover { background: #1e2631; color: #a6abb5; }
+
+    /* Status bar */
+    .status-divider { color: #1e2631; }
+  </style>
+</head>
+<body class="min-h-screen bg-page">
+
+  <!-- ─── DESKTOP LAYOUT ─── -->
+  <div class="hidden lg:block">
+
+    <!-- Header nav simulation -->
+    <nav class="border-b border-border bg-card px-6 py-3 flex items-center gap-4" style="background:#0d1420;">
+      <span class="text-txt font-bold text-base tracking-tight">Toolk<span class="text-primary">1</span>t</span>
+      <div class="flex-1"></div>
+      <span class="text-txt-muted text-sm">Tools</span>
+      <span class="text-txt-muted text-sm">Pricing</span>
+      <button class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+        <span class="material-symbols-rounded text-primary" style="font-size:16px;">person</span>
+      </button>
+    </nav>
+
+    <!-- Main content -->
+    <main class="max-w-[1200px] mx-auto px-4 py-10 flex flex-col gap-6">
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-1.5 text-xs" aria-label="Breadcrumb">
+        <span class="text-txt-muted hover:text-txt-sec cursor-pointer">Home</span>
+        <span class="text-txt-muted">/</span>
+        <span class="text-txt-muted hover:text-txt-sec cursor-pointer">Tools</span>
+        <span class="text-txt-muted">/</span>
+        <span class="text-txt-sec font-medium">Regex Tester</span>
+      </nav>
+
+      <!-- Page title -->
+      <div class="space-y-1">
+        <h1 class="text-3xl font-bold text-txt">Regex Tester</h1>
+        <p class="text-sm text-txt-sec">
+          Test, match, and replace with regular expressions — 100% client-side with 30+ preset patterns.
+        </p>
+      </div>
+
+      <!-- Two-column layout -->
+      <div class="flex gap-6 items-start">
+
+        <!-- ── LEFT: Preset Sidebar ── -->
+        <aside class="w-64 shrink-0 sticky top-6 rounded-xl border border-border bg-card overflow-hidden">
+
+          <!-- Search -->
+          <div class="p-3 border-b border-border">
+            <div class="relative">
+              <span class="material-symbols-rounded absolute left-2.5 top-1/2 -translate-y-1/2 text-txt-muted" style="font-size:16px;">search</span>
+              <input
+                type="text"
+                placeholder="Search presets..."
+                class="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-border bg-card-alt text-txt placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors"
+                style="min-height:44px;"
+                value=""
+              />
+            </div>
+          </div>
+
+          <!-- Preset list -->
+          <div class="overflow-y-auto p-2" style="max-height: calc(100vh - 260px);">
+
+            <!-- COMMON -->
+            <div class="mb-3">
+              <h3 class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-widest text-txt-muted">Common</h3>
+              <div class="space-y-0.5">
+                <button class="preset-item preset-active w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center gap-2" style="min-height:44px;">
+                  <span>✉️</span><span class="truncate">Email Address</span>
+                </button>
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center gap-2 text-txt-sec cursor-pointer" style="min-height:44px;">
+                  <span>🔗</span><span class="truncate">URL</span>
+                </button>
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center gap-2 text-txt-sec cursor-pointer" style="min-height:44px;">
+                  <span>🎨</span><span class="truncate">Hex Color</span>
+                </button>
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center gap-2 text-txt-sec cursor-pointer" style="min-height:44px;">
+                  <span class="text-base">📧</span><span class="truncate">Username</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- NETWORK -->
+            <div class="mb-3">
+              <h3 class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-widest text-txt-muted">Network</h3>
+              <div class="space-y-0.5">
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-txt-sec cursor-pointer" style="min-height:44px;">IPv4 Address</button>
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-txt-sec cursor-pointer" style="min-height:44px;">IPv6 Address</button>
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-txt-sec cursor-pointer" style="min-height:44px;">MAC Address</button>
+              </div>
+            </div>
+
+            <!-- IDENTITY -->
+            <div class="mb-3">
+              <h3 class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-widest text-txt-muted">Identity</h3>
+              <div class="space-y-0.5">
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-txt-sec cursor-pointer" style="min-height:44px;">Social Security Number</button>
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-txt-sec cursor-pointer" style="min-height:44px;">Passport Number</button>
+              </div>
+            </div>
+
+            <!-- PHONE NUMBERS -->
+            <div class="mb-3">
+              <h3 class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-widest text-txt-muted">Phone Numbers</h3>
+              <div class="space-y-0.5">
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center gap-2 text-txt-sec cursor-pointer" style="min-height:44px;">
+                  <span>📞</span><span class="truncate">US Phone Number</span>
+                </button>
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-txt-sec cursor-pointer" style="min-height:44px;">International Phone</button>
+              </div>
+            </div>
+
+            <!-- DATE & TIME -->
+            <div class="mb-3">
+              <h3 class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-widest text-txt-muted">Date &amp; Time</h3>
+              <div class="space-y-0.5">
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-txt-sec cursor-pointer" style="min-height:44px;">ISO Date</button>
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-txt-sec cursor-pointer" style="min-height:44px;">US Date Format</button>
+              </div>
+            </div>
+
+            <!-- FINANCIAL -->
+            <div class="mb-3">
+              <h3 class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-widest text-txt-muted">Financial</h3>
+              <div class="space-y-0.5">
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-txt-sec cursor-pointer" style="min-height:44px;">Credit Card</button>
+                <button class="preset-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-txt-sec cursor-pointer" style="min-height:44px;">IBAN</button>
+              </div>
+            </div>
+
+          </div>
+        </aside>
+
+        <!-- ── RIGHT: Main Workspace ── -->
+        <div class="flex-1 min-w-0 flex flex-col gap-4">
+
+          <!-- Toolbar -->
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <!-- Mode toggle -->
+            <div class="flex p-1 rounded-lg" style="background:#131a23;">
+              <button class="tab-active px-5 py-2 rounded-md text-sm transition-colors cursor-pointer" style="min-height:44px;">Match</button>
+              <button class="tab-inactive px-5 py-2 rounded-md text-sm transition-colors cursor-pointer" style="min-height:44px;">Replace</button>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-0.5">
+              <button class="action-btn flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-txt-muted transition-colors cursor-pointer" style="min-height:44px;">
+                <span class="material-symbols-rounded">history</span>
+                <span>History</span>
+              </button>
+              <button class="action-btn flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-txt-muted transition-colors cursor-pointer" style="min-height:44px;">
+                <span class="material-symbols-rounded">share</span>
+                <span>Share</span>
+              </button>
+              <button class="btn-clear flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-txt-muted transition-colors cursor-pointer" style="min-height:44px;">
+                <span class="material-symbols-rounded">close</span>
+                <span>Clear</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Regex Pattern Input -->
+          <div class="flex items-center rounded-xl border border-border bg-card focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30 transition-colors" style="min-height:52px;">
+            <!-- Leading slash -->
+            <span class="pl-4 pr-1 text-txt-muted font-mono text-lg select-none">/</span>
+
+            <!-- Pattern field -->
+            <input
+              type="text"
+              value="[\w.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}"
+              spellcheck="false"
+              class="flex-1 py-3 font-mono text-sm text-txt bg-transparent placeholder:text-txt-muted focus:outline-none min-w-0"
+              aria-label="Regular expression pattern"
+              style="font-size:13.5px;"
+            />
+
+            <!-- Trailing slash -->
+            <span class="pr-1 text-txt-muted font-mono text-lg select-none">/</span>
+
+            <!-- Flag toggles -->
+            <div class="flex items-center border-l border-border pl-1 pr-2 gap-0.5" style="min-height:52px;">
+              <button class="flag-active w-8 h-8 rounded-md text-xs font-mono font-bold transition-colors cursor-pointer flex items-center justify-center" title="Global — find all matches" aria-pressed="true">g</button>
+              <button class="flag-inactive w-8 h-8 rounded-md text-xs font-mono font-bold transition-colors cursor-pointer flex items-center justify-center" title="Case insensitive" aria-pressed="false">i</button>
+              <button class="flag-active w-8 h-8 rounded-md text-xs font-mono font-bold transition-colors cursor-pointer flex items-center justify-center" title="Multiline — ^ and $ match line boundaries" aria-pressed="true">m</button>
+              <button class="flag-inactive w-8 h-8 rounded-md text-xs font-mono font-bold transition-colors cursor-pointer flex items-center justify-center" title="Dotall — . matches newline" aria-pressed="false">s</button>
+            </div>
+          </div>
+
+          <!-- Preset description hint -->
+          <div class="px-3 py-2 rounded-lg border text-sm" style="background:rgba(61,106,242,0.06);border-color:rgba(61,106,242,0.2);color:#6B9CF4;">
+            Validates standard email addresses including subdomains and plus-addressing. Requires a TLD of 2+ characters.
+          </div>
+
+          <!-- Test String -->
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-widest text-txt-muted mb-2">Test String</label>
+            <div class="relative rounded-xl border border-border bg-card overflow-hidden focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30 transition-colors">
+
+              <!-- Highlight layer -->
+              <div class="highlight-layer" aria-hidden="true">Contact us at <mark class="match-yellow">support@toolk1t.com</mark> or <mark class="match-cyan">hello@example.org</mark> for help.
+Billing invoices go to <mark class="match-pink">billing+invoices@company.co.uk</mark>.
+Invalid addresses: not-an-email, @missing-user.com, missingdomain@</div>
+
+              <!-- Textarea -->
+              <textarea
+                class="transparent-caret relative w-full p-3 font-mono text-sm resize-y focus:outline-none placeholder:text-txt-muted"
+                rows="6"
+                spellcheck="false"
+                autocomplete="off"
+                aria-label="Test string input"
+                style="min-height:160px;font-size:13px;line-height:1.6;"
+              >Contact us at support@toolk1t.com or hello@example.org for help.
+Billing invoices go to billing+invoices@company.co.uk.
+Invalid addresses: not-an-email, @missing-user.com, missingdomain@</textarea>
+            </div>
+          </div>
+
+          <!-- Match Results -->
+          <div>
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-[10px] font-bold uppercase tracking-widest text-txt-muted">Matches</h3>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold" style="background:rgba(61,106,242,0.12);color:#3D6AF2;">3 matches</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium text-txt-muted" style="background:#1e2631;">2 groups</span>
+              </div>
+            </div>
+
+            <!-- Match list -->
+            <div class="rounded-xl border border-border bg-card p-2 space-y-1" style="max-height:340px;overflow-y:auto;">
+
+              <!-- Match #0 — collapsed, no groups -->
+              <div class="match-row rounded-lg border border-border overflow-hidden cursor-default">
+                <div class="flex items-center gap-3 px-3 py-2.5" style="min-height:44px;">
+                  <span class="font-mono text-[10px] text-txt-muted w-6 shrink-0 text-right">#0</span>
+                  <span class="font-mono text-xs text-txt flex-1 truncate">&ldquo;support@toolk1t.com&rdquo;</span>
+                  <span class="font-mono text-[10px] text-txt-muted shrink-0">0&ndash;22</span>
+                </div>
+              </div>
+
+              <!-- Match #1 — collapsed, no groups -->
+              <div class="match-row rounded-lg border border-border overflow-hidden cursor-default">
+                <div class="flex items-center gap-3 px-3 py-2.5" style="min-height:44px;">
+                  <span class="font-mono text-[10px] text-txt-muted w-6 shrink-0 text-right">#1</span>
+                  <span class="font-mono text-xs text-txt flex-1 truncate">&ldquo;hello@example.org&rdquo;</span>
+                  <span class="font-mono text-[10px] text-txt-muted shrink-0">27&ndash;45</span>
+                </div>
+              </div>
+
+              <!-- Match #2 — expanded, with groups -->
+              <div class="rounded-lg border border-border overflow-hidden">
+                <button class="match-row w-full flex items-center gap-3 px-3 py-2.5 text-left cursor-pointer" style="min-height:44px;" aria-expanded="true">
+                  <span class="font-mono text-[10px] text-txt-muted w-6 shrink-0 text-right">#2</span>
+                  <span class="font-mono text-xs text-txt flex-1 truncate">&ldquo;billing+invoices@company.co.uk&rdquo;</span>
+                  <span class="font-mono text-[10px] text-txt-muted shrink-0">78&ndash;108</span>
+                  <span class="material-symbols-rounded text-txt-muted shrink-0" style="font-size:16px;transform:rotate(180deg);">expand_more</span>
+                </button>
+                <!-- Expanded groups -->
+                <div class="px-3 pb-3 pt-1 border-t border-border" style="background:#0d1420;">
+                  <table class="w-full text-xs group-table">
+                    <tbody>
+                      <tr class="border-t border-border">
+                        <td class="font-mono font-semibold text-txt-muted whitespace-nowrap">user</td>
+                        <td class="font-mono text-txt-sec break-all">billing+invoices</td>
+                      </tr>
+                      <tr class="border-t border-border">
+                        <td class="font-mono font-semibold text-txt-muted whitespace-nowrap">domain</td>
+                        <td class="font-mono text-txt-sec break-all">company.co.uk</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Status bar -->
+          <div class="flex flex-wrap items-center gap-3 px-3 py-2 rounded-lg font-mono text-xs text-txt-muted" style="background:#131a23;">
+            <span>3 matches</span>
+            <span class="status-divider" aria-hidden="true">|</span>
+            <span>2 groups</span>
+            <span class="status-divider" aria-hidden="true">|</span>
+            <span>Flags: /gm/</span>
+            <span class="status-divider" aria-hidden="true">|</span>
+            <span>JavaScript RegExp</span>
+          </div>
+
+        </div>
+        <!-- /right col -->
+
+      </div>
+      <!-- /two-column -->
+
+    </main>
+  </div>
+  <!-- /desktop -->
+
+
+  <!-- ─── MOBILE LAYOUT ─── -->
+  <div class="lg:hidden">
+
+    <!-- Nav -->
+    <nav class="border-b border-border px-4 py-3 flex items-center gap-3" style="background:#0d1420;">
+      <span class="text-txt font-bold text-base tracking-tight">Toolk<span class="text-primary">1</span>t</span>
+      <div class="flex-1"></div>
+      <button class="w-9 h-9 flex items-center justify-center rounded-lg text-txt-muted" style="background:#131a23;">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+    </nav>
+
+    <main class="px-4 py-8 flex flex-col gap-5">
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-1.5 text-xs">
+        <span class="text-txt-muted">Home</span>
+        <span class="text-txt-muted">/</span>
+        <span class="text-txt-muted">Tools</span>
+        <span class="text-txt-muted">/</span>
+        <span class="text-txt-sec font-medium">Regex Tester</span>
+      </nav>
+
+      <!-- Title -->
+      <div class="space-y-1">
+        <h1 class="text-2xl font-bold text-txt">Regex Tester</h1>
+        <p class="text-sm text-txt-sec">Test, match, and replace with regular expressions — 100% client-side.</p>
+      </div>
+
+      <!-- Pattern Library button -->
+      <button class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-border bg-card text-sm font-medium text-txt-sec hover:bg-border transition-colors" style="min-height:44px;">
+        <span class="material-symbols-rounded" style="font-size:18px;">library_books</span>
+        Pattern Library
+      </button>
+
+      <!-- Toolbar (wraps on mobile) -->
+      <div class="flex flex-col gap-2">
+        <!-- Mode toggle (full-width) -->
+        <div class="flex p-1 rounded-lg" style="background:#131a23;">
+          <button class="tab-active flex-1 py-2 rounded-md text-sm transition-colors cursor-pointer text-center" style="min-height:44px;">Match</button>
+          <button class="tab-inactive flex-1 py-2 rounded-md text-sm transition-colors cursor-pointer text-center" style="min-height:44px;">Replace</button>
+        </div>
+        <!-- Action buttons -->
+        <div class="flex items-center gap-0.5">
+          <button class="action-btn flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm text-txt-muted transition-colors cursor-pointer" style="min-height:44px;">
+            <span class="material-symbols-rounded" style="font-size:18px;">history</span>
+          </button>
+          <button class="action-btn flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm text-txt-muted transition-colors cursor-pointer" style="min-height:44px;">
+            <span class="material-symbols-rounded" style="font-size:18px;">share</span>
+          </button>
+          <button class="btn-clear flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm text-txt-muted transition-colors cursor-pointer" style="min-height:44px;">
+            <span class="material-symbols-rounded" style="font-size:18px;">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Regex input -->
+      <div class="flex items-center rounded-xl border border-border bg-card focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30 transition-colors" style="min-height:52px;">
+        <span class="pl-3 pr-1 text-txt-muted font-mono text-lg select-none">/</span>
+        <input
+          type="text"
+          value="[\w.+-]+@[a-zA-Z0-9-]+"
+          spellcheck="false"
+          class="flex-1 py-3 font-mono text-xs text-txt bg-transparent focus:outline-none min-w-0"
+          aria-label="Regular expression pattern"
+        />
+        <span class="pr-1 text-txt-muted font-mono text-lg select-none">/</span>
+        <div class="flex items-center border-l border-border pl-1 pr-2 gap-0.5">
+          <button class="flag-active w-8 h-8 rounded-md text-xs font-mono font-bold cursor-pointer flex items-center justify-center">g</button>
+          <button class="flag-inactive w-8 h-8 rounded-md text-xs font-mono font-bold cursor-pointer flex items-center justify-center">i</button>
+          <button class="flag-active w-8 h-8 rounded-md text-xs font-mono font-bold cursor-pointer flex items-center justify-center">m</button>
+          <button class="flag-inactive w-8 h-8 rounded-md text-xs font-mono font-bold cursor-pointer flex items-center justify-center">s</button>
+        </div>
+      </div>
+
+      <!-- Hint -->
+      <div class="px-3 py-2 rounded-lg border text-xs" style="background:rgba(61,106,242,0.06);border-color:rgba(61,106,242,0.2);color:#6B9CF4;">
+        Validates standard email addresses including subdomains and plus-addressing.
+      </div>
+
+      <!-- Test string textarea -->
+      <div>
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-txt-muted mb-2">Test String</label>
+        <div class="relative rounded-xl border border-border bg-card overflow-hidden focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30 transition-colors">
+          <div class="highlight-layer" aria-hidden="true">Contact us at <mark class="match-yellow">support@toolk1t.com</mark> or <mark class="match-cyan">hello@example.org</mark> for help.
+Billing invoices go to <mark class="match-pink">billing+invoices@company.co.uk</mark>.
+Invalid addresses: not-an-email, @missing-user.com</div>
+          <textarea
+            class="transparent-caret relative w-full p-3 font-mono text-xs resize-y focus:outline-none"
+            rows="5"
+            spellcheck="false"
+            aria-label="Test string input"
+            style="min-height:130px;font-size:12px;line-height:1.6;"
+          >Contact us at support@toolk1t.com or hello@example.org for help.
+Billing invoices go to billing+invoices@company.co.uk.
+Invalid addresses: not-an-email, @missing-user.com</textarea>
+        </div>
+      </div>
+
+      <!-- Match results (mobile) -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-[10px] font-bold uppercase tracking-widest text-txt-muted">Matches</h3>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold" style="background:rgba(61,106,242,0.12);color:#3D6AF2;">3 matches</span>
+        </div>
+        <div class="rounded-xl border border-border bg-card p-2 space-y-1">
+          <div class="match-row rounded-lg border border-border cursor-default">
+            <div class="flex items-center gap-2 px-3 py-2.5" style="min-height:44px;">
+              <span class="font-mono text-[10px] text-txt-muted w-5 shrink-0 text-right">#0</span>
+              <span class="font-mono text-xs text-txt flex-1 truncate">&ldquo;support@toolk1t.com&rdquo;</span>
+              <span class="font-mono text-[10px] text-txt-muted shrink-0">0&ndash;22</span>
+            </div>
+          </div>
+          <div class="match-row rounded-lg border border-border cursor-default">
+            <div class="flex items-center gap-2 px-3 py-2.5" style="min-height:44px;">
+              <span class="font-mono text-[10px] text-txt-muted w-5 shrink-0 text-right">#1</span>
+              <span class="font-mono text-xs text-txt flex-1 truncate">&ldquo;hello@example.org&rdquo;</span>
+              <span class="font-mono text-[10px] text-txt-muted shrink-0">27&ndash;45</span>
+            </div>
+          </div>
+          <div class="rounded-lg border border-border">
+            <div class="match-row flex items-center gap-2 px-3 py-2.5 cursor-pointer" style="min-height:44px;">
+              <span class="font-mono text-[10px] text-txt-muted w-5 shrink-0 text-right">#2</span>
+              <span class="font-mono text-xs text-txt flex-1 truncate">&ldquo;billing+invoices@company.co.uk&rdquo;</span>
+              <span class="material-symbols-rounded text-txt-muted shrink-0" style="font-size:16px;transform:rotate(180deg);">expand_more</span>
+            </div>
+            <div class="px-3 pb-3 pt-1 border-t border-border" style="background:#0d1420;">
+              <table class="w-full text-xs group-table">
+                <tbody>
+                  <tr class="border-t border-border">
+                    <td class="font-mono font-semibold text-txt-muted">user</td>
+                    <td class="font-mono text-txt-sec">billing+invoices</td>
+                  </tr>
+                  <tr class="border-t border-border">
+                    <td class="font-mono font-semibold text-txt-muted">domain</td>
+                    <td class="font-mono text-txt-sec">company.co.uk</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status bar -->
+      <div class="flex flex-wrap items-center gap-2 px-3 py-2 rounded-lg font-mono text-xs text-txt-muted" style="background:#131a23;">
+        <span>3 matches</span>
+        <span class="status-divider">|</span>
+        <span>2 groups</span>
+        <span class="status-divider">|</span>
+        <span>Flags: /gm/</span>
+        <span class="status-divider">|</span>
+        <span>JavaScript RegExp</span>
+      </div>
+
+    </main>
+  </div>
+  <!-- /mobile -->
+
+</body>
+</html>

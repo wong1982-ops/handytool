@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mood Board Studio — Toolk1t Design Mockup</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'page-bg': '#090f16',
+            'card-bg': '#131a23',
+            'card-hover': '#1e2631',
+            'tk-border': '#1e2631',
+            'tk-primary': '#3D6AF2',
+            'tk-primary-light': '#3D9DF2',
+            'tk-secondary': '#32A9D9',
+            'text-primary': '#ffffff',
+            'text-secondary': '#a6abb5',
+            'text-muted': '#70767f',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #090f16; color: #ffffff; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+    /* Gradient button */
+    .btn-primary {
+      background: linear-gradient(135deg, #3D6AF2 0%, #3D9DF2 100%);
+      color: #fff;
+      font-weight: 600;
+      border-radius: 12px;
+      min-height: 44px;
+      padding: 0 24px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary {
+      background: #131a23;
+      color: #a6abb5;
+      border: 1px solid #1e2631;
+      border-radius: 12px;
+      min-height: 44px;
+      padding: 0 20px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .btn-secondary:hover { background: #1e2631; color: #fff; }
+
+    /* Pill button */
+    .pill-btn {
+      background: #131a23;
+      color: #a6abb5;
+      border: 1px solid #1e2631;
+      border-radius: 999px;
+      min-height: 44px;
+      padding: 0 24px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .pill-btn:hover { background: #1e2631; color: #fff; }
+    .pill-btn.active { background: #3D6AF2; color: #fff; border-color: #3D6AF2; }
+
+    /* Card */
+    .tk-card {
+      background: #131a23;
+      border: 1px solid #1e2631;
+      border-radius: 12px;
+    }
+    .tk-card:hover { background: #1e2631; }
+
+    /* Mood card selection ring */
+    .mood-card.selected { box-shadow: 0 0 0 2px var(--accent-color, #3D6AF2), 0 0 20px var(--accent-glow, rgba(61,106,242,0.3)); }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { animation: spin 1s linear infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    .pulse { animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes shimmer { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+
+    /* Nav tab active underline */
+    .view-tab.active { color: #3D9DF2; border-bottom: 2px solid #3D6AF2; }
+    .view-tab { color: #a6abb5; border-bottom: 2px solid transparent; padding: 8px 12px; font-size: 13px; cursor: pointer; transition: color 0.15s; white-space: nowrap; }
+    .view-tab:hover { color: #fff; }
+
+    /* Image grid item hover */
+    .img-grid-item:hover .img-delete-btn { opacity: 1; }
+    .img-delete-btn { opacity: 0; transition: opacity 0.15s; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090f16; }
+    ::-webkit-scrollbar-thumb { background: #1e2631; border-radius: 3px; }
+
+    /* Side drawer strip */
+    .drawer-strip { position: fixed; right: 0; top: 50%; transform: translateY(-50%); z-index: 30; display: flex; flex-direction: column; background: #131a23; border: 1px solid #1e2631; border-right: none; border-radius: 12px 0 0 12px; overflow: hidden; }
+    .drawer-strip button { min-height: 44px; width: 48px; display: flex; align-items: center; justify-content: center; color: #70767f; transition: background 0.15s, color 0.15s; cursor: pointer; border: none; background: transparent; position: relative; }
+    .drawer-strip button:hover { background: #1e2631; color: #fff; }
+
+    /* Tooltip */
+    .has-tooltip:hover .tooltip { opacity: 1; pointer-events: auto; }
+    .tooltip { position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); background: #131a23; border: 1px solid #1e2631; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 6px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+
+    /* Step indicator dots */
+    .step-dot { width: 8px; height: 8px; border-radius: 50%; background: #1e2631; transition: background 0.2s; }
+    .step-dot.active { background: #3D6AF2; }
+    .step-dot.done { background: #3D9DF2; }
+
+    /* Swatch color blocks */
+    .swatch-block { width: 48px; height: 48px; border-radius: 10px; cursor: pointer; transition: transform 0.15s; position: relative; }
+    .swatch-block:hover { transform: scale(1.06); }
+    .swatch-block.selected::after { content: ''; position: absolute; inset: -3px; border: 2px solid #3D6AF2; border-radius: 12px; }
+
+    /* Note card */
+    .note-card { background: #131a23; border: 1px solid #1e2631; border-left: 4px solid #F59E0B; border-radius: 10px; padding: 12px; min-width: 160px; position: relative; }
+    .note-card:hover .note-del { opacity: 1; }
+    .note-del { opacity: 0; transition: opacity 0.15s; position: absolute; top: 6px; right: 6px; }
+
+    /* Section label */
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #70767f; margin-bottom: 12px; }
+
+    /* Board title input */
+    .board-title-input { background: transparent; border: none; outline: none; font-size: 24px; font-weight: 700; color: #fff; width: 100%; }
+    .board-title-input::placeholder { color: rgba(255,255,255,0.2); }
+    .board-title-input:focus { color: #fff; }
+
+    /* Template card */
+    .template-card { background: #131a23; border: 1px solid #1e2631; border-radius: 10px; padding: 14px; cursor: pointer; text-align: left; transition: background 0.15s, border-color 0.15s; }
+    .template-card:hover { background: #1e2631; border-color: #3D6AF2; }
+
+    /* Gradient text */
+    .gradient-text { background: linear-gradient(135deg, #3D6AF2, #3D9DF2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION: View Switcher (design preview only) -->
+<!-- ============================================================ -->
+<div style="position:fixed;top:0;left:0;right:0;z-index:100;background:#090f16;border-bottom:1px solid #1e2631;padding:0 16px;">
+  <div style="display:flex;align-items:center;gap:4px;overflow-x:auto;">
+    <span style="font-size:12px;color:#70767f;padding:8px 8px 8px 0;white-space:nowrap;font-weight:600;">VIEWS:</span>
+    <button class="view-tab active" onclick="showView('wizard')">Wizard</button>
+    <button class="view-tab" onclick="showView('loading')">Loading</button>
+    <button class="view-tab" onclick="showView('board')">Board</button>
+    <button class="view-tab" onclick="showView('my-boards')">My Boards</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VIEW 1: WIZARD -->
+<!-- ============================================================ -->
+<div id="view-wizard" style="padding-top:41px;">
+  <!-- Themed header -->
+  <header style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid #1e2631;background:#090f16;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#3D6AF2,#3D9DF2);display:flex;align-items:center;justify-content:center;">
+        <span class="material-symbols-outlined" style="font-size:18px;color:#fff;">palette</span>
+      </div>
+      <span style="font-size:15px;font-weight:700;color:#fff;">Mood Board Studio</span>
+    </div>
+    <button class="btn-secondary" style="border-radius:10px;min-height:36px;padding:0 14px;font-size:13px;" onclick="showView('my-boards')">
+      <span class="material-symbols-outlined" style="font-size:16px;">grid_view</span>
+      My Boards
+    </button>
+  </header>
+
+  <!-- Wizard Container -->
+  <div style="min-height:calc(100vh - 97px);display:flex;align-items:center;justify-content:center;padding:32px 16px;">
+    <div style="max-width:520px;width:100%;">
+
+      <!-- Step 1: Theme description (visible by default) -->
+      <div id="wizard-step-1">
+        <!-- Step indicator -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:32px;">
+          <div class="step-dot active"></div>
+          <div style="height:1px;width:24px;background:#1e2631;"></div>
+          <div class="step-dot"></div>
+          <div style="height:1px;width:24px;background:#1e2631;"></div>
+          <div class="step-dot"></div>
+        </div>
+
+        <div style="margin-bottom:8px;">
+          <h1 style="font-size:28px;font-weight:700;color:#fff;margin:0 0 8px 0;line-height:1.2;">What's your mood board for?</h1>
+          <p style="font-size:14px;color:#a6abb5;margin:0;">Describe your project, brand, or creative vision.</p>
+        </div>
+
+        <div style="margin-top:24px;">
+          <textarea rows="3" placeholder="A cozy autumn wedding with rustic details..." style="width:100%;background:#131a23;border:1px solid #1e2631;border-radius:12px;color:#fff;padding:14px 16px;font-size:14px;resize:none;outline:none;font-family:inherit;transition:border-color 0.15s;" onfocus="this.style.borderColor='#3D6AF2'" onblur="this.style.borderColor='#1e2631'"></textarea>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button class="btn-primary" style="width:100%;font-size:15px;" onclick="goWizardStep(2)">
+            Next
+            <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
+          </button>
+        </div>
+
+        <div style="text-align:center;margin-top:20px;">
+          <button onclick="toggleTemplates()" style="background:none;border:none;color:#3D6AF2;font-size:14px;cursor:pointer;font-family:inherit;">Or start from a template</button>
+        </div>
+
+        <!-- Templates grid -->
+        <div id="templates-grid" style="display:none;margin-top:20px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <button class="template-card">
+              <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;">Wedding</div>
+              <div style="font-size:11px;color:#70767f;line-height:1.4;">Romantic wedding with soft florals and elegant details</div>
+            </button>
+            <button class="template-card">
+              <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;">Brand Identity</div>
+              <div style="font-size:11px;color:#70767f;line-height:1.4;">Modern tech startup branding with clean lines</div>
+            </button>
+            <button class="template-card">
+              <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;">Interior Design</div>
+              <div style="font-size:11px;color:#70767f;line-height:1.4;">Scandinavian-inspired living room with warm neutrals</div>
+            </button>
+            <button class="template-card">
+              <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;">Fashion</div>
+              <div style="font-size:11px;color:#70767f;line-height:1.4;">Streetwear collection with urban aesthetic</div>
+            </button>
+            <button class="template-card">
+              <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;">Food &amp; Drink</div>
+              <div style="font-size:11px;color:#70767f;line-height:1.4;">Artisan cafe with rustic charm and fresh ingredients</div>
+            </button>
+            <button class="template-card">
+              <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;">Travel</div>
+              <div style="font-size:11px;color:#70767f;line-height:1.4;">Tropical island getaway with turquoise waters</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Pick a vibe (hidden) -->
+      <div id="wizard-step-2" style="display:none;">
+        <!-- Step indicator -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:32px;">
+          <div class="step-dot done"></div>
+          <div style="height:1px;width:24px;background:#3D9DF2;"></div>
+          <div class="step-dot active"></div>
+          <div style="height:1px;width:24px;background:#1e2631;"></div>
+          <div class="step-dot"></div>
+        </div>
+
+        <h2 style="font-size:24px;font-weight:700;color:#fff;margin:0 0 24px 0;">Pick a vibe</h2>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:28px;">
+          <!-- Cozy -->
+          <button class="mood-card" style="--accent-color:#D4845A;--accent-glow:rgba(212,132,90,0.3);border-radius:12px;overflow:hidden;border:1px solid #1e2631;background:#131a23;padding:0;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;text-align:left;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="selectMood(this)">
+            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#D4845A 0%,#C4633A 35%,#8B4513 100%);"></div>
+            <div style="padding:10px 12px;background:#131a23;">
+              <div style="font-size:13px;font-weight:600;color:#fff;">Cozy</div>
+              <div style="font-size:11px;color:#70767f;margin-top:2px;">Warm, inviting</div>
+            </div>
+          </button>
+          <!-- Bold -->
+          <button class="mood-card" style="--accent-color:#FF3366;--accent-glow:rgba(255,51,102,0.3);border-radius:12px;overflow:hidden;border:1px solid #1e2631;background:#131a23;padding:0;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;text-align:left;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="selectMood(this)">
+            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#FF3366 0%,#E61E50 40%,#CC0033 100%);"></div>
+            <div style="padding:10px 12px;background:#131a23;">
+              <div style="font-size:13px;font-weight:600;color:#fff;">Bold</div>
+              <div style="font-size:11px;color:#70767f;margin-top:2px;">Strong, vibrant</div>
+            </div>
+          </button>
+          <!-- Elegant -->
+          <button class="mood-card" style="--accent-color:#C9B8A8;--accent-glow:rgba(201,184,168,0.3);border-radius:12px;overflow:hidden;border:1px solid #1e2631;background:#131a23;padding:0;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;text-align:left;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="selectMood(this)">
+            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#C9B8A8 0%,#A89888 40%,#887868 100%);"></div>
+            <div style="padding:10px 12px;background:#131a23;">
+              <div style="font-size:13px;font-weight:600;color:#fff;">Elegant</div>
+              <div style="font-size:11px;color:#70767f;margin-top:2px;">Refined, luxe</div>
+            </div>
+          </button>
+          <!-- Playful -->
+          <button class="mood-card selected" style="--accent-color:#C468FF;--accent-glow:rgba(196,104,255,0.3);border-radius:12px;overflow:hidden;border:1px solid #1e2631;background:#131a23;padding:0;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;text-align:left;box-shadow:0 0 0 2px #C468FF,0 0 20px rgba(196,104,255,0.3);" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="selectMood(this)">
+            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#FF6B9D 0%,#C468FF 50%,#6C63FF 100%);position:relative;">
+              <div style="position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;">
+                <span class="material-symbols-outlined filled" style="font-size:14px;color:#3D6AF2;">check</span>
+              </div>
+            </div>
+            <div style="padding:10px 12px;background:#131a23;">
+              <div style="font-size:13px;font-weight:600;color:#fff;">Playful</div>
+              <div style="font-size:11px;color:#70767f;margin-top:2px;">Fun, colorful</div>
+            </div>
+          </button>
+          <!-- Minimal -->
+          <button class="mood-card" style="border-radius:12px;overflow:hidden;border:1px solid #1e2631;background:#131a23;padding:0;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;text-align:left;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="selectMood(this)">
+            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#F5F5F5 0%,#E0E0E0 50%,#BDBDBD 100%);"></div>
+            <div style="padding:10px 12px;background:#131a23;">
+              <div style="font-size:13px;font-weight:600;color:#fff;">Minimal</div>
+              <div style="font-size:11px;color:#70767f;margin-top:2px;">Clean, focused</div>
+            </div>
+          </button>
+          <!-- Vintage -->
+          <button class="mood-card" style="--accent-color:#D4A574;--accent-glow:rgba(212,165,116,0.3);border-radius:12px;overflow:hidden;border:1px solid #1e2631;background:#131a23;padding:0;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;text-align:left;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="selectMood(this)">
+            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#D4A574 0%,#B8956A 40%,#8B7355 100%);"></div>
+            <div style="padding:10px 12px;background:#131a23;">
+              <div style="font-size:13px;font-weight:600;color:#fff;">Vintage</div>
+              <div style="font-size:11px;color:#70767f;margin-top:2px;">Retro, timeless</div>
+            </div>
+          </button>
+          <!-- Luxurious -->
+          <button class="mood-card" style="--accent-color:#D4AF37;--accent-glow:rgba(212,175,55,0.3);border-radius:12px;overflow:hidden;border:1px solid #1e2631;background:#131a23;padding:0;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;text-align:left;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="selectMood(this)">
+            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#2C2C2C 0%,#1A1A2E 40%,#16213E 100%);position:relative;">
+              <div style="position:absolute;inset:0;background:radial-gradient(circle at 30% 70%,rgba(212,175,55,0.25) 0%,transparent 50%),radial-gradient(circle at 70% 30%,rgba(212,175,55,0.15) 0%,transparent 45%);"></div>
+            </div>
+            <div style="padding:10px 12px;background:#131a23;">
+              <div style="font-size:13px;font-weight:600;color:#fff;">Luxurious</div>
+              <div style="font-size:11px;color:#70767f;margin-top:2px;">Premium, opulent</div>
+            </div>
+          </button>
+          <!-- Natural -->
+          <button class="mood-card" style="--accent-color:#5B8C5A;--accent-glow:rgba(91,140,90,0.3);border-radius:12px;overflow:hidden;border:1px solid #1e2631;background:#131a23;padding:0;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;text-align:left;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="selectMood(this)">
+            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#5B8C5A 0%,#3D7B5F 40%,#2D6A4F 100%);"></div>
+            <div style="padding:10px 12px;background:#131a23;">
+              <div style="font-size:13px;font-weight:600;color:#fff;">Natural</div>
+              <div style="font-size:11px;color:#70767f;margin-top:2px;">Organic, earthy</div>
+            </div>
+          </button>
+        </div>
+
+        <div style="display:flex;gap:12px;">
+          <button class="btn-secondary" style="flex:1;" onclick="goWizardStep(1)">Back</button>
+          <button class="btn-primary" style="flex:1;" onclick="goWizardStep(3)">Next <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span></button>
+        </div>
+      </div>
+
+      <!-- Step 3: Color direction (hidden) -->
+      <div id="wizard-step-3" style="display:none;">
+        <!-- Step indicator -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:32px;">
+          <div class="step-dot done"></div>
+          <div style="height:1px;width:24px;background:#3D9DF2;"></div>
+          <div class="step-dot done"></div>
+          <div style="height:1px;width:24px;background:#3D9DF2;"></div>
+          <div class="step-dot active"></div>
+        </div>
+
+        <h2 style="font-size:24px;font-weight:700;color:#fff;margin:0 0 8px 0;">Any color direction?</h2>
+        <p style="font-size:14px;color:#a6abb5;margin:0 0 28px 0;">This shapes the palette AI generates for your board.</p>
+
+        <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-start;margin-bottom:24px;">
+          <button class="pill-btn">Warm</button>
+          <button class="pill-btn active">Surprise me</button>
+          <button class="pill-btn">Cool</button>
+          <button class="pill-btn">Neutral</button>
+        </div>
+
+        <div style="text-align:center;margin-bottom:24px;">
+          <button style="background:none;border:none;color:#70767f;font-size:13px;cursor:pointer;font-family:inherit;" onmouseover="this.style.color='#a6abb5'" onmouseout="this.style.color='#70767f'">Skip</button>
+        </div>
+
+        <div style="max-width:380px;margin:0 auto;display:flex;flex-direction:column;gap:12px;">
+          <button class="btn-primary" style="width:100%;font-size:15px;" onclick="showView('loading')">
+            <span class="material-symbols-outlined filled" style="font-size:20px;">auto_awesome</span>
+            Generate Board
+          </button>
+          <button class="btn-secondary" style="width:100%;" onclick="goWizardStep(2)">Back</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VIEW 2: LOADING SCREEN -->
+<!-- ============================================================ -->
+<div id="view-loading" style="display:none;padding-top:41px;">
+  <div style="min-height:calc(100vh - 41px);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+    <!-- Ambient glow -->
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(61,106,242,0.15) 0%,transparent 70%);pointer-events:none;"></div>
+
+    <div style="max-width:380px;width:100%;padding:0 16px;text-align:center;">
+      <!-- Spinner -->
+      <div style="width:44px;height:44px;border-radius:50%;border:2px solid #1e2631;border-top-color:#3D6AF2;margin:0 auto 20px;" class="spinner"></div>
+
+      <p style="font-size:15px;color:#a6abb5;margin:0 0 28px 0;font-weight:500;">Building your board…</p>
+
+      <!-- Progress steps -->
+      <div style="text-align:left;display:flex;flex-direction:column;gap:14px;margin-bottom:32px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="color:#a6abb5;font-size:16px;">✓</span>
+          <span style="font-size:14px;color:#a6abb5;">Generating images…</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#3D6AF2;display:inline-block;" class="pulse"></span>
+          <span style="font-size:14px;color:#fff;font-weight:600;">Creating palette…</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:transparent;border:1px solid #1e2631;display:inline-block;"></span>
+          <span style="font-size:14px;color:#70767f;">Picking fonts…</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:transparent;border:1px solid #1e2631;display:inline-block;"></span>
+          <span style="font-size:14px;color:#70767f;">Arranging board…</span>
+        </div>
+      </div>
+
+      <!-- Skeleton image grid -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+        <div style="aspect-ratio:1;border-radius:10px;background:#1e2631;"></div>
+        <div style="aspect-ratio:1;border-radius:10px;background:#1e2631;"></div>
+        <div style="aspect-ratio:1;border-radius:10px;background:#1e2631;"></div>
+        <div style="aspect-ratio:1;border-radius:10px;background:#1e2631;"></div>
+        <div style="aspect-ratio:1;border-radius:10px;background:#131a23;" class="pulse"></div>
+        <div style="aspect-ratio:1;border-radius:10px;background:#131a23;" class="pulse"></div>
+        <div style="aspect-ratio:1;border-radius:10px;background:#131a23;" class="pulse"></div>
+        <div style="aspect-ratio:1;border-radius:10px;background:#131a23;" class="pulse"></div>
+      </div>
+
+      <button class="btn-secondary" style="margin-top:32px;min-height:36px;font-size:13px;" onclick="showView('board')">
+        Preview Board →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VIEW 3: BOARD VIEW -->
+<!-- ============================================================ -->
+<div id="view-board" style="display:none;padding-top:41px;">
+
+  <!-- Toolbar -->
+  <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid #1e2631;background:#090f16;position:sticky;top:41px;z-index:20;">
+    <!-- Left -->
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn-secondary" style="min-height:36px;padding:0 12px;font-size:13px;border-radius:8px;" onclick="showView('wizard')">
+        <span class="material-symbols-outlined" style="font-size:16px;">add</span>
+        <span>New Board</span>
+      </button>
+    </div>
+    <!-- Right -->
+    <div style="display:flex;align-items:center;gap:8px;">
+      <!-- Save indicator -->
+      <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#70767f;margin-right:4px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block;"></span>
+        Saved
+      </span>
+      <!-- My Boards -->
+      <button class="btn-secondary" style="min-height:36px;padding:0 12px;font-size:13px;border-radius:8px;" onclick="showView('my-boards')">
+        <span class="material-symbols-outlined" style="font-size:16px;">grid_view</span>
+        <span>My Boards</span>
+      </button>
+      <!-- Share -->
+      <button class="btn-secondary" style="min-height:36px;padding:0 12px;font-size:13px;border-radius:8px;">
+        <span class="material-symbols-outlined" style="font-size:16px;">share</span>
+        <span>Share</span>
+      </button>
+      <!-- Download -->
+      <div style="position:relative;">
+        <button class="btn-secondary" style="min-height:36px;padding:0 12px;font-size:13px;border-radius:8px;" onclick="toggleDownload()">
+          <span class="material-symbols-outlined" style="font-size:16px;">download</span>
+          <span>Download</span>
+          <span class="material-symbols-outlined" style="font-size:14px;" id="download-chevron">expand_more</span>
+        </button>
+        <div id="download-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);width:160px;background:#131a23;border:1px solid #1e2631;border-radius:10px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:50;">
+          <button style="width:100%;min-height:44px;padding:0 14px;text-align:left;background:transparent;border:none;color:#a6abb5;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='#1e2631'" onmouseout="this.style.background='transparent'">
+            <span class="material-symbols-outlined" style="font-size:16px;">image</span> Export as PNG
+          </button>
+          <button style="width:100%;min-height:44px;padding:0 14px;text-align:left;background:transparent;border:none;color:#a6abb5;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='#1e2631'" onmouseout="this.style.background='transparent'">
+            <span class="material-symbols-outlined" style="font-size:16px;">picture_as_pdf</span> Export as PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Board canvas (with right padding to avoid the icon strip overlap) -->
+  <div style="max-width:960px;margin:0 auto;padding:32px 24px 80px;padding-right:80px;">
+
+    <!-- Board title + subtitle -->
+    <div style="margin-bottom:6px;">
+      <input class="board-title-input" type="text" value="Playful Summer Brand" placeholder="Untitled Board" />
+    </div>
+    <p style="font-size:13px;color:#70767f;margin:0 0 32px 0;">A vibrant lifestyle brand targeting Gen-Z with colorful visuals</p>
+
+    <!-- ── Section: Images ── -->
+    <section style="margin-bottom:8px;">
+      <div class="section-label">Images</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+        <!-- Image cards with gradient placeholders representing real images -->
+        <div class="img-grid-item" style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#FF6B9D,#C468FF);position:relative;overflow:hidden;border:1px solid #1e2631;cursor:pointer;">
+          <div class="img-delete-btn" style="position:absolute;top:6px;right:6px;">
+            <button style="width:24px;height:24px;border-radius:6px;background:rgba(0,0,0,0.6);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+              <span class="material-symbols-outlined" style="font-size:14px;">close</span>
+            </button>
+          </div>
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.4) 0%,transparent 50%);"></div>
+        </div>
+        <div class="img-grid-item" style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#6C63FF,#FF6B9D);position:relative;overflow:hidden;border:1px solid #1e2631;cursor:pointer;">
+          <div class="img-delete-btn" style="position:absolute;top:6px;right:6px;">
+            <button style="width:24px;height:24px;border-radius:6px;background:rgba(0,0,0,0.6);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+              <span class="material-symbols-outlined" style="font-size:14px;">close</span>
+            </button>
+          </div>
+        </div>
+        <div class="img-grid-item" style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#C468FF,#6C63FF);position:relative;overflow:hidden;border:2px solid #3D6AF2;cursor:pointer;">
+          <!-- Selected state -->
+          <div style="position:absolute;inset:0;outline:2px solid #3D6AF2;outline-offset:-2px;border-radius:9px;"></div>
+          <div class="img-delete-btn" style="position:absolute;top:6px;right:6px;opacity:1;">
+            <button style="width:24px;height:24px;border-radius:6px;background:rgba(0,0,0,0.6);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+              <span class="material-symbols-outlined" style="font-size:14px;">close</span>
+            </button>
+          </div>
+        </div>
+        <div class="img-grid-item" style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#FF3366,#C468FF);position:relative;overflow:hidden;border:1px solid #1e2631;cursor:pointer;"></div>
+        <div class="img-grid-item" style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#FFD700,#FF6B9D);position:relative;overflow:hidden;border:1px solid #1e2631;cursor:pointer;"></div>
+        <div class="img-grid-item" style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#00C6FF,#6C63FF);position:relative;overflow:hidden;border:1px solid #1e2631;cursor:pointer;"></div>
+        <div class="img-grid-item" style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#FF6B9D,#FFD700);position:relative;overflow:hidden;border:1px solid #1e2631;cursor:pointer;"></div>
+        <div class="img-grid-item" style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#6C63FF,#00C6FF);position:relative;overflow:hidden;border:1px solid #1e2631;cursor:pointer;"></div>
+      </div>
+    </section>
+
+    <!-- ── Section: Palette & Typography ── -->
+    <section style="border-top:1px solid #1e2631;border-bottom:1px solid #1e2631;padding:24px 0;display:flex;flex-wrap:wrap;gap:40px;margin-bottom:4px;">
+      <!-- Palette -->
+      <div>
+        <div class="section-label">Palette</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div class="swatch-block selected" style="background:#FF6B9D;"></div>
+            <span style="font-size:10px;color:#70767f;font-family:monospace;">#FF6B9D</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div class="swatch-block" style="background:#C468FF;"></div>
+            <span style="font-size:10px;color:#70767f;font-family:monospace;">#C468FF</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div class="swatch-block" style="background:#6C63FF;"></div>
+            <span style="font-size:10px;color:#70767f;font-family:monospace;">#6C63FF</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div class="swatch-block" style="background:#FFD166;"></div>
+            <span style="font-size:10px;color:#70767f;font-family:monospace;">#FFD166</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div class="swatch-block" style="background:#06D6A0;"></div>
+            <span style="font-size:10px;color:#70767f;font-family:monospace;">#06D6A0</span>
+          </div>
+        </div>
+      </div>
+      <!-- Typography -->
+      <div>
+        <div class="section-label">Typography</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button style="background:#131a23;border:1px solid #1e2631;border-radius:10px;padding:14px 16px;text-align:left;cursor:pointer;transition:border-color 0.15s;min-width:140px;" onmouseover="this.style.borderColor='rgba(61,106,242,0.5)'" onmouseout="this.style.borderColor='#1e2631'">
+            <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;">Righteous</div>
+            <div style="font-size:13px;color:#a6abb5;margin-bottom:6px;">Bold &amp; Playful</div>
+            <div style="font-size:11px;color:#70767f;">heading</div>
+          </button>
+          <button style="background:#131a23;border:1px solid #3D6AF2;border-radius:10px;padding:14px 16px;text-align:left;cursor:pointer;box-shadow:0 0 0 2px rgba(61,106,242,0.3);min-width:140px;">
+            <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;">Nunito</div>
+            <div style="font-size:13px;color:#a6abb5;margin-bottom:6px;">The quick brown fox</div>
+            <div style="font-size:11px;color:#70767f;">body</div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Section: Notes & Swatches ── -->
+    <section style="padding:24px 0;">
+      <div class="section-label">Notes &amp; Swatches</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">
+        <!-- Text note -->
+        <div class="note-card" style="min-width:180px;max-width:240px;">
+          <button class="note-del" style="background:rgba(239,68,68,0.15);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#EF4444;">
+            <span class="material-symbols-outlined" style="font-size:13px;">close</span>
+          </button>
+          <textarea rows="3" style="width:100%;background:transparent;border:none;outline:none;color:#a6abb5;font-size:13px;resize:none;font-family:inherit;line-height:1.5;">Target audience: Gen-Z, 16–24. Values authenticity and self-expression.</textarea>
+        </div>
+        <!-- Text note 2 -->
+        <div class="note-card" style="min-width:180px;max-width:240px;">
+          <button class="note-del" style="background:rgba(239,68,68,0.15);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#EF4444;">
+            <span class="material-symbols-outlined" style="font-size:13px;">close</span>
+          </button>
+          <textarea rows="2" style="width:100%;background:transparent;border:none;outline:none;color:#a6abb5;font-size:13px;resize:none;font-family:inherit;line-height:1.5;">Tone: bold, playful, irreverent.</textarea>
+        </div>
+        <!-- Color swatch card -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;" onmouseover="this.querySelector('.swatch-card-del').style.opacity='1'" onmouseout="this.querySelector('.swatch-card-del').style.opacity='0'">
+          <div style="width:72px;height:72px;border-radius:12px;background:#FF6B9D;border:2px solid #1e2631;cursor:pointer;"></div>
+          <span style="font-size:10px;color:#70767f;font-family:monospace;">#FF6B9D</span>
+          <button class="swatch-card-del" style="position:absolute;top:4px;right:4px;opacity:0;background:rgba(0,0,0,0.5);border:none;border-radius:4px;width:18px;height:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;transition:opacity 0.15s;">
+            <span class="material-symbols-outlined" style="font-size:12px;">close</span>
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;" onmouseover="this.querySelector('.swatch-card-del').style.opacity='1'" onmouseout="this.querySelector('.swatch-card-del').style.opacity='0'">
+          <div style="width:72px;height:72px;border-radius:12px;background:#06D6A0;border:2px solid #1e2631;cursor:pointer;"></div>
+          <span style="font-size:10px;color:#70767f;font-family:monospace;">#06D6A0</span>
+          <button class="swatch-card-del" style="position:absolute;top:4px;right:4px;opacity:0;background:rgba(0,0,0,0.5);border:none;border-radius:4px;width:18px;height:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;transition:opacity 0.15s;">
+            <span class="material-symbols-outlined" style="font-size:12px;">close</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Side drawer icon strip -->
+  <div class="drawer-strip" id="drawer-strip">
+    <button class="has-tooltip" onclick="toggleDrawer('ai')" title="AI Add More">
+      <span class="material-symbols-outlined" style="font-size:20px;">auto_awesome</span>
+      <span class="tooltip">AI Add More</span>
+    </button>
+    <button class="has-tooltip" onclick="toggleDrawer('upload')" title="Upload Image">
+      <span class="material-symbols-outlined" style="font-size:20px;">image</span>
+      <span class="tooltip">Upload Image</span>
+    </button>
+    <button class="has-tooltip" onclick="toggleDrawer('text')" title="Add Text">
+      <span class="material-symbols-outlined" style="font-size:20px;">text_fields</span>
+      <span class="tooltip">Add Text Note</span>
+    </button>
+    <button class="has-tooltip" onclick="toggleDrawer('swatch')" title="Add Color">
+      <span class="material-symbols-outlined" style="font-size:20px;">palette</span>
+      <span class="tooltip">Add Color</span>
+    </button>
+    <button class="has-tooltip" onclick="toggleDrawer('links')" title="Cross-tools">
+      <span class="material-symbols-outlined" style="font-size:20px;">link</span>
+      <span class="tooltip">Cross-tools</span>
+    </button>
+  </div>
+
+  <!-- Side drawer expanded panel -->
+  <div id="drawer-panel" style="display:none;position:fixed;right:0;top:97px;bottom:0;width:288px;background:#0d1117;border-left:1px solid #1e2631;box-shadow:-4px 0 24px rgba(0,0,0,0.4);z-index:40;display:none;flex-direction:column;">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #1e2631;flex-shrink:0;">
+      <!-- Section tabs -->
+      <div style="display:flex;align-items:center;gap:4px;">
+        <button id="dtab-ai" onclick="setDrawerTab('ai')" style="width:36px;height:36px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(61,106,242,0.15);color:#3D9DF2;" title="AI Add More">
+          <span class="material-symbols-outlined" style="font-size:18px;">auto_awesome</span>
+        </button>
+        <button id="dtab-upload" onclick="setDrawerTab('upload')" style="width:36px;height:36px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:transparent;color:#a6abb5;" title="Upload" onmouseover="this.style.background='#1e2631'" onmouseout="this.style.background='transparent'">
+          <span class="material-symbols-outlined" style="font-size:18px;">image</span>
+        </button>
+        <button id="dtab-text" onclick="setDrawerTab('text')" style="width:36px;height:36px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:transparent;color:#a6abb5;" title="Text" onmouseover="this.style.background='#1e2631'" onmouseout="this.style.background='transparent'">
+          <span class="material-symbols-outlined" style="font-size:18px;">text_fields</span>
+        </button>
+        <button id="dtab-swatch" onclick="setDrawerTab('swatch')" style="width:36px;height:36px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:transparent;color:#a6abb5;" title="Swatch" onmouseover="this.style.background='#1e2631'" onmouseout="this.style.background='transparent'">
+          <span class="material-symbols-outlined" style="font-size:18px;">palette</span>
+        </button>
+        <button id="dtab-links" onclick="setDrawerTab('links')" style="width:36px;height:36px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:transparent;color:#a6abb5;" title="Links" onmouseover="this.style.background='#1e2631'" onmouseout="this.style.background='transparent'">
+          <span class="material-symbols-outlined" style="font-size:18px;">link</span>
+        </button>
+      </div>
+      <button onclick="closeDrawer()" style="width:36px;height:36px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:transparent;color:#a6abb5;" onmouseover="this.style.background='#1e2631'" onmouseout="this.style.background='transparent'">
+        <span class="material-symbols-outlined" style="font-size:18px;">close</span>
+      </button>
+    </div>
+
+    <!-- Section label -->
+    <div style="padding:12px 16px 4px;flex-shrink:0;">
+      <p id="drawer-section-label" style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#70767f;margin:0;">AI ADD MORE</p>
+    </div>
+
+    <!-- Content -->
+    <div style="flex:1;overflow-y:auto;padding:12px 16px 24px;">
+      <!-- AI section -->
+      <div id="drawer-content-ai">
+        <h3 style="font-size:13px;font-weight:600;color:#fff;margin:0 0 12px 0;">Add More Elements</h3>
+        <textarea rows="3" placeholder="What should I add? e.g. 'More summer photos'" style="width:100%;background:#131a23;border:1px solid #1e2631;border-radius:10px;color:#fff;padding:12px;font-size:13px;resize:none;outline:none;font-family:inherit;transition:border-color 0.15s;" onfocus="this.style.borderColor='#3D6AF2'" onblur="this.style.borderColor='#1e2631'"></textarea>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0;">
+          <span style="font-size:12px;color:#70767f;">8/30 elements</span>
+          <span style="font-size:12px;color:#7C3AED;font-weight:500;">1 credit</span>
+        </div>
+        <button class="btn-primary" style="width:100%;border-radius:10px;font-size:13px;">
+          <span class="material-symbols-outlined" style="font-size:16px;">auto_awesome</span>
+          Add
+        </button>
+      </div>
+      <!-- Upload section (hidden) -->
+      <div id="drawer-content-upload" style="display:none;">
+        <h3 style="font-size:13px;font-weight:600;color:#fff;margin:0 0 12px 0;">Upload Image</h3>
+        <button style="width:100%;border:2px dashed #1e2631;border-radius:10px;padding:32px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;background:transparent;cursor:pointer;transition:border-color 0.15s;" onmouseover="this.style.borderColor='#3D6AF2'" onmouseout="this.style.borderColor='#1e2631'">
+          <span class="material-symbols-outlined" style="font-size:32px;color:#70767f;">upload</span>
+          <span style="font-size:13px;color:#a6abb5;">Click to browse</span>
+          <span style="font-size:11px;color:#70767f;">or drag &amp; drop</span>
+        </button>
+      </div>
+      <!-- Text section (hidden) -->
+      <div id="drawer-content-text" style="display:none;">
+        <h3 style="font-size:13px;font-weight:600;color:#fff;margin:0 0 12px 0;">Add Text Note</h3>
+        <p style="font-size:13px;color:#a6abb5;margin:0 0 16px 0;">Add a sticky note to your board for annotations and ideas.</p>
+        <button class="btn-secondary" style="width:100%;border-radius:10px;font-size:13px;">Add Note</button>
+      </div>
+      <!-- Swatch section (hidden) -->
+      <div id="drawer-content-swatch" style="display:none;">
+        <h3 style="font-size:13px;font-weight:600;color:#fff;margin:0 0 12px 0;">Add Color</h3>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <input type="color" value="#3D6AF2" style="width:44px;height:44px;border-radius:10px;border:1px solid #1e2631;cursor:pointer;background:transparent;padding:2px;" />
+          <span style="font-size:13px;color:#a6abb5;font-family:monospace;">#3D6AF2</span>
+        </div>
+        <button class="btn-secondary" style="width:100%;border-radius:10px;font-size:13px;">Add to Board</button>
+      </div>
+      <!-- Links section (hidden) -->
+      <div id="drawer-content-links" style="display:none;">
+        <h3 style="font-size:13px;font-weight:600;color:#fff;margin:0 0 12px 0;">Open in Other Tools</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a href="#" style="text-decoration:none;display:block;background:#131a23;border:1px solid #1e2631;border-radius:10px;padding:12px 14px;transition:background 0.15s;" onmouseover="this.style.background='#1e2631'" onmouseout="this.style.background='#131a23'">
+            <div style="font-size:13px;font-weight:500;color:#fff;margin-bottom:3px;">Color Palette</div>
+            <div style="font-size:11px;color:#70767f;">Open your palette in the color tool</div>
+          </a>
+          <a href="#" style="text-decoration:none;display:block;background:#131a23;border:1px solid #1e2631;border-radius:10px;padding:12px 14px;transition:background 0.15s;" onmouseover="this.style.background='#1e2631'" onmouseout="this.style.background='#131a23'">
+            <div style="font-size:13px;font-weight:500;color:#fff;margin-bottom:3px;">Font Generator</div>
+            <div style="font-size:11px;color:#70767f;">Explore fonts for your design</div>
+          </a>
+          <a href="#" style="text-decoration:none;display:block;background:#131a23;border:1px solid #1e2631;border-radius:10px;padding:12px 14px;transition:background 0.15s;" onmouseover="this.style.background='#1e2631'" onmouseout="this.style.background='#131a23'">
+            <div style="font-size:13px;font-weight:500;color:#fff;margin-bottom:3px;">Logo Generator</div>
+            <div style="font-size:11px;color:#70767f;">Create a logo from your mood</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile FAB -->
+  <button style="position:fixed;right:16px;bottom:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#3D6AF2,#3D9DF2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(61,106,242,0.4);z-index:50;" title="Add elements">
+    <span class="material-symbols-outlined" style="font-size:24px;color:#fff;">add</span>
+  </button>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- VIEW 4: MY BOARDS -->
+<!-- ============================================================ -->
+<div id="view-my-boards" style="display:none;padding-top:41px;">
+  <!-- Toolbar (same as board view) -->
+  <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid #1e2631;background:#090f16;position:sticky;top:41px;z-index:20;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn-secondary" style="min-height:36px;padding:0 12px;font-size:13px;border-radius:8px;" onclick="showView('wizard')">
+        <span class="material-symbols-outlined" style="font-size:16px;">add</span>
+        <span>New Board</span>
+      </button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#70767f;margin-right:4px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block;"></span>
+        Saved
+      </span>
+      <button class="btn-secondary" style="min-height:36px;padding:0 12px;font-size:13px;border-radius:8px;background:#1e2631;border-color:#3D6AF2;color:#3D9DF2;">
+        <span class="material-symbols-outlined" style="font-size:16px;">grid_view</span>
+        <span>My Boards</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- My Boards content -->
+  <div style="max-width:720px;margin:0 auto;padding:32px 24px;">
+
+    <!-- Back button -->
+    <button onclick="showView('board')" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:#70767f;font-size:13px;cursor:pointer;margin-bottom:24px;font-family:inherit;padding:0;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#70767f'">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+      Back to board
+    </button>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <h2 style="font-size:20px;font-weight:700;color:#fff;margin:0;">My Boards</h2>
+      <span style="font-size:13px;color:#70767f;">3 boards</span>
+    </div>
+
+    <!-- Board entries -->
+    <div style="display:flex;flex-direction:column;gap:10px;">
+
+      <!-- Entry 1 (active / selected appearance) -->
+      <button onclick="showView('board')" style="width:100%;background:#131a23;border:1px solid #3D6AF2;border-radius:12px;padding:16px;text-align:left;cursor:pointer;transition:all 0.15s;display:flex;gap:16px;align-items:flex-start;box-shadow:0 0 0 1px rgba(61,106,242,0.2);">
+        <!-- Thumbnail -->
+        <div style="width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,#FF6B9D,#C468FF);flex-shrink:0;"></div>
+        <!-- Info -->
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:14px;font-weight:600;color:#3D9DF2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Playful Summer Brand</span>
+            <span style="background:rgba(61,106,242,0.2);color:#3D6AF2;font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap;">Shared</span>
+          </div>
+          <p style="font-size:12px;color:#70767f;margin:0 0 6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">A vibrant lifestyle brand targeting Gen-Z with colorful visuals</p>
+          <p style="font-size:12px;color:#70767f;margin:0;">8 elements &middot; Apr 3</p>
+        </div>
+      </button>
+
+      <!-- Entry 2 -->
+      <button style="width:100%;background:#131a23;border:1px solid #1e2631;border-radius:12px;padding:16px;text-align:left;cursor:pointer;transition:all 0.15s;display:flex;gap:16px;align-items:flex-start;" onmouseover="this.style.background='#1e2631';this.style.borderColor='rgba(61,106,242,0.3)'" onmouseout="this.style.background='#131a23';this.style.borderColor='#1e2631'" onclick="showView('board')">
+        <div style="width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,#D4845A,#8B4513);flex-shrink:0;"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Autumn Wedding Inspo</span>
+          </div>
+          <p style="font-size:12px;color:#70767f;margin:0 0 6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Romantic wedding with soft florals and warm rustic details</p>
+          <p style="font-size:12px;color:#70767f;margin:0;">12 elements &middot; Mar 28</p>
+        </div>
+      </button>
+
+      <!-- Entry 3 -->
+      <button style="width:100%;background:#131a23;border:1px solid #1e2631;border-radius:12px;padding:16px;text-align:left;cursor:pointer;transition:all 0.15s;display:flex;gap:16px;align-items:flex-start;" onmouseover="this.style.background='#1e2631';this.style.borderColor='rgba(61,106,242,0.3)'" onmouseout="this.style.background='#131a23';this.style.borderColor='#1e2631'" onclick="showView('board')">
+        <!-- No image thumbnail placeholder -->
+        <div style="width:64px;height:64px;border-radius:10px;background:#0d1117;border:1px solid #1e2631;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+          <span class="material-symbols-outlined" style="font-size:24px;color:#70767f;">image</span>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Minimalist Workspace</span>
+          </div>
+          <p style="font-size:12px;color:#70767f;margin:0 0 6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Scandinavian home office with neutral tones and clean lines</p>
+          <p style="font-size:12px;color:#70767f;margin:0;">5 elements &middot; Mar 22</p>
+        </div>
+      </button>
+
+    </div>
+
+    <!-- Empty state (for reference, hidden) -->
+    <div style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:80px 0;text-align:center;">
+      <div style="width:56px;height:56px;border-radius:16px;background:rgba(61,106,242,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+        <span class="material-symbols-outlined" style="font-size:28px;color:rgba(61,106,242,0.6);">dashboard</span>
+      </div>
+      <p style="font-size:16px;font-weight:600;color:#fff;margin:0 0 8px 0;">No boards yet</p>
+      <p style="font-size:14px;color:#70767f;margin:0;max-width:260px;">Create your first mood board to see it here.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT -->
+<!-- ============================================================ -->
+<script>
+  // ── View switching ──────────────────────────────────────────
+  function showView(name) {
+    ['wizard','loading','board','my-boards'].forEach(v => {
+      document.getElementById('view-' + v).style.display = 'none';
+    });
+    document.getElementById('view-' + name).style.display = 'block';
+
+    // Update tab styles
+    document.querySelectorAll('.view-tab').forEach(tab => {
+      tab.classList.remove('active');
+      if (tab.textContent.toLowerCase().replace(/ /g,'-') === name ||
+          (name === 'my-boards' && tab.textContent === 'My Boards') ||
+          (name === 'board' && tab.textContent === 'Board') ||
+          (name === 'loading' && tab.textContent === 'Loading') ||
+          (name === 'wizard' && tab.textContent === 'Wizard')) {
+        tab.classList.add('active');
+      }
+    });
+  }
+
+  // ── Wizard step navigation ──────────────────────────────────
+  function goWizardStep(n) {
+    [1,2,3].forEach(i => {
+      document.getElementById('wizard-step-' + i).style.display = i === n ? 'block' : 'none';
+    });
+  }
+
+  // ── Template toggle ─────────────────────────────────────────
+  function toggleTemplates() {
+    const el = document.getElementById('templates-grid');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+
+  // ── Mood card selection ─────────────────────────────────────
+  function selectMood(btn) {
+    document.querySelectorAll('.mood-card').forEach(c => {
+      c.classList.remove('selected');
+      c.style.boxShadow = '';
+      // Remove check icon if present
+      const chk = c.querySelector('.mood-check');
+      if (chk) chk.remove();
+    });
+    btn.classList.add('selected');
+    const accent = getComputedStyle(btn).getPropertyValue('--accent-color').trim() || '#3D6AF2';
+    const glow = getComputedStyle(btn).getPropertyValue('--accent-glow').trim() || 'rgba(61,106,242,0.3)';
+    btn.style.boxShadow = `0 0 0 2px ${accent}, 0 0 20px ${glow}`;
+    // Add check icon
+    const gradDiv = btn.querySelector('div[style*="aspect-ratio"]');
+    if (gradDiv) {
+      const chk = document.createElement('div');
+      chk.className = 'mood-check';
+      chk.style.cssText = 'position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;';
+      chk.innerHTML = '<span class="material-symbols-outlined filled" style="font-size:14px;color:#3D6AF2;">check</span>';
+      gradDiv.style.position = 'relative';
+      gradDiv.appendChild(chk);
+    }
+  }
+
+  // ── Download dropdown ───────────────────────────────────────
+  function toggleDownload() {
+    const menu = document.getElementById('download-menu');
+    const chevron = document.getElementById('download-chevron');
+    const isOpen = menu.style.display !== 'none';
+    menu.style.display = isOpen ? 'none' : 'block';
+    chevron.textContent = isOpen ? 'expand_more' : 'expand_less';
+  }
+  document.addEventListener('click', function(e) {
+    const menu = document.getElementById('download-menu');
+    if (menu && !e.target.closest('[onclick="toggleDownload()"]')) {
+      menu.style.display = 'none';
+      const chevron = document.getElementById('download-chevron');
+      if (chevron) chevron.textContent = 'expand_more';
+    }
+  });
+
+  // ── Side drawer ─────────────────────────────────────────────
+  let currentDrawerTab = null;
+
+  function toggleDrawer(section) {
+    const panel = document.getElementById('drawer-panel');
+    const strip = document.getElementById('drawer-strip');
+    if (currentDrawerTab === section && panel.style.display === 'flex') {
+      closeDrawer();
+    } else {
+      panel.style.display = 'flex';
+      strip.style.display = 'none';
+      setDrawerTab(section);
+    }
+  }
+
+  function closeDrawer() {
+    const panel = document.getElementById('drawer-panel');
+    const strip = document.getElementById('drawer-strip');
+    panel.style.display = 'none';
+    strip.style.display = 'flex';
+    currentDrawerTab = null;
+  }
+
+  function setDrawerTab(tab) {
+    currentDrawerTab = tab;
+    const labels = { ai:'AI ADD MORE', upload:'UPLOAD IMAGE', text:'ADD TEXT NOTE', swatch:'ADD COLOR', links:'CROSS-TOOLS' };
+    document.getElementById('drawer-section-label').textContent = labels[tab] || '';
+
+    // Content sections
+    ['ai','upload','text','swatch','links'].forEach(t => {
+      const el = document.getElementById('drawer-content-' + t);
+      if (el) el.style.display = t === tab ? 'block' : 'none';
+    });
+
+    // Tab active state
+    ['ai','upload','text','swatch','links'].forEach(t => {
+      const btn = document.getElementById('dtab-' + t);
+      if (!btn) return;
+      if (t === tab) {
+        btn.style.background = 'rgba(61,106,242,0.15)';
+        btn.style.color = '#3D9DF2';
+      } else {
+        btn.style.background = 'transparent';
+        btn.style.color = '#a6abb5';
+      }
+    });
+  }
+
+  // ── View tab clicks (match by content) ─────────────────────
+  document.querySelectorAll('.view-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // ── Init ────────────────────────────────────────────────────
+  showView('wizard');
+</script>
+</body>
+</html>

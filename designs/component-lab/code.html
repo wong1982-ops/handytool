@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Component Lab — Toolk1t Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; font-family: 'Inter', system-ui, sans-serif; background: #090f16; color: #fff; }
+
+    /* Material Symbols sizing */
+    .material-symbols-outlined { font-size: 18px; line-height: 1; vertical-align: middle; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20; }
+    .icon-sm { font-size: 16px; }
+    .icon-xs { font-size: 14px; }
+
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(90deg, #3D6AF2, #7C3AED);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Gradient button */
+    .btn-gradient {
+      background: linear-gradient(90deg, #3D6AF2, #7C3AED);
+    }
+    .btn-gradient:hover {
+      background: linear-gradient(90deg, #3D79F2, #8B4CF0);
+    }
+
+    /* Pill button */
+    .pill-btn {
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      outline: none;
+      min-height: 28px;
+      background: #131a23;
+      color: #70767f;
+    }
+    .pill-btn:hover { color: #a6abb5; background: #1a2333; }
+    .pill-btn.active { background: #3D6AF2; color: #fff; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #1e2631; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2a3444; }
+
+    /* Code syntax highlighting */
+    .code-keyword { color: #79c0ff; }
+    .code-fn { color: #d2a8ff; }
+    .code-tag { color: #7ee787; }
+    .code-str { color: #a5d6ff; }
+    .code-var { color: #ffa657; }
+    .code-cmt { color: #6e7681; font-style: italic; }
+    .code-op { color: #ff7b72; }
+    .code-punct { color: #70767f; }
+    .code-prop { color: #d2a8ff; }
+
+    /* Chat bubble */
+    .chat-user { background: rgba(61, 106, 242, 0.18); color: #93aaff; }
+    .chat-ai { background: #131a23; color: #a6abb5; }
+
+    /* Checker bg swatch */
+    .swatch-checker {
+      background-color: #e0e0e0;
+      background-image: linear-gradient(45deg,#aaa 25%,transparent 25%),linear-gradient(-45deg,#aaa 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#aaa 75%),linear-gradient(-45deg,transparent 75%,#aaa 75%);
+      background-size: 8px 8px;
+      background-position: 0 0,0 4px,4px -4px,-4px 0px;
+    }
+
+    /* Tab underline */
+    .tab-active { border-bottom: 2px solid #3D6AF2; color: #fff; }
+    .tab-inactive { color: #70767f; border-bottom: 2px solid transparent; }
+    .tab-inactive:hover { color: #a6abb5; }
+
+    /* Viewport pill active */
+    .vp-active { background: #1e2631; color: #fff; }
+    .vp-inactive { color: #6b7280; }
+    .vp-inactive:hover { color: #9ca3af; background: #161d27; }
+
+    /* Bg toggle active */
+    .bg-toggle-active { background: #1e2631; box-shadow: 0 0 0 1px #3d6af2; }
+    .bg-toggle-inactive:hover { background: #161d27; }
+
+    /* Textarea focus */
+    textarea:focus, input:focus {
+      outline: none;
+      border-color: #3D6AF2 !important;
+      box-shadow: 0 0 0 1px #3D6AF2;
+    }
+
+    /* Reference image remove btn */
+    .ref-remove {
+      position: absolute; top: 8px; right: 8px;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(0,0,0,0.6);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 12px;
+      transition: background 0.15s;
+    }
+    .ref-remove:hover { background: rgba(0,0,0,0.85); }
+
+    /* Version nav */
+    .ver-btn {
+      width: 28px; height: 28px; border-radius: 8px;
+      border: none; background: transparent; color: #70767f;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .ver-btn:hover { color: #fff; background: #1e2631; }
+    .ver-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* Send button */
+    .send-btn {
+      width: 40px; height: 40px; border-radius: 12px; border: none;
+      background: #3D6AF2; color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s; flex-shrink: 0;
+    }
+    .send-btn:hover { background: #3D79F2; }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Ghost nav button */
+    .ghost-nav {
+      padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 500;
+      color: #a6abb5; background: transparent; border: none; cursor: pointer;
+      transition: all 0.15s; min-height: 36px; display: flex; align-items: center;
+    }
+    .ghost-nav:hover { color: #fff; background: #1e2631; }
+
+    /* Reset / copy toolbar buttons */
+    .toolbar-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 6px; border: none;
+      background: transparent; color: #70767f; font-size: 12px;
+      cursor: pointer; transition: all 0.15s; min-height: 44px;
+    }
+    .toolbar-btn:hover { color: #a6abb5; background: #1a2333; }
+    .copy-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 6px; border: none;
+      background: #1a2333; color: #a6abb5; font-size: 12px;
+      cursor: pointer; transition: all 0.15s; min-height: 44px;
+    }
+    .copy-btn:hover { background: #1e2d3d; color: #e6edf3; }
+
+    /* Line numbers */
+    .line-num { color: #4b5563; user-select: none; min-width: 36px; text-align: right; padding-right: 16px; flex-shrink: 0; }
+
+    /* Chat log toggle */
+    .chat-toggle {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; background: transparent; border: none; cursor: pointer;
+      color: #70767f; font-size: 12px; transition: color 0.15s; min-height: 36px;
+    }
+    .chat-toggle:hover { color: #a6abb5; }
+
+    /* Breadcrumb */
+    .breadcrumb { font-size: 12px; color: #70767f; }
+    .breadcrumb span { color: #3D6AF2; }
+
+    /* Pricing preview iframe content */
+    .preview-area {
+      background: #fff;
+      border-radius: 8px;
+      padding: 24px;
+      height: 100%;
+      min-height: 380px;
+      overflow: auto;
+    }
+    .pricing-toggle {
+      display: flex; align-items: center; gap: 8px;
+      justify-content: center; margin-bottom: 24px;
+    }
+    .pricing-toggle .toggle-pill {
+      display: flex; background: #f3f4f6; border-radius: 9999px; padding: 4px;
+    }
+    .toggle-opt {
+      padding: 5px 16px; border-radius: 9999px; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s; color: #6b7280;
+    }
+    .toggle-opt.active { background: #fff; color: #111; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .pricing-card {
+      border-radius: 12px; padding: 20px; border: 1.5px solid #e5e7eb;
+      display: flex; flex-direction: column; gap: 12px; position: relative;
+    }
+    .pricing-card.pro {
+      border-color: #3D6AF2;
+      box-shadow: 0 0 0 3px rgba(61,106,242,0.15), 0 4px 24px rgba(61,106,242,0.18);
+    }
+    .pricing-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(90deg, #3D6AF2, #7C3AED);
+      color: #fff; font-size: 10px; font-weight: 600; padding: 3px 10px;
+      border-radius: 9999px; white-space: nowrap;
+    }
+    .tier-name { font-size: 14px; font-weight: 600; color: #111; }
+    .tier-price { font-size: 28px; font-weight: 700; color: #111; }
+    .tier-price span { font-size: 14px; font-weight: 400; color: #6b7280; }
+    .tier-desc { font-size: 12px; color: #6b7280; }
+    .tier-feature { font-size: 12px; color: #374151; display: flex; align-items: center; gap: 6px; }
+    .tier-feature::before { content: '✓'; color: #10B981; font-weight: 700; flex-shrink: 0; }
+    .tier-cta {
+      margin-top: auto; padding: 9px 0; border-radius: 8px; font-size: 13px;
+      font-weight: 600; text-align: center; cursor: pointer; border: none; width: 100%;
+    }
+    .tier-cta.outline { background: transparent; border: 1.5px solid #e5e7eb; color: #374151; }
+    .tier-cta.primary { background: linear-gradient(90deg, #3D6AF2, #7C3AED); color: #fff; }
+    .tier-cta.outline-dark { background: transparent; border: 1.5px solid #374151; color: #111; }
+  </style>
+</head>
+<body>
+  <!-- Root: full-height column -->
+  <div style="display:flex; flex-direction:column; height:100vh; overflow:hidden;">
+
+    <!-- ============================================================ -->
+    <!-- HEADER -->
+    <!-- ============================================================ -->
+    <header style="display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:56px; border-bottom:1px solid #1e2631; flex-shrink:0; background:#090f16;">
+      <!-- Left: breadcrumb + title -->
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="breadcrumb">
+          Tools&nbsp;/&nbsp;<span>Component Lab</span>
+        </div>
+        <div style="width:1px; height:16px; background:#1e2631;"></div>
+        <h1 style="font-size:16px; font-weight:700; letter-spacing:-0.02em; margin:0;">
+          Component <span class="gradient-text">Lab</span>
+        </h1>
+      </div>
+
+      <!-- Right: nav buttons -->
+      <div style="display:flex; align-items:center; gap:6px;">
+        <button class="ghost-nav">Library</button>
+        <button class="ghost-nav">Explore</button>
+        <button class="btn-gradient" style="display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:8px; border:none; color:#fff; font-size:12px; font-weight:600; cursor:pointer; min-height:36px;">
+          <span class="material-symbols-outlined icon-xs">bookmark</span>
+          Save
+          <span style="font-size:10px; opacity:0.65; font-weight:400;">1cr</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- BODY ROW: Sidebar + Center + Code Editor -->
+    <!-- ============================================================ -->
+    <div style="display:flex; flex:1; min-height:0;">
+
+      <!-- ======================================================== -->
+      <!-- LEFT SIDEBAR: Prompt Panel (288px) -->
+      <!-- ======================================================== -->
+      <aside style="width:288px; flex-shrink:0; border-right:1px solid #1e2631; overflow-y:auto; background:#090f16; display:flex; flex-direction:column;">
+        <div style="padding:16px; display:flex; flex-direction:column; gap:20px;">
+
+          <!-- 1. Component Description -->
+          <section>
+            <label style="display:block; font-size:13px; font-weight:500; color:#a6abb5; margin-bottom:8px;">Component Description</label>
+            <textarea
+              rows="5"
+              style="width:100%; background:#131a23; border:1px solid #1e2631; border-radius:12px; color:#fff; font-size:13px; padding:12px 14px; resize:none; font-family:inherit; line-height:1.5; transition:border-color 0.15s;"
+              placeholder="A pricing table with 3 tiers, toggle for monthly/annual..."
+            >A pricing table with 3 tiers (Basic, Pro, Enterprise). Include a monthly/annual toggle at the top. Pro tier should be highlighted with a gradient border and glow. Each card shows price, a short description, 4 feature bullets, and a CTA button. Use Tailwind CSS.</textarea>
+            <p style="font-size:10px; color:#4a5060; margin:4px 0 0; text-align:right;">247/1000</p>
+          </section>
+
+          <!-- 2. Reference Image -->
+          <section>
+            <label style="display:block; font-size:13px; font-weight:500; color:#a6abb5; margin-bottom:8px;">Reference Image</label>
+            <div style="position:relative; border-radius:12px; overflow:hidden; border:1px solid #1e2631; background:#131a23;">
+              <!-- Simulated uploaded image using a gradient placeholder -->
+              <div style="width:100%; height:112px; background:linear-gradient(135deg, #1a2333 0%, #1e2d3d 50%, #131a23 100%); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; color:#4a5060;">
+                <span class="material-symbols-outlined" style="font-size:28px; color:#2a3444;">image</span>
+                <span style="font-size:11px; color:#2a3444;">pricing-reference.png</span>
+              </div>
+              <button class="ref-remove" title="Remove reference image">
+                <span class="material-symbols-outlined" style="font-size:12px;">close</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- 3. Settings -->
+          <section style="display:flex; flex-direction:column; gap:14px;">
+            <p style="font-size:13px; font-weight:500; color:#a6abb5; margin:0;">Settings</p>
+
+            <!-- Theme -->
+            <div>
+              <p style="font-size:11px; color:#70767f; margin:0 0 6px;">Theme</p>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <button class="pill-btn">Light</button>
+                <button class="pill-btn active">Dark</button>
+                <button class="pill-btn">Both</button>
+              </div>
+            </div>
+
+            <!-- Responsive -->
+            <div>
+              <p style="font-size:11px; color:#70767f; margin:0 0 6px;">Responsive</p>
+              <div style="display:flex; gap:6px;">
+                <button class="pill-btn active">Yes</button>
+                <button class="pill-btn">No</button>
+              </div>
+            </div>
+
+            <!-- Animations -->
+            <div>
+              <p style="font-size:11px; color:#70767f; margin:0 0 6px;">Animations</p>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <button class="pill-btn">None</button>
+                <button class="pill-btn active">Subtle</button>
+                <button class="pill-btn">Rich</button>
+              </div>
+            </div>
+
+            <!-- Accessibility -->
+            <div>
+              <p style="font-size:11px; color:#70767f; margin:0 0 6px;">Accessibility</p>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <button class="pill-btn active">Standard</button>
+                <button class="pill-btn">WCAG AA</button>
+              </div>
+            </div>
+
+            <!-- CSS Framework -->
+            <div>
+              <p style="font-size:11px; color:#70767f; margin:0 0 6px;">CSS Framework</p>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <button class="pill-btn active">Tailwind</button>
+                <button class="pill-btn">Vanilla</button>
+                <button class="pill-btn">None</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. Generate Button -->
+          <button class="btn-gradient" style="width:100%; min-height:44px; border-radius:12px; border:none; color:#fff; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:18px; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;">auto_awesome</span>
+            Generate Component
+          </button>
+
+        </div>
+      </aside>
+
+      <!-- ======================================================== -->
+      <!-- CENTER: Live Preview -->
+      <!-- ======================================================== -->
+      <div style="flex:1; display:flex; flex-direction:column; min-width:0; background:#0d1117;">
+
+        <!-- Preview toolbar -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 12px; border-bottom:1px solid #1e2631; flex-shrink:0;">
+          <!-- Viewport presets -->
+          <div style="display:flex; align-items:center; gap:4px;">
+            <button style="display:flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px; border:none; font-size:11px; font-weight:500; cursor:pointer; min-height:32px;" class="vp-inactive">
+              <span class="material-symbols-outlined icon-xs" style="color:inherit;">smartphone</span>
+              <span>Mobile</span>
+              <span style="font-size:10px; color:#4b5563;">375</span>
+            </button>
+            <button style="display:flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px; border:none; font-size:11px; font-weight:500; cursor:pointer; min-height:32px;" class="vp-inactive">
+              <span class="material-symbols-outlined icon-xs" style="color:inherit;">tablet</span>
+              <span>Tablet</span>
+              <span style="font-size:10px; color:#4b5563;">768</span>
+            </button>
+            <button style="display:flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px; border:none; font-size:11px; font-weight:500; cursor:pointer; min-height:32px;" class="vp-active">
+              <span class="material-symbols-outlined icon-xs" style="color:inherit;">desktop_windows</span>
+              <span>Desktop</span>
+              <span style="font-size:10px; color:#6b7280;">1280</span>
+            </button>
+            <span style="margin-left:8px; font-size:11px; color:#4b5563; font-variant-numeric:tabular-nums;">1280px</span>
+          </div>
+
+          <!-- Background toggles -->
+          <div style="display:flex; align-items:center; gap:4px;" role="group" aria-label="Preview background">
+            <button style="width:32px; height:32px; border-radius:6px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;" class="bg-toggle-active" aria-label="White background" aria-pressed="true">
+              <span style="display:block; width:16px; height:16px; border-radius:3px; background:#fff; border:1px solid #2a3444;"></span>
+            </button>
+            <button style="width:32px; height:32px; border-radius:6px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; background:transparent;" class="bg-toggle-inactive" aria-label="Dark background" aria-pressed="false">
+              <span style="display:block; width:16px; height:16px; border-radius:3px; background:#0d1117; border:1px solid #2a3444;"></span>
+            </button>
+            <button style="width:32px; height:32px; border-radius:6px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; background:transparent;" class="bg-toggle-inactive" aria-label="Checker background" aria-pressed="false">
+              <span class="swatch-checker" style="display:block; width:16px; height:16px; border-radius:3px; border:1px solid #2a3444;"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Preview content area -->
+        <div style="flex:1; overflow:auto; display:flex; align-items:flex-start; justify-content:center; padding:16px;">
+          <div style="width:100%; max-width:1280px; min-height:200px;">
+            <!-- Simulated rendered component -->
+            <div class="preview-area">
+              <!-- Pricing table mock -->
+              <div style="text-align:center; margin-bottom:16px;">
+                <h2 style="font-size:22px; font-weight:700; color:#111; margin:0 0 4px;">Simple, Transparent Pricing</h2>
+                <p style="font-size:13px; color:#6b7280; margin:0 0 16px;">No hidden fees. Cancel anytime.</p>
+                <!-- Toggle -->
+                <div class="pricing-toggle">
+                  <div class="toggle-pill">
+                    <div class="toggle-opt active">Monthly</div>
+                    <div class="toggle-opt">Annual <span style="font-size:11px; background:#dcfce7; color:#15803d; border-radius:9999px; padding:1px 7px; font-weight:600;">-20%</span></div>
+                  </div>
+                </div>
+              </div>
+              <!-- Cards -->
+              <div class="pricing-grid">
+                <!-- Basic -->
+                <div class="pricing-card">
+                  <div class="tier-name">Basic</div>
+                  <div class="tier-price">$9<span>/mo</span></div>
+                  <div class="tier-desc">Perfect for individuals and small projects.</div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+                    <div class="tier-feature">5 projects</div>
+                    <div class="tier-feature">10 GB storage</div>
+                    <div class="tier-feature">Email support</div>
+                    <div class="tier-feature">API access</div>
+                  </div>
+                  <button class="tier-cta outline">Get Started</button>
+                </div>
+                <!-- Pro -->
+                <div class="pricing-card pro" style="margin-top:8px;">
+                  <div class="pricing-badge">Most Popular</div>
+                  <div class="tier-name" style="color:#3D6AF2;">Pro</div>
+                  <div class="tier-price">$29<span>/mo</span></div>
+                  <div class="tier-desc">For growing teams that need more power.</div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+                    <div class="tier-feature">Unlimited projects</div>
+                    <div class="tier-feature">100 GB storage</div>
+                    <div class="tier-feature">Priority support</div>
+                    <div class="tier-feature">Advanced analytics</div>
+                  </div>
+                  <button class="tier-cta primary">Get Started</button>
+                </div>
+                <!-- Enterprise -->
+                <div class="pricing-card">
+                  <div class="tier-name">Enterprise</div>
+                  <div class="tier-price">$99<span>/mo</span></div>
+                  <div class="tier-desc">For large teams with custom requirements.</div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+                    <div class="tier-feature">Unlimited everything</div>
+                    <div class="tier-feature">1 TB storage</div>
+                    <div class="tier-feature">Dedicated support</div>
+                    <div class="tier-feature">SSO &amp; SAML</div>
+                  </div>
+                  <button class="tier-cta outline-dark">Contact Sales</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- RIGHT: Code Editor (480px) -->
+      <!-- ======================================================== -->
+      <div style="width:480px; flex-shrink:0; border-left:1px solid #1e2631; display:flex; flex-direction:column; background:#131a23; overflow:hidden;">
+
+        <!-- Framework tabs + actions -->
+        <div style="display:flex; align-items:center; gap:6px; padding:8px 12px; border-bottom:1px solid #1e2631; flex-shrink:0;">
+          <button class="pill-btn active" style="min-height:32px;">React</button>
+          <button class="pill-btn" style="min-height:32px;">Vue</button>
+          <button class="pill-btn" style="min-height:32px;">Svelte</button>
+          <button class="pill-btn" style="min-height:32px;">HTML</button>
+          <div style="flex:1;"></div>
+          <button class="toolbar-btn" title="Reset to AI-generated code" aria-label="Reset">
+            <span class="material-symbols-outlined icon-xs">restart_alt</span>
+            Reset
+          </button>
+          <button class="copy-btn" aria-label="Copy code">
+            <span class="material-symbols-outlined icon-xs">content_copy</span>
+            Copy
+          </button>
+        </div>
+
+        <!-- Code area -->
+        <div style="flex:1; overflow:auto; background:#131a23;">
+          <div style="padding:12px 0; font-family:'ui-monospace','SFMono-Regular','Menlo','Monaco','Consolas',monospace; font-size:12.5px; line-height:1.6; color:#e6edf3; min-height:100%;">
+
+            <!-- Line 1 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">1</span>
+              <span><span class="code-cmt">// PricingTable.jsx — Generated by Component Lab</span></span>
+            </div>
+            <!-- Line 2 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">2</span>
+              <span></span>
+            </div>
+            <!-- Line 3 -->
+            <div style="display:flex; padding:0 16px; background:#1a2333;">
+              <span class="line-num" style="color:#70767f;">3</span>
+              <span><span class="code-keyword">import</span> <span class="code-punct">{</span> <span class="code-var">useState</span> <span class="code-punct">}</span> <span class="code-keyword">from</span> <span class="code-str">'react'</span></span>
+            </div>
+            <!-- Line 4 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">4</span>
+              <span></span>
+            </div>
+            <!-- Line 5 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">5</span>
+              <span><span class="code-keyword">const</span> <span class="code-var">plans</span> <span class="code-op">=</span> <span class="code-punct">[</span></span>
+            </div>
+            <!-- Line 6 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">6</span>
+              <span>&nbsp;&nbsp;<span class="code-punct">{</span></span>
+            </div>
+            <!-- Line 7 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">7</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">name</span><span class="code-punct">:</span> <span class="code-str">'Basic'</span><span class="code-punct">,</span> <span class="code-prop">price</span><span class="code-punct">:</span> <span class="code-var">9</span><span class="code-punct">,</span></span>
+            </div>
+            <!-- Line 8 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">8</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">desc</span><span class="code-punct">:</span> <span class="code-str">'Perfect for individuals'</span><span class="code-punct">,</span></span>
+            </div>
+            <!-- Line 9 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">9</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">features</span><span class="code-punct">:</span> <span class="code-punct">[</span><span class="code-str">'5 projects'</span><span class="code-punct">,</span> <span class="code-str">'10 GB'</span><span class="code-punct">,</span> <span class="code-str">'Email support'</span><span class="code-punct">,</span> <span class="code-str">'API access'</span><span class="code-punct">],</span></span>
+            </div>
+            <!-- Line 10 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">10</span>
+              <span>&nbsp;&nbsp;<span class="code-punct">},</span></span>
+            </div>
+            <!-- Line 11 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">11</span>
+              <span>&nbsp;&nbsp;<span class="code-punct">{</span> <span class="code-prop">name</span><span class="code-punct">:</span> <span class="code-str">'Pro'</span><span class="code-punct">,</span> <span class="code-prop">price</span><span class="code-punct">:</span> <span class="code-var">29</span><span class="code-punct">,</span> <span class="code-prop">popular</span><span class="code-punct">:</span> <span class="code-keyword">true</span><span class="code-punct">,</span></span>
+            </div>
+            <!-- Line 12 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">12</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">desc</span><span class="code-punct">:</span> <span class="code-str">'For growing teams'</span><span class="code-punct">,</span></span>
+            </div>
+            <!-- Line 13 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">13</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">features</span><span class="code-punct">:</span> <span class="code-punct">[</span><span class="code-str">'Unlimited projects'</span><span class="code-punct">,</span> <span class="code-str">'100 GB'</span><span class="code-punct">,</span> <span class="code-str">'Priority support'</span><span class="code-punct">,</span> <span class="code-str">'Analytics'</span><span class="code-punct">]</span> <span class="code-punct">},</span></span>
+            </div>
+            <!-- Line 14 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">14</span>
+              <span>&nbsp;&nbsp;<span class="code-punct">{</span> <span class="code-prop">name</span><span class="code-punct">:</span> <span class="code-str">'Enterprise'</span><span class="code-punct">,</span> <span class="code-prop">price</span><span class="code-punct">:</span> <span class="code-var">99</span><span class="code-punct">,</span></span>
+            </div>
+            <!-- Line 15 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">15</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">desc</span><span class="code-punct">:</span> <span class="code-str">'For large organizations'</span><span class="code-punct">,</span></span>
+            </div>
+            <!-- Line 16 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">16</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">features</span><span class="code-punct">:</span> <span class="code-punct">[</span><span class="code-str">'Unlimited'</span><span class="code-punct">,</span> <span class="code-str">'1 TB'</span><span class="code-punct">,</span> <span class="code-str">'Dedicated support'</span><span class="code-punct">,</span> <span class="code-str">'SSO'</span><span class="code-punct">]</span> <span class="code-punct">},</span></span>
+            </div>
+            <!-- Line 17 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">17</span>
+              <span><span class="code-punct">]</span></span>
+            </div>
+            <!-- Line 18 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">18</span>
+              <span></span>
+            </div>
+            <!-- Line 19 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">19</span>
+              <span><span class="code-keyword">export default function</span> <span class="code-fn">PricingTable</span><span class="code-punct">() {</span></span>
+            </div>
+            <!-- Line 20 -->
+            <div style="display:flex; padding:0 16px; background:#1a2333;">
+              <span class="line-num" style="color:#70767f;">20</span>
+              <span>&nbsp;&nbsp;<span class="code-keyword">const</span> <span class="code-punct">[</span><span class="code-var">annual</span><span class="code-punct">,</span> <span class="code-var">setAnnual</span><span class="code-punct">]</span> <span class="code-op">=</span> <span class="code-fn">useState</span><span class="code-punct">(</span><span class="code-keyword">false</span><span class="code-punct">)</span></span>
+            </div>
+            <!-- Line 21 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">21</span>
+              <span></span>
+            </div>
+            <!-- Line 22 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">22</span>
+              <span>&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-punct">(</span></span>
+            </div>
+            <!-- Line 23 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">23</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;div</span> <span class="code-prop">className</span><span class="code-op">=</span><span class="code-str">"max-w-5xl mx-auto py-12 px-4"</span><span class="code-tag">&gt;</span></span>
+            </div>
+            <!-- Line 24 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">24</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;h2</span> <span class="code-prop">className</span><span class="code-op">=</span><span class="code-str">"text-3xl font-bold text-center mb-4"</span><span class="code-tag">&gt;</span></span>
+            </div>
+            <!-- Line 25 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">25</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-str">Simple, Transparent Pricing</span></span>
+            </div>
+            <!-- Line 26 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">26</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;/h2&gt;</span></span>
+            </div>
+            <!-- Line 27 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">27</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-cmt">{/* Annual/Monthly toggle */}</span></span>
+            </div>
+            <!-- Line 28 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">28</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;div</span> <span class="code-prop">className</span><span class="code-op">=</span><span class="code-str">"flex justify-center mb-8"</span><span class="code-tag">&gt;</span></span>
+            </div>
+            <!-- Line 29 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">29</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;button</span> <span class="code-prop">onClick</span><span class="code-op">=</span><span class="code-punct">{()</span> <span class="code-op">=&gt;</span> <span class="code-fn">setAnnual</span><span class="code-punct">(</span><span class="code-op">!</span><span class="code-var">annual</span><span class="code-punct">)}</span></span>
+            </div>
+            <!-- Line 30 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">30</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">className</span><span class="code-op">=</span><span class="code-str">"bg-gray-100 rounded-full p-1 flex"</span><span class="code-tag">&gt;</span></span>
+            </div>
+            <!-- Line 31 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">31</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;span</span> <span class="code-prop">className</span><span class="code-op">=</span><span class="code-str">{`px-4 py-1 rounded-full text-sm font-medium transition-all</span></span>
+            </div>
+            <!-- Line 32 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">32</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-str">$&#123;!annual ? 'bg-white shadow' : 'text-gray-500'&#125;`}</span><span class="code-tag">&gt;</span>Monthly<span class="code-tag">&lt;/span&gt;</span></span>
+            </div>
+            <!-- Line 33 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">33</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;span</span> <span class="code-prop">className</span><span class="code-op">=</span><span class="code-str">{`px-4 py-1 rounded-full text-sm font-medium transition-all</span></span>
+            </div>
+            <!-- Line 34 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">34</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-str">$&#123;annual ? 'bg-white shadow' : 'text-gray-500'&#125;`}</span><span class="code-tag">&gt;</span>Annual <span class="code-tag">&lt;span&gt;</span>-20%<span class="code-tag">&lt;/span&gt;&lt;/span&gt;</span></span>
+            </div>
+            <!-- Line 35 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">35</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;/button&gt;</span></span>
+            </div>
+            <!-- Line 36 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">36</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;/div&gt;</span></span>
+            </div>
+            <!-- Line 37 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">37</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-cmt">{/* Cards grid */}</span></span>
+            </div>
+            <!-- Line 38 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">38</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;div</span> <span class="code-prop">className</span><span class="code-op">=</span><span class="code-str">"grid grid-cols-3 gap-6"</span><span class="code-tag">&gt;</span></span>
+            </div>
+            <!-- Line 39 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">39</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-punct">{</span><span class="code-var">plans</span><span class="code-punct">.</span><span class="code-fn">map</span><span class="code-punct">((</span><span class="code-var">plan</span><span class="code-punct">)</span> <span class="code-op">=&gt;</span> <span class="code-punct">(</span></span>
+            </div>
+            <!-- Line 40 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">40</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;div</span> <span class="code-prop">key</span><span class="code-op">=</span><span class="code-punct">{</span><span class="code-var">plan</span><span class="code-punct">.</span><span class="code-prop">name</span><span class="code-punct">}</span></span>
+            </div>
+            <!-- Line 41 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">41</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-prop">className</span><span class="code-op">=</span><span class="code-punct">{</span><span class="code-str">`rounded-2xl p-6 border-2 flex flex-col gap-4</span></span>
+            </div>
+            <!-- Line 42 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">42</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-str">$&#123;plan.popular</span></span>
+            </div>
+            <!-- Line 43 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">43</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-str">? 'border-blue-500 ring-4 ring-blue-500/20 shadow-blue-500/20 shadow-xl'</span></span>
+            </div>
+            <!-- Line 44 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">44</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-str">: 'border-gray-200'&#125;`}</span><span class="code-tag">&gt;</span></span>
+            </div>
+            <!-- Line 45 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">45</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-cmt">{/* ... plan content ... */}</span></span>
+            </div>
+            <!-- Line 46 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">46</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;/div&gt;</span></span>
+            </div>
+            <!-- Line 47 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">47</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-punct">))}</span></span>
+            </div>
+            <!-- Line 48 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">48</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;/div&gt;</span></span>
+            </div>
+            <!-- Line 49 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">49</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;/div&gt;</span></span>
+            </div>
+            <!-- Line 50 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">50</span>
+              <span>&nbsp;&nbsp;<span class="code-punct">)</span></span>
+            </div>
+            <!-- Line 51 -->
+            <div style="display:flex; padding:0 16px;">
+              <span class="line-num">51</span>
+              <span><span class="code-punct">}</span></span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- BOTTOM: Chat Bar -->
+    <!-- ============================================================ -->
+    <div style="border-top:1px solid #1e2631; background:#090f16; flex-shrink:0;">
+
+      <!-- Collapsible chat log -->
+      <div>
+        <button class="chat-toggle" aria-expanded="true" aria-controls="chat-log">
+          <span style="display:flex; align-items:center; gap:6px;">
+            <span class="material-symbols-outlined icon-xs">chat_bubble</span>
+            Chat history (2)
+          </span>
+          <span class="material-symbols-outlined icon-xs" style="transform:rotate(180deg);">expand_more</span>
+        </button>
+
+        <!-- Chat messages -->
+        <div id="chat-log" style="max-height:128px; overflow-y:auto; padding:0 16px 8px; display:flex; flex-direction:column; gap:8px;">
+          <!-- User message -->
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+            <div class="chat-user" style="max-width:80%; border-radius:12px; padding:8px 12px; font-size:12px; line-height:1.5;">
+              Make the Pro tier card glow blue and add a gradient border
+            </div>
+            <span style="font-size:10px; color:#4a5060;">09:41</span>
+          </div>
+          <!-- AI message -->
+          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;">
+            <div class="chat-ai" style="max-width:80%; border-radius:12px; padding:8px 12px; font-size:12px; line-height:1.5;">
+              Added a blue glow ring using <code style="font-family:monospace; background:#1a2333; padding:1px 4px; border-radius:3px; font-size:11px;">ring-4 ring-blue-500/20</code> and a gradient border via <code style="font-family:monospace; background:#1a2333; padding:1px 4px; border-radius:3px; font-size:11px;">border-blue-500 shadow-xl shadow-blue-500/20</code> to the Pro card.
+            </div>
+            <span style="font-size:10px; color:#4a5060;">09:41</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input row -->
+      <div style="display:flex; align-items:center; gap:8px; padding:10px 16px 12px;">
+        <!-- Version nav -->
+        <div style="display:flex; align-items:center; gap:2px; flex-shrink:0;">
+          <button class="ver-btn" aria-label="Previous version">
+            <span class="material-symbols-outlined icon-xs">chevron_left</span>
+          </button>
+          <span style="font-size:10px; color:#70767f; font-weight:500; width:28px; text-align:center; user-select:none;">v2</span>
+          <button class="ver-btn" disabled aria-label="Next version">
+            <span class="material-symbols-outlined icon-xs">chevron_right</span>
+          </button>
+        </div>
+
+        <!-- Text input -->
+        <input
+          type="text"
+          placeholder="Describe changes... (e.g. make the button larger, add a shadow)"
+          style="flex:1; min-height:44px; border-radius:12px; background:#131a23; border:1px solid #1e2631; color:#fff; font-size:13px; padding:10px 16px; font-family:inherit; transition:border-color 0.15s, box-shadow 0.15s;"
+          value=""
+        />
+
+        <!-- Send button -->
+        <button class="send-btn" aria-label="Send refinement instruction">
+          <span class="material-symbols-outlined icon-xs">send</span>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- end root -->
+
+  <!-- ============================================================ -->
+  <!-- EMPTY STATE SCREEN (shown below as a second screen for reference) -->
+  <!-- ============================================================ -->
+  <div style="margin-top:48px; border-top:2px dashed #1e2631; padding-top:8px;">
+    <div style="padding:8px 16px; font-size:11px; color:#70767f; font-family:monospace;">
+      — Empty State (first-load) —
+    </div>
+
+    <div style="display:flex; flex-direction:column; height:600px; overflow:hidden; border-top:1px solid #1e2631;">
+      <!-- Header (same) -->
+      <header style="display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:56px; border-bottom:1px solid #1e2631; flex-shrink:0; background:#090f16;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="breadcrumb">Tools&nbsp;/&nbsp;<span>Component Lab</span></div>
+          <div style="width:1px; height:16px; background:#1e2631;"></div>
+          <h1 style="font-size:16px; font-weight:700; letter-spacing:-0.02em; margin:0;">
+            Component <span class="gradient-text">Lab</span>
+          </h1>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <button class="ghost-nav">Library</button>
+          <button class="ghost-nav">Explore</button>
+          <button class="btn-gradient" style="display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:8px; border:none; color:#fff; font-size:12px; font-weight:600; cursor:pointer; min-height:36px; opacity:0.4;" disabled>
+            <span class="material-symbols-outlined icon-xs">bookmark</span>
+            Save
+            <span style="font-size:10px; opacity:0.65; font-weight:400;">1cr</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Body row -->
+      <div style="display:flex; flex:1; min-height:0;">
+        <!-- Sidebar -->
+        <aside style="width:288px; flex-shrink:0; border-right:1px solid #1e2631; overflow-y:auto; background:#090f16;">
+          <div style="padding:16px; display:flex; flex-direction:column; gap:20px;">
+            <!-- Description (empty) -->
+            <section>
+              <label style="display:block; font-size:13px; font-weight:500; color:#a6abb5; margin-bottom:8px;">Component Description</label>
+              <textarea rows="5" style="width:100%; background:#131a23; border:1px solid #1e2631; border-radius:12px; color:#fff; font-size:13px; padding:12px 14px; resize:none; font-family:inherit; line-height:1.5; transition:border-color 0.15s;" placeholder="A pricing table with 3 tiers, toggle for monthly/annual..."></textarea>
+              <p style="font-size:10px; color:#4a5060; margin:4px 0 0; text-align:right;">0/1000</p>
+            </section>
+            <!-- Reference Image dropzone -->
+            <section>
+              <label style="display:block; font-size:13px; font-weight:500; color:#a6abb5; margin-bottom:8px;">Reference Image</label>
+              <div style="border:2px dashed #1e2631; border-radius:12px; padding:24px 16px; background:#131a23; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; transition:border-color 0.15s;">
+                <span class="material-symbols-outlined" style="font-size:24px; color:#70767f;">image</span>
+                <p style="font-size:11px; color:#70767f; text-align:center; margin:0;">
+                  Drop image or click to upload<br/>
+                  <span style="font-size:10px; color:#4a5060;">PNG, JPG, GIF · max 10MB</span>
+                </p>
+              </div>
+            </section>
+            <!-- Settings (defaults) -->
+            <section style="display:flex; flex-direction:column; gap:14px;">
+              <p style="font-size:13px; font-weight:500; color:#a6abb5; margin:0;">Settings</p>
+              <div><p style="font-size:11px; color:#70767f; margin:0 0 6px;">Theme</p><div style="display:flex; flex-wrap:wrap; gap:6px;"><button class="pill-btn active">Light</button><button class="pill-btn">Dark</button><button class="pill-btn">Both</button></div></div>
+              <div><p style="font-size:11px; color:#70767f; margin:0 0 6px;">Responsive</p><div style="display:flex; gap:6px;"><button class="pill-btn active">Yes</button><button class="pill-btn">No</button></div></div>
+              <div><p style="font-size:11px; color:#70767f; margin:0 0 6px;">Animations</p><div style="display:flex; flex-wrap:wrap; gap:6px;"><button class="pill-btn">None</button><button class="pill-btn active">Subtle</button><button class="pill-btn">Rich</button></div></div>
+              <div><p style="font-size:11px; color:#70767f; margin:0 0 6px;">Accessibility</p><div style="display:flex; flex-wrap:wrap; gap:6px;"><button class="pill-btn active">Standard</button><button class="pill-btn">WCAG AA</button></div></div>
+              <div><p style="font-size:11px; color:#70767f; margin:0 0 6px;">CSS Framework</p><div style="display:flex; flex-wrap:wrap; gap:6px;"><button class="pill-btn active">Tailwind</button><button class="pill-btn">Vanilla</button><button class="pill-btn">None</button></div></div>
+            </section>
+            <!-- Generate (disabled) -->
+            <button class="btn-gradient" style="width:100%; min-height:44px; border-radius:12px; border:none; color:#fff; font-size:14px; font-weight:600; cursor:not-allowed; display:flex; align-items:center; justify-content:center; gap:8px; opacity:0.4;" disabled>
+              <span class="material-symbols-outlined" style="font-size:18px;">auto_awesome</span>
+              Generate Component
+            </button>
+          </div>
+        </aside>
+
+        <!-- Center: empty state -->
+        <div style="flex:1; display:flex; flex-direction:column; min-width:0; background:#0d1117;">
+          <!-- Toolbar -->
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 12px; border-bottom:1px solid #1e2631; flex-shrink:0;">
+            <div style="display:flex; align-items:center; gap:4px;">
+              <button style="display:flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px; border:none; font-size:11px; font-weight:500; cursor:pointer; min-height:32px;" class="vp-inactive"><span class="material-symbols-outlined icon-xs">smartphone</span>Mobile <span style="font-size:10px;color:#4b5563;">375</span></button>
+              <button style="display:flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px; border:none; font-size:11px; font-weight:500; cursor:pointer; min-height:32px;" class="vp-inactive"><span class="material-symbols-outlined icon-xs">tablet</span>Tablet <span style="font-size:10px;color:#4b5563;">768</span></button>
+              <button style="display:flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px; border:none; font-size:11px; font-weight:500; cursor:pointer; min-height:32px;" class="vp-active"><span class="material-symbols-outlined icon-xs">desktop_windows</span>Desktop <span style="font-size:10px;color:#6b7280;">1280</span></button>
+            </div>
+            <div style="display:flex; align-items:center; gap:4px;">
+              <button style="width:32px; height:32px; border-radius:6px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;" class="bg-toggle-active"><span style="display:block; width:16px; height:16px; border-radius:3px; background:#fff; border:1px solid #2a3444;"></span></button>
+              <button style="width:32px; height:32px; border-radius:6px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; background:transparent;" class="bg-toggle-inactive"><span style="display:block; width:16px; height:16px; border-radius:3px; background:#0d1117; border:1px solid #2a3444;"></span></button>
+              <button style="width:32px; height:32px; border-radius:6px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; background:transparent;" class="bg-toggle-inactive"><span class="swatch-checker" style="display:block; width:16px; height:16px; border-radius:3px; border:1px solid #2a3444;"></span></button>
+            </div>
+          </div>
+          <!-- Empty state illustration -->
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; color:#4b5563;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5"/>
+            </svg>
+            <span style="font-size:14px; font-weight:500; color:#6b7280;">Preview will appear here</span>
+            <span style="font-size:12px; color:#374151;">Generate or write a component to see it rendered</span>
+          </div>
+        </div>
+
+        <!-- Right: code editor (empty) -->
+        <div style="width:480px; flex-shrink:0; border-left:1px solid #1e2631; display:flex; flex-direction:column; background:#131a23; overflow:hidden;">
+          <!-- Framework tabs -->
+          <div style="display:flex; align-items:center; gap:6px; padding:8px 12px; border-bottom:1px solid #1e2631; flex-shrink:0;">
+            <button class="pill-btn active" style="min-height:32px;">React</button>
+            <button class="pill-btn" style="min-height:32px;">Vue</button>
+            <button class="pill-btn" style="min-height:32px;">Svelte</button>
+            <button class="pill-btn" style="min-height:32px;">HTML</button>
+            <div style="flex:1;"></div>
+            <button class="toolbar-btn">
+              <span class="material-symbols-outlined icon-xs">restart_alt</span>
+              Reset
+            </button>
+            <button class="copy-btn">
+              <span class="material-symbols-outlined icon-xs">content_copy</span>
+              Copy
+            </button>
+          </div>
+          <!-- Empty code area -->
+          <div style="flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <div style="font-family:'ui-monospace','SFMono-Regular','Menlo','Monaco','Consolas',monospace; font-size:13px; color:#4b5563;">
+              <span style="color:#6e7681; font-style:italic;">// No code generated yet</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat bar (empty) -->
+      <div style="border-top:1px solid #1e2631; background:#090f16; flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:8px; padding:10px 16px 12px;">
+          <div style="display:flex; align-items:center; gap:2px; flex-shrink:0;">
+            <button class="ver-btn" disabled><span class="material-symbols-outlined icon-xs">chevron_left</span></button>
+            <span style="font-size:10px; color:#70767f; font-weight:500; width:28px; text-align:center; user-select:none;">—</span>
+            <button class="ver-btn" disabled><span class="material-symbols-outlined icon-xs">chevron_right</span></button>
+          </div>
+          <input type="text" placeholder="Describe changes... (e.g. make the button larger, add a shadow)" style="flex:1; min-height:44px; border-radius:12px; background:#131a23; border:1px solid #1e2631; color:#fff; font-size:13px; padding:10px 16px; font-family:inherit;" disabled />
+          <button class="send-btn" disabled><span class="material-symbols-outlined icon-xs">send</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

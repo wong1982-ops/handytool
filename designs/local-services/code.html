@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Local Services — Toolk1t Dark Theme</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'page':     '#090f16',
+            'card':     '#131a23',
+            'surface':  '#0d1420',
+            'border':   '#1e2631',
+            'primary':  '#3D6AF2',
+            'success':  '#10B981',
+            'danger':   '#ef4444',
+            'text-1':   '#ffffff',
+            'text-2':   '#a6abb5',
+            'text-3':   '#70767f',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #090f16; color: #ffffff; }
+    .ms { font-family: 'Material Symbols Rounded'; font-size: 20px; line-height: 1; user-select: none; }
+    .ms-sm { font-family: 'Material Symbols Rounded'; font-size: 16px; line-height: 1; }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #1e2631; border-radius: 2px; }
+
+    /* Chip scroll hide scrollbar */
+    .chips-scroll { scrollbar-width: none; }
+    .chips-scroll::-webkit-scrollbar { display: none; }
+
+    /* Map tile placeholder */
+    .map-bg {
+      background-color: #0a1520;
+      background-image:
+        linear-gradient(rgba(30,38,49,0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30,38,49,0.4) 1px, transparent 1px),
+        radial-gradient(ellipse at 60% 40%, rgba(61,106,242,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 30% 70%, rgba(16,185,129,0.04) 0%, transparent 50%);
+      background-size: 40px 40px, 40px 40px, 100% 100%, 100% 100%;
+    }
+
+    /* Road-like lines on the map */
+    .map-road {
+      position: absolute;
+      background: rgba(255,255,255,0.04);
+      border-radius: 2px;
+    }
+
+    /* Screen selector tabs */
+    .screen-tab { cursor: pointer; transition: all 0.15s; }
+    .screen-tab:hover { opacity: 0.8; }
+    .screen-tab.active { background: #3D6AF2; color: #fff; }
+
+    /* Panel transitions */
+    .panel-animate { animation: slideIn 0.2s ease-out; }
+    @keyframes slideIn { from { transform: translateX(-12px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* Bottom sheet simulate */
+    .bottom-sheet { animation: sheetUp 0.25s ease-out; }
+    @keyframes sheetUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* Star filled */
+    .star { color: #f59e0b; }
+
+    /* Map pin */
+    .map-pin {
+      width: 28px; height: 28px;
+      background: #3D6AF2;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      position: absolute;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .map-pin::after {
+      content: '';
+      width: 10px; height: 10px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 7px; left: 7px;
+    }
+    .map-pin-green { background: #10B981; }
+    .map-pin-muted { background: #70767f; }
+  </style>
+</head>
+<body class="h-full min-h-screen">
+
+<!-- ────────────────────────────────────────
+     SCREEN SWITCHER (design reference nav)
+──────────────────────────────────────────── -->
+<div class="fixed top-0 left-0 right-0 z-[200] flex items-center gap-1 px-3 py-2 bg-[#050c14] border-b border-[#1e2631]">
+  <span class="text-[#70767f] text-[10px] font-semibold uppercase tracking-wider mr-2">Screen:</span>
+  <button onclick="showScreen(1)" id="tab-1" class="screen-tab active px-3 py-1 rounded-full text-[11px] font-semibold bg-[#3D6AF2] text-white">1 Search</button>
+  <button onclick="showScreen(2)" id="tab-2" class="screen-tab px-3 py-1 rounded-full text-[11px] font-semibold bg-[#1e2631] text-[#a6abb5]">2 Results</button>
+  <button onclick="showScreen(3)" id="tab-3" class="screen-tab px-3 py-1 rounded-full text-[11px] font-semibold bg-[#1e2631] text-[#a6abb5]">3 Detail</button>
+  <button onclick="showScreen(4)" id="tab-4" class="screen-tab px-3 py-1 rounded-full text-[11px] font-semibold bg-[#1e2631] text-[#a6abb5]">4 Location</button>
+  <button onclick="showScreen(5)" id="tab-5" class="screen-tab px-3 py-1 rounded-full text-[11px] font-semibold bg-[#1e2631] text-[#a6abb5]">5 Suggest</button>
+</div>
+
+<!-- ────────────────────────────────────────
+     APP SHELL — Full screen below tab bar
+──────────────────────────────────────────── -->
+<div class="fixed top-[36px] left-0 right-0 bottom-0 overflow-hidden" style="background:#090f16;">
+
+  <!-- ══════════════════════════════════════
+       SCREEN 1 — Default / Search state
+  ══════════════════════════════════════════ -->
+  <div id="screen-1" class="absolute inset-0 flex flex-col">
+
+    <!-- Map -->
+    <div class="absolute inset-0 map-bg overflow-hidden">
+      <!-- Road lines -->
+      <div class="map-road" style="width:3px; height:100%; top:0; left:38%;"></div>
+      <div class="map-road" style="width:100%; height:2px; top:55%; left:0;"></div>
+      <div class="map-road" style="width:100%; height:2px; top:30%; left:0; transform:rotate(-3deg); transform-origin: left center;"></div>
+      <div class="map-road" style="width:3px; height:100%; top:0; left:62%;"></div>
+      <div class="map-road" style="width:100%; height:2px; top:72%; left:0;"></div>
+      <!-- Location pulse -->
+      <div class="absolute" style="top:52%; left:50%; transform:translate(-50%,-50%)">
+        <div class="w-4 h-4 rounded-full bg-[#3D6AF2] border-2 border-white shadow-lg"></div>
+        <div class="absolute inset-0 rounded-full bg-[#3D6AF2] opacity-30 animate-ping"></div>
+      </div>
+      <!-- Watermark text -->
+      <div class="absolute bottom-20 right-16 text-[#1e2631] text-[9px] font-mono">© OpenStreetMap</div>
+    </div>
+
+    <!-- Floating search bar -->
+    <div class="absolute top-0 left-0 right-0 z-10" style="background:rgba(19,26,35,0.97); backdrop-filter:blur(12px); border-bottom:1px solid #1e2631;">
+      <div class="max-w-3xl mx-auto px-4 pt-3 pb-2">
+        <!-- Row 1: Back | Search | Fav -->
+        <div class="flex items-center gap-2">
+          <button class="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style="background:#1e2631;" aria-label="Back">
+            <span class="ms text-[#a6abb5]">arrow_back</span>
+          </button>
+          <div class="flex-1 relative">
+            <span class="ms-sm absolute left-3 top-1/2 -translate-y-1/2 text-[#70767f]">search</span>
+            <input type="text" placeholder="Search Service Finder…" class="w-full pl-10 pr-4 h-11 rounded-full text-sm outline-none" style="background:#0d1420; border:1px solid #1e2631; color:#ffffff;" />
+          </div>
+          <button class="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style="background:#1e2631;" aria-label="Favourites">
+            <span class="ms text-[#a6abb5]">favorite</span>
+          </button>
+        </div>
+        <!-- Row 2: Category chips -->
+        <div class="chips-scroll flex gap-2 mt-2 overflow-x-auto pb-1">
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#3D6AF2; color:#fff;">All</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🚛 Moving</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🔧 Plumber</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">⚡ Electrician</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">✂️ Hairdresser</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🌿 Lawn &amp; Garden</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🧹 Cleaning</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🔑 Locksmith</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🏥 Doctor</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🦷 Dentist</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">💊 Pharmacy</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🐾 Vet</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">☕ Cafe</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🛒 Supermarket</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">💪 Gym</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map location button -->
+    <button class="absolute right-4 bottom-8 z-10 w-11 h-11 rounded-full flex items-center justify-center shadow-xl" style="background:#131a23; border:1px solid #1e2631;" aria-label="My location">
+      <span class="ms text-[#a6abb5]">my_location</span>
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SCREEN 2 — Results Panel
+  ══════════════════════════════════════════ -->
+  <div id="screen-2" class="absolute inset-0 hidden flex-col">
+
+    <!-- Map -->
+    <div class="absolute inset-0 map-bg overflow-hidden">
+      <div class="map-road" style="width:3px; height:100%; top:0; left:38%;"></div>
+      <div class="map-road" style="width:100%; height:2px; top:55%; left:0;"></div>
+      <div class="map-road" style="width:100%; height:2px; top:30%; left:0;"></div>
+      <div class="map-road" style="width:3px; height:100%; top:0; left:62%;"></div>
+      <!-- Map pins -->
+      <div class="absolute" style="top:40%; left:55%; transform:rotate(45deg)">
+        <div class="map-pin map-pin-green"></div>
+      </div>
+      <div class="absolute" style="top:58%; left:60%; transform:rotate(45deg)">
+        <div class="map-pin map-pin-green"></div>
+      </div>
+      <div class="absolute" style="top:47%; left:70%; transform:rotate(45deg)">
+        <div class="map-pin map-pin-muted"></div>
+      </div>
+      <div class="absolute" style="top:35%; left:65%; transform:rotate(45deg)">
+        <div class="map-pin map-pin-muted"></div>
+      </div>
+      <!-- User location -->
+      <div class="absolute" style="top:50%; left:58%; transform:translate(-50%,-50%)">
+        <div class="w-4 h-4 rounded-full bg-[#3D6AF2] border-2 border-white shadow-lg"></div>
+        <div class="absolute inset-0 rounded-full bg-[#3D6AF2] opacity-30 animate-ping"></div>
+      </div>
+    </div>
+
+    <!-- Floating search bar (same as S1, Plumber active) -->
+    <div class="absolute top-0 left-0 right-0 z-10" style="background:rgba(19,26,35,0.97); backdrop-filter:blur(12px); border-bottom:1px solid #1e2631;">
+      <div class="max-w-3xl mx-auto px-4 pt-3 pb-2">
+        <div class="flex items-center gap-2">
+          <button class="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style="background:#1e2631;">
+            <span class="ms text-[#a6abb5]">arrow_back</span>
+          </button>
+          <div class="flex-1 relative">
+            <span class="ms-sm absolute left-3 top-1/2 -translate-y-1/2 text-[#70767f]">search</span>
+            <input type="text" value="Plumber" class="w-full pl-10 pr-4 h-11 rounded-full text-sm outline-none" style="background:#0d1420; border:1px solid #1e2631; color:#ffffff;" />
+          </div>
+          <button class="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style="background:#1e2631;">
+            <span class="ms text-[#a6abb5]">favorite</span>
+          </button>
+        </div>
+        <div class="chips-scroll flex gap-2 mt-2 overflow-x-auto pb-1">
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">All</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🚛 Moving</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#3D6AF2; color:#fff;">🔧 Plumber</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">⚡ Electrician</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">✂️ Hairdresser</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🌿 Lawn &amp; Garden</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🧹 Cleaning</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🔑 Locksmith</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🏥 Doctor</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">🦷 Dentist</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results panel -->
+    <div class="absolute z-10 panel-animate" style="top:108px; left:0; bottom:0; width:380px; background:#131a23; border-right:1px solid #1e2631; border-top-right-radius:16px; border-bottom-right-radius:16px; display:flex; flex-direction:column; overflow:hidden;">
+      <!-- Header -->
+      <div class="shrink-0 px-4 py-3" style="border-bottom:1px solid #1e2631;">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold" style="color:#ffffff;">8 results nearby</h2>
+          <div class="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style="border-color:#3D6AF2; border-top-color:transparent;"></div>
+        </div>
+      </div>
+
+      <!-- Scrollable list -->
+      <div class="flex-1 overflow-y-auto min-h-0 px-3 py-3 space-y-2">
+
+        <!-- Community label -->
+        <p class="text-[10px] font-bold uppercase tracking-wider px-1" style="color:#10B981; letter-spacing:0.08em;">Community Recommended 社区推荐</p>
+
+        <!-- Community card 1 (selected) -->
+        <button class="w-full flex items-center gap-3 p-3 rounded-2xl text-left" style="background:#0d1420; border:2px solid rgba(61,106,242,0.3); box-shadow:0 0 0 2px rgba(61,106,242,0.1);">
+          <div class="w-14 h-14 rounded-xl shrink-0 overflow-hidden relative" style="background:linear-gradient(135deg,#1a2638,#0d1a28);">
+            <span class="absolute inset-0 flex items-center justify-center ms text-[#3D6AF2]">plumbing</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h4 class="text-sm font-semibold truncate" style="color:#ffffff;">Mike's Plumbing Solutions</h4>
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style="background:#3D6AF2; color:#fff;">✓ Verified</span>
+                </div>
+                <p class="text-xs mt-0.5" style="color:#70767f;">Plumber</p>
+              </div>
+              <div class="flex items-center gap-0.5 shrink-0">
+                <span class="text-xs font-bold" style="color:#ffffff;">4.8</span>
+                <span class="star text-sm">★</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="text-[11px] flex items-center gap-1" style="color:#70767f;">
+                <span class="ms-sm">location_on</span> 0.8km away
+              </span>
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.15); color:#10B981;">Available</span>
+            </div>
+          </div>
+          <button class="shrink-0 w-8 h-8 flex items-center justify-center rounded-full" style="color:#ef4444;" onclick="event.stopPropagation()" aria-label="Favourite">
+            <span class="ms text-[18px]" style="font-variation-settings:'FILL' 1;">favorite</span>
+          </button>
+        </button>
+
+        <!-- Community card 2 -->
+        <button class="w-full flex items-center gap-3 p-3 rounded-2xl text-left" style="background:#131a23; border:1px solid #1e2631;">
+          <div class="w-14 h-14 rounded-xl shrink-0 overflow-hidden relative" style="background:linear-gradient(135deg,#1a2638,#0d1a28);">
+            <span class="absolute inset-0 flex items-center justify-center ms text-[#a6abb5]">plumbing</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <h4 class="text-sm font-semibold truncate" style="color:#ffffff;">Sam's Fix-It Plumbing</h4>
+                <p class="text-xs mt-0.5" style="color:#70767f;">Plumber</p>
+              </div>
+              <div class="flex items-center gap-0.5 shrink-0">
+                <span class="text-xs font-bold" style="color:#ffffff;">4.6</span>
+                <span class="star text-sm">★</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="text-[11px] flex items-center gap-1" style="color:#70767f;">
+                <span class="ms-sm">location_on</span> 1.2km away
+              </span>
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.15); color:#10B981;">Available</span>
+            </div>
+          </div>
+          <button class="shrink-0 w-8 h-8 flex items-center justify-center rounded-full" style="color:#70767f;" onclick="event.stopPropagation()" aria-label="Favourite">
+            <span class="ms text-[18px]">favorite</span>
+          </button>
+        </button>
+
+        <!-- Google label -->
+        <p class="text-[10px] font-bold uppercase tracking-wider px-1 pt-2" style="color:#70767f; letter-spacing:0.08em;">Google Places</p>
+
+        <!-- Google cards -->
+        <button class="w-full flex items-center gap-3 p-3 rounded-2xl text-left" style="background:#131a23; border:1px solid #1e2631;">
+          <div class="w-14 h-14 rounded-xl shrink-0 overflow-hidden relative" style="background:linear-gradient(135deg,#1a2638,#0d1a28);">
+            <span class="absolute inset-0 flex items-center justify-center ms text-[#70767f]">store</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="text-sm font-semibold truncate" style="color:#ffffff;">Auckland City Plumbers</h4>
+              <div class="flex items-center gap-0.5 shrink-0">
+                <span class="text-xs font-bold" style="color:#ffffff;">4.4</span>
+                <span class="star text-sm">★</span>
+              </div>
+            </div>
+            <p class="text-xs mt-0.5" style="color:#70767f;">Plumber</p>
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="text-[11px]" style="color:#70767f;">1.5km away</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.15); color:#10B981;">Available</span>
+            </div>
+          </div>
+          <button class="shrink-0 w-8 h-8 flex items-center justify-center" style="color:#70767f;" onclick="event.stopPropagation()">
+            <span class="ms text-[18px]">favorite</span>
+          </button>
+        </button>
+
+        <button class="w-full flex items-center gap-3 p-3 rounded-2xl text-left" style="background:#131a23; border:1px solid #1e2631;">
+          <div class="w-14 h-14 rounded-xl shrink-0 overflow-hidden relative" style="background:linear-gradient(135deg,#1a2638,#0d1a28);">
+            <span class="absolute inset-0 flex items-center justify-center ms text-[#70767f]">store</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="text-sm font-semibold truncate" style="color:#ffffff;">Waterworks Ltd</h4>
+              <div class="flex items-center gap-0.5 shrink-0">
+                <span class="text-xs font-bold" style="color:#ffffff;">4.1</span>
+                <span class="star text-sm">★</span>
+              </div>
+            </div>
+            <p class="text-xs mt-0.5" style="color:#70767f;">Plumber</p>
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="text-[11px]" style="color:#70767f;">2.3km away</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background:rgba(239,68,68,0.15); color:#ef4444;">Busy</span>
+            </div>
+          </div>
+          <button class="shrink-0 w-8 h-8 flex items-center justify-center" style="color:#70767f;" onclick="event.stopPropagation()">
+            <span class="ms text-[18px]">favorite</span>
+          </button>
+        </button>
+
+        <button class="w-full flex items-center gap-3 p-3 rounded-2xl text-left" style="background:#131a23; border:1px solid #1e2631;">
+          <div class="w-14 h-14 rounded-xl shrink-0 overflow-hidden relative" style="background:linear-gradient(135deg,#1a2638,#0d1a28);">
+            <span class="absolute inset-0 flex items-center justify-center ms text-[#70767f]">store</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="text-sm font-semibold truncate" style="color:#ffffff;">Capital Plumbing Co.</h4>
+              <div class="flex items-center gap-0.5 shrink-0">
+                <span class="text-xs font-bold" style="color:#ffffff;">3.9</span>
+                <span class="star text-sm">★</span>
+              </div>
+            </div>
+            <p class="text-xs mt-0.5" style="color:#70767f;">Plumber</p>
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="text-[11px]" style="color:#70767f;">3.1km away</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background:rgba(239,68,68,0.15); color:#ef4444;">Busy</span>
+            </div>
+          </div>
+          <button class="shrink-0 w-8 h-8 flex items-center justify-center" style="color:#70767f;" onclick="event.stopPropagation()">
+            <span class="ms text-[18px]">favorite</span>
+          </button>
+        </button>
+
+        <button class="w-full flex items-center gap-3 p-3 rounded-2xl text-left" style="background:#131a23; border:1px solid #1e2631;">
+          <div class="w-14 h-14 rounded-xl shrink-0 overflow-hidden relative" style="background:linear-gradient(135deg,#1a2638,#0d1a28);">
+            <span class="absolute inset-0 flex items-center justify-center ms text-[#70767f]">store</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="text-sm font-semibold truncate" style="color:#ffffff;">ProFlow Plumbing</h4>
+              <div class="flex items-center gap-0.5 shrink-0">
+                <span class="text-xs font-bold" style="color:#ffffff;">4.7</span>
+                <span class="star text-sm">★</span>
+              </div>
+            </div>
+            <p class="text-xs mt-0.5" style="color:#70767f;">Plumber</p>
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="text-[11px]" style="color:#70767f;">4.8km away</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.15); color:#10B981;">Available</span>
+            </div>
+          </div>
+          <button class="shrink-0 w-8 h-8 flex items-center justify-center" style="color:#70767f;" onclick="event.stopPropagation()">
+            <span class="ms text-[18px]">favorite</span>
+          </button>
+        </button>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="shrink-0 px-4 py-3" style="border-top:1px solid #1e2631; background:#131a23;">
+        <button class="w-full h-11 rounded-xl text-xs font-semibold transition-colors" style="border:2px dashed #1e2631; color:#70767f;">
+          ＋ Suggest a local provider
+        </button>
+      </div>
+    </div>
+
+    <!-- Map location btn -->
+    <button class="absolute right-4 bottom-8 z-10 w-11 h-11 rounded-full flex items-center justify-center shadow-xl" style="background:#131a23; border:1px solid #1e2631;" aria-label="My location">
+      <span class="ms text-[#a6abb5]">my_location</span>
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SCREEN 3 — Detail Panel
+  ══════════════════════════════════════════ -->
+  <div id="screen-3" class="absolute inset-0 hidden flex-col">
+
+    <!-- Map background (dimmed) -->
+    <div class="absolute inset-0 map-bg overflow-hidden" style="opacity:0.5;"></div>
+
+    <!-- Floating search bar -->
+    <div class="absolute top-0 left-0 right-0 z-10" style="background:rgba(19,26,35,0.97); backdrop-filter:blur(12px); border-bottom:1px solid #1e2631;">
+      <div class="max-w-3xl mx-auto px-4 pt-3 pb-2">
+        <div class="flex items-center gap-2">
+          <button class="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style="background:#1e2631;">
+            <span class="ms text-[#a6abb5]">arrow_back</span>
+          </button>
+          <div class="flex-1 relative">
+            <span class="ms-sm absolute left-3 top-1/2 -translate-y-1/2 text-[#70767f]">search</span>
+            <input type="text" value="Plumber" class="w-full pl-10 pr-4 h-11 rounded-full text-sm outline-none" style="background:#0d1420; border:1px solid #1e2631; color:#ffffff;" />
+          </div>
+          <button class="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style="background:#1e2631;">
+            <span class="ms text-[#a6abb5]">favorite</span>
+          </button>
+        </div>
+        <div class="chips-scroll flex gap-2 mt-2 overflow-x-auto pb-1">
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">All</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#3D6AF2; color:#fff;">🔧 Plumber</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">⚡ Electrician</button>
+          <button class="h-9 px-3 rounded-full text-[11px] font-semibold whitespace-nowrap shrink-0" style="background:#1e2631; color:#a6abb5;">✂️ Hairdresser</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail panel -->
+    <div class="absolute z-10 panel-animate overflow-y-auto" style="top:108px; left:0; bottom:0; width:380px; background:#131a23; border-right:1px solid #1e2631; border-top-right-radius:16px; border-bottom-right-radius:16px;">
+
+      <!-- Sticky back bar -->
+      <div class="sticky top-0 flex items-center gap-3 px-4 py-3 z-20" style="background:#131a23; border-bottom:1px solid #1e2631;">
+        <button class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style="background:#1e2631;">
+          <span class="ms-sm text-[#a6abb5]">chevron_left</span>
+        </button>
+        <span class="text-xs" style="color:#70767f;">Back to results</span>
+      </div>
+
+      <!-- Hero image -->
+      <div class="h-48 relative overflow-hidden" style="background:linear-gradient(135deg,#0d1a28 0%,#1a2638 50%,#0a1520 100%);">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="ms text-[#1e2631]" style="font-size:80px; opacity:0.5;">plumbing</span>
+        </div>
+        <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1" style="background:#10B981; color:#fff;">
+          ★ Community 社区推荐
+        </div>
+        <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold" style="background:#3D6AF2; color:#fff;">
+          ✓ Verified
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="px-4 py-4 space-y-4">
+
+        <!-- Name + rating -->
+        <div>
+          <div class="flex items-start justify-between gap-2">
+            <h2 class="text-lg font-bold" style="color:#ffffff;">Mike's Plumbing Solutions</h2>
+            <button class="shrink-0 mt-1 w-9 h-9 flex items-center justify-center" aria-label="Favourite">
+              <span class="ms" style="color:#ef4444; font-variation-settings:'FILL' 1;">favorite</span>
+            </button>
+          </div>
+          <p class="text-xs mt-0.5" style="color:#70767f;">Plumber</p>
+          <div class="flex items-center gap-2 mt-1.5">
+            <span class="text-sm font-bold" style="color:#ffffff;">4.8</span>
+            <div class="flex gap-0.5">
+              <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+            </div>
+            <span class="text-xs" style="color:#70767f;">(127 reviews)</span>
+          </div>
+          <div class="flex items-center gap-1.5 mt-1.5">
+            <div class="w-2 h-2 rounded-full" style="background:#10B981;"></div>
+            <span class="text-xs font-medium" style="color:#10B981;">Open now</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <p class="text-sm leading-relaxed" style="color:#a6abb5;">Expert residential and commercial plumbing. Burst pipes, hot water systems, leak detection, and full bathroom renovations. 24-hour emergency callouts available.</p>
+
+        <!-- Pricing + Availability -->
+        <div class="flex gap-3">
+          <div class="flex-1 p-3 rounded-xl" style="background:#0d1420; border:1px solid #1e2631;">
+            <p class="text-[10px] font-semibold uppercase tracking-wide" style="color:#70767f;">Pricing</p>
+            <p class="text-sm font-medium mt-0.5" style="color:#ffffff;">$80–$120/hr</p>
+          </div>
+          <div class="flex-1 p-3 rounded-xl" style="background:#0d1420; border:1px solid #1e2631;">
+            <p class="text-[10px] font-semibold uppercase tracking-wide" style="color:#70767f;">Availability</p>
+            <p class="text-sm font-medium mt-0.5" style="color:#ffffff;">Mon–Sat</p>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex gap-2">
+          <a href="tel:+6491234567" class="flex-1 h-11 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold" style="background:#3D6AF2; color:#fff;">
+            <span class="ms-sm">call</span> Call
+          </a>
+          <a href="#" class="flex-1 h-11 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold" style="background:#1e2631; color:#a6abb5;">
+            <span class="ms-sm">language</span> Website
+          </a>
+        </div>
+
+        <!-- Contact info -->
+        <div class="space-y-2.5">
+          <div class="flex items-start gap-3 text-sm" style="color:#a6abb5;">
+            <span class="ms-sm shrink-0 mt-0.5" style="color:#70767f;">location_on</span>
+            <span>12 Water St, Auckland CBD, Auckland 1010</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm">
+            <span class="ms-sm shrink-0" style="color:#70767f;">call</span>
+            <a href="tel:+6491234567" style="color:#3D6AF2;">+64 9 123 4567</a>
+          </div>
+          <div class="flex items-start gap-3 text-sm" style="color:#a6abb5;">
+            <span class="ms-sm shrink-0 mt-0.5" style="color:#70767f;">map</span>
+            <span>Serves: Auckland CBD, Ponsonby, Grey Lynn, Mt Eden</span>
+          </div>
+        </div>
+
+        <!-- Social links -->
+        <div class="flex gap-2">
+          <a href="#" class="px-3 py-1.5 rounded-lg text-xs font-medium" style="background:#1e2631; color:#a6abb5;">Facebook</a>
+          <a href="#" class="px-3 py-1.5 rounded-lg text-xs font-medium" style="background:#1e2631; color:#a6abb5;">Instagram</a>
+        </div>
+
+        <!-- Portfolio -->
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:#70767f;">Portfolio</p>
+          <div class="flex gap-2 overflow-x-auto pb-1 chips-scroll">
+            <div class="w-24 h-24 rounded-xl shrink-0 flex items-center justify-center" style="background:#0d1420; border:1px solid #1e2631;">
+              <span class="ms text-[#1e2631]" style="font-size:32px;">photo</span>
+            </div>
+            <div class="w-24 h-24 rounded-xl shrink-0 flex items-center justify-center" style="background:#0d1420; border:1px solid #1e2631;">
+              <span class="ms text-[#1e2631]" style="font-size:32px;">photo</span>
+            </div>
+            <div class="w-24 h-24 rounded-xl shrink-0 flex items-center justify-center" style="background:#0d1420; border:1px solid #1e2631;">
+              <span class="ms text-[#1e2631]" style="font-size:32px;">photo</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hours -->
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:#70767f;">Hours</p>
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs" style="color:#a6abb5;"><span>Mon–Fri</span><span>7:00am – 6:00pm</span></div>
+            <div class="flex justify-between text-xs" style="color:#a6abb5;"><span>Saturday</span><span>8:00am – 4:00pm</span></div>
+            <div class="flex justify-between text-xs" style="color:#70767f;"><span>Sunday</span><span>Closed</span></div>
+          </div>
+        </div>
+
+        <!-- Reviews -->
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:#70767f;">Reviews (127)</p>
+          <div class="space-y-3">
+            <div class="p-3 rounded-xl" style="background:#0d1420; border:1px solid #1e2631;">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-semibold" style="color:#ffffff;">Sarah T.</span>
+                <div class="flex gap-0.5"><span class="star text-xs">★</span><span class="star text-xs">★</span><span class="star text-xs">★</span><span class="star text-xs">★</span><span class="star text-xs">★</span></div>
+              </div>
+              <p class="text-xs leading-relaxed" style="color:#70767f;">Mike was prompt and professional. Fixed our burst pipe within the hour. Would absolutely recommend to anyone!</p>
+            </div>
+            <div class="p-3 rounded-xl" style="background:#0d1420; border:1px solid #1e2631;">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-semibold" style="color:#ffffff;">James K.</span>
+                <div class="flex gap-0.5"><span class="star text-xs">★</span><span class="star text-xs">★</span><span class="star text-xs">★</span><span class="star text-xs">★</span><span class="text-xs" style="color:#1e2631;">★</span></div>
+              </div>
+              <p class="text-xs leading-relaxed" style="color:#70767f;">Great service, fair price. Hot water cylinder replacement done in 3 hours. Very happy with the result.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Write review -->
+        <button class="w-full h-11 rounded-xl text-sm font-medium" style="border:1px solid #1e2631; color:#3D6AF2;">
+          Write a Review
+        </button>
+
+        <!-- Spacer -->
+        <div class="h-4"></div>
+      </div>
+    </div>
+
+    <!-- Map location btn -->
+    <button class="absolute right-4 bottom-8 z-10 w-11 h-11 rounded-full flex items-center justify-center shadow-xl" style="background:#131a23; border:1px solid #1e2631;" aria-label="My location">
+      <span class="ms text-[#a6abb5]">my_location</span>
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SCREEN 4 — Location Modal
+  ══════════════════════════════════════════ -->
+  <div id="screen-4" class="absolute inset-0 hidden items-center justify-center p-4">
+    <!-- Map bg -->
+    <div class="absolute inset-0 map-bg" style="opacity:0.3;"></div>
+    <!-- Backdrop -->
+    <div class="absolute inset-0" style="background:rgba(9,15,22,0.85);"></div>
+
+    <!-- Modal -->
+    <div class="relative w-full max-w-md rounded-2xl p-6 z-10 panel-animate" style="background:#131a23; border:1px solid #1e2631; box-shadow:0 25px 50px rgba(0,0,0,0.5);">
+      <h2 class="text-lg font-bold mb-1" style="color:#ffffff;">Set your location</h2>
+      <p class="text-sm mb-5" style="color:#a6abb5;">Choose how we find services near you</p>
+
+      <!-- GPS option -->
+      <div class="p-4 rounded-xl mb-3 cursor-pointer" style="background:#0d1420; border:2px solid #3D6AF2;">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(61,106,242,0.15);">
+            <span class="ms" style="color:#3D6AF2;">gps_fixed</span>
+          </div>
+          <div>
+            <p class="text-sm font-semibold" style="color:#ffffff;">Use my GPS location</p>
+            <p class="text-xs mt-0.5" style="color:#70767f;">Automatically detect your current location</p>
+          </div>
+          <span class="ms ml-auto" style="color:#3D6AF2;">radio_button_checked</span>
+        </div>
+      </div>
+
+      <!-- Manual option -->
+      <div class="p-4 rounded-xl mb-4 cursor-pointer" style="background:#0d1420; border:1px solid #1e2631;">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:#1e2631;">
+            <span class="ms" style="color:#a6abb5;">edit_location</span>
+          </div>
+          <div>
+            <p class="text-sm font-semibold" style="color:#ffffff;">Enter location manually</p>
+            <p class="text-xs mt-0.5" style="color:#70767f;">Type a suburb, city, or address</p>
+          </div>
+          <span class="ms ml-auto" style="color:#70767f;">radio_button_unchecked</span>
+        </div>
+      </div>
+
+      <!-- Recent locations -->
+      <p class="text-[10px] font-semibold uppercase tracking-wider mb-2" style="color:#70767f;">Recent Locations</p>
+      <div class="space-y-1 mb-5">
+        <div class="flex items-center gap-3 h-10 px-2 rounded-lg cursor-pointer hover:bg-[#1e2631]">
+          <span class="ms-sm" style="color:#70767f;">history</span>
+          <span class="text-sm" style="color:#a6abb5;">Auckland CBD</span>
+        </div>
+        <div class="flex items-center gap-3 h-10 px-2 rounded-lg cursor-pointer hover:bg-[#1e2631]">
+          <span class="ms-sm" style="color:#70767f;">history</span>
+          <span class="text-sm" style="color:#a6abb5;">Ponsonby, Auckland</span>
+        </div>
+      </div>
+
+      <!-- Confirm -->
+      <button class="w-full h-12 rounded-xl text-sm font-semibold mb-3" style="background:#3D6AF2; color:#fff;">
+        Confirm Location
+      </button>
+      <button class="w-full text-xs text-center" style="color:#70767f;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SCREEN 5 — Suggest a Provider
+  ══════════════════════════════════════════ -->
+  <div id="screen-5" class="absolute inset-0 hidden items-center justify-center p-4">
+    <!-- Map bg -->
+    <div class="absolute inset-0 map-bg" style="opacity:0.3;"></div>
+    <!-- Backdrop -->
+    <div class="absolute inset-0" style="background:rgba(9,15,22,0.85);"></div>
+
+    <!-- Modal -->
+    <div class="relative w-full max-w-md rounded-2xl p-6 z-10 panel-animate overflow-y-auto" style="background:#131a23; border:1px solid #1e2631; box-shadow:0 25px 50px rgba(0,0,0,0.5); max-height:calc(100vh - 60px);">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold" style="color:#ffffff;">Suggest a Local Provider</h2>
+        <button class="w-9 h-9 rounded-full flex items-center justify-center" style="background:#1e2631; color:#a6abb5;" aria-label="Close">
+          <span class="ms-sm">close</span>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Provider name -->
+        <div>
+          <label class="block text-xs font-semibold mb-1.5" style="color:#a6abb5;">Provider Name</label>
+          <input type="text" placeholder="e.g. Mike's Plumbing Solutions" class="w-full h-12 px-4 rounded-xl text-sm outline-none" style="background:#0d1420; border:1px solid #1e2631; color:#ffffff;" />
+        </div>
+
+        <!-- Category -->
+        <div>
+          <label class="block text-xs font-semibold mb-1.5" style="color:#a6abb5;">Category</label>
+          <div class="relative">
+            <select class="w-full h-12 px-4 rounded-xl text-sm outline-none appearance-none" style="background:#0d1420; border:1px solid #1e2631; color:#a6abb5;">
+              <option value="" disabled selected>Select a category…</option>
+              <option>🚛 Moving</option>
+              <option>🔧 Plumber</option>
+              <option>⚡ Electrician</option>
+              <option>✂️ Hairdresser</option>
+              <option>🌿 Lawn &amp; Garden</option>
+              <option>🧹 Cleaning</option>
+              <option>🔑 Locksmith</option>
+              <option>🏥 Doctor / GP</option>
+              <option>🦷 Dentist</option>
+              <option>💪 Gym</option>
+            </select>
+            <span class="ms-sm absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" style="color:#70767f;">expand_more</span>
+          </div>
+        </div>
+
+        <!-- Phone -->
+        <div>
+          <label class="block text-xs font-semibold mb-1.5" style="color:#a6abb5;">Phone Number</label>
+          <input type="tel" placeholder="+64 9 000 0000" class="w-full h-12 px-4 rounded-xl text-sm outline-none" style="background:#0d1420; border:1px solid #1e2631; color:#ffffff;" />
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-xs font-semibold mb-1.5" style="color:#a6abb5;">Description</label>
+          <textarea placeholder="Briefly describe this provider's services…" rows="3" class="w-full px-4 py-3 rounded-xl text-sm outline-none resize-none" style="background:#0d1420; border:1px solid #1e2631; color:#ffffff;"></textarea>
+        </div>
+
+        <!-- Service area -->
+        <div>
+          <label class="block text-xs font-semibold mb-1.5" style="color:#a6abb5;">Service Area</label>
+          <div class="p-3 rounded-xl min-h-[48px] flex flex-wrap gap-2" style="background:#0d1420; border:1px solid #1e2631;">
+            <span class="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.2); color:#3D6AF2;">
+              Auckland CBD
+              <span class="ms-sm cursor-pointer" style="font-size:14px;">close</span>
+            </span>
+            <span class="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.2); color:#3D6AF2;">
+              Ponsonby
+              <span class="ms-sm cursor-pointer" style="font-size:14px;">close</span>
+            </span>
+            <input type="text" placeholder="Add suburb…" class="flex-1 min-w-20 text-xs bg-transparent outline-none" style="color:#ffffff;" />
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button class="w-full h-12 rounded-xl text-sm font-semibold mt-2" style="background:#3D6AF2; color:#fff;">
+          Submit Provider
+        </button>
+        <button class="w-full text-xs text-center" style="color:#70767f;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app shell -->
+
+<script>
+  function showScreen(n) {
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById('screen-' + i);
+      const tab = document.getElementById('tab-' + i);
+      if (i === n) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+        tab.style.background = '#3D6AF2';
+        tab.style.color = '#fff';
+      } else {
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+        tab.style.background = '#1e2631';
+        tab.style.color = '#a6abb5';
+      }
+    }
+  }
+  // Start on screen 1
+  showScreen(1);
+</script>
+</body>
+</html>

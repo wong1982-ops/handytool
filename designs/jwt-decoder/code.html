@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JWT Decoder — Toolk1t Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'tk-bg':       '#090f16',
+            'tk-card':     '#131a23',
+            'tk-input':    '#0d1420',
+            'tk-border':   '#1e2631',
+            'tk-hover':    '#1a2230',
+            'tk-primary':  '#3D6AF2',
+            'tk-primary-light': '#3D9DF2',
+            'tk-cyan':     '#32A9D9',
+            'tk-success':  '#10B981',
+            'tk-danger':   '#EF4444',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['ui-monospace', 'Cascadia Code', 'Menlo', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* Material Symbols */
+    .material-symbols-rounded {
+      font-family: 'Material Symbols Rounded';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      user-select: none;
+      vertical-align: middle;
+    }
+    .icon-outline { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20; }
+
+    /* Subtle starfield via CSS radial dots */
+    .starfield {
+      background-image:
+        radial-gradient(1px 1px at 12% 22%, rgba(61, 106, 242, 0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 68%, rgba(50, 169, 217, 0.25) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 45% 15%, rgba(61, 157, 242, 0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 63% 78%, rgba(61, 106, 242, 0.2) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 78% 35%, rgba(50, 169, 217, 0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 89% 55%, rgba(61, 106, 242, 0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 7% 82%, rgba(61, 157, 242, 0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 52% 48%, rgba(50, 169, 217, 0.15) 0%, transparent 100%),
+        radial-gradient(1px 1px at 36% 90%, rgba(61, 106, 242, 0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 95% 12%, rgba(50, 217, 217, 0.25) 0%, transparent 100%);
+    }
+
+    /* Custom thin scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #090f16; }
+    ::-webkit-scrollbar-thumb { background: #1e2631; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3D6AF2; }
+
+    /* Syntax highlight colors for JSON */
+    .json-key    { color: #818cf8; } /* indigo-400 */
+    .json-str    { color: #86efac; } /* green-300  */
+    .json-num    { color: #fb923c; } /* orange-400 */
+    .json-bool   { color: #c084fc; } /* purple-400 */
+    .json-null   { color: #94a3b8; } /* slate-400  */
+    .json-comment{ color: #70767f; font-style: italic; }
+
+    /* Token color segments */
+    .jwt-header-part  { color: #f87171; } /* red-400   */
+    .jwt-payload-part { color: #818cf8; } /* indigo-400*/
+    .jwt-sig-part     { color: #2dd4bf; } /* teal-400  */
+    .jwt-dot          { color: #70767f; }
+
+    /* Copy button feedback */
+    .copy-btn:active { transform: scale(0.95); }
+
+    /* Section card left border accent */
+    .section-card { border-radius: 0.75rem; overflow: hidden; }
+    .section-card-inner { border-left: 4px solid; }
+  </style>
+</head>
+<body class="bg-tk-bg font-sans text-white antialiased min-h-screen">
+
+  <!-- ====================================================
+       GLOBAL NAVIGATION (stub)
+       ==================================================== -->
+  <nav class="sticky top-0 z-50 border-b border-tk-border bg-tk-bg/95 backdrop-blur-sm">
+    <div class="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-0 h-14">
+      <div class="flex items-center gap-2">
+        <span class="text-lg font-bold tracking-tight text-white">Toolk<span class="text-tk-primary">1</span>t</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="flex h-9 w-9 items-center justify-center rounded-lg border border-tk-border bg-transparent text-[#a6abb5] hover:border-tk-primary hover:text-white transition-colors" aria-label="Toggle dark mode">
+          <span class="material-symbols-rounded icon-outline text-[18px]">light_mode</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ====================================================
+       THEMED HEADER
+       ==================================================== -->
+  <header class="relative overflow-hidden starfield"
+    style="background: linear-gradient(135deg, #0c1424 0%, #111b2e 50%, #0c1424 100%);">
+    <!-- Glow blob -->
+    <div class="pointer-events-none absolute left-1/2 top-1/2 h-64 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10"
+      style="background: radial-gradient(ellipse, #3D6AF2 0%, transparent 70%);"></div>
+
+    <div class="relative mx-auto max-w-[860px] px-4 py-10">
+      <!-- Breadcrumb -->
+      <nav aria-label="Breadcrumb" class="mb-5 flex items-center gap-1.5 text-xs text-[#70767f]">
+        <a href="#" class="hover:text-[#a6abb5] transition-colors">Home</a>
+        <span class="material-symbols-rounded text-[14px]">chevron_right</span>
+        <a href="#" class="hover:text-[#a6abb5] transition-colors">Tools</a>
+        <span class="material-symbols-rounded text-[14px]">chevron_right</span>
+        <span class="text-[#a6abb5]">JWT Decoder</span>
+      </nav>
+
+      <!-- Tool identity -->
+      <div class="flex items-start gap-4">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-tk-primary/30 bg-tk-primary/15">
+          <span class="material-symbols-rounded text-[24px] text-tk-primary">token</span>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-white sm:text-3xl">JWT Decoder</h1>
+          <p class="mt-1 text-sm text-[#a6abb5]">
+            Decode, verify, and generate JSON Web Tokens — 100% client-side, your tokens stay in your browser.
+          </p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================
+       MAIN CONTENT
+       ==================================================== -->
+  <main class="mx-auto max-w-[860px] px-4 py-8 space-y-6">
+
+    <!-- ==================================================
+         SECTION 1 — DECODE
+         ================================================== -->
+    <section aria-label="Decode JWT">
+
+      <!-- Label -->
+      <label for="jwt-input" class="mb-1.5 block text-sm font-medium text-[#a6abb5]">
+        Paste your JWT
+      </label>
+
+      <!-- Textarea -->
+      <textarea
+        id="jwt-input"
+        rows="4"
+        spellcheck="false"
+        autocomplete="off"
+        class="w-full resize-y rounded-xl border border-tk-border bg-tk-input px-4 py-3 font-mono text-xs leading-relaxed text-[#a6abb5] placeholder-[#70767f] focus:border-tk-primary focus:outline-none focus:ring-2 focus:ring-tk-primary/30 transition-colors"
+        style="min-height: 80px;"
+      >eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlNhcmFoIENoZW4iLCJlbWFpbCI6InNhcmFoLmNoZW5AY29tcGFueS5pbyIsInJvbGUiOiJhZG1pbiIsImlzcyI6Imh0dHBzOi8vYXV0aC5jb21wYW55LmlvIiwiYXVkIjoiY29tcGFueS1hcHAiLCJpYXQiOjE3MTYyMzkwMjIsImV4cCI6MTcxNjI0MjYyMn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</textarea>
+
+      <!-- Color-coded JWT preview strip -->
+      <div class="mt-3 rounded-xl border border-tk-border bg-[#0d1420] px-4 py-3">
+        <p class="font-mono text-xs leading-relaxed break-all">
+          <span class="jwt-header-part">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span><span class="jwt-dot">.</span><span class="jwt-payload-part">eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlNhcmFoIENoZW4iLCJlbWFpbCI6InNhcmFoLmNoZW5AY29tcGFueS5pbyIsInJvbGUiOiJhZG1pbiIsImlzcyI6Imh0dHBzOi8vYXV0aC5jb21wYW55LmlvIiwiYXVkIjoiY29tcGFueS1hcHAiLCJpYXQiOjE3MTYyMzkwMjIsImV4cCI6MTcxNjI0MjYyMn0</span><span class="jwt-dot">.</span><span class="jwt-sig-part">SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</span>
+        </p>
+        <!-- Legend -->
+        <div class="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">
+          <span class="flex items-center gap-1.5 text-[11px]">
+            <span class="inline-block h-2 w-2 rounded-full bg-red-400"></span>
+            <span class="text-[#70767f]">Header</span>
+          </span>
+          <span class="flex items-center gap-1.5 text-[11px]">
+            <span class="inline-block h-2 w-2 rounded-full bg-indigo-400"></span>
+            <span class="text-[#70767f]">Payload</span>
+          </span>
+          <span class="flex items-center gap-1.5 text-[11px]">
+            <span class="inline-block h-2 w-2 rounded-full bg-teal-400"></span>
+            <span class="text-[#70767f]">Signature</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Decoded section cards -->
+      <div class="mt-4 space-y-3">
+
+        <!-- HEADER card -->
+        <div class="overflow-hidden rounded-xl border border-tk-border bg-tk-card" style="border-left: 4px solid #f87171;">
+          <!-- Card bar -->
+          <div class="flex items-center justify-between border-b border-tk-border bg-[#0d1420] px-4 py-2">
+            <span class="text-[11px] font-semibold uppercase tracking-widest text-red-400">Header</span>
+            <button class="copy-btn flex min-h-[32px] items-center gap-1.5 rounded-lg border border-tk-border bg-transparent px-3 py-1 text-xs text-[#a6abb5] transition-colors hover:border-tk-primary hover:text-white">
+              <span class="material-symbols-rounded icon-outline text-[15px]">content_copy</span>
+              Copy
+            </button>
+          </div>
+          <!-- Content -->
+          <div class="overflow-x-auto px-4 py-3">
+            <pre class="font-mono text-xs leading-relaxed sm:text-sm"><span class="text-[#70767f]">{</span>
+  <span class="json-key">"alg"</span><span class="text-[#70767f]">:</span> <span class="json-str">"HS256"</span><span class="text-[#70767f]">,</span>
+  <span class="json-key">"typ"</span><span class="text-[#70767f]">:</span> <span class="json-str">"JWT"</span>
+<span class="text-[#70767f]">}</span></pre>
+          </div>
+        </div>
+
+        <!-- PAYLOAD card -->
+        <div class="overflow-hidden rounded-xl border border-tk-border bg-tk-card" style="border-left: 4px solid #818cf8;">
+          <!-- Card bar -->
+          <div class="flex items-center justify-between border-b border-tk-border bg-[#0d1420] px-4 py-2">
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] font-semibold uppercase tracking-widest text-indigo-400">Payload</span>
+              <!-- No expired badge — token is valid in this mock -->
+            </div>
+            <button class="copy-btn flex min-h-[32px] items-center gap-1.5 rounded-lg border border-tk-border bg-transparent px-3 py-1 text-xs text-[#a6abb5] transition-colors hover:border-tk-primary hover:text-white">
+              <span class="material-symbols-rounded icon-outline text-[15px]">content_copy</span>
+              Copy
+            </button>
+          </div>
+          <!-- Content -->
+          <div class="overflow-x-auto px-4 py-3">
+            <pre class="font-mono text-xs leading-relaxed sm:text-sm"><span class="text-[#70767f]">{</span>
+  <span class="json-key">"sub"</span><span class="text-[#70767f]">:</span>   <span class="json-str">"1234567890"</span><span class="text-[#70767f]">,</span>
+  <span class="json-key">"name"</span><span class="text-[#70767f]">:</span>  <span class="json-str">"Sarah Chen"</span><span class="text-[#70767f]">,</span>
+  <span class="json-key">"email"</span><span class="text-[#70767f]">:</span> <span class="json-str">"sarah.chen@company.io"</span><span class="text-[#70767f]">,</span>
+  <span class="json-key">"role"</span><span class="text-[#70767f]">:</span>  <span class="json-str">"admin"</span><span class="text-[#70767f]">,</span>
+  <span class="json-key">"iss"</span><span class="text-[#70767f]">:</span>   <span class="json-str">"https://auth.company.io"</span><span class="text-[#70767f]">,</span>
+  <span class="json-key">"aud"</span><span class="text-[#70767f]">:</span>   <span class="json-str">"company-app"</span><span class="text-[#70767f]">,</span>
+  <span class="json-key">"iat"</span><span class="text-[#70767f]">:</span>   <span class="json-num">1716239022</span><span class="text-[#70767f]">,</span>  <span class="json-comment">// May 20, 2024, 10:23:42 AM PDT</span>
+  <span class="json-key">"exp"</span><span class="text-[#70767f]">:</span>   <span class="json-num">1716242622</span>   <span class="json-comment">// May 20, 2024, 11:23:42 AM PDT</span>
+<span class="text-[#70767f]">}</span></pre>
+          </div>
+        </div>
+
+        <!-- SIGNATURE card -->
+        <div class="overflow-hidden rounded-xl border border-tk-border bg-tk-card" style="border-left: 4px solid #2dd4bf;">
+          <!-- Card bar -->
+          <div class="flex items-center justify-between border-b border-tk-border bg-[#0d1420] px-4 py-2">
+            <span class="text-[11px] font-semibold uppercase tracking-widest text-teal-400">Signature</span>
+            <button class="copy-btn flex min-h-[32px] items-center gap-1.5 rounded-lg border border-tk-border bg-transparent px-3 py-1 text-xs text-[#a6abb5] transition-colors hover:border-tk-primary hover:text-white">
+              <span class="material-symbols-rounded icon-outline text-[15px]">content_copy</span>
+              Copy
+            </button>
+          </div>
+          <!-- Content -->
+          <div class="overflow-x-auto px-4 py-3">
+            <pre class="font-mono text-xs leading-relaxed text-[#a6abb5] break-all whitespace-pre-wrap sm:text-sm">SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================================================
+         SECTION 2 — VERIFY (expanded, valid state)
+         ================================================== -->
+    <section aria-label="Verify JWT Signature">
+      <div class="overflow-hidden rounded-2xl border border-tk-border bg-tk-card">
+
+        <!-- Collapsible header button -->
+        <button type="button" aria-expanded="true"
+          class="flex w-full min-h-[44px] items-center justify-between px-5 py-3 text-left transition-colors hover:bg-tk-hover">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-rounded text-[18px] text-tk-primary">verified</span>
+            <span class="text-sm font-semibold text-white">Verify Signature</span>
+          </div>
+          <span class="material-symbols-rounded text-[18px] text-[#70767f] transition-transform duration-200 rotate-180">expand_more</span>
+        </button>
+
+        <!-- Expanded content -->
+        <div class="border-t border-tk-border px-5 pb-5 pt-4 space-y-4">
+
+          <!-- Algorithm select -->
+          <div>
+            <label for="verify-alg" class="mb-1.5 block text-xs font-medium text-[#a6abb5]">Algorithm</label>
+            <select id="verify-alg"
+              class="w-full min-h-[44px] rounded-lg border border-tk-border bg-tk-input px-3 py-2 font-mono text-sm text-white focus:border-tk-primary focus:outline-none focus:ring-2 focus:ring-tk-primary/30 transition-colors appearance-none"
+              style="background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2370767f' viewBox='0 0 20 20'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E\"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px;">
+              <optgroup label="HMAC">
+                <option selected>HS256</option>
+                <option>HS384</option>
+                <option>HS512</option>
+              </optgroup>
+              <optgroup label="RSA">
+                <option>RS256</option>
+                <option>RS384</option>
+                <option>RS512</option>
+                <option>PS256</option>
+                <option>PS384</option>
+                <option>PS512</option>
+              </optgroup>
+              <optgroup label="ECDSA">
+                <option>ES256</option>
+                <option>ES384</option>
+                <option>ES512</option>
+              </optgroup>
+              <optgroup label="EdDSA">
+                <option>EdDSA</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- Secret input (HMAC mode) -->
+          <div>
+            <label for="verify-secret" class="mb-1.5 block text-xs font-medium text-[#a6abb5]">Secret</label>
+            <input
+              id="verify-secret"
+              type="text"
+              value="your-super-secret-key"
+              autocomplete="off"
+              spellcheck="false"
+              class="w-full min-h-[44px] rounded-lg border border-tk-border bg-tk-input px-3 py-2 font-mono text-sm text-white placeholder-[#70767f] focus:border-tk-primary focus:outline-none focus:ring-2 focus:ring-tk-primary/30 transition-colors"
+            />
+          </div>
+
+          <!-- Status: Valid -->
+          <div role="status" aria-live="polite"
+            class="flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium"
+            style="background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.3); color: #10B981;">
+            <span class="material-symbols-rounded text-[20px] shrink-0">check_circle</span>
+            <span>Signature verified</span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================
+         SECTION 3 — GENERATE (collapsed)
+         ================================================== -->
+    <section aria-label="Generate JWT">
+      <div class="overflow-hidden rounded-2xl border border-tk-border bg-tk-card">
+
+        <!-- Collapsible header button -->
+        <button type="button" aria-expanded="false"
+          class="flex w-full min-h-[44px] items-center justify-between px-5 py-3 text-left transition-colors hover:bg-tk-hover">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-rounded text-[18px] text-tk-primary">add_circle</span>
+            <span class="text-sm font-semibold text-white">Generate Token</span>
+          </div>
+          <span class="material-symbols-rounded text-[18px] text-[#70767f] transition-transform duration-200">expand_more</span>
+        </button>
+
+        <!-- Collapsed: no body -->
+
+      </div>
+    </section>
+
+    <!-- ==================================================
+         EXTRA MOCK: GENERATE SECTION (expanded)
+         Shown below as a separate card to preview the state
+         ================================================== -->
+    <section aria-label="Generate JWT — Expanded Preview">
+      <p class="mb-2 text-xs font-medium text-[#70767f] uppercase tracking-widest">Design Preview — Generate Expanded State</p>
+      <div class="overflow-hidden rounded-2xl border border-tk-border bg-tk-card">
+
+        <!-- Header (expanded) -->
+        <button type="button" aria-expanded="true"
+          class="flex w-full min-h-[44px] items-center justify-between px-5 py-3 text-left transition-colors hover:bg-tk-hover">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-rounded text-[18px] text-tk-primary">add_circle</span>
+            <span class="text-sm font-semibold text-white">Generate Token</span>
+          </div>
+          <span class="material-symbols-rounded text-[18px] text-[#70767f] transition-transform duration-200 rotate-180">expand_more</span>
+        </button>
+
+        <!-- Content -->
+        <div class="border-t border-tk-border px-5 pb-5 pt-4 space-y-4">
+
+          <!-- Algorithm -->
+          <div>
+            <label for="gen-alg" class="mb-1.5 block text-xs font-medium text-[#a6abb5]">Algorithm</label>
+            <select id="gen-alg"
+              class="w-full min-h-[44px] rounded-lg border border-tk-border bg-tk-input px-3 py-2 font-mono text-sm text-white focus:border-tk-primary focus:outline-none focus:ring-2 focus:ring-tk-primary/30 transition-colors appearance-none"
+              style="background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2370767f' viewBox='0 0 20 20'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E\"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px;">
+              <optgroup label="HMAC">
+                <option selected>HS256</option>
+                <option>HS384</option>
+                <option>HS512</option>
+              </optgroup>
+              <optgroup label="RSA">
+                <option>RS256</option>
+              </optgroup>
+              <optgroup label="ECDSA">
+                <option>ES256</option>
+              </optgroup>
+              <optgroup label="EdDSA">
+                <option>EdDSA</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- Header textarea -->
+          <div>
+            <label for="gen-header" class="mb-1.5 block text-xs font-medium text-[#a6abb5]">Header</label>
+            <textarea id="gen-header" rows="4" spellcheck="false"
+              class="w-full resize-y rounded-lg border border-tk-border bg-tk-input px-3 py-2 font-mono text-xs leading-relaxed text-white focus:border-tk-primary focus:outline-none focus:ring-2 focus:ring-tk-primary/30 transition-colors">&#123;
+  "alg": "HS256",
+  "typ": "JWT"
+&#125;</textarea>
+          </div>
+
+          <!-- Payload textarea -->
+          <div>
+            <label for="gen-payload" class="mb-1.5 block text-xs font-medium text-[#a6abb5]">Payload</label>
+            <textarea id="gen-payload" rows="6" spellcheck="false"
+              class="w-full resize-y rounded-lg border border-tk-border bg-tk-input px-3 py-2 font-mono text-xs leading-relaxed text-white focus:border-tk-primary focus:outline-none focus:ring-2 focus:ring-tk-primary/30 transition-colors">&#123;
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1716239022
+&#125;</textarea>
+          </div>
+
+          <!-- Secret -->
+          <div>
+            <label for="gen-secret" class="mb-1.5 block text-xs font-medium text-[#a6abb5]">Secret</label>
+            <input id="gen-secret" type="text" placeholder="your-256-bit-secret" autocomplete="off" spellcheck="false"
+              class="w-full min-h-[44px] rounded-lg border border-tk-border bg-tk-input px-3 py-2 font-mono text-sm text-white placeholder-[#70767f] focus:border-tk-primary focus:outline-none focus:ring-2 focus:ring-tk-primary/30 transition-colors" />
+          </div>
+
+          <!-- Generate button -->
+          <button type="button"
+            class="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-tk-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#3460e0] focus:outline-none focus:ring-2 focus:ring-tk-primary focus:ring-offset-2 focus:ring-offset-tk-card">
+            <span class="material-symbols-rounded text-[18px]">key</span>
+            Generate Token
+          </button>
+
+          <!-- Generated output -->
+          <div>
+            <label class="mb-1.5 block text-xs font-medium text-[#a6abb5]">Generated Token</label>
+            <div class="rounded-lg border border-tk-border bg-tk-input p-3 font-mono text-xs leading-relaxed text-[#a6abb5] break-all">
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNzE2MjM5MDIyfQ.49TbMzFYFkLS3nQN2lEEkGNYYKtRgriWHuYnRvd2Kto
+            </div>
+            <div class="mt-2 flex justify-end">
+              <button class="copy-btn flex min-h-[36px] items-center gap-1.5 rounded-lg border border-tk-border bg-transparent px-3 py-1.5 text-xs text-[#a6abb5] transition-colors hover:border-tk-primary hover:text-white">
+                <span class="material-symbols-rounded icon-outline text-[15px]">content_copy</span>
+                Copy Token
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================
+         EXTRA MOCK: ERROR STATE
+         ================================================== -->
+    <section aria-label="Error State Preview">
+      <p class="mb-2 text-xs font-medium text-[#70767f] uppercase tracking-widest">Design Preview — Invalid JWT / Error State</p>
+
+      <div class="space-y-3">
+        <!-- Textarea with bad input -->
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-[#a6abb5]">Paste your JWT</label>
+          <textarea rows="3" spellcheck="false"
+            class="w-full resize-y rounded-xl border border-tk-danger/50 bg-tk-input px-4 py-3 font-mono text-xs leading-relaxed text-[#a6abb5] focus:border-tk-danger focus:outline-none focus:ring-2 focus:ring-tk-danger/30 transition-colors"
+            style="min-height: 70px;">not.a.valid.jwt.token.with.too.many.parts</textarea>
+        </div>
+
+        <!-- Error banner -->
+        <div role="alert"
+          class="flex items-start gap-3 rounded-xl border px-4 py-3 text-sm"
+          style="background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.3); color: #f87171;">
+          <span class="material-symbols-rounded text-[18px] shrink-0 mt-0.5">error</span>
+          <span>Invalid JWT structure: expected 3 dot-separated parts.</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ====================================================
+       FOOTER (stub)
+       ==================================================== -->
+  <footer class="mt-16 border-t border-tk-border">
+    <div class="mx-auto max-w-[1200px] px-4 py-8 flex items-center justify-between text-xs text-[#70767f]">
+      <span>© 2026 Toolk1t. All rights reserved.</span>
+      <div class="flex gap-4">
+        <a href="#" class="hover:text-[#a6abb5] transition-colors">Privacy</a>
+        <a href="#" class="hover:text-[#a6abb5] transition-colors">Terms</a>
+        <a href="#" class="hover:text-[#a6abb5] transition-colors">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Toggle collapse/expand for Verify and Generate section headers
+    document.querySelectorAll('[aria-expanded]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const expanded = btn.getAttribute('aria-expanded') === 'true'
+        btn.setAttribute('aria-expanded', String(!expanded))
+        const chevron = btn.querySelector('.material-symbols-rounded:last-child')
+        if (chevron) {
+          chevron.style.transform = !expanded ? 'rotate(180deg)' : 'rotate(0deg)'
+        }
+        // Toggle content panel (sibling div after button)
+        const panel = btn.nextElementSibling
+        if (panel && panel.classList.contains('border-t')) {
+          panel.style.display = !expanded ? 'block' : 'none'
+        }
+      })
+    })
+
+    // Copy button feedback
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const label = btn.querySelector('span:last-child')
+        const icon  = btn.querySelector('.material-symbols-rounded')
+        const origLabel = label ? label.textContent : ''
+        if (icon)  icon.textContent = 'check'
+        if (label) label.textContent = 'Copied!'
+        btn.style.borderColor = '#10B981'
+        btn.style.color       = '#10B981'
+        setTimeout(() => {
+          if (icon)  icon.textContent = 'content_copy'
+          if (label) label.textContent = origLabel
+          btn.style.borderColor = ''
+          btn.style.color       = ''
+        }, 1800)
+      })
+    })
+  </script>
+</body>
+</html>

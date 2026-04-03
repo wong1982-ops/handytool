@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Favicon Generator — Toolk1t Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'page-bg':   '#090f16',
+            'card-bg':   '#131a23',
+            'border':    '#1e2631',
+            'hover-bg':  '#1e2a3a',
+            'primary':   '#3D6AF2',
+            'primary-2': '#3D9DF2',
+            'txt-pri':   '#ffffff',
+            'txt-sec':   '#a6abb5',
+            'txt-muted': '#70767f',
+            'success':   '#10B981',
+            'danger':    '#EF4444',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #090f16; color: #fff; font-family: 'Inter', system-ui, sans-serif; }
+
+    .ms { font-family: 'Material Symbols Rounded'; font-size: 18px; line-height: 1;
+          font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20; }
+    .ms-fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20; }
+
+    /* custom range slider */
+    input[type=range] { -webkit-appearance: none; appearance: none; height: 4px;
+      background: #1e2631; border-radius: 9999px; outline: none; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none;
+      width: 14px; height: 14px; border-radius: 50%; background: #3D6AF2; cursor: pointer; }
+    input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%;
+      background: #3D6AF2; cursor: pointer; border: none; }
+
+    /* custom checkbox */
+    input[type=checkbox] { accent-color: #3D6AF2; width: 15px; height: 15px; cursor: pointer; }
+
+    /* color input */
+    input[type=color] { padding: 0; border: none; cursor: pointer; background: transparent; }
+
+    /* toggle switch */
+    .toggle { position: relative; display: inline-flex; width: 40px; height: 22px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track { position: absolute; inset: 0; border-radius: 9999px; background: #1e2631;
+      transition: background .2s; cursor: pointer; }
+    .toggle input:checked + .toggle-track { background: #3D6AF2; }
+    .toggle-thumb { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px;
+      border-radius: 50%; background: white; transition: transform .2s; pointer-events: none; }
+    .toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #090f16; }
+    ::-webkit-scrollbar-thumb { background: #1e2631; border-radius: 3px; }
+
+    /* Icon grid scroll */
+    .icon-grid { max-height: 288px; overflow-y: auto; }
+
+    /* tab active glow */
+    .tab-active { box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+
+    /* section label */
+    .sec-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #70767f; }
+
+    /* favicon mock */
+    .favicon-mock {
+      width: 40px; height: 40px; border-radius: 9px;
+      background: linear-gradient(135deg, #3D6AF2 0%, #32D9D9 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: #fff;
+    }
+    .favicon-mock-sm {
+      width: 14px; height: 14px; border-radius: 3px;
+      background: linear-gradient(135deg, #3D6AF2 0%, #32D9D9 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+
+    /* tab underline indicator */
+    .tab-btn { transition: all .15s; }
+    .tab-btn.active { background: #131a23; color: #fff; }
+    .tab-btn:not(.active) { color: #70767f; }
+    .tab-btn:not(.active):hover { color: #a6abb5; }
+
+    .shape-btn { transition: all .15s; }
+    .shape-btn.active { background: #3D6AF2; color: #fff; }
+    .shape-btn:not(.active) { background: #1e2631; color: #a6abb5; }
+    .shape-btn:not(.active):hover { background: #1e2a3a; }
+
+    .bg-type-btn { transition: all .15s; flex: 1; }
+    .bg-type-btn.active { background: #3D6AF2; color: #fff; }
+    .bg-type-btn:not(.active) { color: #70767f; }
+    .bg-type-btn:not(.active):hover { color: #a6abb5; }
+
+    .font-chip { transition: all .15s; }
+    .font-chip.active { background: #3D6AF2; color: #fff; }
+    .font-chip:not(.active) { background: #1e2631; color: #a6abb5; }
+    .font-chip:not(.active):hover { background: #1e2a3a; }
+
+    .cat-chip { transition: all .15s; white-space: nowrap; }
+    .cat-chip.active { background: #3D6AF2; color: #fff; }
+    .cat-chip:not(.active) { background: #1e2631; color: #a6abb5; }
+    .cat-chip:not(.active):hover { background: #1e2a3a; }
+
+    .icon-btn { transition: all .15s; }
+    .icon-btn.selected { border-color: #3D6AF2; background: rgba(61,106,242,.08); }
+    .icon-btn:not(.selected) { border-color: #1e2631; background: #131a23; }
+    .icon-btn:not(.selected):hover { border-color: #2a3447; }
+
+    .style-btn { transition: all .15s; }
+    .style-btn.active { background: #3D6AF2; color: #fff; }
+    .style-btn:not(.active) { background: #1e2631; color: #a6abb5; }
+    .style-btn:not(.active):hover { background: #1e2a3a; }
+
+    /* AI result card */
+    .ai-result { transition: all .15s; }
+    .ai-result.selected { border-color: #3D6AF2; background: rgba(61,106,242,.07); }
+    .ai-result:not(.selected) { border-color: #1e2631; }
+    .ai-result:not(.selected):hover { border-color: #2a3447; }
+
+    /* Glow on primary button */
+    .btn-primary:hover { opacity: .9; }
+
+    /* Upload dropzone */
+    .dropzone { border: 2px dashed #2a3447; transition: all .15s; }
+    .dropzone:hover { border-color: #3D6AF2; background: rgba(61,106,242,.04); }
+
+    /* Copy feedback */
+    .copy-flash { animation: flashGreen .4s ease; }
+    @keyframes flashGreen { 0% { color: #a6abb5; } 50% { color: #10B981; } 100% { color: #a6abb5; } }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- NAV -->
+  <nav class="sticky top-0 z-50 border-b border-[#1e2631] bg-[#090f16]/95 backdrop-blur-sm">
+    <div class="max-w-[1200px] mx-auto px-4 h-14 flex items-center gap-4">
+      <!-- Logo -->
+      <div class="flex items-center gap-2 mr-4">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-[#3D6AF2] to-[#32D9D9] flex items-center justify-center">
+          <span class="text-white font-bold text-xs">T</span>
+        </div>
+        <span class="font-semibold text-white text-sm">Toolk1t</span>
+      </div>
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-1.5 text-sm">
+        <a href="#" class="text-[#70767f] hover:text-[#a6abb5] transition-colors">Tools</a>
+        <span class="text-[#1e2631]">/</span>
+        <span class="text-[#a6abb5]">Favicon Generator</span>
+      </div>
+      <!-- Spacer -->
+      <div class="flex-1"></div>
+      <!-- Nav actions -->
+      <button class="w-9 h-9 rounded-lg border border-[#1e2631] bg-[#131a23] flex items-center justify-center text-[#a6abb5] hover:text-white hover:border-[#2a3447] transition-all">
+        <span class="ms" style="font-size:18px">dark_mode</span>
+      </button>
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#3D6AF2] to-[#3D9DF2] flex items-center justify-center text-white text-xs font-semibold">LW</div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="max-w-[1200px] mx-auto px-4 py-10 flex flex-col gap-6">
+
+    <!-- Page heading -->
+    <div class="space-y-1">
+      <h1 class="text-[28px] font-bold text-white leading-tight">Favicon Generator</h1>
+      <p class="text-[#a6abb5] text-sm">Create favicons from text, icons, images, or AI — download a complete package</p>
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="flex gap-6 items-start">
+
+      <!-- LEFT: Creation area -->
+      <div class="flex-1 min-w-0 flex flex-col gap-4">
+
+        <!-- Tab bar -->
+        <div id="tab-bar" role="tablist" class="flex gap-1 p-1 rounded-xl bg-[#1e2631]">
+          <button onclick="switchTab('upload')" id="tab-upload" role="tab" class="tab-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap min-h-[44px]">
+            <span class="ms" style="font-size:16px">upload</span>
+            <span>Upload</span>
+          </button>
+          <button onclick="switchTab('text')" id="tab-text" role="tab" class="tab-btn active tab-active flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap min-h-[44px]">
+            <span class="ms" style="font-size:16px">title</span>
+            <span>Text</span>
+          </button>
+          <button onclick="switchTab('icon')" id="tab-icon" role="tab" class="tab-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap min-h-[44px]">
+            <span class="ms" style="font-size:16px">grid_view</span>
+            <span>Icons</span>
+          </button>
+          <button onclick="switchTab('ai')" id="tab-ai" role="tab" class="tab-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap min-h-[44px]">
+            <span class="ms" style="font-size:16px">auto_awesome</span>
+            <span>AI</span>
+          </button>
+        </div>
+
+        <!-- ══════════════════════ TEXT TAB ══════════════════════ -->
+        <div id="panel-text" class="rounded-xl border border-[#1e2631] bg-[#131a23] p-5 space-y-5">
+          <!-- Text input -->
+          <div class="space-y-2">
+            <label class="sec-label block">Text / Emoji</label>
+            <input
+              type="text"
+              value="Tk"
+              maxlength="10"
+              class="w-full rounded-lg border border-[#1e2631] bg-[#090f16] px-4 py-3 text-center text-2xl font-bold text-white placeholder-[#70767f] focus:outline-none focus:border-[#3D6AF2] focus:ring-2 focus:ring-[#3D6AF2]/20 transition-all"
+            />
+          </div>
+
+          <!-- Style controls -->
+          <div class="space-y-4 pt-1">
+
+            <!-- Shape -->
+            <div class="space-y-2">
+              <span class="sec-label">Shape</span>
+              <div class="grid grid-cols-4 gap-2 mt-1.5">
+                <button onclick="setShape(this,'circle')" class="shape-btn flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/></svg>
+                  <span>Circle</span>
+                </button>
+                <button onclick="setShape(this,'square')" class="shape-btn flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" stroke="currentColor" stroke-width="2"/></svg>
+                  <span>Square</span>
+                </button>
+                <button onclick="setShape(this,'rounded')" class="shape-btn active flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="4" stroke="currentColor" stroke-width="2"/></svg>
+                  <span>Rounded</span>
+                </button>
+                <button onclick="setShape(this,'hexagon')" class="shape-btn flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L17 6.5V13.5L10 18L3 13.5V6.5L10 2Z" stroke="currentColor" stroke-width="2"/></svg>
+                  <span>Hexagon</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Background -->
+            <div class="space-y-2">
+              <span class="sec-label">Background</span>
+              <div id="bg-type-row" class="flex gap-1 rounded-lg bg-[#090f16] p-1 mt-1.5">
+                <button onclick="setBgType(this,'solid')" class="bg-type-btn rounded-md px-2 py-1.5 text-xs font-medium min-h-[36px] transition-colors">Solid</button>
+                <button onclick="setBgType(this,'gradient')" class="bg-type-btn active rounded-md px-2 py-1.5 text-xs font-medium min-h-[36px] bg-[#3D6AF2] text-white">Gradient</button>
+                <button onclick="setBgType(this,'transparent')" class="bg-type-btn rounded-md px-2 py-1.5 text-xs font-medium min-h-[36px] transition-colors">Transparent</button>
+              </div>
+              <!-- Gradient controls -->
+              <div id="gradient-controls" class="space-y-2 pt-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-[#70767f]">From</span>
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden flex-shrink-0" style="background:#3D6AF2">
+                      <input type="color" value="#3D6AF2" class="w-10 h-10 -m-1 opacity-0 cursor-pointer" />
+                    </div>
+                    <span class="text-xs text-[#70767f] font-mono w-16">#3D6AF2</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-[#70767f]">To</span>
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden flex-shrink-0" style="background:#32D9D9">
+                      <input type="color" value="#32D9D9" class="w-10 h-10 -m-1 opacity-0 cursor-pointer" />
+                    </div>
+                    <span class="text-xs text-[#70767f] font-mono w-16">#32D9D9</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-[#70767f]">Angle</span>
+                  <div class="flex items-center gap-2">
+                    <input type="range" min="0" max="360" value="135" class="w-24" />
+                    <span class="text-xs text-[#70767f] font-mono w-10 text-right">135°</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Foreground color -->
+            <div class="flex items-center justify-between">
+              <span class="sec-label">Foreground Color</span>
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden flex-shrink-0" style="background:#ffffff">
+                  <input type="color" value="#ffffff" class="w-10 h-10 -m-1 opacity-0 cursor-pointer" />
+                </div>
+                <span class="text-xs text-[#70767f] font-mono w-16">#FFFFFF</span>
+              </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="border-t border-[#1e2631]"></div>
+
+            <!-- Font -->
+            <div class="space-y-2">
+              <span class="sec-label">Font</span>
+              <div class="flex flex-wrap gap-1.5 mt-1">
+                <button class="font-chip active rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Sans</button>
+                <button class="font-chip rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Serif</button>
+                <button class="font-chip rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Mono</button>
+                <button class="font-chip rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Rounded</button>
+                <button class="font-chip rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Hand</button>
+              </div>
+            </div>
+
+            <!-- Font size -->
+            <div class="flex items-center justify-between">
+              <span class="sec-label">Font Size</span>
+              <div class="flex items-center gap-2">
+                <input type="range" min="50" max="100" value="70" class="w-24" />
+                <span class="text-xs text-[#70767f] font-mono w-10 text-right">70%</span>
+              </div>
+            </div>
+
+            <!-- Padding -->
+            <div class="flex items-center justify-between">
+              <span class="sec-label">Padding</span>
+              <div class="flex items-center gap-2">
+                <input type="range" min="0" max="40" value="15" class="w-24" />
+                <span class="text-xs text-[#70767f] font-mono w-10 text-right">15%</span>
+              </div>
+            </div>
+
+            <!-- Border -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="sec-label">Border</span>
+                <label class="toggle">
+                  <input type="checkbox" id="border-toggle" onchange="toggleSection('border-section', this.checked)" />
+                  <span class="toggle-track"></span>
+                  <span class="toggle-thumb"></span>
+                </label>
+              </div>
+              <div id="border-section" class="hidden space-y-2 pl-3 border-l-2 border-[#1e2631]">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-[#70767f]">Color</span>
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden" style="background:#ffffff">
+                      <input type="color" value="#ffffff" class="w-10 h-10 -m-1 opacity-0 cursor-pointer" />
+                    </div>
+                    <span class="text-xs text-[#70767f] font-mono w-16">#FFFFFF</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-[#70767f]">Width</span>
+                  <div class="flex items-center gap-2">
+                    <input type="range" min="1" max="4" value="2" class="w-24" />
+                    <span class="text-xs text-[#70767f] font-mono w-10 text-right">2px</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shadow -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="sec-label">Shadow</span>
+                <label class="toggle">
+                  <input type="checkbox" id="shadow-toggle" onchange="toggleSection('shadow-section', this.checked)" />
+                  <span class="toggle-track"></span>
+                  <span class="toggle-thumb"></span>
+                </label>
+              </div>
+              <div id="shadow-section" class="hidden space-y-2 pl-3 border-l-2 border-[#1e2631]">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-[#70767f]">Blur</span>
+                  <div class="flex items-center gap-2">
+                    <input type="range" min="0" max="20" value="8" class="w-24" />
+                    <span class="text-xs text-[#70767f] font-mono w-10 text-right">8px</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-[#70767f]">Offset Y</span>
+                  <div class="flex items-center gap-2">
+                    <input type="range" min="0" max="10" value="2" class="w-24" />
+                    <span class="text-xs text-[#70767f] font-mono w-10 text-right">2px</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ══════════════════════ UPLOAD TAB ══════════════════════ -->
+        <div id="panel-upload" class="hidden rounded-xl border border-[#1e2631] bg-[#131a23] p-5 space-y-5">
+          <!-- Drop zone -->
+          <div class="dropzone rounded-xl flex flex-col items-center justify-center gap-3 p-10 cursor-pointer min-h-[160px] bg-[#090f16]/40">
+            <span class="ms text-[#70767f]" style="font-size:40px">upload_file</span>
+            <div class="text-center">
+              <p class="text-sm font-medium text-[#a6abb5]">Drop image here or click to browse</p>
+              <p class="text-xs text-[#70767f] mt-1">PNG, JPEG, SVG, WebP · Max 10MB</p>
+            </div>
+          </div>
+          <!-- Background color -->
+          <div class="flex items-center justify-between">
+            <span class="sec-label">Background Color</span>
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden" style="background:#3D6AF2">
+                <input type="color" value="#3D6AF2" class="w-10 h-10 -m-1 opacity-0 cursor-pointer" />
+              </div>
+              <span class="text-xs text-[#70767f] font-mono w-16">#3D6AF2</span>
+            </div>
+          </div>
+          <!-- Shape -->
+          <div class="space-y-2">
+            <span class="sec-label">Shape</span>
+            <div class="grid grid-cols-4 gap-2 mt-1.5">
+              <button class="shape-btn flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/></svg>
+                <span>Circle</span>
+              </button>
+              <button class="shape-btn flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" stroke="currentColor" stroke-width="2"/></svg>
+                <span>Square</span>
+              </button>
+              <button class="shape-btn active flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="4" stroke="currentColor" stroke-width="2"/></svg>
+                <span>Rounded</span>
+              </button>
+              <button class="shape-btn flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2L17 6.5V13.5L10 18L3 13.5V6.5L10 2Z" stroke="currentColor" stroke-width="2"/></svg>
+                <span>Hexagon</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════ ICONS TAB ══════════════════════ -->
+        <div id="panel-icon" class="hidden rounded-xl border border-[#1e2631] bg-[#131a23] p-5 space-y-4">
+          <!-- Search -->
+          <div class="relative">
+            <span class="ms absolute left-3 top-1/2 -translate-y-1/2 text-[#70767f]" style="font-size:16px">search</span>
+            <input type="text" placeholder="Search icons..." class="w-full rounded-lg border border-[#1e2631] bg-[#090f16] pl-9 pr-3 py-2.5 text-sm text-white placeholder-[#70767f] focus:outline-none focus:border-[#3D6AF2] focus:ring-2 focus:ring-[#3D6AF2]/20 min-h-[44px] transition-all" />
+          </div>
+          <!-- Category chips -->
+          <div class="flex gap-1.5 overflow-x-auto pb-1">
+            <button class="cat-chip active rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">All</button>
+            <button class="cat-chip rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">UI</button>
+            <button class="cat-chip rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Nature</button>
+            <button class="cat-chip rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Tech</button>
+            <button class="cat-chip rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Business</button>
+            <button class="cat-chip rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Animals</button>
+            <button class="cat-chip rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Food</button>
+            <button class="cat-chip rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Sports</button>
+          </div>
+          <!-- Icon grid -->
+          <div class="icon-grid grid grid-cols-6 gap-2 pr-1">
+            <!-- Row 1 -->
+            <button class="icon-btn selected flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">rocket_launch</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">rocket</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">bolt</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">bolt</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">star</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">star</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">favorite</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">heart</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">diamond</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">diamond</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">local_fire_department</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">fire</span>
+            </button>
+            <!-- Row 2 -->
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">code</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">code</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">terminal</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">terminal</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">cloud</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">cloud</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">memory</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">chip</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">layers</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">layers</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">data_object</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">json</span>
+            </button>
+            <!-- Row 3 -->
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">palette</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">palette</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">brush</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">brush</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">auto_awesome</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">spark</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">bar_chart</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">chart</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">hub</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">hub</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">travel_explore</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">globe</span>
+            </button>
+            <!-- Row 4 -->
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">celebration</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">party</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">emoji_nature</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">leaf</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">sports_esports</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">game</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">music_note</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">music</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">camera_alt</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">camera</span>
+            </button>
+            <button class="icon-btn flex flex-col items-center gap-1 rounded-lg p-2 border min-h-[60px]">
+              <span class="ms text-[#a6abb5]" style="font-size:24px">local_cafe</span>
+              <span class="text-[10px] text-[#70767f] truncate w-full text-center">coffee</span>
+            </button>
+          </div>
+          <!-- Style controls (no font) separator -->
+          <div class="border-t border-[#1e2631] pt-4 space-y-4">
+            <!-- Shape -->
+            <div class="space-y-2">
+              <span class="sec-label">Shape</span>
+              <div class="grid grid-cols-4 gap-2 mt-1.5">
+                <button class="shape-btn flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/></svg>
+                  <span>Circle</span>
+                </button>
+                <button class="shape-btn flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" stroke="currentColor" stroke-width="2"/></svg>
+                  <span>Square</span>
+                </button>
+                <button class="shape-btn active flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="4" stroke="currentColor" stroke-width="2"/></svg>
+                  <span>Rounded</span>
+                </button>
+                <button class="shape-btn flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium min-h-[56px]">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L17 6.5V13.5L10 18L3 13.5V6.5L10 2Z" stroke="currentColor" stroke-width="2"/></svg>
+                  <span>Hexagon</span>
+                </button>
+              </div>
+            </div>
+            <!-- BG -->
+            <div class="space-y-2">
+              <span class="sec-label">Background</span>
+              <div class="flex gap-1 rounded-lg bg-[#090f16] p-1 mt-1.5">
+                <button class="bg-type-btn active rounded-md px-2 py-1.5 text-xs font-medium min-h-[36px] bg-[#3D6AF2] text-white">Solid</button>
+                <button class="bg-type-btn rounded-md px-2 py-1.5 text-xs font-medium min-h-[36px] text-[#70767f]">Gradient</button>
+                <button class="bg-type-btn rounded-md px-2 py-1.5 text-xs font-medium min-h-[36px] text-[#70767f]">Transparent</button>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-[#70767f]">Color</span>
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden" style="background:#3D6AF2">
+                    <input type="color" value="#3D6AF2" class="w-10 h-10 -m-1 opacity-0 cursor-pointer" />
+                  </div>
+                  <span class="text-xs text-[#70767f] font-mono w-16">#3D6AF2</span>
+                </div>
+              </div>
+            </div>
+            <!-- FG color -->
+            <div class="flex items-center justify-between">
+              <span class="sec-label">Foreground Color</span>
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden" style="background:#ffffff">
+                  <input type="color" value="#ffffff" class="w-10 h-10 -m-1 opacity-0 cursor-pointer" />
+                </div>
+                <span class="text-xs text-[#70767f] font-mono w-16">#FFFFFF</span>
+              </div>
+            </div>
+            <!-- Padding -->
+            <div class="flex items-center justify-between">
+              <span class="sec-label">Padding</span>
+              <div class="flex items-center gap-2">
+                <input type="range" min="0" max="40" value="15" class="w-24" />
+                <span class="text-xs text-[#70767f] font-mono w-10 text-right">15%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════ AI TAB ══════════════════════ -->
+        <div id="panel-ai" class="hidden rounded-xl border border-[#1e2631] bg-[#131a23] p-5 space-y-5">
+          <!-- Prompt -->
+          <div class="space-y-2">
+            <label class="sec-label block">Describe your favicon</label>
+            <textarea rows="3" maxlength="500" placeholder="e.g., 'a minimalist rocket icon' or 'coffee cup with steam, warm colors'"
+              class="w-full rounded-lg border border-[#1e2631] bg-[#090f16] px-4 py-3 text-sm text-white placeholder-[#70767f] focus:outline-none focus:border-[#3D6AF2] focus:ring-2 focus:ring-[#3D6AF2]/20 resize-none transition-all">a bold shield with a lightning bolt inside</textarea>
+            <p class="text-xs text-[#70767f]">42/500</p>
+          </div>
+          <!-- Style -->
+          <div class="space-y-2">
+            <span class="sec-label">Style</span>
+            <div class="flex flex-wrap gap-1.5 mt-1">
+              <button class="style-btn active rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Flat</button>
+              <button class="style-btn rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">3D</button>
+              <button class="style-btn rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Pixel Art</button>
+              <button class="style-btn rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Minimal</button>
+              <button class="style-btn rounded-full px-3 py-1.5 text-xs font-medium min-h-[36px]">Gradient</button>
+            </div>
+          </div>
+          <!-- Generate button -->
+          <button class="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white min-h-[48px] transition-all"
+            style="background:linear-gradient(135deg, #3D6AF2 0%, #7c3aed 100%)">
+            <span class="ms" style="font-size:16px">auto_awesome</span>
+            Generate with AI
+            <span class="ml-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px]">1 credit</span>
+          </button>
+          <!-- Results -->
+          <div class="space-y-3">
+            <span class="sec-label">Choose an icon</span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <!-- Result 1 — selected -->
+              <button class="ai-result selected flex flex-col items-center gap-2 p-4 rounded-xl border-2 min-h-[100px]">
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#3D6AF2,#32D9D9)">
+                  <span class="ms text-white ms-fill" style="font-size:28px">shield</span>
+                </div>
+                <span class="text-xs text-[#70767f] truncate w-full text-center">Shield v1</span>
+                <span class="ms text-[#3D6AF2]" style="font-size:16px">check_circle</span>
+              </button>
+              <!-- Result 2 -->
+              <button class="ai-result flex flex-col items-center gap-2 p-4 rounded-xl border-2 min-h-[100px]">
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background:#1e2631">
+                  <span class="ms text-[#a6abb5] ms-fill" style="font-size:28px">verified_user</span>
+                </div>
+                <span class="text-xs text-[#70767f] truncate w-full text-center">Shield v2</span>
+              </button>
+              <!-- Result 3 -->
+              <button class="ai-result flex flex-col items-center gap-2 p-4 rounded-xl border-2 min-h-[100px]">
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background:#1e2631">
+                  <span class="ms text-[#a6abb5]" style="font-size:28px">security</span>
+                </div>
+                <span class="text-xs text-[#70767f] truncate w-full text-center">Security</span>
+              </button>
+              <!-- Result 4 -->
+              <button class="ai-result flex flex-col items-center gap-2 p-4 rounded-xl border-2 min-h-[100px]">
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background:#1e2631">
+                  <span class="ms text-[#a6abb5]" style="font-size:28px">lock</span>
+                </div>
+                <span class="text-xs text-[#70767f] truncate w-full text-center">Lock</span>
+              </button>
+            </div>
+            <p class="text-xs text-[#70767f] text-center">Icon applied — customize it further using the style controls</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Preview + Export -->
+      <div class="w-[380px] shrink-0 flex flex-col gap-4">
+
+        <!-- ── Preview Panel ── -->
+        <div class="rounded-xl border border-[#1e2631] bg-[#131a23] overflow-hidden">
+          <div class="px-4 pt-4 pb-2">
+            <h2 class="text-sm font-semibold text-white">Preview</h2>
+          </div>
+          <div class="px-4 pb-4 space-y-4">
+
+            <!-- Browser Tab -->
+            <div class="space-y-1.5">
+              <span class="sec-label">Browser Tab</span>
+              <div class="rounded-lg overflow-hidden border border-[#1e2631]">
+                <!-- Tab bar -->
+                <div class="flex items-end gap-px bg-[#0d1520] px-2 pt-2">
+                  <div class="flex items-center gap-1.5 bg-[#1e2631] rounded-t-md px-3 py-1.5 max-w-[160px]">
+                    <div class="favicon-mock-sm flex-shrink-0">Tk</div>
+                    <span class="text-[10px] font-medium text-[#a6abb5] truncate">My Website</span>
+                    <span class="ms text-[#70767f] flex-shrink-0" style="font-size:10px">close</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 bg-[#131a23] rounded-t-md px-3 py-1.5 opacity-50">
+                    <span class="text-[10px] text-[#70767f]">New Tab</span>
+                  </div>
+                </div>
+                <!-- URL bar -->
+                <div class="bg-[#131a23] px-3 py-2">
+                  <div class="flex items-center gap-1.5 bg-[#090f16] rounded px-2 py-1 border border-[#1e2631]">
+                    <span class="ms text-[#70767f]" style="font-size:10px">lock</span>
+                    <span class="text-[9px] text-[#70767f]">mywebsite.com</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bookmarks -->
+            <div class="space-y-1.5">
+              <span class="sec-label">Bookmarks</span>
+              <div class="bg-[#090f16] rounded-lg px-3 py-2 border border-[#1e2631]">
+                <div class="border-b border-[#1e2631] mb-1.5 pb-1"></div>
+                <div class="flex items-center gap-2 overflow-hidden">
+                  <div class="flex items-center gap-1 rounded px-2 py-0.5 bg-[#131a23] border border-[#1e2631]">
+                    <div class="favicon-mock-sm">Tk</div>
+                    <span class="text-[9px] font-medium text-[#a6abb5] shrink-0">My Site</span>
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <span class="ms text-[#70767f]" style="font-size:10px">folder</span>
+                    <span class="text-[9px] text-[#70767f]">News</span>
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <span class="ms text-[#70767f]" style="font-size:10px">folder</span>
+                    <span class="text-[9px] text-[#70767f]">GitHub</span>
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <span class="ms text-[#70767f]" style="font-size:10px">folder</span>
+                    <span class="text-[9px] text-[#70767f]">Gmail</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Home Screen -->
+            <div class="space-y-1.5">
+              <span class="sec-label">Mobile Home Screen</span>
+              <div class="flex justify-center">
+                <div class="relative w-[120px] h-[200px] rounded-2xl border-2 border-[#1e2631] bg-[#090f16] flex flex-col items-center justify-center p-3">
+                  <div class="absolute top-1.5 w-12 h-1 rounded-full bg-[#1e2631]"></div>
+                  <div class="grid grid-cols-3 gap-2 mt-3">
+                    <!-- 9 icons, center = favicon -->
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="w-6 h-6 rounded-md bg-[#1e2631]"></div>
+                      <span class="text-[5px] text-[#70767f]">App</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="w-6 h-6 rounded-md bg-[#1e2631]"></div>
+                      <span class="text-[5px] text-[#70767f]">App</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="w-6 h-6 rounded-md bg-[#1e2631]"></div>
+                      <span class="text-[5px] text-[#70767f]">App</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="w-6 h-6 rounded-md bg-[#1e2631]"></div>
+                      <span class="text-[5px] text-[#70767f]">App</span>
+                    </div>
+                    <!-- CENTER: favicon -->
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="w-6 h-6 rounded-md favicon-mock" style="font-size:10px">Tk</div>
+                      <span class="text-[5px] text-[#a6abb5]">My App</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="w-6 h-6 rounded-md bg-[#1e2631]"></div>
+                      <span class="text-[5px] text-[#70767f]">App</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="w-6 h-6 rounded-md bg-[#1e2631]"></div>
+                      <span class="text-[5px] text-[#70767f]">App</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="w-6 h-6 rounded-md bg-[#1e2631]"></div>
+                      <span class="text-[5px] text-[#70767f]">App</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="w-6 h-6 rounded-md bg-[#1e2631]"></div>
+                      <span class="text-[5px] text-[#70767f]">App</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Google Search Result -->
+            <div class="space-y-1.5">
+              <span class="sec-label">Google Search Result</span>
+              <div class="bg-[#090f16] rounded-lg p-3 border border-[#1e2631]">
+                <div class="flex items-center gap-2 mb-1">
+                  <div class="favicon-mock-sm">Tk</div>
+                  <span class="text-[10px] text-[#70767f]">mywebsite.com</span>
+                </div>
+                <p class="text-xs font-medium text-[#3D9DF2] mb-0.5">My Website — Home</p>
+                <p class="text-[9px] text-[#70767f] leading-relaxed">Welcome to My Website. Discover great tools and resources for your everyday needs and projects.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── Export Panel ── -->
+        <div class="rounded-xl border border-[#1e2631] bg-[#131a23] p-4 space-y-4">
+          <h2 class="text-sm font-semibold text-white">Export</h2>
+
+          <!-- Sizes -->
+          <div class="space-y-2">
+            <span class="sec-label">Sizes</span>
+            <div class="grid grid-cols-2 gap-x-3 gap-y-2 mt-1">
+              <label class="flex items-center gap-2 cursor-pointer min-h-[32px]">
+                <input type="checkbox" checked class="accent-[#3D6AF2]" />
+                <span class="text-xs text-[#a6abb5]">16×16</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer min-h-[32px]">
+                <input type="checkbox" checked class="accent-[#3D6AF2]" />
+                <span class="text-xs text-[#a6abb5]">32×32</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer min-h-[32px]">
+                <input type="checkbox" checked class="accent-[#3D6AF2]" />
+                <span class="text-xs text-[#a6abb5]">48×48</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer min-h-[32px]">
+                <input type="checkbox" checked class="accent-[#3D6AF2]" />
+                <span class="text-xs text-[#a6abb5]">180×180 (Apple)</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer min-h-[32px]">
+                <input type="checkbox" checked class="accent-[#3D6AF2]" />
+                <span class="text-xs text-[#a6abb5]">192×192 (Android)</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer min-h-[32px]">
+                <input type="checkbox" checked class="accent-[#3D6AF2]" />
+                <span class="text-xs text-[#a6abb5]">512×512 (PWA)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Download ZIP CTA -->
+          <button class="btn-primary flex items-center justify-center gap-2 w-full rounded-lg text-white font-semibold text-sm px-4 py-3 min-h-[44px] transition-opacity"
+            style="background:linear-gradient(90deg,#3D6AF2 0%,#3D9DF2 100%)">
+            <span class="ms" style="font-size:16px">download</span>
+            Download ZIP
+          </button>
+
+          <!-- Copy buttons -->
+          <div class="flex gap-2">
+            <button onclick="flashCopy(this,'HTML Tags')" class="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#1e2631] bg-[#1e2631] text-[#a6abb5] text-xs font-medium px-3 py-2.5 min-h-[44px] hover:bg-[#1e2a3a] hover:text-white transition-all">
+              <span class="ms" style="font-size:14px">content_copy</span>
+              HTML Tags
+            </button>
+            <button onclick="flashCopy(this,'manifest.json')" class="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#1e2631] bg-[#1e2631] text-[#a6abb5] text-xs font-medium px-3 py-2.5 min-h-[44px] hover:bg-[#1e2a3a] hover:text-white transition-all">
+              <span class="ms" style="font-size:14px">content_copy</span>
+              manifest.json
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-[#1e2631] mt-12 py-6">
+    <div class="max-w-[1200px] mx-auto px-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-5 h-5 rounded-md bg-gradient-to-br from-[#3D6AF2] to-[#32D9D9] flex items-center justify-center">
+          <span class="text-white font-bold" style="font-size:9px">T</span>
+        </div>
+        <span class="text-xs text-[#70767f]">Toolk1t</span>
+      </div>
+      <p class="text-xs text-[#70767f]">&copy; 2026 Toolk1t. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ── Tab switching ──────────────────────────────────────────
+    const tabs = ['upload', 'text', 'icon', 'ai']
+
+    function switchTab(name) {
+      tabs.forEach(t => {
+        const btn = document.getElementById('tab-' + t)
+        const panel = document.getElementById('panel-' + t)
+        const isActive = t === name
+        btn.classList.toggle('active', isActive)
+        btn.classList.toggle('tab-active', isActive)
+        panel.classList.toggle('hidden', !isActive)
+      })
+    }
+
+    // ── Shape buttons ──────────────────────────────────────────
+    function setShape(btn, shape) {
+      const group = btn.closest('.grid')
+      group.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+    }
+
+    // ── BG type buttons ────────────────────────────────────────
+    function setBgType(btn, type) {
+      const group = btn.closest('div')
+      group.querySelectorAll('.bg-type-btn').forEach(b => {
+        b.classList.remove('active', 'bg-[#3D6AF2]', 'text-white')
+        b.classList.add('text-[#70767f]')
+      })
+      btn.classList.add('active', 'bg-[#3D6AF2]', 'text-white')
+      btn.classList.remove('text-[#70767f]')
+
+      const gradientControls = document.getElementById('gradient-controls')
+      if (gradientControls) {
+        gradientControls.style.display = type === 'gradient' ? '' : 'none'
+      }
+    }
+
+    // ── Toggle sections ────────────────────────────────────────
+    function toggleSection(id, checked) {
+      const el = document.getElementById(id)
+      if (el) el.classList.toggle('hidden', !checked)
+    }
+
+    // ── Copy flash ─────────────────────────────────────────────
+    function flashCopy(btn, label) {
+      const icon = btn.querySelector('.ms')
+      const originalText = btn.lastChild.textContent || ''
+      icon.textContent = 'check'
+      icon.style.color = '#10B981'
+      btn.style.borderColor = '#10B981'
+      setTimeout(() => {
+        icon.textContent = 'content_copy'
+        icon.style.color = ''
+        btn.style.borderColor = ''
+      }, 1800)
+    }
+
+    // ── Range slider live values ───────────────────────────────
+    document.querySelectorAll('input[type=range]').forEach(range => {
+      const valueEl = range.parentElement.querySelector('span:last-child')
+      if (!valueEl) return
+      const unit = valueEl.textContent.replace(/[\d.]/g, '')
+      range.addEventListener('input', () => {
+        valueEl.textContent = range.value + unit
+      })
+    })
+
+    // ── Font chips ─────────────────────────────────────────────
+    document.querySelectorAll('.font-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.closest('.flex').querySelectorAll('.font-chip').forEach(c => c.classList.remove('active'))
+        chip.classList.add('active')
+      })
+    })
+
+    // ── Category chips ─────────────────────────────────────────
+    document.querySelectorAll('.cat-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.closest('.flex').querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'))
+        chip.classList.add('active')
+      })
+    })
+
+    // ── Style chips (AI tab) ───────────────────────────────────
+    document.querySelectorAll('.style-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.flex').querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+      })
+    })
+
+    // ── AI result selection ────────────────────────────────────
+    document.querySelectorAll('.ai-result').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.grid').querySelectorAll('.ai-result').forEach(b => {
+          b.classList.remove('selected')
+          const chk = b.querySelector('.ms:last-child')
+          if (chk) chk.remove()
+        })
+        btn.classList.add('selected')
+        if (!btn.querySelector('.ms.text-\\[\\#3D6AF2\\]')) {
+          const chk = document.createElement('span')
+          chk.className = 'ms text-[#3D6AF2]'
+          chk.style.fontSize = '16px'
+          chk.textContent = 'check_circle'
+          btn.appendChild(chk)
+        }
+      })
+    })
+
+    // ── Icon selection ─────────────────────────────────────────
+    document.querySelectorAll('.icon-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.icon-grid, .grid').querySelectorAll('.icon-btn').forEach(b => b.classList.remove('selected'))
+        btn.classList.add('selected')
+      })
+    })
+  </script>
+</body>
+</html>

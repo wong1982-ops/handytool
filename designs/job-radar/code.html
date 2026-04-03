@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Radar — Toolk1t</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'page-bg': '#090f16',
+            'card-bg': '#131a23',
+            'card-hover': '#1e2631',
+            'border-col': '#1e2631',
+            'primary': '#3D6AF2',
+            'primary-hover': '#3D79F2',
+            'text-pri': '#ffffff',
+            'text-sec': '#a6abb5',
+            'text-mut': '#70767f',
+            'success': '#10B981',
+            'danger': '#EF4444',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #090f16;
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 20px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* Shimmer skeleton */
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #131a23 25%, #1e2631 50%, #131a23 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.5s infinite linear;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #090f16; }
+    ::-webkit-scrollbar-thumb { background: #1e2631; border-radius: 3px; }
+
+    /* Select styling */
+    select {
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2370767f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 32px !important;
+    }
+
+    /* Dialog reset */
+    dialog {
+      padding: 0;
+      border: none;
+      background: transparent;
+      max-width: 100%;
+      max-height: 100%;
+      width: 100%;
+      height: 100%;
+    }
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.65);
+    }
+
+    /* Tab transition */
+    .tab-btn {
+      transition: all 150ms ease;
+    }
+
+    /* Job card hover */
+    .job-card {
+      transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+    }
+    .job-card:hover {
+      border-color: rgba(61, 106, 242, 0.55) !important;
+      box-shadow: 0 4px 20px rgba(61, 106, 242, 0.08);
+      background-color: #1e2631;
+    }
+    .job-card:hover .job-title {
+      color: #3D6AF2;
+    }
+
+    /* Focus ring */
+    input:focus, select:focus, button:focus-visible {
+      outline: 2px solid rgba(61, 106, 242, 0.6);
+      outline-offset: 2px;
+    }
+
+    /* Primary button glow */
+    .btn-primary:hover {
+      background-color: #3D79F2;
+      box-shadow: 0 4px 16px rgba(61, 106, 242, 0.35);
+    }
+
+    /* Filters panel on mobile */
+    .filters-mobile {
+      display: none;
+    }
+    .filters-mobile.open {
+      display: block;
+    }
+  </style>
+</head>
+
+<body class="bg-page-bg text-text-pri">
+
+  <!-- ===== HEADER NAV ===== -->
+  <header class="sticky top-0 z-40 bg-page-bg/95 backdrop-blur-md border-b border-border-col">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Logo -->
+        <div class="flex items-center gap-1.5">
+          <div class="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+            <span class="text-white text-xs font-black">T</span>
+          </div>
+          <span class="font-bold text-sm tracking-tight text-text-pri">Toolk1t</span>
+        </div>
+        <span class="text-border-col text-lg select-none">|</span>
+        <nav class="hidden sm:flex items-center gap-5 text-xs font-medium text-text-sec">
+          <a href="#" class="hover:text-text-pri transition-colors">Tools</a>
+          <a href="#" class="hover:text-text-pri transition-colors">Blog</a>
+          <a href="#" class="hover:text-text-pri transition-colors">Pricing</a>
+        </nav>
+      </div>
+      <button class="w-9 h-9 rounded-lg border border-border-col flex items-center justify-center hover:bg-card-hover transition-colors" aria-label="Toggle theme">
+        <span class="material-symbols-outlined text-text-sec" style="font-size:18px">light_mode</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="max-w-[1200px] mx-auto px-4 sm:px-6 py-8 flex flex-col gap-6">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-xs text-text-mut">
+      <a href="#" class="hover:text-text-sec transition-colors">Home</a>
+      <span class="material-symbols-outlined" style="font-size:14px;color:#70767f">chevron_right</span>
+      <a href="#" class="hover:text-text-sec transition-colors">Tools</a>
+      <span class="material-symbols-outlined" style="font-size:14px;color:#70767f">chevron_right</span>
+      <span class="text-text-sec">Job Radar</span>
+    </nav>
+
+    <!-- Page title -->
+    <div class="space-y-1.5">
+      <h1 class="text-2xl sm:text-3xl font-bold text-text-pri tracking-tight">Job Radar</h1>
+      <p class="text-sm text-text-sec">IT &amp; French language jobs across Australia and New Zealand — updated daily</p>
+    </div>
+
+    <!-- Category Tabs -->
+    <div role="tablist" aria-label="Job categories"
+         class="flex gap-1 p-1 rounded-xl w-fit"
+         style="background:#131a23; border:1px solid #1e2631;">
+      <button
+        id="tab-it"
+        role="tab"
+        type="button"
+        aria-selected="true"
+        aria-controls="panel-it"
+        onclick="switchTab('it')"
+        class="tab-btn px-5 py-2.5 rounded-lg text-sm font-medium min-h-[44px]"
+        style="background:#090f16; color:#ffffff; box-shadow:0 1px 4px rgba(0,0,0,0.4);">
+        IT / Tech
+      </button>
+      <button
+        id="tab-french"
+        role="tab"
+        type="button"
+        aria-selected="false"
+        aria-controls="panel-french"
+        onclick="switchTab('french')"
+        class="tab-btn px-5 py-2.5 rounded-lg text-sm font-medium min-h-[44px]"
+        style="color:#70767f;">
+        French Language
+      </button>
+    </div>
+
+    <!-- ===== GALLERY AREA ===== -->
+    <div id="panel-it" role="tabpanel" aria-labelledby="tab-it" class="flex flex-col gap-4">
+
+      <!-- Sticky search + mobile filters -->
+      <div class="sticky top-14 z-30 pb-3 -mx-4 px-4 pt-2 lg:static lg:mx-0 lg:px-0 lg:pt-0 lg:pb-0"
+           style="background:#090f16; border-bottom:1px solid rgba(30,38,49,0.6);">
+        <div class="flex flex-col gap-2 lg:gap-3">
+          <!-- Search bar -->
+          <div class="relative w-full">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-text-mut pointer-events-none" style="font-size:20px">search</span>
+            <input
+              type="search"
+              placeholder="Search jobs by title, skill, or keyword..."
+              class="w-full h-12 pl-11 pr-4 rounded-xl text-sm text-text-pri placeholder-text-mut transition-all"
+              style="background:#131a23; border:1px solid #1e2631; outline:none;"
+              onfocus="this.style.borderColor='rgba(61,106,242,0.6)'; this.style.boxShadow='0 0 0 3px rgba(61,106,242,0.12)'"
+              onblur="this.style.borderColor='#1e2631'; this.style.boxShadow='none'"
+              aria-label="Search jobs"
+            />
+          </div>
+
+          <!-- Mobile filter toggle -->
+          <div class="lg:hidden">
+            <button
+              type="button"
+              onclick="toggleMobileFilters()"
+              id="filter-toggle"
+              class="w-full flex items-center justify-center gap-2 px-4 rounded-xl text-sm font-medium transition-colors min-h-[44px]"
+              style="background:#131a23; border:1px solid #1e2631; color:#a6abb5;"
+              aria-expanded="false"
+              aria-controls="mobile-filters">
+              <span class="material-symbols-outlined" style="font-size:18px">tune</span>
+              Filters
+              <span id="filter-dot" class="w-2 h-2 rounded-full hidden" style="background:#3D6AF2;"></span>
+            </button>
+            <!-- Mobile filter panel -->
+            <div id="mobile-filters" class="filters-mobile mt-2 p-4 rounded-xl" style="background:#131a23; border:1px solid #1e2631;">
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Employment</label>
+                  <select class="h-10 px-3 rounded-lg text-sm text-text-pri" style="background:#090f16; border:1px solid #1e2631; color:#ffffff;">
+                    <option value="">All</option>
+                    <option>Full-time</option>
+                    <option>Contract</option>
+                    <option>Part-time</option>
+                  </select>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Work Mode</label>
+                  <select class="h-10 px-3 rounded-lg text-sm text-text-pri" style="background:#090f16; border:1px solid #1e2631; color:#ffffff;">
+                    <option value="">All</option>
+                    <option>Remote</option>
+                    <option>Hybrid</option>
+                    <option>On-site</option>
+                  </select>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Country</label>
+                  <select class="h-10 px-3 rounded-lg text-sm text-text-pri" style="background:#090f16; border:1px solid #1e2631; color:#ffffff;">
+                    <option value="">All</option>
+                    <option>🇦🇺 Australia</option>
+                    <option>🇳🇿 New Zealand</option>
+                  </select>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Posted Within</label>
+                  <select class="h-10 px-3 rounded-lg text-sm text-text-pri" style="background:#090f16; border:1px solid #1e2631; color:#ffffff;">
+                    <option value="">All</option>
+                    <option>Last 24h</option>
+                    <option>Last 3 days</option>
+                    <option>Last 7 days</option>
+                    <option>Last 14 days</option>
+                    <option>Last 30 days</option>
+                  </select>
+                </div>
+                <div class="col-span-2 flex flex-col gap-1">
+                  <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Salary Range (Annual)</label>
+                  <div class="flex gap-2">
+                    <input type="number" placeholder="Min" class="w-full h-10 px-3 rounded-lg text-sm text-text-pri placeholder-text-mut" style="background:#090f16; border:1px solid #1e2631;" />
+                    <input type="number" placeholder="Max" class="w-full h-10 px-3 rounded-lg text-sm text-text-pri placeholder-text-mut" style="background:#090f16; border:1px solid #1e2631;" />
+                  </div>
+                </div>
+                <div class="col-span-2 flex flex-col gap-1">
+                  <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Hourly Rate (Contract)</label>
+                  <div class="flex gap-2">
+                    <input type="number" placeholder="Min" class="w-full h-10 px-3 rounded-lg text-sm text-text-pri placeholder-text-mut" style="background:#090f16; border:1px solid #1e2631;" />
+                    <input type="number" placeholder="Max" class="w-full h-10 px-3 rounded-lg text-sm text-text-pri placeholder-text-mut" style="background:#090f16; border:1px solid #1e2631;" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two-column layout: sidebar + jobs -->
+      <div class="flex gap-6">
+
+        <!-- ===== DESKTOP SIDEBAR ===== -->
+        <aside class="hidden lg:block w-60 shrink-0">
+          <div class="sticky top-24 p-4 rounded-xl" style="background:#131a23; border:1px solid #1e2631;">
+            <h2 class="text-sm font-semibold text-text-pri mb-4">Filters</h2>
+            <div class="flex flex-col gap-4">
+
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Employment</label>
+                <select class="h-10 px-3 rounded-lg text-sm" style="background:#090f16; border:1px solid #1e2631; color:#ffffff;">
+                  <option value="">All</option>
+                  <option>Full-time</option>
+                  <option>Contract</option>
+                  <option>Part-time</option>
+                </select>
+              </div>
+
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Work Mode</label>
+                <select class="h-10 px-3 rounded-lg text-sm" style="background:#090f16; border:1px solid #1e2631; color:#ffffff;">
+                  <option value="">All</option>
+                  <option selected>Remote</option>
+                  <option>Hybrid</option>
+                  <option>On-site</option>
+                </select>
+              </div>
+
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Country</label>
+                <select class="h-10 px-3 rounded-lg text-sm" style="background:#090f16; border:1px solid #1e2631; color:#ffffff;">
+                  <option value="">All</option>
+                  <option>🇦🇺 Australia</option>
+                  <option>🇳🇿 New Zealand</option>
+                </select>
+              </div>
+
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Posted Within</label>
+                <select class="h-10 px-3 rounded-lg text-sm" style="background:#090f16; border:1px solid #1e2631; color:#ffffff;">
+                  <option value="">All</option>
+                  <option>Last 24h</option>
+                  <option selected>Last 7 days</option>
+                  <option>Last 14 days</option>
+                  <option>Last 30 days</option>
+                </select>
+              </div>
+
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Salary Range (Annual)</label>
+                <div class="flex gap-2">
+                  <input type="number" placeholder="Min" class="w-full h-10 px-3 rounded-lg text-sm text-text-pri placeholder-text-mut" style="background:#090f16; border:1px solid #1e2631;" />
+                  <input type="number" placeholder="Max" class="w-full h-10 px-3 rounded-lg text-sm text-text-pri placeholder-text-mut" style="background:#090f16; border:1px solid #1e2631;" />
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] font-semibold uppercase tracking-widest text-text-mut">Hourly Rate (Contract)</label>
+                <div class="flex gap-2">
+                  <input type="number" placeholder="Min" class="w-full h-10 px-3 rounded-lg text-sm text-text-pri placeholder-text-mut" style="background:#090f16; border:1px solid #1e2631;" />
+                  <input type="number" placeholder="Max" class="w-full h-10 px-3 rounded-lg text-sm text-text-pri placeholder-text-mut" style="background:#090f16; border:1px solid #1e2631;" />
+                </div>
+              </div>
+
+              <!-- Clear filters (shown when active) -->
+              <button type="button" class="h-10 rounded-lg text-sm font-medium transition-colors" style="color:#EF4444;" onmouseover="this.style.background='rgba(239,68,68,0.08)'" onmouseout="this.style.background='transparent'">
+                Clear all filters
+              </button>
+
+            </div>
+          </div>
+        </aside>
+
+        <!-- ===== JOB LIST ===== -->
+        <div class="flex-1 min-w-0 flex flex-col gap-4">
+
+          <!-- Results count + sort -->
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-text-sec">
+              <span class="font-semibold text-text-pri">147</span> jobs found
+            </p>
+            <div class="flex items-center gap-2">
+              <label class="text-xs text-text-mut" for="sort-select">Sort:</label>
+              <select id="sort-select" class="h-9 px-2.5 pr-8 rounded-lg text-xs" style="background:#131a23; border:1px solid #1e2631; color:#a6abb5;">
+                <option>Newest first</option>
+                <option>Highest salary</option>
+                <option>Lowest salary</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ===== JOB CARDS GRID ===== -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="job-grid">
+
+            <!-- Card 1 -->
+            <button type="button" onclick="openModal('job1')" class="job-card w-full text-left p-5 rounded-xl cursor-pointer" style="background:#131a23; border:1px solid #1e2631;" aria-label="View details for Senior Full-Stack Engineer at Atlassian">
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h3 class="job-title text-sm font-semibold text-text-pri transition-colors line-clamp-2">Senior Full-Stack Engineer</h3>
+                <span class="text-xs text-text-mut whitespace-nowrap shrink-0 mt-0.5">Today</span>
+              </div>
+              <p class="text-xs text-text-sec mb-3">Atlassian · 🇦🇺 Sydney NSW</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.15); color:#3D6AF2;">Full-time</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(16,185,129,0.15); color:#10B981;">Remote</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-text-pri">$130k–$165k AUD</span>
+                <span class="text-xs text-text-mut">Seek</span>
+              </div>
+            </button>
+
+            <!-- Card 2 -->
+            <button type="button" onclick="openModal('job2')" class="job-card w-full text-left p-5 rounded-xl cursor-pointer" style="background:#131a23; border:1px solid #1e2631;" aria-label="View details for DevOps / Platform Engineer at Canva">
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h3 class="job-title text-sm font-semibold text-text-pri transition-colors line-clamp-2">DevOps / Platform Engineer</h3>
+                <span class="text-xs text-text-mut whitespace-nowrap shrink-0 mt-0.5">Today</span>
+              </div>
+              <p class="text-xs text-text-sec mb-3">Canva · 🇦🇺 Sydney NSW</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.15); color:#3D6AF2;">Full-time</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(16,185,129,0.15); color:#10B981;">Hybrid</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-text-pri">$120k–$155k AUD</span>
+                <span class="text-xs text-text-mut">LinkedIn</span>
+              </div>
+            </button>
+
+            <!-- Card 3 -->
+            <button type="button" onclick="openModal('job1')" class="job-card w-full text-left p-5 rounded-xl cursor-pointer" style="background:#131a23; border:1px solid #1e2631;" aria-label="View details for Contract Cloud Architect at ANZ Bank">
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h3 class="job-title text-sm font-semibold text-text-pri transition-colors line-clamp-2">Contract Cloud Architect — AWS/Azure</h3>
+                <span class="text-xs text-text-mut whitespace-nowrap shrink-0 mt-0.5">Yesterday</span>
+              </div>
+              <p class="text-xs text-text-sec mb-3">ANZ Bank · 🇦🇺 Melbourne VIC</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.15); color:#3D6AF2;">Contract</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(16,185,129,0.15); color:#10B981;">Hybrid</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-text-pri">$110–$145/hr AUD</span>
+                <span class="text-xs text-text-mut">Seek</span>
+              </div>
+            </button>
+
+            <!-- Card 4 -->
+            <button type="button" onclick="openModal('job1')" class="job-card w-full text-left p-5 rounded-xl cursor-pointer" style="background:#131a23; border:1px solid #1e2631;" aria-label="View details for Senior React Developer at Xero">
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h3 class="job-title text-sm font-semibold text-text-pri transition-colors line-clamp-2">Senior React Developer</h3>
+                <span class="text-xs text-text-mut whitespace-nowrap shrink-0 mt-0.5">2 days ago</span>
+              </div>
+              <p class="text-xs text-text-sec mb-3">Xero · 🇳🇿 Wellington</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.15); color:#3D6AF2;">Full-time</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(16,185,129,0.15); color:#10B981;">Remote</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-text-pri">$115k–$140k NZD</span>
+                <span class="text-xs text-text-mut">Trade Me</span>
+              </div>
+            </button>
+
+            <!-- Card 5 -->
+            <button type="button" onclick="openModal('job1')" class="job-card w-full text-left p-5 rounded-xl cursor-pointer" style="background:#131a23; border:1px solid #1e2631;" aria-label="View details for Data Engineer at Westpac">
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h3 class="job-title text-sm font-semibold text-text-pri transition-colors line-clamp-2">Data Engineer — Databricks & Spark</h3>
+                <span class="text-xs text-text-mut whitespace-nowrap shrink-0 mt-0.5">3 days ago</span>
+              </div>
+              <p class="text-xs text-text-sec mb-3">Westpac Group · 🇦🇺 Brisbane QLD</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.15); color:#3D6AF2;">Full-time</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(16,185,129,0.15); color:#10B981;">On-site</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-text-pri">$105k–$130k AUD</span>
+                <span class="text-xs text-text-mut">Indeed</span>
+              </div>
+            </button>
+
+            <!-- Card 6 -->
+            <button type="button" onclick="openModal('job1')" class="job-card w-full text-left p-5 rounded-xl cursor-pointer" style="background:#131a23; border:1px solid #1e2631;" aria-label="View details for iOS / Swift Developer at REA Group">
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h3 class="job-title text-sm font-semibold text-text-pri transition-colors line-clamp-2">iOS / Swift Developer</h3>
+                <span class="text-xs text-text-mut whitespace-nowrap shrink-0 mt-0.5">3 days ago</span>
+              </div>
+              <p class="text-xs text-text-sec mb-3">REA Group · 🇦🇺 Melbourne VIC</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.15); color:#3D6AF2;">Full-time</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(16,185,129,0.15); color:#10B981;">Hybrid</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-text-pri">$110k–$140k AUD</span>
+                <span class="text-xs text-text-mut">Seek</span>
+              </div>
+            </button>
+
+            <!-- Card 7 -->
+            <button type="button" onclick="openModal('job1')" class="job-card w-full text-left p-5 rounded-xl cursor-pointer" style="background:#131a23; border:1px solid #1e2631;" aria-label="View details for Machine Learning Engineer at Airtasker">
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h3 class="job-title text-sm font-semibold text-text-pri transition-colors line-clamp-2">Machine Learning Engineer</h3>
+                <span class="text-xs text-text-mut whitespace-nowrap shrink-0 mt-0.5">4 days ago</span>
+              </div>
+              <p class="text-xs text-text-sec mb-3">Airtasker · 🇦🇺 Sydney NSW</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.15); color:#3D6AF2;">Full-time</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(16,185,129,0.15); color:#10B981;">Remote</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-text-pri">$140k–$180k AUD</span>
+                <span class="text-xs text-text-mut">LinkedIn</span>
+              </div>
+            </button>
+
+            <!-- Card 8 -->
+            <button type="button" onclick="openModal('job1')" class="job-card w-full text-left p-5 rounded-xl cursor-pointer" style="background:#131a23; border:1px solid #1e2631;" aria-label="View details for QA Automation Engineer at Myob">
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h3 class="job-title text-sm font-semibold text-text-pri transition-colors line-clamp-2">QA Automation Engineer — Playwright / Cypress</h3>
+                <span class="text-xs text-text-mut whitespace-nowrap shrink-0 mt-0.5">5 days ago</span>
+              </div>
+              <p class="text-xs text-text-sec mb-3">MYOB · 🇦🇺 Perth WA</p>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.15); color:#3D6AF2;">Contract</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium" style="background:rgba(16,185,129,0.15); color:#10B981;">Remote</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-text-pri">$85–$110/hr AUD</span>
+                <span class="text-xs text-text-mut">Indeed</span>
+              </div>
+            </button>
+
+          </div>
+
+          <!-- ===== PAGINATION ===== -->
+          <nav aria-label="Job results pagination" class="flex flex-col items-center gap-3 mt-6">
+            <p class="text-sm text-text-sec">
+              <span class="font-semibold text-text-pri">147</span> jobs found
+            </p>
+            <div class="flex items-center gap-1.5">
+              <button type="button" class="px-3 h-10 rounded-lg text-sm transition-colors min-w-[44px]" style="background:#131a23; border:1px solid #1e2631; color:#70767f; opacity:0.4; cursor:not-allowed;" disabled aria-label="Previous page">
+                Prev
+              </button>
+              <button type="button" aria-current="page" class="min-w-[40px] h-10 flex items-center justify-center text-sm rounded-lg font-medium" style="background:#3D6AF2; color:#ffffff; border:1px solid transparent;">1</button>
+              <button type="button" class="min-w-[40px] h-10 flex items-center justify-center text-sm rounded-lg transition-colors" style="background:#131a23; border:1px solid #1e2631; color:#a6abb5;">2</button>
+              <button type="button" class="min-w-[40px] h-10 flex items-center justify-center text-sm rounded-lg transition-colors" style="background:#131a23; border:1px solid #1e2631; color:#a6abb5;">3</button>
+              <span class="px-2 text-text-mut text-sm">...</span>
+              <button type="button" class="min-w-[40px] h-10 flex items-center justify-center text-sm rounded-lg transition-colors" style="background:#131a23; border:1px solid #1e2631; color:#a6abb5;">8</button>
+              <button type="button" class="px-3 h-10 rounded-lg text-sm transition-colors min-w-[44px]" style="background:#131a23; border:1px solid #1e2631; color:#a6abb5;" aria-label="Next page">
+                Next
+              </button>
+            </div>
+          </nav>
+
+        </div><!-- /job list -->
+      </div><!-- /two-col -->
+    </div><!-- /tab panel -->
+  </main>
+
+  <!-- ===== JOB DETAIL MODAL ===== -->
+  <dialog id="job-modal" onclick="handleDialogClick(event)">
+    <div id="modal-panel"
+         class="absolute bottom-0 left-0 right-0 lg:static overflow-y-auto rounded-t-2xl lg:rounded-2xl"
+         style="background:#131a23; border:1px solid #1e2631; max-height:88vh; box-shadow:0 -8px 40px rgba(0,0,0,0.5);">
+
+      <!-- Sticky modal header -->
+      <div class="sticky top-0 flex items-start justify-between gap-4 p-5" style="background:#131a23; border-bottom:1px solid #1e2631; z-index:1;">
+        <div class="flex-1 min-w-0">
+          <h2 class="text-lg font-bold text-text-pri mb-1">Senior Full-Stack Engineer</h2>
+          <p class="text-sm text-text-sec">Atlassian · 🇦🇺 Sydney NSW</p>
+        </div>
+        <button
+          type="button"
+          onclick="closeModal()"
+          class="flex items-center justify-center w-10 h-10 rounded-lg transition-colors shrink-0"
+          style="color:#a6abb5;"
+          onmouseover="this.style.background='#1e2631'"
+          onmouseout="this.style.background='transparent'"
+          aria-label="Close">
+          <span class="material-symbols-outlined" style="font-size:22px">close</span>
+        </button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="p-5 flex flex-col gap-5">
+
+        <!-- Badges -->
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 rounded-full text-sm font-medium" style="background:rgba(61,106,242,0.15); color:#3D6AF2;">Full-time</span>
+          <span class="px-3 py-1.5 rounded-full text-sm font-medium" style="background:rgba(16,185,129,0.15); color:#10B981;">Remote</span>
+          <span class="px-3 py-1.5 rounded-full text-sm font-medium" style="background:#1e2631; color:#a6abb5;">Seek</span>
+        </div>
+
+        <!-- Compensation block -->
+        <div class="p-4 rounded-xl" style="background:#0d1520; border:1px solid #1e2631;">
+          <p class="text-[10px] font-semibold uppercase tracking-widest text-text-mut mb-1.5">Compensation</p>
+          <p class="text-xl font-bold text-text-pri">$130,000 – $165,000 AUD per year</p>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <h3 class="text-sm font-semibold text-text-pri mb-2">Description</h3>
+          <p class="text-sm text-text-sec leading-relaxed">
+            We're looking for a Senior Full-Stack Engineer to join the Growth team at Atlassian. You'll work across the full product stack — from React frontends to Node.js and Python microservices — helping millions of teams collaborate better every day.
+          </p>
+          <p class="text-sm text-text-sec leading-relaxed mt-3">
+            This is a remote role open to candidates anywhere in Australia. You'll be part of a distributed team and work closely with product managers, designers, and data engineers to ship high-quality features at scale.
+          </p>
+          <ul class="mt-3 space-y-1.5 text-sm text-text-sec">
+            <li class="flex gap-2"><span style="color:#3D6AF2;">•</span> 5+ years of full-stack experience (React + Node/Python)</li>
+            <li class="flex gap-2"><span style="color:#3D6AF2;">•</span> Comfortable owning features end-to-end</li>
+            <li class="flex gap-2"><span style="color:#3D6AF2;">•</span> Strong written communication skills</li>
+            <li class="flex gap-2"><span style="color:#3D6AF2;">•</span> Experience with distributed systems at scale</li>
+          </ul>
+        </div>
+
+        <!-- Tags -->
+        <div>
+          <h3 class="text-sm font-semibold text-text-pri mb-2">Skills &amp; Tags</h3>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.1); color:#3D6AF2;">React</span>
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.1); color:#3D6AF2;">TypeScript</span>
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.1); color:#3D6AF2;">Node.js</span>
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.1); color:#3D6AF2;">Python</span>
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.1); color:#3D6AF2;">AWS</span>
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.1); color:#3D6AF2;">PostgreSQL</span>
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.1); color:#3D6AF2;">GraphQL</span>
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium" style="background:rgba(61,106,242,0.1); color:#3D6AF2;">Microservices</span>
+          </div>
+        </div>
+
+        <!-- Posted date -->
+        <p class="text-xs text-text-mut">Posted 3 April 2026</p>
+
+      </div>
+
+      <!-- Sticky footer -->
+      <div class="sticky bottom-0 flex gap-3 p-5" style="background:#131a23; border-top:1px solid #1e2631;">
+        <a
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-primary flex-1 flex items-center justify-center gap-2 h-12 rounded-xl font-medium text-sm text-white transition-all"
+          style="background:#3D6AF2;">
+          Apply on Seek
+          <span class="material-symbols-outlined" style="font-size:16px">open_in_new</span>
+        </a>
+        <button
+          type="button"
+          class="h-12 px-5 rounded-xl text-sm font-medium text-text-sec transition-colors"
+          style="background:#1e2631; border:1px solid #1e2631;"
+          onmouseover="this.style.background='#252e3d'"
+          onmouseout="this.style.background='#1e2631'">
+          Share
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script>
+    // ── Tab switching ──────────────────────────────────────────────────────────
+    function switchTab(category) {
+      const tabs = { it: document.getElementById('tab-it'), french: document.getElementById('tab-french') }
+      const panels = { it: document.getElementById('panel-it') }
+
+      Object.entries(tabs).forEach(([key, btn]) => {
+        const isActive = key === category
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false')
+        if (isActive) {
+          btn.style.background = '#090f16'
+          btn.style.color = '#ffffff'
+          btn.style.boxShadow = '0 1px 4px rgba(0,0,0,0.4)'
+        } else {
+          btn.style.background = 'transparent'
+          btn.style.color = '#70767f'
+          btn.style.boxShadow = 'none'
+        }
+      })
+    }
+
+    // ── Mobile filters toggle ──────────────────────────────────────────────────
+    function toggleMobileFilters() {
+      const panel = document.getElementById('mobile-filters')
+      const toggle = document.getElementById('filter-toggle')
+      const isOpen = panel.classList.contains('open')
+      panel.classList.toggle('open', !isOpen)
+      toggle.setAttribute('aria-expanded', String(!isOpen))
+    }
+
+    // ── Modal ──────────────────────────────────────────────────────────────────
+    const dialog = document.getElementById('job-modal')
+
+    // Position modal panel for desktop
+    function positionModal() {
+      const panel = document.getElementById('modal-panel')
+      if (window.innerWidth >= 1024) {
+        panel.style.position = 'relative'
+        panel.style.margin = 'auto'
+        panel.style.width = '100%'
+        panel.style.maxWidth = '640px'
+        panel.style.borderRadius = '16px'
+        dialog.style.display = 'flex'
+        dialog.style.alignItems = 'center'
+        dialog.style.justifyContent = 'center'
+        dialog.style.padding = '24px'
+      } else {
+        panel.style.position = ''
+        panel.style.margin = ''
+        panel.style.width = ''
+        panel.style.maxWidth = ''
+        panel.style.borderRadius = '16px 16px 0 0'
+        dialog.style.display = ''
+        dialog.style.alignItems = ''
+        dialog.style.justifyContent = ''
+        dialog.style.padding = ''
+      }
+    }
+
+    function openModal(id) {
+      positionModal()
+      dialog.showModal()
+      document.body.style.overflow = 'hidden'
+    }
+
+    function closeModal() {
+      dialog.close()
+      document.body.style.overflow = ''
+    }
+
+    function handleDialogClick(e) {
+      if (e.target === dialog) closeModal()
+    }
+
+    dialog.addEventListener('close', () => {
+      document.body.style.overflow = ''
+    })
+
+    window.addEventListener('resize', () => {
+      if (dialog.open) positionModal()
+    })
+
+    // Keyboard: Escape to close
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && dialog.open) closeModal()
+    })
+  </script>
+
+</body>
+</html>
