@@ -35,7 +35,7 @@ export function DecodeSection({ token, onTokenChange, onAlgorithmDetected }: Dec
       <div className="mb-4">
         <label
           htmlFor="jwt-input"
-          className="block text-sm font-medium text-[var(--tk-color-text-secondary)] mb-1"
+          className="mb-1.5 block text-sm font-medium text-[#a6abb5]"
         >
           Paste your JWT
         </label>
@@ -43,13 +43,14 @@ export function DecodeSection({ token, onTokenChange, onAlgorithmDetected }: Dec
           id="jwt-input"
           value={token}
           onChange={(e) => onTokenChange(e.target.value)}
-          rows={5}
+          rows={4}
           spellCheck={false}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
           placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-          className="w-full font-mono text-xs sm:text-sm rounded-xl border border-[var(--tk-color-border)] bg-[var(--tk-color-bg-secondary)] text-[var(--tk-color-text-primary)] px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500)] placeholder:text-[var(--tk-color-text-tertiary,#888)] min-h-[80px]"
+          className={`w-full font-mono text-xs leading-relaxed rounded-xl border bg-[#0d1420] text-[#a6abb5] px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/30 focus:border-[#3D6AF2] placeholder:text-[#70767f] transition-colors ${!result.ok && token.trim().length > 0 ? 'border-[#EF4444]/50' : 'border-[#1e2631]'}`}
+          style={{ minHeight: '80px' }}
         />
       </div>
 
@@ -57,7 +58,8 @@ export function DecodeSection({ token, onTokenChange, onAlgorithmDetected }: Dec
       {!result.ok && token.trim().length > 0 && (
         <div
           role="alert"
-          className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400 mb-4"
+          className="flex items-start gap-3 rounded-xl border px-4 py-3 text-sm mb-4"
+          style={{ background: 'rgba(239,68,68,0.08)', borderColor: 'rgba(239,68,68,0.3)', color: '#f87171' }}
         >
           <svg className="mt-0.5 w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.25a.75.75 0 011.5 0v4.5a.75.75 0 01-1.5 0v-4.5zm.75 7.5a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
@@ -68,7 +70,7 @@ export function DecodeSection({ token, onTokenChange, onAlgorithmDetected }: Dec
 
       {/* Decoded blocks */}
       {result.ok && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Header block */}
           <DecodedBlock
             label="Header"
@@ -79,12 +81,12 @@ export function DecodeSection({ token, onTokenChange, onAlgorithmDetected }: Dec
 
           {/* Payload block */}
           <div
-            className="rounded-xl border border-[var(--tk-color-border)] bg-[var(--tk-color-bg-secondary)] overflow-hidden"
-            style={{ borderLeftWidth: '4px', borderLeftColor: 'rgb(129 140 248)' /* indigo-400 */ }}
+            className="rounded-xl border border-[#1e2631] bg-[#131a23] overflow-hidden"
+            style={{ borderLeft: '4px solid #818cf8' }}
           >
-            <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--tk-color-border)]">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-[#1e2631] bg-[#0d1420]">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400">
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-indigo-400">
                   Payload
                 </span>
                 {expired && (
@@ -93,10 +95,10 @@ export function DecodeSection({ token, onTokenChange, onAlgorithmDetected }: Dec
                   </span>
                 )}
               </div>
-              <CopyButton text={payloadJson} label="Copy" className="!px-3 !py-1.5 !text-xs !rounded-lg !shadow-none" />
+              <CopyButton text={payloadJson} label="Copy" className="!px-3 !py-1.5 !text-xs !rounded-lg !shadow-none !border !border-[#1e2631] !bg-transparent !text-[#a6abb5] hover:!border-[#3D6AF2] hover:!text-white" />
             </div>
             <div className="px-4 py-3 overflow-x-auto">
-              <pre className="font-mono text-xs sm:text-sm text-[var(--tk-color-text-primary)] whitespace-pre-wrap break-all">
+              <pre className="font-mono text-xs leading-relaxed sm:text-sm text-white whitespace-pre-wrap break-all">
                 <PayloadWithTimestamps payload={result.payload} payloadJson={payloadJson} />
               </pre>
             </div>
@@ -129,30 +131,24 @@ interface DecodedBlockProps {
 }
 
 function DecodedBlock({ label, borderColor, labelColor, content, mono = false }: DecodedBlockProps) {
+  const borderColorMap: Record<string, string> = {
+    'border-red-400': '#f87171',
+    'border-teal-400': '#2dd4bf',
+  }
+
   return (
     <div
-      className={`rounded-xl border border-[var(--tk-color-border)] bg-[var(--tk-color-bg-secondary)] overflow-hidden`}
-      style={{ borderLeftWidth: '4px' }}
-      // Use inline style for the dynamic left border color since Tailwind JIT can't always
-      // generate arbitrary border-left-color values at runtime from props
-      ref={(el) => {
-        if (el) {
-          const colorMap: Record<string, string> = {
-            'border-red-400': 'rgb(248 113 113)',
-            'border-teal-400': 'rgb(45 212 191)',
-          }
-          el.style.borderLeftColor = colorMap[borderColor] ?? ''
-        }
-      }}
+      className="rounded-xl border border-[#1e2631] bg-[#131a23] overflow-hidden"
+      style={{ borderLeft: `4px solid ${borderColorMap[borderColor] ?? '#1e2631'}` }}
     >
-      <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--tk-color-border)]">
-        <span className={`text-xs font-semibold uppercase tracking-wider ${labelColor}`}>
+      <div className="flex items-center justify-between px-4 py-2 border-b border-[#1e2631] bg-[#0d1420]">
+        <span className={`text-[11px] font-semibold uppercase tracking-widest ${labelColor}`}>
           {label}
         </span>
-        <CopyButton text={content} label="Copy" className="!px-3 !py-1.5 !text-xs !rounded-lg !shadow-none" />
+        <CopyButton text={content} label="Copy" className="!px-3 !py-1.5 !text-xs !rounded-lg !shadow-none !border !border-[#1e2631] !bg-transparent !text-[#a6abb5] hover:!border-[#3D6AF2] hover:!text-white" />
       </div>
       <div className="px-4 py-3 overflow-x-auto">
-        <pre className={`text-xs sm:text-sm text-[var(--tk-color-text-primary)] whitespace-pre-wrap break-all ${mono ? 'font-mono' : 'font-mono'}`}>
+        <pre className={`text-xs leading-relaxed sm:text-sm whitespace-pre-wrap break-all ${mono ? 'font-mono text-[#a6abb5]' : 'font-mono text-white'}`}>
           {content}
         </pre>
       </div>
@@ -187,7 +183,7 @@ function PayloadWithTimestamps({ payload, payloadJson }: PayloadWithTimestampsPr
             <span key={i}>
               {line}
               {humanDate && (
-                <span className="ml-2 text-[var(--tk-color-text-tertiary,#888)] text-xs not-italic">
+                <span className="ml-2 text-[#70767f] text-xs italic">
                   {/* inline comment style */}
                   {'// '}{humanDate}
                 </span>
