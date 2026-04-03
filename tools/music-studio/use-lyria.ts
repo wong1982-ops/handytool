@@ -101,6 +101,13 @@ export function useLyria(apiKey: string): UseLyriaReturn {
   // Connect to Lyria
   const connect = useCallback(async () => {
     if (sessionRef.current) return
+
+    if (!apiKey) {
+      setError('Music Studio requires a Gemini API key. Please check your configuration.')
+      setStatus('error')
+      return
+    }
+
     setStatus('connecting')
     setError(null)
 
