@@ -363,4 +363,15 @@ export const tools: Tool[] = [
     ),
     color: 'from-teal-500 to-cyan-400',
   },
+  {
+    name: 'Flight Monitor',
+    href: '/tools/flight-monitor',
+    description: 'Track flight prices, set alerts, and discover deals',
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+      </svg>
+    ),
+    color: 'from-[#3D6AF2] to-[#32A9D9]',
+  },
 ]
