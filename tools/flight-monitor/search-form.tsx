@@ -141,7 +141,9 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
   const [originDisplay, setOriginDisplay] = useState(defaultOrigin ?? '')
   const [destCode, setDestCode] = useState(defaultDestination ?? '')
   const [destDisplay, setDestDisplay] = useState(defaultDestination ?? '')
+  const [tripType, setTripType] = useState<'oneway' | 'return'>('oneway')
   const [departureDate, setDepartureDate] = useState('')
+  const [returnDate, setReturnDate] = useState('')
   const [adults, setAdults] = useState(1)
 
   const canSearch = originCode.length === 3 && destCode.length === 3 && departureDate !== ''
@@ -160,6 +162,7 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
       origin: originCode,
       destination: destCode,
       departureDate,
+      ...(tripType === 'return' && returnDate ? { returnDate } : {}),
       adults,
     })
   }
@@ -169,6 +172,34 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
 
   return (
     <form onSubmit={handleSubmit} className="rounded-xl bg-[#131a23] border border-[#1e2631] p-4 sm:p-6">
+      {/* Trip type toggle */}
+      <div className="flex gap-1 mb-4 p-1 rounded-lg bg-[#090f16] w-fit">
+        <button
+          type="button"
+          onClick={() => { setTripType('oneway'); setReturnDate('') }}
+          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+            tripType === 'oneway'
+              ? 'bg-[#1e2631] text-white'
+              : 'text-[#70767f] hover:text-[#a6abb5]'
+          }`}
+          style={{ minHeight: '36px' }}
+        >
+          One Way
+        </button>
+        <button
+          type="button"
+          onClick={() => setTripType('return')}
+          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+            tripType === 'return'
+              ? 'bg-[#1e2631] text-white'
+              : 'text-[#70767f] hover:text-[#a6abb5]'
+          }`}
+          style={{ minHeight: '36px' }}
+        >
+          Return
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] gap-3 items-end">
         {/* Origin */}
         <AirportInput
@@ -219,7 +250,7 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3 mt-3 items-end">
+      <div className={`grid grid-cols-1 ${tripType === 'return' ? 'sm:grid-cols-[1fr_1fr_auto_auto]' : 'sm:grid-cols-[1fr_auto_auto]'} gap-3 mt-3 items-end`}>
         {/* Departure date */}
         <div>
           <label className="block text-xs font-medium text-[#a6abb5] mb-1.5">Departure</label>
@@ -242,6 +273,31 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
             />
           </div>
         </div>
+
+        {/* Return date (conditional) */}
+        {tripType === 'return' && (
+          <div>
+            <label className="block text-xs font-medium text-[#a6abb5] mb-1.5">Return</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#70767f]">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                </svg>
+              </span>
+              <input
+                type="date"
+                value={returnDate}
+                min={departureDate || today}
+                onChange={(e) => setReturnDate(e.target.value)}
+                className="w-full rounded-lg bg-[#131a23] border border-[#1e2631] text-white
+                  pl-10 pr-3 py-2.5 text-sm outline-none focus:border-[#3D6AF2]/50 focus:ring-1 focus:ring-[#3D6AF2]/30 transition-colors
+                  [color-scheme:dark]"
+                style={{ minHeight: '44px' }}
+                aria-label="Return date"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Passengers */}
         <div>

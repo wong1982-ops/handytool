@@ -6,6 +6,7 @@
 -- =============================================================================
 
 -- 1. Rewrite get_book_by_slug with extended timeout for large JSONB
+DROP FUNCTION IF EXISTS public.get_book_by_slug(TEXT, UUID);
 CREATE OR REPLACE FUNCTION public.get_book_by_slug(p_slug TEXT, p_user_id UUID DEFAULT NULL)
 RETURNS TABLE (
   id UUID,

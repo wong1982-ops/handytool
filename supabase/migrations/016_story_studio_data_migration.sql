@@ -61,8 +61,8 @@ SELECT
   p->>'imageUrl' AS image_url,
   'done' AS status,
   'quality' AS quality_mode
-FROM public.books b,
-  jsonb_array_elements(b.data->'pages') AS p
+FROM public.books b
+CROSS JOIN LATERAL jsonb_array_elements(b.data->'pages') AS p
 JOIN public.book_pages bp ON bp.book_id = b.id AND bp.sequence = (p->>'sequence')::int
 WHERE p->>'imageUrl' IS NOT NULL
   AND p->>'imageUrl' != ''
@@ -77,8 +77,8 @@ SELECT
   bp.id AS book_page_id,
   p->>'audioUrl' AS audio_url,
   'done' AS status
-FROM public.books b,
-  jsonb_array_elements(b.data->'pages') AS p
+FROM public.books b
+CROSS JOIN LATERAL jsonb_array_elements(b.data->'pages') AS p
 JOIN public.book_pages bp ON bp.book_id = b.id AND bp.sequence = (p->>'sequence')::int
 WHERE p->>'audioUrl' IS NOT NULL
   AND p->>'audioUrl' != ''
