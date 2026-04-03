@@ -2,10 +2,19 @@ import Amadeus from 'amadeus'
 import crypto from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 
-const amadeus = new Amadeus({
-  clientId: process.env.AMADEUS_CLIENT_ID || '',
-  clientSecret: process.env.AMADEUS_CLIENT_SECRET || '',
-})
+let _amadeus: InstanceType<typeof Amadeus> | null = null
+
+function getAmadeus() {
+  if (!_amadeus) {
+    const clientId = process.env.AMADEUS_CLIENT_ID
+    const clientSecret = process.env.AMADEUS_CLIENT_SECRET
+    if (!clientId || !clientSecret) {
+      throw new Error('AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET must be set')
+    }
+    _amadeus = new Amadeus({ clientId, clientSecret })
+  }
+  return _amadeus
+}
 
 interface SearchParams {
   origin: string
@@ -43,7 +52,7 @@ export async function searchFlights(params: SearchParams, forceRefresh = false) 
   }
 
   // Call Amadeus
-  const response = await amadeus.shopping.flightOffersSearch.get({
+  const response = await getAmadeus().shopping.flightOffersSearch.get({
     originLocationCode: params.origin,
     destinationLocationCode: params.destination,
     departureDate: params.departureDate,
@@ -104,7 +113,7 @@ function parseAmadeusResponse(data: unknown[]): unknown[] {
 }
 
 export async function searchAirports(keyword: string): Promise<unknown[]> {
-  const response = await amadeus.referenceData.locations.get({
+  const response = await getAmadeus().referenceData.locations.get({
     keyword,
     subType: 'AIRPORT,CITY',
     'page[limit]': '8',
