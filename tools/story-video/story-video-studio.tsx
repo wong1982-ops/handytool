@@ -167,7 +167,7 @@ export default function StoryVideoStudio() {
             type="button"
             onClick={() => setTab(t)}
             className={`
-              px-4 py-2 rounded-full text-sm font-semibold transition-all cursor-pointer min-h-[44px]
+              px-5 py-2 rounded-full text-sm font-semibold transition-all cursor-pointer min-h-[44px]
               ${tab === t
                 ? 'bg-[#3D6AF2] text-white'
                 : 'bg-[#131a23] text-[#a6abb5] border border-[#1e2631] hover:border-[#3D6AF2]/30'}
@@ -201,7 +201,7 @@ export default function StoryVideoStudio() {
           {/* Active Jobs */}
           {activeJobs.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-sm font-medium text-[#a6abb5]">In Progress</h2>
+              <h2 className="text-xs font-medium text-[#a6abb5]">In Progress</h2>
               {activeJobs.map((job) => (
                 <JobProgress key={job.id} job={job} onRetry={handleRetry} onDelete={handleDelete} />
               ))}

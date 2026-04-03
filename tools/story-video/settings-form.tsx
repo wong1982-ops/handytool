@@ -8,11 +8,11 @@ import {
   type DurationPreset,
 } from '@/tools/story-video/types'
 
-const DURATION_OPTIONS: { id: DurationPreset; label: string }[] = [
+const DURATION_OPTIONS: { id: DurationPreset; label: string; credits?: string }[] = [
   { id: 'auto', label: 'Auto' },
-  { id: 'short', label: 'Short' },
-  { id: 'medium', label: 'Medium' },
-  { id: 'long', label: 'Long' },
+  { id: 'short', label: 'Short', credits: '5 cr' },
+  { id: 'medium', label: 'Medium', credits: '10 cr' },
+  { id: 'long', label: 'Long', credits: '20 cr' },
 ]
 
 interface SettingsFormProps {
@@ -32,7 +32,7 @@ export default function SettingsForm({ selectedBook, onGenerate, generating }: S
     <section className="space-y-5">
       {/* Art Style */}
       <div>
-        <h2 className="text-sm font-medium text-[#a6abb5] mb-3">Art Style</h2>
+        <h2 className="text-xs font-medium text-[#a6abb5] mb-3">Art Style</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {ART_STYLES.map((style) => {
             const isSelected = artStyle === style.id
@@ -60,8 +60,8 @@ export default function SettingsForm({ selectedBook, onGenerate, generating }: S
 
       {/* Duration */}
       <div>
-        <h2 className="text-sm font-medium text-[#a6abb5] mb-3">Duration</h2>
-        <div className="flex gap-2">
+        <h2 className="text-xs font-medium text-[#a6abb5] mb-3">Duration</h2>
+        <div className="flex gap-2 flex-wrap">
           {DURATION_OPTIONS.map((opt) => {
             const isSelected = duration === opt.id
             return (
@@ -77,6 +77,9 @@ export default function SettingsForm({ selectedBook, onGenerate, generating }: S
                 `}
               >
                 {opt.label}
+                {opt.credits && (
+                  <span className="ml-1 text-[10px] text-[#70767f] font-normal">{opt.credits}</span>
+                )}
               </button>
             )
           })}

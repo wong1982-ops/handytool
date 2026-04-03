@@ -36,14 +36,14 @@ export default function JobProgress({ job, onRetry, onDelete }: JobProgressProps
       isFailed ? 'border-red-500/30' : isComplete ? 'border-emerald-500/30' : 'border-[#1e2631]'
     }`}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <h3 className="text-white text-sm font-semibold">{job.book_title}</h3>
+      <div className="flex items-start justify-between mb-3 gap-3">
+        <div className="min-w-0">
+          <h3 className="text-white text-sm font-semibold truncate">{job.book_title}</h3>
           <p className="text-[#70767f] text-xs mt-0.5">
             {job.art_style} &middot; {timeAgo(job.created_at)}
           </p>
         </div>
-        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${
+        <span className={`shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${
           isComplete
             ? 'bg-emerald-500/20 text-emerald-400'
             : isFailed
@@ -55,7 +55,7 @@ export default function JobProgress({ job, onRetry, onDelete }: JobProgressProps
       </div>
 
       {/* 7-Step Progress Bar */}
-      <div className="flex items-center gap-1 mb-4">
+      <div className="flex items-center gap-1 mb-3">
         {PIPELINE_STEPS.map((step, i) => {
           const stepStatus = job.steps[step]
           return (
@@ -83,13 +83,13 @@ export default function JobProgress({ job, onRetry, onDelete }: JobProgressProps
         {PIPELINE_STEPS.map((step) => (
           <span
             key={step}
-            className={`text-[10px] ${
+            className={`text-[9px] ${
               job.steps[step] === 'processing'
                 ? 'text-[#3D6AF2] font-semibold'
                 : job.steps[step] === 'done'
-                  ? 'text-emerald-400'
+                  ? 'text-emerald-400 font-semibold'
                   : job.steps[step] === 'failed'
-                    ? 'text-red-400'
+                    ? 'text-red-400 font-semibold'
                     : 'text-[#70767f]'
             }`}
           >

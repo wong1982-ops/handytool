@@ -17,7 +17,7 @@ export default function VideoPlayer({ job }: VideoPlayerProps) {
 
   return (
     <section className="space-y-4">
-      <h2 className="text-sm font-medium text-[#a6abb5]">Preview</h2>
+      <h2 className="text-xs font-medium text-[#a6abb5]">Preview</h2>
 
       {/* Video Player */}
       <div className="rounded-xl overflow-hidden bg-black">
@@ -37,7 +37,7 @@ export default function VideoPlayer({ job }: VideoPlayerProps) {
           href={job.artifacts.finalVideo}
           download={`${job.book_title}-video.mp4`}
           className="
-            bg-emerald-600 hover:bg-emerald-500 text-white font-semibold
+            bg-[#059669] hover:opacity-80 text-white font-semibold
             rounded-xl min-h-[44px] px-4 py-2 text-sm cursor-pointer
             inline-flex items-center gap-1.5 transition-colors
           "
@@ -55,7 +55,7 @@ export default function VideoPlayer({ job }: VideoPlayerProps) {
             className="
               border border-[#1e2631] text-[#a6abb5] hover:text-white hover:bg-[#1e2631]
               font-semibold rounded-xl min-h-[44px] px-4 py-2 text-sm cursor-pointer
-              inline-flex items-center gap-1.5 transition-colors
+              inline-flex items-center gap-1.5 transition-all
             "
           >
             <svg

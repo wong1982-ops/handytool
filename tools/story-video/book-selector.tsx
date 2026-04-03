@@ -32,10 +32,10 @@ export default function BookSelector({ books, selectedId, onSelect }: BookSelect
 
   return (
     <section>
-      <h2 className="text-sm font-medium text-[#a6abb5] mb-3">Select a Book</h2>
+      <h2 className="text-xs font-medium text-[#a6abb5] mb-3">Select a Book</h2>
       <div
         ref={scrollRef}
-        className="flex gap-3 overflow-x-auto pb-2 scroll-smooth"
+        className="flex gap-3 overflow-x-auto pb-2 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {books.map((book) => {
@@ -47,7 +47,7 @@ export default function BookSelector({ books, selectedId, onSelect }: BookSelect
               onClick={() => onSelect(book.id)}
               className={`
                 shrink-0 w-36 rounded-xl bg-[#131a23] border transition-all
-                cursor-pointer min-h-[44px] text-left
+                cursor-pointer min-h-[44px] text-left overflow-hidden
                 ${isSelected
                   ? 'border-[#3D6AF2] shadow-[0_0_0_3px_#3D6AF2,0_0_20px_rgba(61,106,242,0.4)]'
                   : 'border-[#1e2631] hover:border-[#3D6AF2]/30 hover:bg-[#1e2631]'}
