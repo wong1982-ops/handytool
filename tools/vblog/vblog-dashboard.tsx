@@ -87,7 +87,7 @@ export default function VBlogDashboard() {
   return (
     <div className="space-y-6">
       {/* Title */}
-      <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-white">
         VBlog{' '}
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3D6AF2] to-[#32A9D9]">
           Studio
@@ -123,19 +123,19 @@ export default function VBlogDashboard() {
       {tab === 'videos' && (
         <>
           {/* New Video Form */}
-          <div className="bg-[#131a23] rounded-xl border border-[#1e2631] p-4 space-y-4">
-            <h2 className="text-sm font-medium text-[#a6abb5]">New Video</h2>
+          <div className="bg-[#131a23] rounded-xl border border-[#1e2631] p-5 space-y-4">
+            <p className="text-xs font-medium text-[#a6abb5] uppercase tracking-wider">New Video</p>
 
             {/* Tool dropdown */}
             <div>
-              <label htmlFor="vblog-tool" className="text-xs text-[#70767f] block mb-1">
+              <label htmlFor="vblog-tool" className="text-xs text-[#70767f] block mb-1.5">
                 Tool
               </label>
               <select
                 id="vblog-tool"
                 value={selectedTool}
                 onChange={(e) => setSelectedTool(e.target.value)}
-                className="w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-sm px-4 py-3 focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
+                className="w-full rounded-xl bg-[#090f16] border border-[#1e2631] text-white text-sm px-4 py-3 min-h-[44px] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
               >
                 {tools.map((t) => (
                   <option key={t.href} value={t.href.replace('/tools/', '')}>
@@ -156,8 +156,8 @@ export default function VBlogDashboard() {
                     onClick={() => setScriptStyle(style)}
                     className={`px-4 py-2 rounded-xl text-sm font-semibold min-h-[44px] cursor-pointer transition-all ${
                       scriptStyle === style
-                        ? 'bg-[#3D6AF2]/20 text-[#3D6AF2] shadow-[0_0_0_2px_#3D6AF2]'
-                        : 'bg-[#131a23] text-[#a6abb5] border border-[#1e2631] hover:border-[#3D6AF2]/30'
+                        ? 'bg-[#3D6AF2]/15 text-[#3D6AF2] shadow-[0_0_0_2px_#3D6AF2]'
+                        : 'bg-[#131a23] text-[#a6abb5] border border-[#1e2631] hover:border-[#3D6AF2]/40 hover:text-white'
                     }`}
                   >
                     {style === 'feature-walkthrough' ? 'Feature Walkthrough' : 'Problem-Solution'}
@@ -177,8 +177,8 @@ export default function VBlogDashboard() {
                     onClick={() => setVoiceType(v)}
                     className={`px-4 py-2 rounded-xl text-sm font-semibold min-h-[44px] cursor-pointer transition-all ${
                       voiceType === v
-                        ? 'bg-[#3D6AF2]/20 text-[#3D6AF2] shadow-[0_0_0_2px_#3D6AF2]'
-                        : 'bg-[#131a23] text-[#a6abb5] border border-[#1e2631] hover:border-[#3D6AF2]/30'
+                        ? 'bg-[#3D6AF2]/15 text-[#3D6AF2] shadow-[0_0_0_2px_#3D6AF2]'
+                        : 'bg-[#131a23] text-[#a6abb5] border border-[#1e2631] hover:border-[#3D6AF2]/40 hover:text-white'
                     }`}
                   >
                     {v === 'clone' ? 'Clone' : 'AI'}
@@ -189,14 +189,14 @@ export default function VBlogDashboard() {
 
             {/* Duration */}
             <div>
-              <label htmlFor="vblog-duration" className="text-xs text-[#70767f] block mb-1">
+              <label htmlFor="vblog-duration" className="text-xs text-[#70767f] block mb-1.5">
                 Duration
               </label>
               <select
                 id="vblog-duration"
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full rounded-xl bg-[#131a23] border border-[#1e2631] text-white text-sm px-4 py-3 focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
+                className="w-full rounded-xl bg-[#090f16] border border-[#1e2631] text-white text-sm px-4 py-3 min-h-[44px] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
               >
                 {DURATION_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -218,7 +218,7 @@ export default function VBlogDashboard() {
               type="button"
               onClick={handleGenerate}
               disabled={generating || !selectedTool}
-              className="w-full bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white font-semibold rounded-xl min-h-[44px] px-6 py-3 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+              className="w-full bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white font-semibold rounded-xl min-h-[44px] px-6 py-3 text-sm cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
             >
               {generating ? 'Generating...' : `Generate ${selectedToolObj?.name ?? ''} Video`}
             </button>

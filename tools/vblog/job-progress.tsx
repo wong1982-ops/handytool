@@ -21,10 +21,18 @@ function relativeTime(dateStr: string): string {
 
 function stepColor(status: StepStatus): string {
   switch (status) {
-    case 'done': return 'bg-emerald-500'
+    case 'done': return 'bg-[#10B981]'
     case 'running': return 'bg-[#3D6AF2] animate-pulse'
-    case 'failed': return 'bg-red-500'
+    case 'failed': return 'bg-[#EF4444]'
     default: return 'bg-[#1e2631]'
+  }
+}
+
+function stepLabelColor(status: StepStatus): string {
+  switch (status) {
+    case 'running': return 'text-[#3D6AF2]'
+    case 'failed': return 'text-[#EF4444]'
+    default: return 'text-[#70767f]'
   }
 }
 
@@ -50,7 +58,7 @@ export function JobProgress({ job, onRetry }: JobProgressProps) {
 
   return (
     <>
-      <div className="bg-[#131a23] rounded-xl p-4 border border-[#1e2631] space-y-3">
+      <div className="bg-[#131a23] rounded-xl p-5 border border-[#1e2631] space-y-3">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
@@ -76,7 +84,7 @@ export function JobProgress({ job, onRetry }: JobProgressProps) {
               <span className="text-base leading-none" role="img" aria-label={`${STEP_LABELS[step]}: ${job.steps[step]}`}>
                 {stepIcon(job.steps[step])}
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#70767f] text-center">
+              <span className={`text-[10px] font-bold uppercase tracking-wider text-center ${stepLabelColor(job.steps[step])}`}>
                 {STEP_LABELS[step]}
               </span>
             </div>
@@ -85,13 +93,13 @@ export function JobProgress({ job, onRetry }: JobProgressProps) {
 
         {/* Error + Retry */}
         {job.status === 'failed' && job.error && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start justify-between gap-3">
-            <span className="min-w-0 break-words">{job.error}</span>
+          <div className="flex items-start justify-between gap-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+            <span className="text-[#EF4444] text-sm min-w-0 break-words">{job.error}</span>
             {failedStep && (
               <button
                 type="button"
                 onClick={() => onRetry(job.id, failedStep)}
-                className="shrink-0 px-3 py-1.5 rounded-xl bg-red-500 text-white text-xs font-semibold min-h-[44px] cursor-pointer hover:bg-red-400 transition-colors"
+                className="shrink-0 px-3 py-1.5 rounded-xl bg-[#EF4444] hover:bg-red-400 text-white text-xs font-semibold min-h-[44px] cursor-pointer whitespace-nowrap transition-colors"
               >
                 Retry {STEP_LABELS[failedStep]}
               </button>
@@ -113,7 +121,7 @@ export function JobProgress({ job, onRetry }: JobProgressProps) {
               <a
                 href={job.artifacts.masterUrl}
                 download
-                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl min-h-[44px] px-4 py-2 text-sm text-center cursor-pointer transition-colors inline-flex items-center justify-center"
+                className="flex-1 bg-[#10B981] hover:bg-emerald-500 text-white font-semibold rounded-xl min-h-[44px] px-4 py-2 text-sm text-center cursor-pointer transition-colors inline-flex items-center justify-center"
               >
                 Download
               </a>
@@ -132,15 +140,20 @@ export function JobProgress({ job, onRetry }: JobProgressProps) {
           aria-label="Video preview"
         >
           <div
-            className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-[#131a23] rounded-xl border border-[#1e2631] p-4"
+            className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-[#131a23] rounded-xl border border-[#1e2631]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white font-semibold">{job.toolName} Demo</h2>
+            <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#1e2631]">
+              <div>
+                <h2 className="text-white font-semibold text-base">{job.toolName} Demo</h2>
+                <p className="text-xs text-[#70767f] mt-0.5">
+                  {job.scriptStyle === 'feature-walkthrough' ? 'Feature Walkthrough' : 'Problem-Solution'} · {job.voiceType === 'ai' ? 'AI' : 'Clone'} Voice · {Math.floor(job.targetDuration / 60)} min
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowPreview(false)}
-                className="text-[#70767f] hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+                className="text-[#70767f] hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer rounded-xl hover:bg-[#1e2631] transition-colors"
                 aria-label="Close preview"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -148,7 +161,9 @@ export function JobProgress({ job, onRetry }: JobProgressProps) {
                 </svg>
               </button>
             </div>
-            <VideoPreview job={job} />
+            <div className="p-5">
+              <VideoPreview job={job} />
+            </div>
           </div>
         </div>
       )}
