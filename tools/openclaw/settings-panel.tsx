@@ -40,27 +40,37 @@ export function SettingsPanel({ onConnect, onDisconnect }: SettingsPanelProps) {
   const isConnected = status === 'connected'
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => dispatch({ type: 'TOGGLE_SETTINGS' })}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(2px)', padding: 24 }}
+      onClick={() => dispatch({ type: 'TOGGLE_SETTINGS' })}
+    >
       <div
-        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md mx-4 p-6 space-y-5"
+        className="w-full max-w-[400px] flex flex-col"
+        style={{ background: '#131a23', border: '1px solid #1e2631', borderRadius: 20, padding: 24, gap: 20 }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-label={t.settings.title}
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t.settings.title}</h2>
+          <h2 className="font-semibold text-white" style={{ fontSize: 18 }}>{t.settings.title}</h2>
           <button
             onClick={() => dispatch({ type: 'TOGGLE_SETTINGS' })}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xl"
+            className="flex items-center justify-center transition-colors"
+            style={{ width: 44, height: 44, borderRadius: 10, color: '#70767f' }}
+            onMouseOver={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#1e2631' }}
+            onMouseOut={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
             aria-label={t.settings.close}
           >
-            ×
+            <svg className="w-5.5 h-5.5" style={{ width: 22, height: 22 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <div className="flex flex-col" style={{ gap: 16 }}>
+          <div className="flex flex-col" style={{ gap: 6 }}>
+            <label style={{ fontSize: 13, fontWeight: 600, color: '#a6abb5' }}>
               {t.settings.gatewayUrl}
             </label>
             <input
@@ -68,13 +78,16 @@ export function SettingsPanel({ onConnect, onDisconnect }: SettingsPanelProps) {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder={t.settings.gatewayUrlPlaceholder}
-              className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              className="w-full text-sm text-white outline-none disabled:opacity-45 disabled:cursor-not-allowed"
+              style={{ height: 44, background: '#090f16', border: '1px solid #1e2631', borderRadius: 10, padding: '0 14px', fontFamily: 'inherit' }}
+              onFocus={(e) => { if (!isConnected) e.target.style.borderColor = '#3D6AF2' }}
+              onBlur={(e) => { e.target.style.borderColor = '#1e2631' }}
               disabled={isConnected}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <div className="flex flex-col" style={{ gap: 6 }}>
+            <label style={{ fontSize: 13, fontWeight: 600, color: '#a6abb5' }}>
               {t.settings.authToken}
             </label>
             <input
@@ -82,30 +95,37 @@ export function SettingsPanel({ onConnect, onDisconnect }: SettingsPanelProps) {
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder={t.settings.authTokenPlaceholder}
-              className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              className="w-full text-sm text-white outline-none disabled:opacity-45 disabled:cursor-not-allowed"
+              style={{ height: 44, background: '#090f16', border: '1px solid #1e2631', borderRadius: 10, padding: '0 14px', fontFamily: 'inherit' }}
+              onFocus={(e) => { if (!isConnected) e.target.style.borderColor = '#3D6AF2' }}
+              onBlur={(e) => { e.target.style.borderColor = '#1e2631' }}
               disabled={isConnected}
             />
           </div>
         </div>
 
-        <div className="flex gap-3">
-          {isConnected ? (
-            <button
-              onClick={handleDisconnect}
-              className="flex-1 px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-            >
-              {t.settings.disconnect}
-            </button>
-          ) : (
-            <button
-              onClick={handleConnect}
-              disabled={!url.trim() || !token.trim()}
-              className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {t.settings.connect}
-            </button>
-          )}
-        </div>
+        {isConnected ? (
+          <button
+            onClick={handleDisconnect}
+            className="w-full font-semibold text-sm transition-colors"
+            style={{ height: 44, background: 'transparent', border: '1px solid #EF4444', borderRadius: 10, color: '#EF4444' }}
+            onMouseOver={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.08)' }}
+            onMouseOut={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
+          >
+            {t.settings.disconnect}
+          </button>
+        ) : (
+          <button
+            onClick={handleConnect}
+            disabled={!url.trim() || !token.trim()}
+            className="w-full font-semibold text-sm text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ height: 44, background: '#3D6AF2', borderRadius: 10 }}
+            onMouseOver={(e) => { if (!e.currentTarget.disabled) (e.currentTarget as HTMLButtonElement).style.background = '#2f5be0' }}
+            onMouseOut={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#3D6AF2' }}
+          >
+            {t.settings.connect}
+          </button>
+        )}
 
         {/* Clear history */}
         <button
@@ -113,7 +133,10 @@ export function SettingsPanel({ onConnect, onDisconnect }: SettingsPanelProps) {
             dispatch({ type: 'CLEAR_HISTORY' })
             dispatch({ type: 'TOGGLE_SETTINGS' })
           }}
-          className="w-full px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          className="w-full text-sm transition-colors"
+          style={{ background: 'transparent', color: '#70767f', padding: 4, border: 'none', fontFamily: 'inherit', cursor: 'pointer' }}
+          onMouseOver={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#EF4444' }}
+          onMouseOut={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#70767f' }}
         >
           {t.settings.clearHistory}
         </button>

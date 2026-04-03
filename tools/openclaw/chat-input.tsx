@@ -41,7 +41,7 @@ export function ChatInput({ onSend }: ChatInputProps) {
   }
 
   return (
-    <div className="flex items-end gap-2 px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
+    <div className="flex items-end gap-2 px-4 py-3 shrink-0" style={{ background: '#131a23', borderTop: '1px solid #1e2631' }}>
       <textarea
         ref={textareaRef}
         value={value}
@@ -50,16 +50,30 @@ export function ChatInput({ onSend }: ChatInputProps) {
         placeholder={isDisabled ? 'Connect to send messages' : t.chat.placeholder}
         disabled={isDisabled}
         rows={1}
-        className="flex-1 resize-none px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex-1 resize-none text-sm text-white outline-none disabled:opacity-45 disabled:cursor-not-allowed"
+        style={{
+          background: '#090f16',
+          border: '1px solid #1e2631',
+          borderRadius: 12,
+          padding: '10px 14px',
+          minHeight: 44,
+          maxHeight: 120,
+          lineHeight: 1.5,
+          fontFamily: 'inherit',
+          colorScheme: 'dark',
+        }}
+        onFocus={(e) => { e.target.style.borderColor = '#3D6AF2' }}
+        onBlur={(e) => { e.target.style.borderColor = '#1e2631' }}
         aria-label={t.chat.placeholder}
       />
       <button
         onClick={handleSend}
         disabled={isDisabled || !value.trim()}
-        className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="shrink-0 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        style={{ width: 44, height: 44, background: '#3D6AF2', borderRadius: 12 }}
         aria-label={t.chat.send}
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style={{ color: '#fff' }}>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19V5m0 0l-7 7m7-7l7 7" />
         </svg>
       </button>

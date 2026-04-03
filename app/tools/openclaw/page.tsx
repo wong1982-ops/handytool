@@ -100,12 +100,12 @@ function OpenClawChatInner() {
   }, [dispatch, send])
 
   return (
-    <div className="flex flex-col h-[100dvh]">
+    <div className="flex flex-col h-[100dvh]" style={{ background: '#090f16' }}>
       {/* Top bar */}
-      <header className="flex items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
+      <header className="flex items-center justify-between px-4 shrink-0" style={{ height: 52, background: '#131a23', borderBottom: '1px solid #1e2631' }}>
         <div className="flex items-center gap-3">
           <BackButton />
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <h1 className="font-semibold text-white" style={{ fontSize: 16 }}>
             {t.header.title}
           </h1>
         </div>
@@ -117,22 +117,28 @@ function OpenClawChatInner() {
 
       {/* Not configured state */}
       {!config ? (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center max-w-sm mx-auto px-4">
-            <p className="text-5xl mb-4" aria-hidden="true">🤖</p>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              {t.setup.title}
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              {t.setup.description}
-            </p>
-            <button
-              onClick={() => dispatch({ type: 'TOGGLE_SETTINGS' })}
-              className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              {t.setup.openSettings}
-            </button>
+        <div className="flex-1 flex flex-col items-center justify-center px-8 text-center" style={{ background: '#090f16' }}>
+          {/* Icon box */}
+          <div className="flex items-center justify-center mb-5" style={{ width: 72, height: 72, borderRadius: 20, background: '#131a23', border: '1px solid #1e2631' }}>
+            <svg className="w-9 h-9" style={{ color: '#70767f' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 00.659 1.591L19 14.5M14.25 3.104c.251.023.501.05.75.082M19 14.5l-2.47-2.47M5 14.5l2.47-2.47m0 0a24.41 24.41 0 019.06 0" />
+            </svg>
           </div>
+          <h2 className="text-lg font-semibold text-white mb-2.5">
+            {t.setup.title}
+          </h2>
+          <p className="text-sm mb-7" style={{ color: '#a6abb5', lineHeight: 1.6, maxWidth: 280 }}>
+            {t.setup.description}
+          </p>
+          <button
+            onClick={() => dispatch({ type: 'TOGGLE_SETTINGS' })}
+            className="font-semibold text-white text-sm transition-colors"
+            style={{ height: 44, padding: '0 28px', background: '#3D6AF2', borderRadius: 10 }}
+            onMouseOver={(e) => { (e.target as HTMLButtonElement).style.background = '#2f5be0' }}
+            onMouseOut={(e) => { (e.target as HTMLButtonElement).style.background = '#3D6AF2' }}
+          >
+            {t.setup.openSettings}
+          </button>
         </div>
       ) : (
         <>

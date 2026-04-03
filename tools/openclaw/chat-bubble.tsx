@@ -12,11 +12,13 @@ export function ChatBubble({ message }: ChatBubbleProps) {
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} group`}>
       <div
-        className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-          isUser
-            ? 'bg-blue-600 text-white rounded-br-md'
-            : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-md'
-        }`}
+        className="max-w-[80%] text-sm text-white"
+        style={{
+          background: isUser ? '#3D6AF2' : '#131a23',
+          borderRadius: isUser ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+          padding: '12px 16px',
+          lineHeight: 1.55,
+        }}
       >
         {/* Message content with basic whitespace/newline preservation */}
         <div className="whitespace-pre-wrap break-words">
@@ -25,15 +27,18 @@ export function ChatBubble({ message }: ChatBubbleProps) {
 
         {/* Streaming indicator */}
         {message.streaming && (
-          <div className="flex gap-1 mt-1">
-            <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-            <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-            <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div className="flex mt-2" style={{ gap: 5 }}>
+            <span className="rounded-full animate-bounce" style={{ width: 6, height: 6, background: '#70767f', animationDelay: '0ms' }} />
+            <span className="rounded-full animate-bounce" style={{ width: 6, height: 6, background: '#70767f', animationDelay: '150ms' }} />
+            <span className="rounded-full animate-bounce" style={{ width: 6, height: 6, background: '#70767f', animationDelay: '300ms' }} />
           </div>
         )}
 
         {/* Timestamp on hover */}
-        <div className="text-[10px] mt-1 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 dark:text-gray-500">
+        <div
+          className="mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ fontSize: 10, color: '#70767f', textAlign: isUser ? 'right' : 'left' }}
+        >
           {new Date(message.timestamp).toLocaleTimeString()}
         </div>
       </div>
