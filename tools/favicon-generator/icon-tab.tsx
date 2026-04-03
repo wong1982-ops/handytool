@@ -125,7 +125,7 @@ export default function IconTab({ config, onConfigChange }: IconTabProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="rounded-xl border border-[#1e2631] bg-[#131a23] p-5 space-y-4">
       {/* Search */}
       <div className="relative">
         <svg
@@ -137,7 +137,7 @@ export default function IconTab({ config, onConfigChange }: IconTabProps) {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-[#70767f]"
         >
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -147,11 +147,11 @@ export default function IconTab({ config, onConfigChange }: IconTabProps) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search icons..."
-          className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 pl-9 pr-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-[var(--tk-color-primary-500,#3D6AF2)] focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500,#3D6AF2)]/20 min-h-[44px]"
+          className="w-full rounded-lg border border-[#1e2631] bg-[#090f16] pl-9 pr-3 py-2.5 text-sm text-white placeholder-[#70767f] focus:border-[#3D6AF2] focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/20 min-h-[44px] transition-all"
         />
         {isSearching && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-[var(--tk-color-primary-500,#3D6AF2)]" />
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#1e2631] border-t-[#3D6AF2]" />
           </div>
         )}
       </div>
@@ -165,10 +165,10 @@ export default function IconTab({ config, onConfigChange }: IconTabProps) {
               key={cat}
               type="button"
               onClick={() => setActiveCategory(cat)}
-              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors min-h-[36px] ${
+              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-all min-h-[36px] ${
                 active
-                  ? 'bg-[var(--tk-color-primary-500,#3D6AF2)] text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  ? 'bg-[#3D6AF2] text-white'
+                  : 'bg-[#1e2631] text-[#a6abb5] hover:bg-[#1e2a3a]'
               }`}
               aria-pressed={active}
             >
@@ -179,7 +179,7 @@ export default function IconTab({ config, onConfigChange }: IconTabProps) {
       </div>
 
       {/* Icon grid */}
-      <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-[320px] overflow-y-auto pr-1">
+      <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-[288px] overflow-y-auto pr-1">
         {allIcons.map((icon, idx) => {
           const selected = isSelected(icon)
           return (
@@ -187,33 +187,33 @@ export default function IconTab({ config, onConfigChange }: IconTabProps) {
               key={`${icon.name}-${idx}`}
               type="button"
               onClick={() => handleSelect(icon)}
-              className={`flex flex-col items-center gap-1 rounded-lg p-2 transition-colors min-h-[60px] ${
+              className={`flex flex-col items-center gap-1 rounded-lg p-2 transition-all min-h-[60px] ${
                 selected
-                  ? 'border-2 border-[var(--tk-color-primary-500,#3D6AF2)] bg-[var(--tk-color-primary-500,#3D6AF2)]/5'
-                  : 'border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'
+                  ? 'border-2 border-[#3D6AF2] bg-[#3D6AF2]/[0.08]'
+                  : 'border border-[#1e2631] bg-[#131a23] hover:border-[#2a3447]'
               }`}
               aria-pressed={selected}
               title={icon.name}
             >
               <span
-                className="w-6 h-6 text-gray-700 dark:text-gray-300 [&>svg]:w-full [&>svg]:h-full"
+                className="w-6 h-6 text-[#a6abb5] [&>svg]:w-full [&>svg]:h-full"
                 dangerouslySetInnerHTML={{ __html: icon.svg }}
               />
-              <span className="text-[10px] text-gray-500 dark:text-gray-400 truncate w-full text-center leading-tight">
+              <span className="text-[10px] text-[#70767f] truncate w-full text-center leading-tight">
                 {icon.name}
               </span>
             </button>
           )
         })}
         {allIcons.length === 0 && !isSearching && (
-          <div className="col-span-full py-8 text-center text-sm text-gray-400 dark:text-gray-500">
+          <div className="col-span-full py-8 text-center text-sm text-[#70767f]">
             No icons found
           </div>
         )}
       </div>
 
       {/* Style controls (no font options for icons) */}
-      <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+      <div className="pt-4 border-t border-[#1e2631]">
         <StyleControls
           config={config}
           onConfigChange={(updates) =>

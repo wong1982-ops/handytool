@@ -76,22 +76,22 @@ export default function FaviconGeneratorPage() {
         <ToolBreadcrumb toolName="Favicon Generator" toolSlug="favicon-generator" />
 
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+          <h1 className="text-[28px] font-bold text-white leading-tight">
             Favicon Generator
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-[#a6abb5]">
             Create favicons from text, icons, images, or AI &mdash; download a complete package
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
           {/* Left: Creation area */}
           <div className="flex-1 min-w-0">
             {/* Tab buttons */}
             <div
               role="tablist"
               aria-label="Favicon creation mode"
-              className="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800 mb-4"
+              className="flex gap-1 p-1 rounded-xl bg-[#1e2631] mb-4"
             >
               {TABS.map((tab) => (
                 <button
@@ -102,8 +102,8 @@ export default function FaviconGeneratorPage() {
                   onClick={() => setActiveTab(tab.value)}
                   className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all cursor-pointer min-h-[44px] ${
                     activeTab === tab.value
-                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                      ? 'bg-[#131a23] text-white shadow-[0_1px_3px_rgba(0,0,0,0.4)]'
+                      : 'text-[#70767f] hover:text-[#a6abb5]'
                   }`}
                 >
                   {tab.icon}

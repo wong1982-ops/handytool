@@ -58,15 +58,15 @@ export default function ExportPanel({ config }: ExportPanelProps) {
   }, [])
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 space-y-4">
-      <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Export</h2>
+    <div className="rounded-xl border border-[#1e2631] bg-[#131a23] p-4 space-y-4">
+      <h2 className="text-sm font-semibold text-white">Export</h2>
 
       {/* Size checkboxes */}
       <div className="space-y-2">
-        <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+        <span className="text-[10px] font-semibold text-[#70767f] uppercase tracking-[0.08em]">
           Sizes
         </span>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-2">
           {sizes.map((size, i) => (
             <label
               key={size.filename}
@@ -76,9 +76,9 @@ export default function ExportPanel({ config }: ExportPanelProps) {
                 type="checkbox"
                 checked={size.checked}
                 onChange={() => toggleSize(i)}
-                className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-[var(--tk-color-primary-500,#3D6AF2)] focus:ring-[var(--tk-color-primary-500,#3D6AF2)] accent-[var(--tk-color-primary-500,#3D6AF2)]"
+                className="h-[15px] w-[15px] accent-[#3D6AF2] cursor-pointer"
               />
-              <span className="text-xs text-gray-600 dark:text-gray-400">{size.label}</span>
+              <span className="text-xs text-[#a6abb5]">{size.label}</span>
             </label>
           ))}
         </div>
@@ -89,7 +89,8 @@ export default function ExportPanel({ config }: ExportPanelProps) {
         type="button"
         onClick={handleDownloadZip}
         disabled={!hasContent || !hasChecked || isGenerating}
-        className="flex items-center justify-center gap-2 w-full rounded-lg bg-gradient-to-r from-[var(--tk-color-primary-500,#3D6AF2)] to-[#3D9DF2] text-white font-medium text-sm px-4 py-3 min-h-[44px] transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+        className="flex items-center justify-center gap-2 w-full rounded-lg text-white font-semibold text-sm px-4 py-3 min-h-[44px] transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+        style={{ background: 'linear-gradient(90deg, #3D6AF2 0%, #3D9DF2 100%)' }}
       >
         {isGenerating ? (
           <>
@@ -116,11 +117,11 @@ export default function ExportPanel({ config }: ExportPanelProps) {
         <button
           type="button"
           onClick={handleCopyHtml}
-          className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-medium px-3 py-2.5 min-h-[44px] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#1e2631] bg-[#1e2631] text-[#a6abb5] text-xs font-medium px-3 py-2.5 min-h-[44px] hover:bg-[#1e2a3a] hover:text-white transition-all"
         >
           {copiedHtml ? (
             <>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#10B981]">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
               Copied!
@@ -139,11 +140,11 @@ export default function ExportPanel({ config }: ExportPanelProps) {
         <button
           type="button"
           onClick={handleCopyManifest}
-          className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-medium px-3 py-2.5 min-h-[44px] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#1e2631] bg-[#1e2631] text-[#a6abb5] text-xs font-medium px-3 py-2.5 min-h-[44px] hover:bg-[#1e2a3a] hover:text-white transition-all"
         >
           {copiedManifest ? (
             <>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#10B981]">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
               Copied!

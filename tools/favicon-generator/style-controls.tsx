@@ -47,7 +47,7 @@ const SHAPE_ICONS: Record<FaviconShape, React.ReactNode> = {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+    <span className="text-[10px] font-semibold text-[#70767f] uppercase tracking-[0.08em]">
       {children}
     </span>
   )
@@ -66,15 +66,15 @@ function ToggleSwitch({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
+      className={`relative inline-flex h-[22px] w-10 shrink-0 cursor-pointer rounded-full transition-colors ${
         checked
-          ? 'bg-[var(--tk-color-primary-500,#3D6AF2)]'
-          : 'bg-gray-200 dark:bg-gray-700'
+          ? 'bg-[#3D6AF2]'
+          : 'bg-[#1e2631]'
       }`}
     >
       <span
-        className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
-          checked ? 'translate-x-5' : 'translate-x-0'
+        className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white transition-transform mt-[3px] ml-[3px] ${
+          checked ? 'translate-x-[18px]' : 'translate-x-0'
         }`}
       />
     </button>
@@ -89,7 +89,7 @@ export default function StyleControls({
   return (
     <div className="space-y-4">
       {/* Shape */}
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <SectionLabel>Shape</SectionLabel>
         <div className="grid grid-cols-4 gap-2">
           {SHAPES.map((shape) => {
@@ -99,10 +99,10 @@ export default function StyleControls({
                 key={shape}
                 type="button"
                 onClick={() => onConfigChange({ shape })}
-                className={`flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium transition-colors min-h-[44px] ${
+                className={`flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium transition-all min-h-[56px] ${
                   active
-                    ? 'bg-[var(--tk-color-primary-500,#3D6AF2)] text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    ? 'bg-[#3D6AF2] text-white'
+                    : 'bg-[#1e2631] text-[#a6abb5] hover:bg-[#1e2a3a]'
                 }`}
                 aria-pressed={active}
               >
@@ -115,9 +115,9 @@ export default function StyleControls({
       </div>
 
       {/* Background */}
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <SectionLabel>Background</SectionLabel>
-        <div className="flex gap-1 rounded-lg bg-gray-100 dark:bg-gray-800 p-1">
+        <div className="flex gap-1 rounded-lg bg-[#090f16] p-1">
           {BG_TYPES.map(({ value, label }) => {
             const active = config.bgType === value
             return (
@@ -125,10 +125,10 @@ export default function StyleControls({
                 key={value}
                 type="button"
                 onClick={() => onConfigChange({ bgType: value })}
-                className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors min-h-[44px] ${
+                className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-all min-h-[36px] ${
                   active
-                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                    ? 'bg-[#3D6AF2] text-white'
+                    : 'text-[#70767f] hover:text-[#a6abb5]'
                 }`}
                 aria-pressed={active}
               >
@@ -140,15 +140,17 @@ export default function StyleControls({
 
         {config.bgType === 'solid' && (
           <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-500 dark:text-gray-400">Color</span>
+            <span className="text-xs text-[#70767f]">Color</span>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={config.bgColor}
-                onChange={(e) => onConfigChange({ bgColor: e.target.value })}
-                className="h-8 w-8 cursor-pointer rounded border border-gray-200 dark:border-gray-700"
-              />
-              <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-16">
+              <div className="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden flex-shrink-0" style={{ background: config.bgColor }}>
+                <input
+                  type="color"
+                  value={config.bgColor}
+                  onChange={(e) => onConfigChange({ bgColor: e.target.value })}
+                  className="w-10 h-10 -m-1 opacity-0 cursor-pointer"
+                />
+              </div>
+              <span className="text-xs text-[#70767f] font-mono w-16">
                 {config.bgColor}
               </span>
             </div>
@@ -158,43 +160,47 @@ export default function StyleControls({
         {config.bgType === 'gradient' && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 dark:text-gray-400">From</span>
+              <span className="text-xs text-[#70767f]">From</span>
               <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={config.bgGradient.from}
-                  onChange={(e) =>
-                    onConfigChange({
-                      bgGradient: { ...config.bgGradient, from: e.target.value },
-                    })
-                  }
-                  className="h-8 w-8 cursor-pointer rounded border border-gray-200 dark:border-gray-700"
-                />
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-16">
+                <div className="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden flex-shrink-0" style={{ background: config.bgGradient.from }}>
+                  <input
+                    type="color"
+                    value={config.bgGradient.from}
+                    onChange={(e) =>
+                      onConfigChange({
+                        bgGradient: { ...config.bgGradient, from: e.target.value },
+                      })
+                    }
+                    className="w-10 h-10 -m-1 opacity-0 cursor-pointer"
+                  />
+                </div>
+                <span className="text-xs text-[#70767f] font-mono w-16">
                   {config.bgGradient.from}
                 </span>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 dark:text-gray-400">To</span>
+              <span className="text-xs text-[#70767f]">To</span>
               <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={config.bgGradient.to}
-                  onChange={(e) =>
-                    onConfigChange({
-                      bgGradient: { ...config.bgGradient, to: e.target.value },
-                    })
-                  }
-                  className="h-8 w-8 cursor-pointer rounded border border-gray-200 dark:border-gray-700"
-                />
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-16">
+                <div className="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden flex-shrink-0" style={{ background: config.bgGradient.to }}>
+                  <input
+                    type="color"
+                    value={config.bgGradient.to}
+                    onChange={(e) =>
+                      onConfigChange({
+                        bgGradient: { ...config.bgGradient, to: e.target.value },
+                      })
+                    }
+                    className="w-10 h-10 -m-1 opacity-0 cursor-pointer"
+                  />
+                </div>
+                <span className="text-xs text-[#70767f] font-mono w-16">
                   {config.bgGradient.to}
                 </span>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Angle</span>
+              <span className="text-xs text-[#70767f]">Angle</span>
               <div className="flex items-center gap-2">
                 <input
                   type="range"
@@ -209,9 +215,9 @@ export default function StyleControls({
                       },
                     })
                   }
-                  className="w-24 accent-[var(--tk-color-primary-500,#3D6AF2)]"
+                  className="w-24 accent-[#3D6AF2]"
                 />
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-10 text-right">
+                <span className="text-xs text-[#70767f] font-mono w-10 text-right">
                   {config.bgGradient.angle}&deg;
                 </span>
               </div>
@@ -224,22 +230,27 @@ export default function StyleControls({
       <div className="flex items-center justify-between">
         <SectionLabel>Foreground Color</SectionLabel>
         <div className="flex items-center gap-2">
-          <input
-            type="color"
-            value={config.fgColor}
-            onChange={(e) => onConfigChange({ fgColor: e.target.value })}
-            className="h-8 w-8 cursor-pointer rounded border border-gray-200 dark:border-gray-700"
-          />
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-16">
+          <div className="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden flex-shrink-0" style={{ background: config.fgColor }}>
+            <input
+              type="color"
+              value={config.fgColor}
+              onChange={(e) => onConfigChange({ fgColor: e.target.value })}
+              className="w-10 h-10 -m-1 opacity-0 cursor-pointer"
+            />
+          </div>
+          <span className="text-xs text-[#70767f] font-mono w-16">
             {config.fgColor}
           </span>
         </div>
       </div>
 
+      {/* Divider before font options */}
+      {showFontOptions && <div className="border-t border-[#1e2631]" />}
+
       {/* Font Options */}
       {showFontOptions && (
         <>
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <SectionLabel>Font</SectionLabel>
             <div className="flex flex-wrap gap-1.5">
               {FONTS.map(({ value, label }) => {
@@ -249,10 +260,10 @@ export default function StyleControls({
                     key={value}
                     type="button"
                     onClick={() => onConfigChange({ fontFamily: value })}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors min-h-[44px] ${
+                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all min-h-[36px] ${
                       active
-                        ? 'bg-[var(--tk-color-primary-500,#3D6AF2)] text-white'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        ? 'bg-[#3D6AF2] text-white'
+                        : 'bg-[#1e2631] text-[#a6abb5] hover:bg-[#1e2a3a]'
                     }`}
                     aria-pressed={active}
                   >
@@ -274,9 +285,9 @@ export default function StyleControls({
                 onChange={(e) =>
                   onConfigChange({ fontSize: Number(e.target.value) })
                 }
-                className="w-24 accent-[var(--tk-color-primary-500,#3D6AF2)]"
+                className="w-24 accent-[#3D6AF2]"
               />
-              <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-10 text-right">
+              <span className="text-xs text-[#70767f] font-mono w-10 text-right">
                 {config.fontSize}%
               </span>
             </div>
@@ -294,9 +305,9 @@ export default function StyleControls({
             max={40}
             value={config.padding}
             onChange={(e) => onConfigChange({ padding: Number(e.target.value) })}
-            className="w-24 accent-[var(--tk-color-primary-500,#3D6AF2)]"
+            className="w-24 accent-[#3D6AF2]"
           />
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-10 text-right">
+          <span className="text-xs text-[#70767f] font-mono w-10 text-right">
             {config.padding}%
           </span>
         </div>
@@ -314,27 +325,29 @@ export default function StyleControls({
           />
         </div>
         {config.border.enabled && (
-          <div className="space-y-2 pl-2 border-l-2 border-gray-200 dark:border-gray-700">
+          <div className="space-y-2 pl-3 border-l-2 border-[#1e2631]">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Color</span>
+              <span className="text-xs text-[#70767f]">Color</span>
               <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={config.border.color}
-                  onChange={(e) =>
-                    onConfigChange({
-                      border: { ...config.border, color: e.target.value },
-                    })
-                  }
-                  className="h-8 w-8 cursor-pointer rounded border border-gray-200 dark:border-gray-700"
-                />
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-16">
+                <div className="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden flex-shrink-0" style={{ background: config.border.color }}>
+                  <input
+                    type="color"
+                    value={config.border.color}
+                    onChange={(e) =>
+                      onConfigChange({
+                        border: { ...config.border, color: e.target.value },
+                      })
+                    }
+                    className="w-10 h-10 -m-1 opacity-0 cursor-pointer"
+                  />
+                </div>
+                <span className="text-xs text-[#70767f] font-mono w-16">
                   {config.border.color}
                 </span>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Width</span>
+              <span className="text-xs text-[#70767f]">Width</span>
               <div className="flex items-center gap-2">
                 <input
                   type="range"
@@ -346,9 +359,9 @@ export default function StyleControls({
                       border: { ...config.border, width: Number(e.target.value) },
                     })
                   }
-                  className="w-24 accent-[var(--tk-color-primary-500,#3D6AF2)]"
+                  className="w-24 accent-[#3D6AF2]"
                 />
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-10 text-right">
+                <span className="text-xs text-[#70767f] font-mono w-10 text-right">
                   {config.border.width}px
                 </span>
               </div>
@@ -369,24 +382,26 @@ export default function StyleControls({
           />
         </div>
         {config.shadow.enabled && (
-          <div className="space-y-2 pl-2 border-l-2 border-gray-200 dark:border-gray-700">
+          <div className="space-y-2 pl-3 border-l-2 border-[#1e2631]">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Color</span>
+              <span className="text-xs text-[#70767f]">Color</span>
               <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={config.shadow.color}
-                  onChange={(e) =>
-                    onConfigChange({
-                      shadow: { ...config.shadow, color: e.target.value },
-                    })
-                  }
-                  className="h-8 w-8 cursor-pointer rounded border border-gray-200 dark:border-gray-700"
-                />
+                <div className="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden flex-shrink-0" style={{ background: config.shadow.color }}>
+                  <input
+                    type="color"
+                    value={config.shadow.color}
+                    onChange={(e) =>
+                      onConfigChange({
+                        shadow: { ...config.shadow, color: e.target.value },
+                      })
+                    }
+                    className="w-10 h-10 -m-1 opacity-0 cursor-pointer"
+                  />
+                </div>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Blur</span>
+              <span className="text-xs text-[#70767f]">Blur</span>
               <div className="flex items-center gap-2">
                 <input
                   type="range"
@@ -398,15 +413,15 @@ export default function StyleControls({
                       shadow: { ...config.shadow, blur: Number(e.target.value) },
                     })
                   }
-                  className="w-24 accent-[var(--tk-color-primary-500,#3D6AF2)]"
+                  className="w-24 accent-[#3D6AF2]"
                 />
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-10 text-right">
+                <span className="text-xs text-[#70767f] font-mono w-10 text-right">
                   {config.shadow.blur}px
                 </span>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Offset Y</span>
+              <span className="text-xs text-[#70767f]">Offset Y</span>
               <div className="flex items-center gap-2">
                 <input
                   type="range"
@@ -421,9 +436,9 @@ export default function StyleControls({
                       },
                     })
                   }
-                  className="w-24 accent-[var(--tk-color-primary-500,#3D6AF2)]"
+                  className="w-24 accent-[#3D6AF2]"
                 />
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-10 text-right">
+                <span className="text-xs text-[#70767f] font-mono w-10 text-right">
                   {config.shadow.offsetY}px
                 </span>
               </div>

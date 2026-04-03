@@ -12,12 +12,12 @@ export default function TextTab({ config, onConfigChange }: TextTabProps) {
   const text = config.text ?? ''
 
   return (
-    <div className="space-y-5">
+    <div className="rounded-xl border border-[#1e2631] bg-[#131a23] p-5 space-y-5">
       {/* Text input */}
       <div className="space-y-2">
         <label
           htmlFor="favicon-text"
-          className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide"
+          className="block text-[10px] font-semibold text-[#70767f] uppercase tracking-[0.08em]"
         >
           Text / Emoji
         </label>
@@ -30,10 +30,10 @@ export default function TextTab({ config, onConfigChange }: TextTabProps) {
             onConfigChange({ mode: 'text', text: e.target.value })
           }
           placeholder="A"
-          className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 text-center text-2xl font-bold text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-gray-600 focus:border-[var(--tk-color-primary-500,#3D6AF2)] focus:outline-none focus:ring-2 focus:ring-[var(--tk-color-primary-500,#3D6AF2)]/20"
+          className="w-full rounded-lg border border-[#1e2631] bg-[#090f16] px-4 py-3 text-center text-2xl font-bold text-white placeholder-[#70767f] focus:border-[#3D6AF2] focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/20 transition-all"
         />
         {text.length > 3 && (
-          <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+          <p className="text-xs text-amber-400 flex items-center gap-1">
             <svg
               width="14"
               height="14"

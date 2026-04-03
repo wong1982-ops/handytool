@@ -100,7 +100,7 @@ export default function UploadTab({ config, onConfigChange }: UploadTabProps) {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="rounded-xl border border-[#1e2631] bg-[#131a23] p-5 space-y-5">
       {!hasImage ? (
         /* Drop zone */
         <div
@@ -119,10 +119,10 @@ export default function UploadTab({ config, onConfigChange }: UploadTabProps) {
               fileInputRef.current?.click()
             }
           }}
-          className={`flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-8 cursor-pointer transition-colors min-h-[160px] ${
+          className={`flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-10 cursor-pointer transition-all min-h-[160px] bg-[#090f16]/40 ${
             isDragging
-              ? 'border-[var(--tk-color-primary-500,#3D6AF2)] bg-[var(--tk-color-primary-500,#3D6AF2)]/5'
-              : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-gray-50 dark:bg-gray-900/50'
+              ? 'border-[#3D6AF2] bg-[#3D6AF2]/5'
+              : 'border-[#2a3447] hover:border-[#3D6AF2] hover:bg-[#3D6AF2]/[0.04]'
           }`}
         >
           <svg
@@ -134,17 +134,17 @@ export default function UploadTab({ config, onConfigChange }: UploadTabProps) {
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-gray-400 dark:text-gray-500"
+            className="text-[#70767f]"
           >
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="17 8 12 3 7 8" />
             <line x1="12" y1="3" x2="12" y2="15" />
           </svg>
           <div className="text-center">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <p className="text-sm font-medium text-[#a6abb5]">
               Drop image here or click to browse
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-[#70767f] mt-1">
               PNG, JPEG, SVG, WebP &middot; Max 10MB
             </p>
           </div>
@@ -152,7 +152,7 @@ export default function UploadTab({ config, onConfigChange }: UploadTabProps) {
       ) : (
         /* Image preview + controls */
         <div className="space-y-4">
-          <div className="relative flex items-center justify-center rounded-xl bg-[repeating-conic-gradient(#e5e7eb_0%_25%,transparent_0%_50%)_0_0/20px_20px] dark:bg-[repeating-conic-gradient(#374151_0%_25%,transparent_0%_50%)_0_0/20px_20px] p-4 min-h-[140px]">
+          <div className="relative flex items-center justify-center rounded-xl bg-[repeating-conic-gradient(#1e2631_0%_25%,transparent_0%_50%)_0_0/20px_20px] p-4 min-h-[140px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={config.imageData}
@@ -165,7 +165,7 @@ export default function UploadTab({ config, onConfigChange }: UploadTabProps) {
           <button
             type="button"
             onClick={handleClear}
-            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50 transition-colors min-h-[44px]"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-[#EF4444] bg-[#EF4444]/10 hover:bg-[#EF4444]/20 transition-colors min-h-[44px]"
           >
             <svg
               width="14"
@@ -195,7 +195,7 @@ export default function UploadTab({ config, onConfigChange }: UploadTabProps) {
       />
 
       {error && (
-        <p className="text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
+        <p className="text-xs text-[#EF4444] flex items-center gap-1">
           <svg
             width="14"
             height="14"
@@ -217,7 +217,7 @@ export default function UploadTab({ config, onConfigChange }: UploadTabProps) {
       {/* Zoom slider */}
       {hasImage && (
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+          <span className="text-[10px] font-semibold text-[#70767f] uppercase tracking-[0.08em]">
             Zoom
           </span>
           <div className="flex items-center gap-2">
@@ -230,9 +230,9 @@ export default function UploadTab({ config, onConfigChange }: UploadTabProps) {
               onChange={(e) =>
                 onConfigChange({ mode: 'upload', cropZoom: Number(e.target.value) })
               }
-              className="w-24 accent-[var(--tk-color-primary-500,#3D6AF2)]"
+              className="w-24 accent-[#3D6AF2]"
             />
-            <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-10 text-right">
+            <span className="text-xs text-[#70767f] font-mono w-10 text-right">
               {config.cropZoom.toFixed(1)}x
             </span>
           </div>
@@ -241,25 +241,27 @@ export default function UploadTab({ config, onConfigChange }: UploadTabProps) {
 
       {/* Background color (for transparent PNGs) */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+        <span className="text-[10px] font-semibold text-[#70767f] uppercase tracking-[0.08em]">
           Background Color
         </span>
         <div className="flex items-center gap-2">
-          <input
-            type="color"
-            value={config.bgColor}
-            onChange={(e) => onConfigChange({ mode: 'upload', bgColor: e.target.value })}
-            className="h-8 w-8 cursor-pointer rounded border border-gray-200 dark:border-gray-700"
-          />
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-mono w-16">
+          <div className="w-8 h-8 rounded-md border border-[#1e2631] overflow-hidden flex-shrink-0" style={{ background: config.bgColor }}>
+            <input
+              type="color"
+              value={config.bgColor}
+              onChange={(e) => onConfigChange({ mode: 'upload', bgColor: e.target.value })}
+              className="w-10 h-10 -m-1 opacity-0 cursor-pointer"
+            />
+          </div>
+          <span className="text-xs text-[#70767f] font-mono w-16">
             {config.bgColor}
           </span>
         </div>
       </div>
 
       {/* Shape selector */}
-      <div className="space-y-1.5">
-        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+      <div className="space-y-2">
+        <span className="text-[10px] font-semibold text-[#70767f] uppercase tracking-[0.08em]">
           Shape
         </span>
         <div className="grid grid-cols-4 gap-2">
@@ -270,10 +272,10 @@ export default function UploadTab({ config, onConfigChange }: UploadTabProps) {
                 key={shape}
                 type="button"
                 onClick={() => onConfigChange({ mode: 'upload', shape })}
-                className={`flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium transition-colors min-h-[44px] ${
+                className={`flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium transition-all min-h-[56px] ${
                   active
-                    ? 'bg-[var(--tk-color-primary-500,#3D6AF2)] text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    ? 'bg-[#3D6AF2] text-white'
+                    : 'bg-[#1e2631] text-[#a6abb5] hover:bg-[#1e2a3a]'
                 }`}
                 aria-pressed={active}
               >

@@ -18,12 +18,12 @@ export default function PreviewPanel({ config }: PreviewPanelProps) {
   const favicon60 = useMemo(() => mounted ? renderFaviconDataUrl(config, 60) : '', [config, mounted])
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
+    <div className="rounded-xl border border-[#1e2631] bg-[#131a23] overflow-hidden">
       {/* Mobile toggle */}
       <button
         type="button"
         onClick={() => setCollapsed(!collapsed)}
-        className="lg:hidden flex items-center justify-between w-full px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white min-h-[44px]"
+        className="lg:hidden flex items-center justify-between w-full px-4 py-3 text-sm font-semibold text-white min-h-[44px]"
         aria-expanded={!collapsed}
       >
         Preview
@@ -44,39 +44,39 @@ export default function PreviewPanel({ config }: PreviewPanelProps) {
 
       {/* Desktop label */}
       <div className="hidden lg:block px-4 pt-4 pb-2">
-        <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Preview</h2>
+        <h2 className="text-sm font-semibold text-white">Preview</h2>
       </div>
 
       {/* Preview content */}
-      <div className={`px-4 pb-4 space-y-3 ${collapsed ? 'hidden lg:block' : ''}`}>
+      <div className={`px-4 pb-4 space-y-4 ${collapsed ? 'hidden lg:block' : ''}`}>
         {/* Browser Tab */}
         <PreviewCard label="Browser Tab">
-          <div className="rounded-t-lg overflow-hidden">
+          <div className="rounded-lg overflow-hidden border border-[#1e2631]">
             {/* Tab bar */}
-            <div className="flex items-end gap-px bg-gray-300 dark:bg-gray-600 px-2 pt-2">
+            <div className="flex items-end gap-px bg-[#0d1520] px-2 pt-2">
               {/* Active tab */}
-              <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 rounded-t-md px-3 py-1.5 max-w-[140px]">
+              <div className="flex items-center gap-1.5 bg-[#1e2631] rounded-t-md px-3 py-1.5 max-w-[160px]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={favicon16} alt="" width={14} height={14} className="shrink-0" />
-                <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300 truncate">
+                <span className="text-[10px] font-medium text-[#a6abb5] truncate">
                   My Website
                 </span>
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-gray-400 shrink-0">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-[#70767f] shrink-0">
                   <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
               </div>
               {/* Inactive tab */}
-              <div className="flex items-center gap-1.5 bg-gray-200 dark:bg-gray-700 rounded-t-md px-3 py-1.5 opacity-60">
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">New Tab</span>
+              <div className="flex items-center gap-1.5 bg-[#131a23] rounded-t-md px-3 py-1.5 opacity-50">
+                <span className="text-[10px] text-[#70767f]">New Tab</span>
               </div>
             </div>
             {/* URL bar */}
-            <div className="bg-gray-100 dark:bg-gray-800 px-3 py-1.5">
-              <div className="flex items-center gap-1.5 bg-white dark:bg-gray-900 rounded px-2 py-1">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400 shrink-0">
+            <div className="bg-[#131a23] px-3 py-2">
+              <div className="flex items-center gap-1.5 bg-[#090f16] rounded px-2 py-1 border border-[#1e2631]">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#70767f] shrink-0">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
-                <span className="text-[9px] text-gray-500 dark:text-gray-400">mywebsite.com</span>
+                <span className="text-[9px] text-[#70767f]">mywebsite.com</span>
               </div>
             </div>
           </div>
@@ -84,8 +84,8 @@ export default function PreviewPanel({ config }: PreviewPanelProps) {
 
         {/* Bookmarks Bar */}
         <PreviewCard label="Bookmarks">
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg px-3 py-2">
-            <div className="border-b border-gray-200 dark:border-gray-700 mb-1.5 pb-1" />
+          <div className="bg-[#090f16] rounded-lg px-3 py-2 border border-[#1e2631]">
+            <div className="border-b border-[#1e2631] mb-1.5 pb-1" />
             <div className="flex items-center gap-2 overflow-hidden">
               <BookmarkPill icon={<img src={favicon16} alt="" width={12} height={12} />} label="My Site" active />
               <BookmarkPill icon={<FolderIcon />} label="News" />
@@ -98,9 +98,9 @@ export default function PreviewPanel({ config }: PreviewPanelProps) {
         {/* Mobile Home Screen */}
         <PreviewCard label="Mobile Home Screen">
           <div className="flex justify-center">
-            <div className="w-[120px] h-[200px] rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center p-3 relative">
+            <div className="w-[120px] h-[200px] rounded-2xl border-2 border-[#1e2631] bg-[#090f16] flex flex-col items-center justify-center p-3 relative">
               {/* Status bar notch */}
-              <div className="absolute top-1.5 w-12 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
+              <div className="absolute top-1.5 w-12 h-1 rounded-full bg-[#1e2631]" />
               {/* App grid */}
               <div className="grid grid-cols-3 gap-2 mt-3">
                 {Array.from({ length: 9 }).map((_, i) => (
@@ -115,12 +115,12 @@ export default function PreviewPanel({ config }: PreviewPanelProps) {
                           height={24}
                           className="rounded-md"
                         />
-                        <span className="text-[5px] text-gray-600 dark:text-gray-400 leading-tight">My App</span>
+                        <span className="text-[5px] text-[#a6abb5] leading-tight">My App</span>
                       </>
                     ) : (
                       <>
-                        <div className="w-6 h-6 rounded-md bg-gray-200 dark:bg-gray-700" />
-                        <span className="text-[5px] text-gray-400 dark:text-gray-500 leading-tight">App</span>
+                        <div className="w-6 h-6 rounded-md bg-[#1e2631]" />
+                        <span className="text-[5px] text-[#70767f] leading-tight">App</span>
                       </>
                     )}
                   </div>
@@ -132,16 +132,16 @@ export default function PreviewPanel({ config }: PreviewPanelProps) {
 
         {/* Google Search */}
         <PreviewCard label="Google Search Result">
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
+          <div className="bg-[#090f16] rounded-lg p-3 border border-[#1e2631]">
             <div className="flex items-center gap-2 mb-1">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={favicon16} alt="" width={14} height={14} className="shrink-0 rounded-sm" />
-              <span className="text-[10px] text-gray-500 dark:text-gray-400">mywebsite.com</span>
+              <span className="text-[10px] text-[#70767f]">mywebsite.com</span>
             </div>
-            <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-0.5">
+            <p className="text-xs font-medium text-[#3D9DF2] mb-0.5">
               My Website &mdash; Home
             </p>
-            <p className="text-[9px] text-gray-500 dark:text-gray-400 leading-relaxed">
+            <p className="text-[9px] text-[#70767f] leading-relaxed">
               Welcome to My Website. Discover great tools and resources for your everyday needs.
             </p>
           </div>
@@ -151,12 +151,12 @@ export default function PreviewPanel({ config }: PreviewPanelProps) {
   )
 }
 
-// ── Sub-components ──────────────────────────────────────────────
+// -- Sub-components --
 
 function PreviewCard({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+      <span className="text-[10px] font-semibold text-[#70767f] uppercase tracking-[0.08em]">
         {label}
       </span>
       {children}
@@ -177,8 +177,8 @@ function BookmarkPill({
     <div
       className={`flex items-center gap-1 rounded px-2 py-0.5 text-[9px] shrink-0 ${
         active
-          ? 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-medium'
-          : 'text-gray-500 dark:text-gray-400'
+          ? 'bg-[#131a23] border border-[#1e2631] text-[#a6abb5] font-medium'
+          : 'text-[#70767f]'
       }`}
     >
       <span className="shrink-0 w-3 h-3 flex items-center justify-center">{icon}</span>
@@ -189,7 +189,7 @@ function BookmarkPill({
 
 function FolderIcon() {
   return (
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#70767f]">
       <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
     </svg>
   )
