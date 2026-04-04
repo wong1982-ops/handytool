@@ -1,5 +1,5 @@
 import { getAdminSupabase } from '@/lib/supabase/admin'
-import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
+import { getAuthUserId, apiSuccess, API_ERRORS } from '@/lib/api/response'
 import { tools } from '@/lib/tools'
 import type { AuditIssue, ToolAuditResult } from '@/tools/seo-studio/types'
 
@@ -171,7 +171,7 @@ export async function POST() {
   // Persist to DB (best-effort — don't fail the response if this errors)
   try {
     const supabase = getAdminSupabase()
-    await supabase.from('seo_audit_results').insert({
+    await (supabase.from as any)('seo_audit_results').insert({
       scanned_at: scannedAt,
       overall_score: overallScore,
       results: results,
