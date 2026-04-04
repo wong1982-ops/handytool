@@ -7,6 +7,7 @@ import { InstallPrompt } from "@/components/layout/install-prompt";
 import { PageTracker } from "@/lib/hooks/use-page-tracker";
 import { MobileShell } from "@/components/mobile/mobile-shell";
 import { TrackingPixels } from "@/components/analytics/tracking-pixels";
+import { ReferralTracker } from "@/components/referral-tracker";
 import "./globals.scss";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://toolk1t.com";
@@ -133,6 +134,7 @@ export default function RootLayout({
         <MobileShell>{children}</MobileShell>
         <ProfilePrompt />
         <InstallPrompt />
+        <ReferralTracker />
         <PageTracker />
         {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
         <TrackingPixels />
