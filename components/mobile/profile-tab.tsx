@@ -9,6 +9,7 @@ import { TermsSheetContent } from '@/components/mobile/sheets/terms-sheet-conten
 import { PrivacySheetContent } from '@/components/mobile/sheets/privacy-sheet-content'
 import { ContactSheetContent } from '@/components/mobile/sheets/contact-sheet-content'
 import { BlogSheetContent } from '@/components/mobile/sheets/blog-sheet-content'
+import ReferralSection from '@/tools/referral/referral-section'
 
 type ViewId = 'settings' | 'blog' | 'terms' | 'privacy' | 'contact' | 'signin'
 
@@ -313,6 +314,13 @@ export function ProfileTab() {
             >
               Sign In
             </button>
+          )}
+
+          {/* Referral section */}
+          {user && (
+            <div className="px-1">
+              <ReferralSection />
+            </div>
           )}
 
           {/* Dark mode toggle */}
