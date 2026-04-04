@@ -59,10 +59,11 @@ function AirportInput({
     let cancelled = false
     fetch(`/api/v1/flights/airports?q=${encodeURIComponent(debouncedQuery)}`)
       .then((r) => r.json())
-      .then((data: AirportSuggestion[]) => {
+      .then((json: { data: AirportSuggestion[] }) => {
+        const results = Array.isArray(json.data) ? json.data : []
         if (!cancelled) {
-          setSuggestions(data)
-          setOpen(data.length > 0)
+          setSuggestions(results)
+          setOpen(results.length > 0)
         }
       })
       .catch(() => {
