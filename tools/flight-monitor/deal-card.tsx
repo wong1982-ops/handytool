@@ -74,30 +74,35 @@ function formatPrice(price: number): string {
 export function DealCard({ deal, onSetAlert, onSearch }: DealCardProps) {
   const originCity = getCityName(deal.origin)
   const destCity = getCityName(deal.destination)
-  const discountLabel = `-${Math.round(deal.discount_pct)}%`
+  const hasDiscount = deal.discount_pct > 0
+  const discountLabel = hasDiscount ? `-${Math.round(deal.discount_pct)}%` : 'Tracking'
 
   return (
-    <article className="rounded-xl bg-[#131a23] border border-[#1e2631] p-5 hover:border-[#10B981]/40 transition-colors">
+    <article className="rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] p-5 hover:border-[#10B981]/40 transition-colors">
       {/* Header row: route + discount badge */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap min-w-0">
-          <span className="text-white font-bold text-base leading-tight truncate">
+          <span className="text-slate-900 dark:text-white font-bold text-base leading-tight truncate">
             {originCity}
           </span>
           <ArrowRightIcon />
-          <span className="text-white font-bold text-base leading-tight truncate">
+          <span className="text-slate-900 dark:text-white font-bold text-base leading-tight truncate">
             {destCity}
           </span>
         </div>
 
         {/* Discount badge */}
-        <span className="inline-flex items-center shrink-0 rounded-full bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 text-xs font-semibold px-2.5 py-1">
+        <span className={`inline-flex items-center shrink-0 rounded-full text-xs font-semibold px-2.5 py-1 ${
+          hasDiscount
+            ? 'bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20'
+            : 'bg-[#3D6AF2]/10 text-[#3D6AF2] border border-[#3D6AF2]/20'
+        }`}>
           {discountLabel}
         </span>
       </div>
 
       {/* Subtitle */}
-      <p className="text-[#70767f] text-xs mt-1">
+      <p className="text-slate-400 dark:text-[#70767f] text-xs mt-1">
         {deal.origin} → {deal.destination} · Multiple airlines
       </p>
 
@@ -105,19 +110,21 @@ export function DealCard({ deal, onSetAlert, onSearch }: DealCardProps) {
       <div className="mt-4 flex items-end justify-between gap-4 flex-wrap">
         {/* Current price */}
         <div>
-          <p className="text-[#70767f] text-xs mb-0.5">Current price</p>
-          <p className="text-2xl font-bold text-white leading-none">
+          <p className="text-slate-400 dark:text-[#70767f] text-xs mb-0.5">Current price</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white leading-none">
             {formatPrice(deal.current_price)}
           </p>
         </div>
 
-        {/* Average price */}
-        <div className="text-right">
-          <p className="text-[#70767f] text-xs mb-0.5">30-day avg</p>
-          <p className="text-base font-medium text-[#a6abb5] line-through">
-            {formatPrice(deal.avg_price)}
-          </p>
-        </div>
+        {/* Average price — only show strikethrough when there's a discount */}
+        {hasDiscount && (
+          <div className="text-right">
+            <p className="text-slate-400 dark:text-[#70767f] text-xs mb-0.5">30-day avg</p>
+            <p className="text-base font-medium text-slate-500 dark:text-[#a6abb5] line-through">
+              {formatPrice(deal.avg_price)}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Sparkline */}
@@ -143,7 +150,7 @@ export function DealCard({ deal, onSetAlert, onSearch }: DealCardProps) {
         <button
           type="button"
           onClick={() => onSearch(deal.origin, deal.destination)}
-          className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-[#1e2631] border border-[#1e2631] text-[#a6abb5] text-sm font-medium px-3 hover:bg-[#1e2631]/70 hover:text-white transition-colors"
+          className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-slate-200 dark:bg-[#1e2631] border border-slate-200 dark:border-[#1e2631] text-slate-500 dark:text-[#a6abb5] text-sm font-medium px-3 hover:bg-slate-300 dark:hover:bg-[#1e2631]/70 hover:text-slate-900 dark:hover:text-white transition-colors"
           style={{ minHeight: '44px' }}
           aria-label={`Search flights from ${originCity} to ${destCity}`}
         >
