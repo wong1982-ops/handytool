@@ -86,7 +86,7 @@ export function PromotionsCarousel() {
   if (loading || promotions.length === 0) return null
 
   return (
-    <section aria-label="Active promotions" className="mb-5">
+    <section aria-label="Active promotions" className="mb-5 sticky top-[46px] z-20 md:static bg-white dark:bg-[#090f16] -mx-4 px-4 pt-4 pb-1 md:mx-0 md:px-0 md:pt-0 md:pb-0">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-slate-900 dark:text-white">🏷️ Active Promotions</span>
