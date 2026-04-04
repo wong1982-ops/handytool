@@ -91,7 +91,7 @@ export function SearchResults({ offers, loading, cachedAt, onSetAlert, onRefresh
       {/* Header */}
       <div className="flex items-center justify-between px-1">
         <p className="text-sm text-slate-500 dark:text-[#a6abb5]">
-          <span className="font-medium text-white">{offers.length}</span> flight{offers.length !== 1 ? 's' : ''} found
+          <span className="font-medium text-slate-900 dark:text-white">{offers.length}</span> flight{offers.length !== 1 ? 's' : ''} found
         </p>
 
         <div className="flex items-center gap-2">
