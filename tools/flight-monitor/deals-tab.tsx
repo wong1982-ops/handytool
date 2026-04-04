@@ -13,6 +13,7 @@ const FROM_CITIES: { value: string; label: string }[] = [
   { value: 'BNE', label: 'From: Brisbane' },
   { value: 'PER', label: 'From: Perth' },
   { value: 'ADL', label: 'From: Adelaide' },
+  { value: 'AKL', label: 'From: Auckland' },
 ]
 
 interface DealsTabProps {
@@ -223,7 +224,7 @@ export function DealsTab({ onSetAlert, onSearch }: DealsTabProps) {
       {/* Deals grid */}
       {!loading && !error && deals.length > 0 && (
         <ul
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 md:[&>li]:flex md:[&>li]:flex-col md:[&>li>article]:flex-1"
           role="list"
           aria-label="Available deals"
         >

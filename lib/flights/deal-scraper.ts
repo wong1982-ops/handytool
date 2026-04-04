@@ -27,6 +27,16 @@ const POPULAR_ROUTES: { origin: string; destination: string }[] = [
   { origin: 'ADL', destination: 'SIN' },
   { origin: 'ADL', destination: 'DPS' },
   { origin: 'SYD', destination: 'AKL' },
+  // From Auckland
+  { origin: 'AKL', destination: 'SIN' },
+  { origin: 'AKL', destination: 'NRT' },
+  { origin: 'AKL', destination: 'DPS' },
+  { origin: 'AKL', destination: 'SYD' },
+  { origin: 'AKL', destination: 'CTU' },
+  // From/to Chengdu
+  { origin: 'SYD', destination: 'CTU' },
+  { origin: 'MEL', destination: 'CTU' },
+  { origin: 'AKL', destination: 'LAX' },
 ]
 
 function getDepartureDate(): string {

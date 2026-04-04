@@ -14,7 +14,8 @@ const CITY_NAMES: Record<string, string> = {
   NRT: 'Tokyo', HND: 'Tokyo Haneda', ICN: 'Seoul', HKG: 'Hong Kong', SIN: 'Singapore',
   BKK: 'Bangkok', DPS: 'Bali', DXB: 'Dubai', LHR: 'London', CDG: 'Paris',
   JFK: 'New York', LAX: 'Los Angeles', SFO: 'San Francisco', AMS: 'Amsterdam',
-  KUL: 'Kuala Lumpur', AKL: 'Auckland', MNL: 'Manila', TPE: 'Taipei',
+  KUL: 'Kuala Lumpur', AKL: 'Auckland', MNL: 'Manila', TPE: 'Taipei', CTU: 'Chengdu',
+  HNL: 'Honolulu',
 }
 
 function getCityName(iata: string): string {
@@ -62,52 +63,77 @@ function FlightDetails({ details }: { details: DealDetails }) {
         </span>
       </div>
 
-      {/* Route visualization */}
-      <div className="flex items-center gap-3">
-        {/* Departure */}
-        <div className="text-center shrink-0">
-          <p className="text-sm font-bold text-slate-900 dark:text-white">{formatTime(firstLeg.depTime)}</p>
-          <p className="text-[11px] text-slate-400 dark:text-[#70767f]">{firstLeg.depCode}</p>
-        </div>
-
-        {/* Route line */}
-        <div className="flex-1 flex flex-col items-center gap-0.5 min-w-0">
-          <p className="text-[11px] text-slate-400 dark:text-[#70767f]">{formatDuration(details.totalDuration)}</p>
-          <div className="w-full flex items-center gap-0.5">
-            <div className="flex-1 h-px bg-slate-300 dark:bg-[#2a3545]" />
-            {details.stops > 0 && (
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-            )}
-            <div className="flex-1 h-px bg-slate-300 dark:bg-[#2a3545]" />
-          </div>
-          <p className={`text-[11px] font-medium ${details.stops === 0 ? 'text-emerald-500' : 'text-amber-400'}`}>
-            {details.stops === 0 ? 'Direct' : `${details.stops} stop`}
-          </p>
-        </div>
-
-        {/* Arrival */}
-        <div className="text-center shrink-0">
-          <p className="text-sm font-bold text-slate-900 dark:text-white">{formatTime(lastLeg.arrTime)}</p>
-          <p className="text-[11px] text-slate-400 dark:text-[#70767f]">{lastLeg.arrCode}</p>
-        </div>
+      {/* Total duration + stops summary */}
+      <div className="flex items-center gap-2 text-[11px] text-slate-400 dark:text-[#70767f]">
+        <span className="font-medium text-slate-600 dark:text-slate-300">{formatDuration(details.totalDuration)} total</span>
+        <span>·</span>
+        <span className={`font-medium ${details.stops === 0 ? 'text-emerald-500' : 'text-amber-400'}`}>
+          {details.stops === 0 ? 'Direct' : `${details.stops} stop${details.stops > 1 ? 's' : ''}`}
+        </span>
+        {details.carbonKg && (
+          <>
+            <span>·</span>
+            <span>CO₂ {details.carbonKg} kg</span>
+          </>
+        )}
       </div>
 
-      {/* Layover + flight info */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1">
-        {details.layovers.length > 0 && (
+      {/* Per-leg breakdown */}
+      <div className="space-y-0">
+        {details.legs.map((leg, i) => (
+          <div key={i}>
+            {/* Flight leg */}
+            <div className="flex items-center gap-2.5 py-1.5">
+              {/* Timeline dot + line */}
+              <div className="flex flex-col items-center w-3 self-stretch shrink-0">
+                <div className="w-2 h-2 rounded-full bg-[#3D6AF2] border-2 border-[#3D6AF2]/30 shrink-0 mt-1" />
+                <div className="flex-1 w-px bg-slate-300 dark:bg-[#2a3545]" />
+              </div>
+
+              {/* Leg info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-slate-900 dark:text-white">{formatTime(leg.depTime)}</span>
+                  <span className="text-[11px] text-slate-400 dark:text-[#70767f]">{leg.depCode}</span>
+                  <span className="text-slate-300 dark:text-[#2a3545]">→</span>
+                  <span className="text-sm font-bold text-slate-900 dark:text-white">{formatTime(leg.arrTime)}</span>
+                  <span className="text-[11px] text-slate-400 dark:text-[#70767f]">{leg.arrCode}</span>
+                </div>
+                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                  {leg.airlineLogo && <img src={leg.airlineLogo} alt="" className="w-3.5 h-3.5 rounded" />}
+                  <span className="text-[11px] text-slate-500 dark:text-[#a6abb5]">{leg.flightNumber}</span>
+                  <span className="text-[11px] text-slate-400 dark:text-[#70767f]">· {formatDuration(leg.duration)}</span>
+                  <span className="text-[11px] text-slate-400 dark:text-[#70767f]">· {leg.airplane}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Layover between legs */}
+            {i < details.layovers.length && (
+              <div className="flex items-center gap-2.5 py-1.5">
+                <div className="flex flex-col items-center w-3 self-stretch shrink-0">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0 mt-1.5" />
+                  <div className="flex-1 w-px bg-slate-300 dark:bg-[#2a3545]" />
+                </div>
+                <div className="flex-1 rounded-lg bg-amber-500/10 border border-amber-500/20 px-2.5 py-1.5">
+                  <p className="text-[11px] font-medium text-amber-500">
+                    {formatDuration(details.layovers[i].duration)} layover in {getCityName(details.layovers[i].code)}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* Final arrival dot */}
+        <div className="flex items-center gap-2.5">
+          <div className="flex flex-col items-center w-3 shrink-0">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 border-2 border-emerald-500/30 shrink-0" />
+          </div>
           <span className="text-[11px] text-slate-400 dark:text-[#70767f]">
-            Layover: {details.layovers.map(l => `${formatDuration(l.duration)} in ${getCityName(l.code)}`).join(', ')}
+            Arrive {lastLeg.arrAirport}
           </span>
-        )}
-        {firstLeg.airplane && (
-          <span className="text-[11px] text-slate-400 dark:text-[#70767f]">{firstLeg.airplane}</span>
-        )}
-        {firstLeg.flightNumber && (
-          <span className="text-[11px] text-slate-400 dark:text-[#70767f]">{firstLeg.flightNumber}</span>
-        )}
-        {details.carbonKg && (
-          <span className="text-[11px] text-slate-400 dark:text-[#70767f]">CO₂: {details.carbonKg} kg</span>
-        )}
+        </div>
       </div>
     </div>
   )
@@ -121,7 +147,7 @@ export function DealCard({ deal, onSetAlert, onSearch }: DealCardProps) {
   const details = deal.details as DealDetails | undefined
 
   return (
-    <article className="rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] p-5 hover:border-[#10B981]/40 transition-colors">
+    <article className="rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] p-5 hover:border-[#10B981]/40 transition-colors flex flex-col">
       {/* Header row: route + discount badge */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap min-w-0">
@@ -179,8 +205,8 @@ export function DealCard({ deal, onSetAlert, onSearch }: DealCardProps) {
         <FlightDetails details={details} />
       )}
 
-      {/* Action buttons */}
-      <div className="mt-4 flex items-center gap-2">
+      {/* Action buttons — pushed to bottom for equal card heights */}
+      <div className="mt-auto pt-4 flex items-center gap-2">
         <button
           type="button"
           onClick={() => onSetAlert(deal.origin, deal.destination)}
