@@ -98,7 +98,7 @@ export async function POST(request: Request) {
   }
 
   // 6. Award credits to referrer
-  const { error: referrerCreditError } = await supabase.rpc('award_referral_credits', {
+  const { error: referrerCreditError } = await (supabase.rpc as any)('award_referral_credits', {
     p_user_id: referrerId,
     p_amount: CREDITS_PER_REFERRAL,
     p_description: `Referral bonus — referred a new user`,
@@ -110,7 +110,7 @@ export async function POST(request: Request) {
   }
 
   // 7. Award credits to referred user
-  const { error: referredCreditError } = await supabase.rpc('award_referral_credits', {
+  const { error: referredCreditError } = await (supabase.rpc as any)('award_referral_credits', {
     p_user_id: referredUserId,
     p_amount: CREDITS_PER_REFERRAL,
     p_description: `Referral bonus — joined via referral link`,
