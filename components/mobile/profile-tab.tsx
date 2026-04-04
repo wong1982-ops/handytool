@@ -10,6 +10,7 @@ import { PrivacySheetContent } from '@/components/mobile/sheets/privacy-sheet-co
 import { ContactSheetContent } from '@/components/mobile/sheets/contact-sheet-content'
 import { BlogSheetContent } from '@/components/mobile/sheets/blog-sheet-content'
 import ReferralSection from '@/tools/referral/referral-section'
+import AnalyticsDashboard from '@/tools/admin/analytics-dashboard'
 
 type ViewId = 'settings' | 'blog' | 'terms' | 'privacy' | 'contact' | 'signin'
 
@@ -322,6 +323,17 @@ export function ProfileTab() {
               <ReferralSection />
             </div>
           )}
+
+          {/* Admin analytics dashboard */}
+          {user && (() => {
+            const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || '').split(',').map(e => e.trim()).filter(Boolean)
+            const isAdmin = adminEmails.length === 0 && process.env.NODE_ENV === 'development' || adminEmails.includes(user.email || '')
+            return isAdmin ? (
+              <div className="px-4 mt-6">
+                <AnalyticsDashboard />
+              </div>
+            ) : null
+          })()}
 
           {/* Dark mode toggle */}
           <div className="flex items-center justify-between p-4 rounded-xl bg-slate-100 dark:bg-white/5">
