@@ -36,6 +36,42 @@ export interface FlightAlert {
   priceHistory?: number[]
 }
 
+export interface DealFlightLeg {
+  depAirport: string
+  depCode: string
+  depTime: string
+  arrAirport: string
+  arrCode: string
+  arrTime: string
+  duration: number        // minutes
+  airline: string
+  airlineLogo: string
+  flightNumber: string
+  airplane: string
+  travelClass: string
+  legroom: string
+  overnight: boolean
+}
+
+export interface DealLayover {
+  airport: string
+  code: string
+  duration: number        // minutes
+}
+
+export interface DealDetails {
+  airline: string
+  airlineLogo: string
+  totalDuration: number   // minutes
+  stops: number
+  legs: DealFlightLeg[]
+  layovers: DealLayover[]
+  carbonKg: number | null
+  tripType: string
+  departureDate: string
+  returnDate: string
+}
+
 export interface FlightDeal {
   id: string
   origin: string
@@ -45,6 +81,7 @@ export interface FlightDeal {
   discount_pct: number
   computed_at: string
   priceHistory?: number[]
+  details?: DealDetails
 }
 
 export interface AirportSuggestion {
