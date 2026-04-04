@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { DealCard } from './deal-card'
+import { PromotionsCarousel } from './promotions-carousel'
 import type { FlightDeal } from './types'
 
-type SortOption = 'discount' | 'price' | 'newest'
+type SortOption = 'hottest' | 'discount' | 'price' | 'newest'
 type FromFilter = 'all' | string
 
 const FROM_CITIES: { value: string; label: string }[] = [
@@ -94,6 +95,9 @@ export function DealsTab({ onSetAlert, onSearch }: DealsTabProps) {
         </p>
       </div>
 
+      {/* Promotions carousel */}
+      <PromotionsCarousel />
+
       {/* Filter bar */}
       <div className="flex items-center gap-3 flex-wrap mb-5">
         {/* From city dropdown */}
@@ -130,6 +134,7 @@ export function DealsTab({ onSetAlert, onSearch }: DealsTabProps) {
             className="appearance-none rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-slate-500 dark:text-[#a6abb5] text-sm pl-3 pr-8 focus:outline-none focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] cursor-pointer hover:border-[#70767f] transition-colors"
             style={{ minHeight: '44px' }}
           >
+            <option value="hottest">Hottest deals</option>
             <option value="discount">Biggest discount</option>
             <option value="price">Lowest price</option>
             <option value="newest">Newest</option>

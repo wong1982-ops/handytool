@@ -142,9 +142,17 @@ function FlightDetails({ details }: { details: DealDetails }) {
 export function DealCard({ deal, onSetAlert, onSearch }: DealCardProps) {
   const originCity = getCityName(deal.origin)
   const destCity = getCityName(deal.destination)
+  const tier = deal.deal_tier || 'normal'
   const hasDiscount = deal.discount_pct > 0
-  const discountLabel = hasDiscount ? `-${Math.round(deal.discount_pct)}%` : 'Tracking'
   const details = deal.details as DealDetails | undefined
+
+  const TIER_BADGES: Record<string, { label: string; className: string }> = {
+    lowest_ever: { label: '⭐ Lowest Ever', className: 'bg-amber-500/15 text-amber-400 border border-amber-500/30' },
+    hot_deal: { label: '🔥 Hot Deal', className: 'bg-red-500/15 text-red-400 border border-red-500/30' },
+    price_drop: { label: '📉 Price Drop', className: 'bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20' },
+    normal: { label: 'Tracking', className: 'bg-[#3D6AF2]/10 text-[#3D6AF2] border border-[#3D6AF2]/20' },
+  }
+  const badge = TIER_BADGES[tier] || TIER_BADGES.normal
 
   return (
     <article className="rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] p-5 hover:border-[#10B981]/40 transition-colors flex flex-col">
@@ -160,12 +168,8 @@ export function DealCard({ deal, onSetAlert, onSearch }: DealCardProps) {
           </span>
         </div>
 
-        <span className={`inline-flex items-center shrink-0 rounded-full text-xs font-semibold px-2.5 py-1 ${
-          hasDiscount
-            ? 'bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20'
-            : 'bg-[#3D6AF2]/10 text-[#3D6AF2] border border-[#3D6AF2]/20'
-        }`}>
-          {discountLabel}
+        <span className={`inline-flex items-center shrink-0 rounded-full text-xs font-semibold px-2.5 py-1 ${badge.className}`}>
+          {badge.label}{hasDiscount ? ` -${Math.round(deal.discount_pct)}%` : ''}
         </span>
       </div>
 
@@ -183,7 +187,7 @@ export function DealCard({ deal, onSetAlert, onSearch }: DealCardProps) {
           </p>
         </div>
 
-        {hasDiscount && (
+        {tier !== 'normal' && (
           <div className="text-right">
             <p className="text-slate-400 dark:text-[#70767f] text-xs mb-0.5">30-day avg</p>
             <p className="text-base font-medium text-slate-500 dark:text-[#a6abb5] line-through">

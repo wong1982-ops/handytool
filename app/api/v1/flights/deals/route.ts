@@ -3,17 +3,26 @@ import { apiSuccess, API_ERRORS } from '@/lib/api/response'
 
 export const dynamic = 'force-dynamic'
 
+// Tier priority for "hottest" sort
+const TIER_ORDER: Record<string, number> = {
+  lowest_ever: 0,
+  hot_deal: 1,
+  price_drop: 2,
+  normal: 3,
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const fromCity = searchParams.get('from')?.toUpperCase()
-  const sortBy = searchParams.get('sort') || 'discount'
+  const sortBy = searchParams.get('sort') || 'hottest'
 
   const supabase = await createClient()
 
+  // Extended window to 4 days (cron runs every 3 days)
   let query = supabase
     .from('flight_deals')
     .select('*')
-    .gte('computed_at', new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString())
+    .gte('computed_at', new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString())
 
   if (fromCity) {
     query = query.eq('origin', fromCity)
@@ -23,11 +32,14 @@ export async function GET(request: Request) {
     query = query.order('current_price', { ascending: true })
   } else if (sortBy === 'newest') {
     query = query.order('computed_at', { ascending: false })
+  } else if (sortBy === 'discount') {
+    query = query.order('discount_pct', { ascending: false })
   } else {
+    // 'hottest' — sort by tier then discount
     query = query.order('discount_pct', { ascending: false })
   }
 
-  query = query.limit(20)
+  query = query.limit(40)
 
   const { data, error } = await query
 
@@ -36,6 +48,7 @@ export async function GET(request: Request) {
     return API_ERRORS.INTERNAL()
   }
 
+  // Enrich with price history
   const enriched = await Promise.all(
     (data || []).map(async (deal: Record<string, unknown>) => {
       const { data: history } = await supabase
@@ -53,6 +66,16 @@ export async function GET(request: Request) {
       }
     })
   )
+
+  // Apply "hottest" sort client-side (tier priority + discount)
+  if (sortBy === 'hottest') {
+    enriched.sort((a, b) => {
+      const tierA = TIER_ORDER[(a.deal_tier as string) || 'normal'] ?? 3
+      const tierB = TIER_ORDER[(b.deal_tier as string) || 'normal'] ?? 3
+      if (tierA !== tierB) return tierA - tierB
+      return (b.discount_pct as number) - (a.discount_pct as number)
+    })
+  }
 
   return apiSuccess({ deals: enriched, stale: (data || []).length === 0 })
 }

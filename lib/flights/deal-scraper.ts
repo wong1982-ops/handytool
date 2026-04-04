@@ -2,6 +2,7 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const SERPAPI_MONTHLY_LIMIT = 200 // leave buffer below 250 free tier
 
 function getServiceClient() {
   return createServiceClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
@@ -283,10 +284,24 @@ export async function scrapeFlightDeals(): Promise<ScrapeResult> {
     await sleep(500)
   }
 
-  // Phase 2: Compute deals with details
+  // Track SerpApi usage
+  const month = now.slice(0, 7) // '2026-04'
+  const { data: usage } = await supabase
+    .from('api_usage_counters')
+    .select('query_count')
+    .eq('api_name', 'serpapi')
+    .eq('month', month)
+    .single()
+  await supabase.from('api_usage_counters').upsert(
+    { api_name: 'serpapi', month, query_count: (usage?.query_count || 0) + result.pricesRecorded },
+    { onConflict: 'api_name,month' },
+  )
+
+  // Phase 2: Compute deals with tiers
   for (const [routeKey, { price: currentPrice, details }] of scraped) {
     const [origin, destination] = routeKey.split('-')
 
+    // 30-day average
     const { data: history } = await supabase
       .from('flight_price_history')
       .select('price')
@@ -296,13 +311,30 @@ export async function scrapeFlightDeals(): Promise<ScrapeResult> {
       .order('scraped_at', { ascending: false })
       .limit(60)
 
+    // All-time minimum
+    const { data: allTimeMin } = await supabase
+      .from('flight_price_history')
+      .select('price')
+      .eq('origin', origin)
+      .eq('destination', destination)
+      .order('price', { ascending: true })
+      .limit(1)
+
     const avgPrice = history && history.length > 0
       ? history.reduce((sum, h) => sum + Number(h.price), 0) / history.length
       : currentPrice
 
+    const minPrice = allTimeMin?.[0] ? Number(allTimeMin[0].price) : currentPrice
+
     const discountPct = avgPrice > 0
       ? Math.round(((avgPrice - currentPrice) / avgPrice) * 100)
       : 0
+
+    // Compute deal tier
+    let dealTier: string = 'normal'
+    if (currentPrice <= minPrice) dealTier = 'lowest_ever'
+    else if (discountPct >= 20) dealTier = 'hot_deal'
+    else if (discountPct >= 10) dealTier = 'price_drop'
 
     const { error } = await supabase.from('flight_deals').upsert(
       {
@@ -311,6 +343,7 @@ export async function scrapeFlightDeals(): Promise<ScrapeResult> {
         current_price: currentPrice,
         avg_price: Math.round(avgPrice * 100) / 100,
         discount_pct: Math.max(0, discountPct),
+        deal_tier: dealTier,
         computed_at: now,
         details,
       },
@@ -321,4 +354,39 @@ export async function scrapeFlightDeals(): Promise<ScrapeResult> {
   }
 
   return result
+}
+
+/**
+ * Check if we have SerpApi budget remaining this month.
+ * Returns { allowed: boolean, used: number, limit: number }
+ */
+export async function checkSerpApiQuota(): Promise<{ allowed: boolean; used: number; limit: number }> {
+  const supabase = getServiceClient()
+  const month = new Date().toISOString().slice(0, 7)
+  const { data } = await supabase
+    .from('api_usage_counters')
+    .select('query_count')
+    .eq('api_name', 'serpapi')
+    .eq('month', month)
+    .single()
+  const used = data?.query_count || 0
+  return { allowed: used < SERPAPI_MONTHLY_LIMIT, used, limit: SERPAPI_MONTHLY_LIMIT }
+}
+
+/**
+ * Increment the SerpApi query counter by 1 (for live user searches).
+ */
+export async function incrementSerpApiUsage(): Promise<void> {
+  const supabase = getServiceClient()
+  const month = new Date().toISOString().slice(0, 7)
+  const { data } = await supabase
+    .from('api_usage_counters')
+    .select('query_count')
+    .eq('api_name', 'serpapi')
+    .eq('month', month)
+    .single()
+  await supabase.from('api_usage_counters').upsert(
+    { api_name: 'serpapi', month, query_count: (data?.query_count || 0) + 1 },
+    { onConflict: 'api_name,month' },
+  )
 }

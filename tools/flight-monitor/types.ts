@@ -80,6 +80,7 @@ export interface FlightDeal {
   avg_price: number
   discount_pct: number
   computed_at: string
+  deal_tier?: 'normal' | 'price_drop' | 'hot_deal' | 'lowest_ever'
   priceHistory?: number[]
   details?: DealDetails
 }
