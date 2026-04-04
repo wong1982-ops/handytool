@@ -86,8 +86,8 @@ export function DealsTab({ onSetAlert, onSearch }: DealsTabProps) {
     <section aria-label="Flight deals">
       {/* Header */}
       <div className="mb-5">
-        <h2 className="text-white text-xl font-bold">Flight Deals</h2>
-        <p className="text-[#a6abb5] text-sm mt-0.5">
+        <h2 className="text-slate-900 dark:text-white text-xl font-bold">Flight Deals</h2>
+        <p className="text-slate-500 dark:text-[#a6abb5] text-sm mt-0.5">
           Best fares with the biggest discounts right now
         </p>
       </div>
@@ -103,7 +103,7 @@ export function DealsTab({ onSetAlert, onSearch }: DealsTabProps) {
             id="deals-from-filter"
             value={from}
             onChange={(e) => setFrom(e.target.value as FromFilter)}
-            className="appearance-none rounded-lg bg-[#131a23] border border-[#1e2631] text-[#a6abb5] text-sm pl-3 pr-8 focus:outline-none focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] cursor-pointer hover:border-[#70767f] transition-colors"
+            className="appearance-none rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-slate-500 dark:text-[#a6abb5] text-sm pl-3 pr-8 focus:outline-none focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] cursor-pointer hover:border-[#70767f] transition-colors"
             style={{ minHeight: '44px' }}
           >
             <option value="all">All cities</option>
@@ -113,7 +113,7 @@ export function DealsTab({ onSetAlert, onSearch }: DealsTabProps) {
               </option>
             ))}
           </select>
-          <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#70767f]" />
+          <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#70767f]" />
         </div>
 
         {/* Sort dropdown */}
@@ -125,19 +125,19 @@ export function DealsTab({ onSetAlert, onSearch }: DealsTabProps) {
             id="deals-sort"
             value={sort}
             onChange={(e) => setSort(e.target.value as SortOption)}
-            className="appearance-none rounded-lg bg-[#131a23] border border-[#1e2631] text-[#a6abb5] text-sm pl-3 pr-8 focus:outline-none focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] cursor-pointer hover:border-[#70767f] transition-colors"
+            className="appearance-none rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-slate-500 dark:text-[#a6abb5] text-sm pl-3 pr-8 focus:outline-none focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] cursor-pointer hover:border-[#70767f] transition-colors"
             style={{ minHeight: '44px' }}
           >
             <option value="discount">Biggest discount</option>
             <option value="price">Lowest price</option>
             <option value="newest">Newest</option>
           </select>
-          <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#70767f]" />
+          <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#70767f]" />
         </div>
 
         {/* Freshness indicator */}
         {!loading && deals.length > 0 && (
-          <div className="ml-auto flex items-center gap-1.5 text-xs text-[#70767f]">
+          <div className="ml-auto flex items-center gap-1.5 text-xs text-slate-400 dark:text-[#70767f]">
             <CheckCircleIcon className="text-[#10B981]" />
             <span>Updated {updatedAgo}</span>
           </div>
@@ -167,7 +167,7 @@ export function DealsTab({ onSetAlert, onSearch }: DealsTabProps) {
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
-              className="rounded-xl bg-[#131a23] border border-[#1e2631] p-5 animate-pulse"
+              className="rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] p-5 animate-pulse"
               style={{ minHeight: '200px' }}
             >
               <div className="flex items-start justify-between gap-3 mb-3">
@@ -203,7 +203,7 @@ export function DealsTab({ onSetAlert, onSearch }: DealsTabProps) {
       {!loading && error && (
         <div
           role="alert"
-          className="rounded-xl bg-[#131a23] border border-[#EF4444]/30 p-6 flex flex-col items-center gap-4 text-center"
+          className="rounded-xl bg-slate-50 dark:bg-[#131a23] border border-[#EF4444]/30 p-6 flex flex-col items-center gap-4 text-center"
         >
           <p className="text-[#EF4444] text-sm">{error}</p>
           <button
@@ -273,8 +273,8 @@ function EmptyState() {
       </svg>
 
       <div>
-        <p className="text-white font-semibold text-base">No deals found</p>
-        <p className="text-[#70767f] text-sm mt-1 max-w-xs mx-auto">
+        <p className="text-slate-900 dark:text-white font-semibold text-base">No deals found</p>
+        <p className="text-slate-400 dark:text-[#70767f] text-sm mt-1 max-w-xs mx-auto">
           Try changing the origin city or check back later for fresh deals.
         </p>
       </div>
