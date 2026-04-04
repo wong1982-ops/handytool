@@ -100,28 +100,26 @@ export async function generateLandingPage(params: {
   ctaText: string
   title: string
   metaDescription: string
+  structuredData: Record<string, unknown>
 }> {
-  const typeLabel = params.pageType === 'use-case' ? 'use-case landing page' : 'free tool landing page'
+  const pageContext = params.pageType === 'use-case'
+    ? `This is a use-case landing page showing how "${params.toolName}" solves a specific problem.`
+    : `This is a free-tool landing page promoting "${params.toolName}" as a free online tool.`
 
-  const prompt = `You are an expert SEO copywriter specializing in SaaS landing pages.
+  const prompt = `You are an expert SEO copywriter. Create landing page content targeting the keyword: "${params.keyword}"
 
-Generate content for a ${typeLabel} targeting the keyword: "${params.keyword}"
-The page promotes the tool "${params.toolName}" at /tools/${params.toolSlug}.
+Tool: "${params.toolName}" at /tools/${params.toolSlug}
+${pageContext}
 
 Return a JSON object with:
-1. "title": SEO-optimized page title (50-60 chars, includes keyword naturally)
-2. "metaDescription": meta description (150-160 chars, keyword included, compelling)
-3. "heroHeadline": a powerful headline for the hero section (8-12 words, includes keyword)
-4. "heroSubheadline": supporting subheadline (15-25 words, reinforces value prop)
-5. "benefits": array of exactly 4 objects, each with "title" (3-5 words) and "description" (1-2 sentences). Focus on user outcomes.
-6. "faq": array of exactly 4 objects, each with "question" and "answer". Target "People Also Ask" style queries about "${params.keyword}". Answers should be 2-3 sentences.
-7. "ctaText": call-to-action button text (2-5 words, action-oriented)
-
-Requirements:
-- Write naturally, avoid keyword stuffing
-- Focus on benefits and user outcomes, not features
-- FAQ answers should be concise and direct
-- Use power words and emotional triggers in headlines
+1. "title": SEO page title (50-60 chars, includes keyword)
+2. "metaDescription": meta description (150-160 chars, includes keyword, compelling)
+3. "heroHeadline": bold headline for the hero section (6-10 words, includes keyword)
+4. "heroSubheadline": supporting subtitle (15-25 words)
+5. "benefits": array of 4 objects, each with "title" (short) and "description" (2-3 sentences)
+6. "faq": array of 5 objects, each with "question" and "answer" (target "People also ask" queries)
+7. "ctaText": call-to-action button text (3-5 words, action-oriented)
+8. "structuredData": a FAQPage JSON-LD schema object with the FAQ questions/answers
 
 Return ONLY valid JSON, no explanation.`
 
@@ -131,4 +129,101 @@ Return ONLY valid JSON, no explanation.`
 
   const { jsonrepair } = await import('jsonrepair')
   return JSON.parse(jsonrepair(jsonMatch[0]))
+}
+
+export type SocialContentType = 'announcement' | 'tips' | 'engagement'
+export type SocialPlatform = 'twitter' | 'linkedin' | 'instagram' | 'facebook' | 'tiktok'
+
+export interface SocialVariant {
+  content: string
+  hashtags: string[]
+  charCount: number
+}
+
+export interface SocialPostSet {
+  platform: SocialPlatform
+  variants: SocialVariant[]
+}
+
+const PLATFORM_RULES: Record<SocialPlatform, { maxChars: number; hashtagCount: string; tone: string }> = {
+  twitter: { maxChars: 280, hashtagCount: '2-3', tone: 'Punchy, casual, emojis OK. Short and impactful.' },
+  linkedin: { maxChars: 500, hashtagCount: '3-5 at end', tone: 'Professional, can include a question to drive engagement.' },
+  instagram: { maxChars: 2200, hashtagCount: '5-10 in separate block', tone: 'Storytelling, emoji-heavy, visually descriptive.' },
+  facebook: { maxChars: 500, hashtagCount: '1-2', tone: 'Conversational, can ask questions, friendly.' },
+  tiktok: { maxChars: 2200, hashtagCount: '3-5', tone: 'Hook-style opening, casual/Gen-Z, trending language.' },
+}
+
+const CONTENT_TYPE_INSTRUCTIONS: Record<SocialContentType, string> = {
+  announcement: 'Write promotional posts announcing this tool. Focus on what it does and why people should try it. Include a call-to-action.',
+  tips: 'Write educational posts sharing tips about how to use this tool effectively. Provide real value and practical advice.',
+  engagement: 'Write engaging posts that spark discussion — polls, questions, hot takes, or surprising facts related to what this tool does.',
+}
+
+export async function generateSocialPosts(params: {
+  toolName: string
+  toolSlug: string
+  toolDescription: string
+  contentType: SocialContentType
+  customAngle?: string
+}): Promise<SocialPostSet[]> {
+  const { toolName, toolSlug, toolDescription, contentType, customAngle } = params
+  const angleNote = customAngle ? `\nCustom angle to emphasize: "${customAngle}"` : ''
+
+  const platformSpecs = Object.entries(PLATFORM_RULES)
+    .map(([p, r]) => `- ${p}: max ${r.maxChars} chars, ${r.hashtagCount} hashtags. Tone: ${r.tone}`)
+    .join('\n')
+
+  const prompt = `You are an expert social media marketer. Generate social media posts for the tool "${toolName}".
+
+Tool description: ${toolDescription}
+Tool URL: https://toolk1t.com/tools/${toolSlug}
+
+Content type: ${CONTENT_TYPE_INSTRUCTIONS[contentType]}
+${angleNote}
+
+Generate posts for these 5 platforms, with 3 unique variants per platform:
+
+${platformSpecs}
+
+Return a JSON object with this exact structure:
+{
+  "posts": [
+    {
+      "platform": "twitter",
+      "variants": [
+        { "content": "post text here", "hashtags": ["#tag1", "#tag2"] },
+        { "content": "another version", "hashtags": ["#tag1", "#tag3"] },
+        { "content": "third version", "hashtags": ["#tag2", "#tag4"] }
+      ]
+    }
+  ]
+}
+
+Rules:
+- Each variant MUST be unique — different angle, different wording
+- Hashtags as separate array, NOT in the content text
+- Content must be within the platform's character limit
+- Include the tool URL naturally where appropriate (not in every post)
+- Write in English
+- No placeholder text — write real, ready-to-post content
+
+Return ONLY valid JSON, no explanation.`
+
+  const text = await callGemini(prompt)
+  const jsonMatch = text.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) throw new Error('No JSON in social posts response')
+
+  const { jsonrepair } = await import('jsonrepair')
+  const parsed = JSON.parse(jsonrepair(jsonMatch[0]))
+
+  const posts: SocialPostSet[] = (parsed.posts || []).map((p: { platform: SocialPlatform; variants: { content: string; hashtags: string[] }[] }) => ({
+    platform: p.platform,
+    variants: p.variants.map(v => ({
+      content: v.content,
+      hashtags: v.hashtags || [],
+      charCount: v.content.length,
+    })),
+  }))
+
+  return posts
 }

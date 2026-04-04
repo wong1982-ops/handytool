@@ -51,6 +51,7 @@ export interface ToolAuditResult {
 }
 
 export interface AuditResult {
+  id?: string
   scannedAt: string
   overallScore: number
   tools: ToolAuditResult[]

@@ -56,21 +56,42 @@ export async function POST(request: Request) {
     // Build page slug
     const pageSlug = `${pageType}/${toolSlug}-${keyword.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`
 
+    const pageContent = {
+      heroHeadline: content.heroHeadline,
+      heroSubheadline: content.heroSubheadline,
+      benefits: content.benefits,
+      faq: content.faq,
+      ctaText: content.ctaText,
+      ctaHref: `/tools/${toolSlug}`,
+    }
+
+    // Persist to DB (best-effort)
+    const supabase = await getSupabase()
+    const { data: savedPage } = await supabase
+      .from('seo_landing_pages')
+      .insert({
+        tool_slug: toolSlug,
+        keyword: keyword.trim(),
+        page_type: pageType,
+        slug: pageSlug,
+        title: content.title,
+        meta_description: content.metaDescription,
+        content: pageContent,
+        structured_data: content.structuredData ?? {},
+        status: 'draft',
+      })
+      .select()
+      .single()
+
     return apiSuccess({
+      id: savedPage?.id,
       toolSlug,
       keyword: keyword.trim(),
       pageType,
       slug: pageSlug,
       title: content.title,
       metaDescription: content.metaDescription,
-      content: {
-        heroHeadline: content.heroHeadline,
-        heroSubheadline: content.heroSubheadline,
-        benefits: content.benefits,
-        faq: content.faq,
-        ctaText: content.ctaText,
-        ctaHref: `/tools/${toolSlug}`,
-      },
+      content: pageContent,
     })
   } catch (err) {
     console.error('[seo-studio/pages/generate] Generation failed:', err)
