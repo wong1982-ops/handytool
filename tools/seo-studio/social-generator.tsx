@@ -119,11 +119,14 @@ export default function SocialGenerator() {
               className="w-full min-h-[44px] rounded-lg bg-[#0d1520] border border-[#1e2631] text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] focus:border-transparent"
             >
               <option value="">Select a tool…</option>
-              {tools.map(tool => (
-                <option key={tool.slug} value={tool.slug}>
-                  {tool.name}
-                </option>
-              ))}
+              {tools.map(tool => {
+                const slug = tool.href.replace('/tools/', '')
+                return (
+                  <option key={slug} value={slug}>
+                    {tool.name}
+                  </option>
+                )
+              })}
             </select>
           </div>
 
