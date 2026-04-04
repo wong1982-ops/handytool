@@ -1,3 +1,4 @@
+import { getAdminSupabase } from '@/lib/supabase/admin'
 import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
 import { tools } from '@/lib/tools'
 import type { AuditIssue, ToolAuditResult } from '@/tools/seo-studio/types'
@@ -164,9 +165,20 @@ export async function POST() {
     ? Math.round(results.reduce((sum, r) => sum + r.score, 0) / results.length)
     : 0
 
-  return apiSuccess({
-    scannedAt: new Date().toISOString(),
-    overallScore,
-    tools: results,
-  })
+  const scannedAt = new Date().toISOString()
+  const auditResult = { scannedAt, overallScore, tools: results }
+
+  // Persist to DB (best-effort — don't fail the response if this errors)
+  try {
+    const supabase = getAdminSupabase()
+    await supabase.from('seo_audit_results').insert({
+      scanned_at: scannedAt,
+      overall_score: overallScore,
+      results: results,
+    })
+  } catch (err) {
+    console.warn('[seo-studio/audit/scan] Failed to save audit result:', err)
+  }
+
+  return apiSuccess(auditResult)
 }
