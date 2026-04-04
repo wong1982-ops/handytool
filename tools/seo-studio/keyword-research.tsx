@@ -64,7 +64,8 @@ export default function KeywordResearch() {
         const body = await res.json().catch(() => ({}))
         throw new Error(body?.error ?? `Request failed (${res.status})`)
       }
-      const data = (await res.json()) as KeywordResearchResponse
+      const json = await res.json()
+      const data = (json.data ?? json) as KeywordResearchResponse
       setResults(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')

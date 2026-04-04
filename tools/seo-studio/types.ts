@@ -82,3 +82,18 @@ export interface LandingPageContent {
   ctaText: string
   ctaHref: string
 }
+
+// Social content types
+export type SocialContentType = 'announcement' | 'tips' | 'engagement'
+export type SocialPlatform = 'twitter' | 'linkedin' | 'instagram' | 'facebook' | 'tiktok'
+
+export interface SocialVariant {
+  content: string
+  hashtags: string[]
+  charCount: number
+}
+
+export interface SocialPostSet {
+  platform: SocialPlatform
+  variants: SocialVariant[]
+}

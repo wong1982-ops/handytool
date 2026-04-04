@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { tools } from '@/lib/tools'
-import type { SocialContentType, SocialPlatform, SocialPostSet } from '@/lib/seo-studio/gemini'
+import type { SocialContentType, SocialPlatform, SocialPostSet } from './types'
 
 // ── Platform config ───────────────────────────────────────────────────────────
 
@@ -79,8 +79,9 @@ export default function SocialGenerator() {
         throw new Error(body?.error || `Server error ${res.status}`)
       }
 
-      const data = await res.json()
-      setPosts(data.posts ?? [])
+      const json = await res.json()
+      const unwrapped = json.data ?? json
+      setPosts(unwrapped.posts ?? [])
       setActivePlatform('twitter')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
