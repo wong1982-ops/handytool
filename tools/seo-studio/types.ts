@@ -33,3 +33,51 @@ export interface DraftContent {
 }
 
 export type ContentPlanStatus = ContentPlan['status']
+
+// ── Audit types ──────────────────────────────────────────────────────────────
+
+export interface AuditIssue {
+  type: 'critical' | 'warning' | 'info'
+  message: string
+  current?: string
+  recommended?: string
+}
+
+export interface ToolAuditResult {
+  slug: string
+  name: string
+  score: number
+  issues: AuditIssue[]
+}
+
+export interface AuditResult {
+  scannedAt: string
+  overallScore: number
+  tools: ToolAuditResult[]
+}
+
+// ── Landing page types ───────────────────────────────────────────────────────
+
+export interface LandingPage {
+  id: string
+  toolSlug: string
+  keyword: string
+  pageType: 'use-case' | 'free-tool'
+  slug: string
+  title: string
+  metaDescription: string
+  content: LandingPageContent
+  structuredData: Record<string, unknown>
+  status: 'draft' | 'live'
+  createdAt: string
+  updatedAt: string
+}
+
+export interface LandingPageContent {
+  heroHeadline: string
+  heroSubheadline: string
+  benefits: { title: string; description: string }[]
+  faq: { question: string; answer: string }[]
+  ctaText: string
+  ctaHref: string
+}
