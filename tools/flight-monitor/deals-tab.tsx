@@ -14,6 +14,7 @@ const FROM_CITIES: { value: string; label: string }[] = [
   { value: 'PER', label: 'From: Perth' },
   { value: 'ADL', label: 'From: Adelaide' },
   { value: 'AKL', label: 'From: Auckland' },
+  { value: 'CTU', label: 'From: Chengdu' },
 ]
 
 interface DealsTabProps {

@@ -37,6 +37,17 @@ const POPULAR_ROUTES: { origin: string; destination: string }[] = [
   { origin: 'SYD', destination: 'CTU' },
   { origin: 'MEL', destination: 'CTU' },
   { origin: 'AKL', destination: 'LAX' },
+  // From Chengdu
+  { origin: 'CTU', destination: 'BKK' },
+  { origin: 'CTU', destination: 'SIN' },
+  { origin: 'CTU', destination: 'NRT' },
+  { origin: 'CTU', destination: 'ICN' },
+  { origin: 'CTU', destination: 'KUL' },
+  { origin: 'CTU', destination: 'DPS' },
+  { origin: 'CTU', destination: 'SYD' },
+  { origin: 'CTU', destination: 'AKL' },
+  { origin: 'CTU', destination: 'LHR' },
+  { origin: 'CTU', destination: 'LAX' },
 ]
 
 function getDepartureDate(): string {
