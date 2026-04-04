@@ -96,7 +96,7 @@ function AirportInput({
           }}
           onFocus={() => suggestions.length > 0 && setOpen(true)}
           placeholder={placeholder}
-          className="w-full rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white placeholder:text-slate-400 dark:text-[#70767f]
+          className="w-full rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#70767f]
             pl-10 pr-3 py-2.5 text-sm outline-none focus:border-[#3D6AF2]/50 focus:ring-1 focus:ring-[#3D6AF2]/30 transition-colors"
           style={{ minHeight: '44px' }}
           autoComplete="off"
@@ -119,7 +119,7 @@ function AirportInput({
                   onChange(s.iataCode, display)
                   setOpen(false)
                 }}
-                className="w-full text-left px-3 py-2.5 text-sm text-slate-500 dark:text-[#a6abb5] hover:bg-slate-200 dark:hover:bg-slate-200 dark:bg-[#1e2631] hover:text-white transition-colors cursor-pointer"
+                className="w-full text-left px-3 py-2.5 text-sm text-slate-500 dark:text-[#a6abb5] hover:bg-slate-200 dark:hover:bg-[#1e2631] hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                 style={{ minHeight: '44px' }}
                 role="option"
                 aria-selected={false}
@@ -179,8 +179,8 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
           onClick={() => { setTripType('oneway'); setReturnDate('') }}
           className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
             tripType === 'oneway'
-              ? 'bg-slate-200 dark:bg-[#1e2631] text-white'
-              : 'text-slate-400 dark:text-[#70767f] hover:text-slate-500 dark:hover:text-slate-500 dark:text-[#a6abb5]'
+              ? 'bg-slate-200 dark:bg-[#1e2631] text-slate-900 dark:text-white'
+              : 'text-slate-400 dark:text-[#70767f] hover:text-slate-500 dark:hover:text-[#a6abb5]'
           }`}
           style={{ minHeight: '44px' }}
         >
@@ -191,8 +191,8 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
           onClick={() => setTripType('return')}
           className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
             tripType === 'return'
-              ? 'bg-slate-200 dark:bg-[#1e2631] text-white'
-              : 'text-slate-400 dark:text-[#70767f] hover:text-slate-500 dark:hover:text-slate-500 dark:text-[#a6abb5]'
+              ? 'bg-slate-200 dark:bg-[#1e2631] text-slate-900 dark:text-white'
+              : 'text-slate-400 dark:text-[#70767f] hover:text-slate-500 dark:hover:text-[#a6abb5]'
           }`}
           style={{ minHeight: '44px' }}
         >
@@ -265,7 +265,7 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
               value={departureDate}
               min={today}
               onChange={(e) => setDepartureDate(e.target.value)}
-              className="w-full rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white
+              className="w-full rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-slate-900 dark:text-white
                 pl-10 pr-3 py-2.5 text-sm outline-none focus:border-[#3D6AF2]/50 focus:ring-1 focus:ring-[#3D6AF2]/30 transition-colors
                 [color-scheme:dark]"
               style={{ minHeight: '44px' }}
@@ -289,7 +289,7 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
                 value={returnDate}
                 min={departureDate || today}
                 onChange={(e) => setReturnDate(e.target.value)}
-                className="w-full rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white
+                className="w-full rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-slate-900 dark:text-white
                   pl-10 pr-3 py-2.5 text-sm outline-none focus:border-[#3D6AF2]/50 focus:ring-1 focus:ring-[#3D6AF2]/30 transition-colors
                   [color-scheme:dark]"
                 style={{ minHeight: '44px' }}
@@ -314,7 +314,7 @@ export function SearchForm({ onSearch, loading, defaultOrigin, defaultDestinatio
               max={9}
               value={adults}
               onChange={(e) => setAdults(Math.max(1, Math.min(9, Number(e.target.value))))}
-              className="w-24 rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white
+              className="w-24 rounded-lg bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-slate-900 dark:text-white
                 pl-10 pr-3 py-2.5 text-sm outline-none focus:border-[#3D6AF2]/50 focus:ring-1 focus:ring-[#3D6AF2]/30 transition-colors"
               style={{ minHeight: '44px' }}
               aria-label="Number of passengers"

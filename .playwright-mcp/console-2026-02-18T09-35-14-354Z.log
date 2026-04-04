@@ -1,3 +1,0 @@
-[   36062ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.location call. @ https://vercel.com/_next/static/chunks/db6f4f93f426b336.js?dpl=dpl_4eUX16Zzvba2Mdzue5hEg2jvWUPq:203
-[   36062ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.location call. @ https://vercel.com/_next/static/chunks/db6f4f93f426b336.js?dpl=dpl_4eUX16Zzvba2Mdzue5hEg2jvWUPq:203
-[   36172ms] [WARNING] Deprecated API for given entry type. @ https://vercel.com/_next/static/chunks/0df791e3224b4018.js?dpl=dpl_4eUX16Zzvba2Mdzue5hEg2jvWUPq:18

@@ -135,7 +135,7 @@ export default function VBlogDashboard() {
                 id="vblog-tool"
                 value={selectedTool}
                 onChange={(e) => setSelectedTool(e.target.value)}
-                className="w-full rounded-xl bg-white dark:bg-[#090f16] border border-slate-200 dark:border-[#1e2631] text-white text-sm px-4 py-3 min-h-[44px] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
+                className="w-full rounded-xl bg-white dark:bg-[#090f16] border border-slate-200 dark:border-[#1e2631] text-slate-900 dark:text-white text-sm px-4 py-3 min-h-[44px] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
               >
                 {tools.map((t) => (
                   <option key={t.href} value={t.href.replace('/tools/', '')}>
@@ -196,7 +196,7 @@ export default function VBlogDashboard() {
                 id="vblog-duration"
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full rounded-xl bg-white dark:bg-[#090f16] border border-slate-200 dark:border-[#1e2631] text-white text-sm px-4 py-3 min-h-[44px] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
+                className="w-full rounded-xl bg-white dark:bg-[#090f16] border border-slate-200 dark:border-[#1e2631] text-slate-900 dark:text-white text-sm px-4 py-3 min-h-[44px] focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer"
               >
                 {DURATION_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>

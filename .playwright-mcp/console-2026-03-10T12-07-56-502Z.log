@@ -1,3 +1,0 @@
-[    9678ms] [WARNING] Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://www.youtube.com') does not match the recipient window's origin ('https://www.google.com'). @ https://www.youtube.com/s/player/e42f4bf8/www-widgetapi.vflset/www-widgetapi.js:209
-[   17255ms] [WARNING] 未检测到 aplus.js, 可能是 aplus.js 还未下载成功，请确保打开 builtInLibrary，或手动注入了 aplus.js, 否则会导致 SPM 和黄金令箭无法上报：https://rax.alibaba-inc.com/docs/guide/inject-sdk @ https://g.alicdn.com/code/npm/@ali/ieu-member-js-sdk/0.1.15/index.umd.js:0
-[   18102ms] [WARNING] [APLUS] -- APLUS INIT SUCCESS @ https://d.alicdn.com/alilog/mlog/aplus/204164368.js?id=204164368&t=4925402:1

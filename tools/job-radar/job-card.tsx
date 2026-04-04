@@ -51,7 +51,7 @@ export function JobCard({ job, onClick }: JobCardProps) {
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-2">
-        <h3 className="text-sm font-semibold text-white group-hover:text-[#3D6AF2] transition-colors line-clamp-2">
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#3D6AF2] transition-colors line-clamp-2">
           {job.title}
         </h3>
         <span className="text-xs text-slate-400 dark:text-[#70767f] whitespace-nowrap shrink-0 mt-0.5">
@@ -80,7 +80,7 @@ export function JobCard({ job, onClick }: JobCardProps) {
 
       {/* Salary + Source */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-white">
+        <span className="text-sm font-semibold text-slate-900 dark:text-white">
           {formatSalary(job)}
         </span>
         <span className="text-xs text-slate-400 dark:text-[#70767f]">

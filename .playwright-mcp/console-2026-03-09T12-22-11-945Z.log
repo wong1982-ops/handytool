@@ -1,4 +1,0 @@
-[   19042ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ https://www.reddit.com/r/cardfightvanguard/comments/1gr0jib/sword_that_connects_heaven_and_earth_alden/:0
-[   66163ms] [WARNING] Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://www.youtube.com') does not match the recipient window's origin ('https://www.google.com'). @ https://www.youtube.com/s/player/44899b31/www-widgetapi.vflset/www-widgetapi.js:209
-[   69517ms] [ERROR] Framing 'https://ogs.google.com/' violates the following report-only Content Security Policy directive: "frame-ancestors 'self'". The violation has been logged, but no further action has been taken.
- @ :0

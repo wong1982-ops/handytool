@@ -8,3 +8,7 @@ e2e/
 .next/
 .vercel/
 .env.local
+
+# Test artifacts
+.playwright-mcp/
+screenshots/

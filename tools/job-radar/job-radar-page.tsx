@@ -38,7 +38,7 @@ function JobRadarContent() {
             onClick={() => switchTab(tab.value)}
             className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer min-h-[44px] ${
               activeCategory === tab.value
-                ? 'bg-white dark:bg-[#090f16] text-white shadow-[0_1px_4px_rgba(0,0,0,0.4)]'
+                ? 'bg-white dark:bg-[#090f16] text-slate-900 dark:text-white shadow-sm dark:shadow-[0_1px_4px_rgba(0,0,0,0.4)]'
                 : 'text-slate-400 dark:text-[#70767f] hover:text-slate-500 dark:hover:text-[#a6abb5]'
             }`}
           >

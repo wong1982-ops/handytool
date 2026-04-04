@@ -173,7 +173,7 @@ export function ExportPanel({ colors }: ExportPanelProps) {
       {/* Text formats: code block + copy */}
       {isTextFormat && (
         <div className="relative">
-          <pre className="max-h-[300px] overflow-y-auto rounded-lg bg-white dark:bg-[#090f16] border border-slate-200 dark:border-[#1e2631] p-3 text-xs font-mono text-white">
+          <pre className="max-h-[300px] overflow-y-auto rounded-lg bg-white dark:bg-[#090f16] border border-slate-200 dark:border-[#1e2631] p-3 text-xs font-mono text-slate-900 dark:text-white">
             <code>{getTextOutput()}</code>
           </pre>
           <button

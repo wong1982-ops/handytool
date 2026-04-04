@@ -394,7 +394,7 @@ export default function TaxDashboard() {
             value={selectedEntityId ?? ''}
             onChange={(e) => setSelectedEntityId(e.target.value)}
             aria-label="Select entity"
-            className="flex-1 min-w-0 rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white text-sm px-4 py-3 focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer min-h-[44px]"
+            className="flex-1 min-w-0 rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-slate-900 dark:text-white text-sm px-4 py-3 focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer min-h-[44px]"
           >
             {entities.map((e) => (
               <option key={e.id} value={e.id}>
@@ -407,7 +407,7 @@ export default function TaxDashboard() {
             value={taxYear}
             onChange={(e) => setTaxYear(e.target.value)}
             aria-label="Select tax year"
-            className="rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-white text-sm px-4 py-3 focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer min-h-[44px]"
+            className="rounded-xl bg-slate-50 dark:bg-[#131a23] border border-slate-200 dark:border-[#1e2631] text-slate-900 dark:text-white text-sm px-4 py-3 focus:border-[#3D6AF2] focus:ring-1 focus:ring-[#3D6AF2] outline-none transition-colors cursor-pointer min-h-[44px]"
           >
             {taxYearOptions.map((yr) => (
               <option key={yr} value={yr}>

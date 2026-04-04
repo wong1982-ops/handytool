@@ -130,7 +130,7 @@ export function ColorPickerPopover({ color, onChange, onClose }: ColorPickerPopo
             onKeyDown={handleHexKeyDown}
             maxLength={6}
             aria-label="Hex color value"
-            className="w-full pl-7 pr-2 py-2 text-sm font-mono rounded-lg border border-slate-200 dark:border-[#1e2631] bg-white dark:bg-[#090f16] text-white focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/50"
+            className="w-full pl-7 pr-2 py-2 text-sm font-mono rounded-lg border border-slate-200 dark:border-[#1e2631] bg-white dark:bg-[#090f16] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]/50"
           />
         </div>
       </div>
