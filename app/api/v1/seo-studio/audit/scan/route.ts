@@ -21,7 +21,7 @@ function auditHtml(html: string): AuditIssue[] {
   const issues: AuditIssue[] = []
 
   // Check <title>
-  const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/is)
+  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)
   if (!titleMatch) {
     issues.push({ type: 'critical', message: 'Missing <title> tag' })
   } else {
@@ -44,7 +44,7 @@ function auditHtml(html: string): AuditIssue[] {
   }
 
   // Check meta description
-  const metaDescMatch = html.match(/<meta\s+name=["']description["']\s+content=["'](.*?)["']/is)
+  const metaDescMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']*)["']/i)
   if (!metaDescMatch) {
     issues.push({ type: 'critical', message: 'Missing meta description' })
   } else {

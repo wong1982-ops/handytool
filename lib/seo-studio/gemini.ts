@@ -86,3 +86,49 @@ Return ONLY valid JSON, no explanation.`
   const { jsonrepair } = await import('jsonrepair')
   return JSON.parse(jsonrepair(jsonMatch[0]))
 }
+
+export async function generateLandingPage(params: {
+  toolName: string
+  toolSlug: string
+  keyword: string
+  pageType: 'use-case' | 'free-tool'
+}): Promise<{
+  heroHeadline: string
+  heroSubheadline: string
+  benefits: { title: string; description: string }[]
+  faq: { question: string; answer: string }[]
+  ctaText: string
+  title: string
+  metaDescription: string
+}> {
+  const typeLabel = params.pageType === 'use-case' ? 'use-case landing page' : 'free tool landing page'
+
+  const prompt = `You are an expert SEO copywriter specializing in SaaS landing pages.
+
+Generate content for a ${typeLabel} targeting the keyword: "${params.keyword}"
+The page promotes the tool "${params.toolName}" at /tools/${params.toolSlug}.
+
+Return a JSON object with:
+1. "title": SEO-optimized page title (50-60 chars, includes keyword naturally)
+2. "metaDescription": meta description (150-160 chars, keyword included, compelling)
+3. "heroHeadline": a powerful headline for the hero section (8-12 words, includes keyword)
+4. "heroSubheadline": supporting subheadline (15-25 words, reinforces value prop)
+5. "benefits": array of exactly 4 objects, each with "title" (3-5 words) and "description" (1-2 sentences). Focus on user outcomes.
+6. "faq": array of exactly 4 objects, each with "question" and "answer". Target "People Also Ask" style queries about "${params.keyword}". Answers should be 2-3 sentences.
+7. "ctaText": call-to-action button text (2-5 words, action-oriented)
+
+Requirements:
+- Write naturally, avoid keyword stuffing
+- Focus on benefits and user outcomes, not features
+- FAQ answers should be concise and direct
+- Use power words and emotional triggers in headlines
+
+Return ONLY valid JSON, no explanation.`
+
+  const text = await callGemini(prompt)
+  const jsonMatch = text.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) throw new Error('No JSON in landing page response')
+
+  const { jsonrepair } = await import('jsonrepair')
+  return JSON.parse(jsonrepair(jsonMatch[0]))
+}
