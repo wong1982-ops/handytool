@@ -715,6 +715,42 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'SEO Studio',
+    description: 'Keyword research and SEO content planning',
+    href: '/tools/seo-studio',
+    gridClass: '',
+    glowClass: 'from-blue-500/10',
+    category: 'utility' as const,
+    preview: (
+      <div className="w-full h-full flex flex-col justify-center gap-2 px-3">
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded bg-blue-500/20 flex items-center justify-center">
+            <svg className="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+          </div>
+          <div className="h-1.5 rounded-full bg-blue-400/40 w-3/4" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded bg-indigo-500/20 flex items-center justify-center">
+            <svg className="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 13.5l4-4 4 4 4-6 4 3" />
+            </svg>
+          </div>
+          <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 flex-1" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded bg-cyan-500/20 flex items-center justify-center">
+            <svg className="w-3 h-3 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-3-3v6" />
+            </svg>
+          </div>
+          <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 w-2/3" />
+        </div>
+      </div>
+    ),
+  },
 ]
 
 function BentoGrid({ items }: { items: typeof bentoItems }) {
