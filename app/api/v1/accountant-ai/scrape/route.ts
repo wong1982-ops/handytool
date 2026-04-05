@@ -11,19 +11,26 @@ const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || '')
   .map((e) => e.trim())
   .filter(Boolean)
 
-export async function POST() {
-  const userId = await getAuthUserId()
-  if (!userId) return API_ERRORS.UNAUTHORIZED()
+export async function POST(request: Request) {
+  // Allow cron secret OR admin auth
+  const cronSecret = process.env.CRON_SECRET || ''
+  const authHeader = request.headers.get('authorization')
+  const cronHeader = request.headers.get('x-cron-secret')
+  const isCronAuth = cronSecret && (authHeader === `Bearer ${cronSecret}` || cronHeader === cronSecret)
 
-  // Admin gate
-  const supabase = getAdminSupabase()
-  const { data: authUser } = await supabase.auth.admin.getUserById(userId)
-  const email = authUser?.user?.email || ''
+  if (!isCronAuth) {
+    const userId = await getAuthUserId()
+    if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-  if (ADMIN_EMAILS.length > 0) {
-    if (!ADMIN_EMAILS.includes(email)) return API_ERRORS.FORBIDDEN()
-  } else if (process.env.NODE_ENV !== 'development') {
-    return API_ERRORS.FORBIDDEN()
+    const supabase = getAdminSupabase()
+    const { data: authUser } = await supabase.auth.admin.getUserById(userId)
+    const email = authUser?.user?.email || ''
+
+    if (ADMIN_EMAILS.length > 0) {
+      if (!ADMIN_EMAILS.includes(email)) return API_ERRORS.FORBIDDEN()
+    } else if (process.env.NODE_ENV !== 'development') {
+      return API_ERRORS.FORBIDDEN()
+    }
   }
 
   try {
