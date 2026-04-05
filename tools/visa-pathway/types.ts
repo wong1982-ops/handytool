@@ -25,7 +25,7 @@ export type MatchLevel = 'strong' | 'possible' | 'unlikely'
 
 export interface RequirementCheck {
   label: string
-  status: 'met' | 'not-met' | 'unknown'
+  status: 'met' | 'not-met' | 'possible' | 'unknown'
 }
 
 export interface FeeInfo {
