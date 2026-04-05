@@ -43,11 +43,14 @@ export async function POST(request: Request) {
 
     // 2. Store documents (upsert by URL)
     if (pages.length > 0) {
+      // Sanitize content — remove null bytes and problematic Unicode escapes
+      const sanitize = (text: string) => text.replace(/\u0000/g, '').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
+
       const documents = pages.map((page) => ({
         url: page.url,
-        title: page.title,
+        title: sanitize(page.title),
         source: page.source,
-        content_text: page.content,
+        content_text: sanitize(page.content),
         scraped_at: new Date().toISOString(),
       }))
 
