@@ -3,9 +3,9 @@
  * BFS crawl up to 3 levels deep, rate-limited to 1 req/sec, max 200 pages per domain.
  */
 
-const RATE_LIMIT_MS = 1000
-const MAX_PAGES_PER_DOMAIN = 200
-const MAX_DEPTH = 3
+const RATE_LIMIT_MS = 500
+const MAX_PAGES_PER_DOMAIN = 30
+const MAX_DEPTH = 2
 
 export interface ScrapedPage {
   url: string
