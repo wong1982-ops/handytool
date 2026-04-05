@@ -105,7 +105,8 @@ export async function POST(request: Request) {
       embeddingsGenerated: embeddings.length,
     })
   } catch (err) {
-    console.error('[accountant-ai/scrape] Pipeline error:', err)
-    return API_ERRORS.INTERNAL()
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[accountant-ai/scrape] Pipeline error:', message)
+    return apiSuccess({ error: message, pagesScraped: 0, chunksCreated: 0, embeddingsGenerated: 0 })
   }
 }
