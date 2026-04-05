@@ -68,6 +68,7 @@ const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   'ecommerce-readiness': 'utility',
   'tenancy-manager': 'utility',
   'healthy-homes': 'utility',
+  'visa-pathway': 'utility',
 }
 
 export function getToolCategory(slug: string): ToolCategory {
