@@ -47,7 +47,7 @@ export async function POST(request: Request) {
         url: page.url,
         title: page.title,
         source: page.source,
-        content: page.content,
+        content_text: page.content,
         scraped_at: new Date().toISOString(),
       }))
 
@@ -85,9 +85,7 @@ export async function POST(request: Request) {
       const rows = batchChunks.map((chunk, j) => ({
         content: chunk.content,
         chunk_index: chunk.chunkIndex,
-        url: chunk.metadata.url,
-        title: chunk.metadata.title,
-        source: chunk.metadata.source,
+        metadata: { url: chunk.metadata.url, title: chunk.metadata.title, source: chunk.metadata.source },
         embedding: `[${batchEmbeddings[j].join(',')}]`,
       }))
 
