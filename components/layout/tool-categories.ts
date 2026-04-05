@@ -52,6 +52,7 @@ const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   'color-palette': 'utility',
   'svg-converter': 'utility',
   'tax-manager': 'utility',
+  'accountant-ai': 'utility',
   'local-services': 'interactive',
   'human-benchmark': 'interactive',
   'slots': 'interactive',
