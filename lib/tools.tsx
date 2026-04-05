@@ -375,6 +375,17 @@ export const tools: Tool[] = [
     color: 'from-[#3D6AF2] to-[#32A9D9]',
   },
   {
+    name: 'Accountant AI',
+    href: '/tools/accountant-ai',
+    description: 'AI-powered NZ tax and accounting assistant',
+    icon: (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3M17 3h4m0 0v4m0-4l-6 6M13 11l-4 4" />
+      </svg>
+    ),
+    color: 'from-blue-500 to-indigo-500',
+  },
+  {
     name: 'SEO Studio',
     href: '/tools/seo-studio',
     description: 'Keyword research and SEO content planning',
