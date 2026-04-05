@@ -854,6 +854,26 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'Healthy Homes',
+    description: 'NZ Healthy Homes compliance checker',
+    href: '/tools/healthy-homes',
+    gridClass: '',
+    glowClass: 'from-green-500/10',
+    category: 'utility' as const,
+    preview: (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-3">
+        <svg className="w-8 h-8 text-green-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+        </svg>
+        <div className="flex flex-col gap-1 w-14">
+          <div className="h-1 rounded-full bg-green-400/40 w-full" />
+          <div className="h-1 rounded-full bg-emerald-400/30 w-4/5" />
+          <div className="h-1 rounded-full bg-emerald-400/20 w-3/5" />
+        </div>
+      </div>
+    ),
+  },
 ]
 
 function BentoGrid({ items }: { items: typeof bentoItems }) {
