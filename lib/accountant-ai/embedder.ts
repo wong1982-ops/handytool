@@ -25,7 +25,7 @@ interface BatchEmbedResponse {
 
 async function batchEmbed(texts: string[]): Promise<number[][]> {
   const apiKey = getApiKey()
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_EMBED_MODEL}:batchEmbedContents?key=${apiKey}`
+  const url = `https://generativelanguage.googleapis.com/v1/models/${GEMINI_EMBED_MODEL}:batchEmbedContents?key=${apiKey}`
 
   const requests: EmbedRequest[] = texts.map((text) => ({
     model: `models/${GEMINI_EMBED_MODEL}`,
