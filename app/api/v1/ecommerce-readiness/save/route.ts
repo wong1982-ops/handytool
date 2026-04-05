@@ -4,9 +4,9 @@ import { getAuthUserId, apiSuccess, apiError, API_ERRORS } from '@/lib/api/respo
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = await getAuthUserId(request);
+    const userId = await getAuthUserId();
     if (!userId) {
-      return apiError(API_ERRORS.UNAUTHORIZED);
+      return API_ERRORS.UNAUTHORIZED();
     }
 
     const supabase = getAdminSupabase();
@@ -19,28 +19,28 @@ export async function GET(request: NextRequest) {
 
     if (error && error.code !== 'PGRST116') {
       console.error('Error fetching assessment:', error);
-      return apiError(API_ERRORS.INTERNAL_SERVER_ERROR);
+      return API_ERRORS.INTERNAL();
     }
 
     return apiSuccess(data || null);
   } catch (error) {
     console.error('GET /ecommerce-readiness/save error:', error);
-    return apiError(API_ERRORS.INTERNAL_SERVER_ERROR);
+    return API_ERRORS.INTERNAL();
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = await getAuthUserId(request);
+    const userId = await getAuthUserId();
     if (!userId) {
-      return apiError(API_ERRORS.UNAUTHORIZED);
+      return API_ERRORS.UNAUTHORIZED();
     }
 
     const body = await request.json();
     const { answers, score, results, roadmapProgress } = body;
 
     if (!answers || !score || !results) {
-      return apiError(API_ERRORS.BAD_REQUEST);
+      return apiError('Missing required fields', 'VALIDATION_ERROR', 400);
     }
 
     const supabase = getAdminSupabase();
@@ -58,12 +58,12 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Error saving assessment:', error);
-      return apiError(API_ERRORS.INTERNAL_SERVER_ERROR);
+      return API_ERRORS.INTERNAL();
     }
 
-    return apiSuccess(data, { status: 201 });
+    return apiSuccess(data, 201);
   } catch (error) {
     console.error('POST /ecommerce-readiness/save error:', error);
-    return apiError(API_ERRORS.INTERNAL_SERVER_ERROR);
+    return API_ERRORS.INTERNAL();
   }
 }
