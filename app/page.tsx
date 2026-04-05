@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { DashboardPreview } from '@/components/home/dashboard-preview'
 import { HeroSection } from '@/components/home/hero-section'
 import { BentoShowcase } from '@/components/home/bento-showcase'
 import { CtaBanner } from '@/components/home/cta-banner'
@@ -86,6 +87,7 @@ async function LatestBlogPosts() {
 export default async function HomePage() {
   return (
     <div>
+      <DashboardPreview />
       <HeroSection />
       <BentoShowcase />
       <LatestBlogPosts />
