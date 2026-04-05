@@ -65,6 +65,7 @@ const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   'flight-monitor': 'utility',
   'seo-studio': 'utility',
   'dashboard': 'utility',
+  'ecommerce-readiness': 'utility',
 }
 
 export function getToolCategory(slug: string): ToolCategory {

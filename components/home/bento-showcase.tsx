@@ -786,6 +786,52 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'E-commerce Readiness',
+    description: 'Is your NZ business ready to sell online?',
+    href: '/tools/ecommerce-readiness',
+    gridClass: '',
+    glowClass: 'from-emerald-500/10',
+    category: 'utility' as const,
+    preview: (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-2 px-3">
+        {/* Score circle */}
+        <div className="relative w-10 h-10 flex items-center justify-center">
+          <svg viewBox="0 0 36 36" className="w-10 h-10 -rotate-90" aria-hidden="true">
+            <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
+            <circle
+              cx="18" cy="18" r="14" fill="none"
+              stroke="url(#ecomGrad)" strokeWidth="4"
+              strokeLinecap="round"
+              strokeDasharray="63 88"
+            />
+            <defs>
+              <linearGradient id="ecomGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#10b981" />
+                <stop offset="100%" stopColor="#14b8a6" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span className="absolute text-[9px] font-bold text-emerald-400">72%</span>
+        </div>
+        {/* Bar chart placeholder */}
+        <div className="flex items-end gap-1 h-5">
+          {[60, 80, 45, 72].map((h, i) => (
+            <div
+              key={i}
+              className="w-2 rounded-t"
+              style={{
+                height: `${(h / 100) * 20}px`,
+                background: i === 3
+                  ? 'linear-gradient(to top, #10b981, #14b8a6)'
+                  : 'rgba(255,255,255,0.12)',
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    ),
+  },
 ]
 
 function BentoGrid({ items }: { items: typeof bentoItems }) {
