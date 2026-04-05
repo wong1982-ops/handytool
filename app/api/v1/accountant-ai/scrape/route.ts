@@ -22,8 +22,8 @@ export async function POST(request: Request) {
     const userId = await getAuthUserId()
     if (!userId) return API_ERRORS.UNAUTHORIZED()
 
-    const supabase = getAdminSupabase()
-    const { data: authUser } = await supabase.auth.admin.getUserById(userId)
+    const adminSb = getAdminSupabase()
+    const { data: authUser } = await adminSb.auth.admin.getUserById(userId)
     const email = authUser?.user?.email || ''
 
     if (ADMIN_EMAILS.length > 0) {
@@ -32,6 +32,8 @@ export async function POST(request: Request) {
       return API_ERRORS.FORBIDDEN()
     }
   }
+
+  const supabase = getAdminSupabase()
 
   try {
     // 1. Scrape all sources
