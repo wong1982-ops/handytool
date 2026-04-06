@@ -308,6 +308,17 @@ export const tools: Tool[] = [
     color: 'from-green-600 to-emerald-500',
   },
   {
+    name: 'Invoice Generator',
+    href: '/tools/invoice-generator',
+    description: 'Create and export professional invoices with live preview',
+    icon: (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z" />
+      </svg>
+    ),
+    color: 'from-sky-500 to-blue-600',
+  },
+  {
     name: 'Story Video',
     href: '/tools/story-video',
     description: 'Turn storybooks into AI cartoon videos',
