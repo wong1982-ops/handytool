@@ -8,6 +8,7 @@ import type {
   FontFamily,
   FontSize,
   InvoiceLabels,
+  InvoiceTheme,
 } from '../invoice-types'
 
 const INPUT_CLASS =
@@ -57,7 +58,7 @@ export function StylingEditor() {
   const { state, dispatch } = useInvoice()
   const { theme, labels } = state.invoice
 
-  const setTheme = (changes: Parameters<typeof dispatch>[0] extends { type: 'SET_THEME'; payload: infer P } ? P : never) => {
+  const setTheme = (changes: Partial<InvoiceTheme>) => {
     dispatch({ type: 'SET_THEME', payload: changes })
   }
 
