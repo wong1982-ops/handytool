@@ -31,7 +31,7 @@ export default function IncomeExpenses() {
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState<TaxCategory>('income')
-  const [entryType, setEntryType] = useState<'income' | 'expense'>('expense')
+  const [entryType, setEntryType] = useState<'income' | 'expense'>('income')
   const [gstInclusive, setGstInclusive] = useState(true)
 
   const fetchEntries = useCallback(async () => {
@@ -67,7 +67,7 @@ export default function IncomeExpenses() {
     setDescription('')
     setAmount('')
     setCategory('income')
-    setEntryType('expense')
+    setEntryType('income')
     setGstInclusive(true)
     setShowForm(false)
   }
@@ -144,28 +144,54 @@ export default function IncomeExpenses() {
     return <div className="text-center py-20 text-slate-400 dark:text-[#70767f]">Loading...</div>
   }
 
+  const isEmpty = entries.length === 0
+
   return (
     <div className="space-y-6">
-      {/* Summary cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4">
-          <p className="text-xs uppercase tracking-wider text-slate-400 dark:text-[#70767f]">Total Income</p>
-          <p className="text-2xl font-bold text-green-400 mt-1">${totalIncome.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</p>
+      {/* Summary cards — only when there's data */}
+      {!isEmpty && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4">
+            <p className="text-xs uppercase tracking-wider text-slate-400 dark:text-[#70767f]">Total Income</p>
+            <p className="text-2xl font-bold text-green-400 mt-1">${totalIncome.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</p>
+          </div>
+          <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
+            <p className="text-xs uppercase tracking-wider text-slate-400 dark:text-[#70767f]">Total Expenses</p>
+            <p className="text-2xl font-bold text-red-400 mt-1">${totalExpenses.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</p>
+          </div>
+          <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
+            <p className="text-xs uppercase tracking-wider text-slate-400 dark:text-[#70767f]">Net Profit</p>
+            <p className={`text-2xl font-bold mt-1 ${netProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              ${netProfit.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}
+            </p>
+          </div>
         </div>
-        <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
-          <p className="text-xs uppercase tracking-wider text-slate-400 dark:text-[#70767f]">Total Expenses</p>
-          <p className="text-2xl font-bold text-red-400 mt-1">${totalExpenses.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</p>
-        </div>
-        <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
-          <p className="text-xs uppercase tracking-wider text-slate-400 dark:text-[#70767f]">Net Profit</p>
-          <p className={`text-2xl font-bold mt-1 ${netProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-            ${netProfit.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}
-          </p>
-        </div>
-      </div>
+      )}
 
-      {/* Add entry button */}
-      {!showForm && (
+      {/* Empty-state welcome */}
+      {isEmpty && !showForm && (
+        <div className="rounded-2xl border border-[#3D6AF2]/20 bg-gradient-to-br from-[#3D6AF2]/10 to-[#3D9DF2]/5 p-6 sm:p-8 text-center space-y-4">
+          <div className="inline-flex w-12 h-12 rounded-xl bg-[#3D6AF2]/15 items-center justify-center text-2xl">📒</div>
+          <div>
+            <h2 className="text-lg sm:text-xl font-semibold text-white">Track every dollar, claim every deduction</h2>
+            <p className="text-sm text-slate-400 mt-1.5 max-w-md mx-auto">
+              Log your income and expenses by category. We&apos;ll calculate GST, tax estimates, and generate a tidy CSV for your accountant.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowForm(true)}
+            className="w-full sm:w-auto sm:min-w-[220px] min-h-[48px] px-6 inline-flex items-center justify-center gap-2 rounded-xl bg-[#3D6AF2] hover:bg-[#3D79F2] text-white text-sm font-semibold transition-colors shadow-lg shadow-[#3D6AF2]/20"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Add your first entry
+          </button>
+        </div>
+      )}
+
+      {/* Add entry button — secondary, only when entries exist */}
+      {!isEmpty && !showForm && (
         <button
           onClick={() => setShowForm(true)}
           className="w-full min-h-[44px] rounded-xl border border-dashed border-slate-600 text-slate-300 hover:border-[#3D6AF2] hover:text-[#3D6AF2] transition-colors text-sm font-medium"
@@ -312,17 +338,15 @@ export default function IncomeExpenses() {
       )}
 
       {/* Entries list */}
-      <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-white">
-          Entries ({entries.length})
-          {!user && entries.length > 0 && (
-            <span className="text-xs font-normal text-slate-500 ml-2">Saved locally</span>
-          )}
-        </h3>
-        {entries.length === 0 ? (
-          <p className="text-sm text-slate-500 py-8 text-center">No entries yet. Add your first income or expense above.</p>
-        ) : (
-          entries.map((entry) => {
+      {!isEmpty && (
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold text-white">
+            Entries ({entries.length})
+            {!user && (
+              <span className="text-xs font-normal text-slate-500 ml-2">Saved locally</span>
+            )}
+          </h3>
+          {entries.map((entry) => {
             const info = EXPENSE_CATEGORIES[entry.category] || EXPENSE_CATEGORIES['other-deduction']
             return (
               <div key={entry.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#1e2631] p-3.5 group">
@@ -350,9 +374,9 @@ export default function IncomeExpenses() {
                 </button>
               </div>
             )
-          })
-        )}
-      </div>
+          })}
+        </div>
+      )}
 
       {/* Sign-in prompt */}
       {!user && entries.length > 0 && (
