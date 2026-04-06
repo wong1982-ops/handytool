@@ -4,7 +4,7 @@ import { useInvoice } from '../invoice-provider'
 import type { PaymentTerms } from '../invoice-types'
 
 const INPUT_CLASS =
-  'w-full min-h-[44px] px-3.5 py-2.5 bg-[#090f16] border border-[#1e2631] rounded-lg text-white text-sm placeholder:text-[#70767f] focus:border-[#3D6AF2] focus:ring-2 focus:ring-[#3D6AF2]/20 outline-none transition-colors'
+  'w-full min-w-0 min-h-[44px] px-3.5 py-2.5 bg-[#090f16] border border-[#1e2631] rounded-lg text-white text-sm placeholder:text-[#70767f] focus:border-[#3D6AF2] focus:ring-2 focus:ring-[#3D6AF2]/20 outline-none transition-colors'
 
 const SELECT_CLASS =
   'w-full min-h-[44px] px-3.5 py-2.5 pr-10 bg-[#090f16] border border-[#1e2631] rounded-lg text-white text-sm appearance-none focus:border-[#3D6AF2] focus:ring-2 focus:ring-[#3D6AF2]/20 outline-none transition-colors bg-[right_12px_center] bg-no-repeat bg-[length:16px]'
@@ -31,7 +31,7 @@ export function InvoiceInfoEditor() {
       </div>
       <div className="bg-[#131a23] rounded-xl p-4 space-y-3">
         <div className="grid grid-cols-2 gap-3">
-          <div>
+          <div className="min-w-0">
             <label className="text-xs text-[#70767f] mb-1 block">Invoice Number</label>
             <input
               type="text"
@@ -40,7 +40,7 @@ export function InvoiceInfoEditor() {
               onChange={(e) => dispatch({ type: 'SET_INVOICE_NUMBER', payload: e.target.value })}
             />
           </div>
-          <div>
+          <div className="min-w-0">
             <label className="text-xs text-[#70767f] mb-1 block">Reference / PO #</label>
             <input
               type="text"
@@ -52,7 +52,7 @@ export function InvoiceInfoEditor() {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <div>
+          <div className="min-w-0">
             <label className="text-xs text-[#70767f] mb-1 block">Issue Date</label>
             <input
               type="date"
@@ -61,7 +61,7 @@ export function InvoiceInfoEditor() {
               onChange={(e) => dispatch({ type: 'SET_ISSUE_DATE', payload: e.target.value })}
             />
           </div>
-          <div>
+          <div className="min-w-0">
             <label className="text-xs text-[#70767f] mb-1 block">Due Date</label>
             <input
               type="date"
