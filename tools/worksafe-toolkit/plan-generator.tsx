@@ -77,7 +77,7 @@ export default function PlanGenerator() {
       businessName,
       questions: answers,
     }
-    generatePlanPdf(planData)
+    generatePlanPdf(planData, INDUSTRIES.find(i => i.id === selectedIndustry)?.name || selectedIndustry)
   }, [user, selectedIndustry, businessName, answers])
 
   const handleGoogleSignIn = useCallback(async () => {
