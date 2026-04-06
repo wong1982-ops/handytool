@@ -6,6 +6,7 @@ import React, {
   useContext,
   useEffect,
   useReducer,
+  useRef,
   useState,
 } from 'react';
 import type { EditorState, InvoiceTemplate } from './invoice-types';
@@ -69,30 +70,28 @@ export interface InvoiceContextValue {
 
 const InvoiceContext = createContext<InvoiceContextValue | null>(null);
 
-// ─── Lazy Initialiser ─────────────────────────────────────────────────────────
-
-function initEditorState(): EditorState {
-  const defaultState = createDefaultEditorState();
-  const draft = loadDraft();
-  return {
-    ...defaultState,
-    invoice: draft ?? defaultState.invoice,
-    // templates are managed separately via useState
-    templates: [],
-  };
-}
-
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function InvoiceProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(invoiceReducer, undefined, initEditorState);
+  // Always start from the deterministic default so SSR and the first client
+  // render produce identical HTML. After mount we hydrate from localStorage.
+  const [state, dispatch] = useReducer(invoiceReducer, undefined, createDefaultEditorState);
+  const [templates, setTemplates] = useState<InvoiceTemplate[]>([]);
+  const hydratedRef = useRef(false);
 
-  // Templates are managed separately so we can update them without touching invoice state
-  const [templates, setTemplates] = useState<InvoiceTemplate[]>(() => loadTemplates());
-
-  // Auto-save draft whenever the invoice becomes dirty
+  // Hydrate from localStorage AFTER first client render to avoid hydration mismatch
   useEffect(() => {
-    if (state.isDirty) {
+    const draft = loadDraft();
+    if (draft) {
+      dispatch({ type: 'LOAD_INVOICE', payload: draft });
+    }
+    setTemplates(loadTemplates());
+    hydratedRef.current = true;
+  }, []);
+
+  // Auto-save draft whenever the invoice becomes dirty (only after hydration)
+  useEffect(() => {
+    if (state.isDirty && hydratedRef.current) {
       saveDraft(state.invoice);
     }
   }, [state.isDirty, state.invoice]);
