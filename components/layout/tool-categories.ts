@@ -71,6 +71,7 @@ const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   'visa-pathway': 'utility',
   'worksafe-toolkit': 'utility',
   'tradie-tax': 'utility',
+  'aml-compliance': 'utility',
 }
 
 export function getToolCategory(slug: string): ToolCategory {

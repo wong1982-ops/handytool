@@ -937,6 +937,26 @@ const bentoItems = [
       </div>
     ),
   },
+  {
+    name: 'AML Compliance',
+    description: 'NZ AML/CFT risk assessment & compliance programme',
+    href: '/tools/aml-compliance',
+    gridClass: '',
+    glowClass: 'from-purple-500/10',
+    category: 'utility' as const,
+    preview: (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-3">
+        <svg className="w-7 h-7 text-purple-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+        </svg>
+        <div className="flex flex-col gap-1 w-16">
+          <div className="h-1 rounded-full bg-purple-400/40 w-full" />
+          <div className="h-1 rounded-full bg-indigo-400/30 w-4/5" />
+          <div className="h-1 rounded-full bg-indigo-400/20 w-3/5" />
+        </div>
+      </div>
+    ),
+  },
 ]
 
 function BentoGrid({ items }: { items: typeof bentoItems }) {
