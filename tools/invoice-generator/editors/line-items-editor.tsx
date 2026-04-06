@@ -3,7 +3,6 @@
 import { useInvoice } from '../invoice-provider'
 import { createEmptyLineItem } from '../invoice-defaults'
 import {
-  calcLineItemSubtotal,
   calcLineItemTotal,
   calcGroupedTotals,
   formatCurrency,
