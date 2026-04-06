@@ -69,6 +69,7 @@ const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   'tenancy-manager': 'utility',
   'healthy-homes': 'utility',
   'visa-pathway': 'utility',
+  'worksafe-toolkit': 'utility',
 }
 
 export function getToolCategory(slug: string): ToolCategory {
