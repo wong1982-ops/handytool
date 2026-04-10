@@ -1,12 +1,5 @@
-import type { Metadata } from 'next'
 import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
 import TarotWizard from '@/tools/tarot/tarot-wizard'
-
-export const metadata: Metadata = {
-  title: 'Tarot Card Reading — AI-Powered Tarot Readings | Toolk1t',
-  description:
-    'Get insightful AI-powered tarot card readings. Ask a question, choose a spread, and receive personalised interpretations for love, career, finance, and personal growth.',
-}
 
 export default function TarotPage() {
   return (
