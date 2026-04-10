@@ -26,6 +26,7 @@ export function ReadingTheater({
   const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null)
   const [cardInterpretations, setCardInterpretations] = useState<CardInterpretation[]>([])
   const [narrative, setNarrative] = useState('')
+  const [saved, setSaved] = useState(false)
 
   const spread = project.spreadId ? getSpread(project.spreadId) : null
 
@@ -166,6 +167,34 @@ export function ReadingTheater({
     }, dealDelay)
   }, [spread, setProject, startReading])
 
+  const handleSave = useCallback(async () => {
+    if (!spread || saved) return
+    try {
+      const res = await fetch('/api/v1/tarot/history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          spreadId: spread.id,
+          question: project.question,
+          language: project.language,
+          category: project.category,
+          cards: project.drawnCards,
+          interpretation: {
+            cards: cardInterpretations,
+            narrative,
+          },
+        }),
+      })
+      if (res.ok) {
+        setSaved(true)
+      } else if (res.status === 401) {
+        alert(t.errors.loginToSave)
+      }
+    } catch {
+      alert(t.errors.network)
+    }
+  }, [spread, saved, project.question, project.language, project.category, project.drawnCards, cardInterpretations, narrative, t])
+
   // Status text
   const statusText =
     project.theaterStage === 'shuffling'
@@ -270,10 +299,11 @@ export function ReadingTheater({
             </button>
             <button
               type="button"
-              onClick={() => alert(t.errors.loginToSave)}
-              className="rounded-xl border border-purple-500/30 bg-purple-500/10 px-6 py-3 text-sm font-semibold text-purple-400 transition-all cursor-pointer min-h-[44px] hover:bg-purple-500/20"
+              onClick={handleSave}
+              disabled={saved}
+              className="rounded-xl border border-purple-500/30 bg-purple-500/10 px-6 py-3 text-sm font-semibold text-purple-400 transition-all cursor-pointer min-h-[44px] hover:bg-purple-500/20 disabled:opacity-70 disabled:cursor-default"
             >
-              {t.theater.saveReading}
+              {saved ? `✓ ${t.theater.saveReading}` : t.theater.saveReading}
             </button>
           </div>
         )}
