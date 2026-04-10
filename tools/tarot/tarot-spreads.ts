@@ -417,6 +417,7 @@ export const TAROT_SPREADS: TarotSpread[] = [
  * Get all spreads belonging to a specific category.
  */
 export function getSpreadsByCategory(category: string): TarotSpread[] {
+  if (category === 'all') return TAROT_SPREADS
   return TAROT_SPREADS.filter((s) => s.category === (category as SpreadCategory))
 }
 

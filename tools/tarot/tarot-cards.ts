@@ -998,7 +998,7 @@ export const TAROT_CARDS: TarotCard[] = [
  */
 export function getCard(id: number): TarotCard {
   const card = TAROT_CARDS[id]
-  if (!card) {
+  if (!card || card.id !== id) {
     throw new Error(`Tarot card with id ${id} not found`)
   }
   return card
