@@ -99,6 +99,13 @@ export async function POST(request: Request) {
 
   const { spreadId: _spreadId, spreadName, question, language, cards } = parsed.data
 
+  if (!GEMINI_API_KEY) {
+    return new Response(JSON.stringify({ error: 'AI service not configured' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   // Anonymous users are allowed — attempt to get userId but don't require it
   const userId = await getAuthUserId()
 

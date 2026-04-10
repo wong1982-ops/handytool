@@ -188,10 +188,10 @@ export function ReadingTheater({
       if (res.ok) {
         setSaved(true)
       } else if (res.status === 401) {
-        alert(t.errors.loginToSave)
+        setProject((p) => ({ ...p, error: t.errors.loginToSave }))
       }
     } catch {
-      alert(t.errors.network)
+      setProject((p) => ({ ...p, error: t.errors.network }))
     }
   }, [spread, saved, project.question, project.language, project.category, project.drawnCards, cardInterpretations, narrative, t])
 
@@ -259,6 +259,7 @@ export function ReadingTheater({
                   reversed={dc.reversed}
                   revealed={isRevealed}
                   active={activeCardIndex === idx}
+                  language={project.language}
                   revealDelay={idx * 300}
                 />
                 {/* Position label */}

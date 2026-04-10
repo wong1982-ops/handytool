@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import type { TarotCard } from './tarot-types'
+import type { TarotCard, Language } from './tarot-types'
 
 interface Props {
   card: TarotCard
   reversed: boolean
   revealed: boolean
   active: boolean
+  language?: Language
   revealDelay?: number
   onClick?: () => void
 }
@@ -17,6 +18,7 @@ export function CardFlip({
   reversed,
   revealed,
   active,
+  language = 'en',
   revealDelay = 0,
   onClick,
 }: Props) {
@@ -41,7 +43,7 @@ export function CardFlip({
     }
   }, [revealed, revealDelay]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const ariaLabel = `${card.name.en}${reversed ? ' (reversed)' : ''}${flipped ? '' : ' — face down'}`
+  const ariaLabel = `${card.name[language]}${reversed ? ' (reversed)' : ''}${flipped ? '' : ' — face down'}`
 
   return (
     <button
@@ -107,7 +109,7 @@ export function CardFlip({
           >
             <img
               src={card.imageUrl}
-              alt={card.name.en}
+              alt={card.name[language]}
               loading="lazy"
               className="w-full h-full object-cover"
               draggable={false}
@@ -119,7 +121,7 @@ export function CardFlip({
             className="absolute bottom-0 left-0 right-0 px-1 py-0.5 text-center text-white/90 bg-black/50 leading-tight select-none"
             style={{ fontSize: 8 }}
           >
-            {card.name.en}
+            {card.name[language]}
           </span>
 
           {/* Reversed badge */}
