@@ -3,6 +3,17 @@
 import { useEffect, useRef, useState } from 'react'
 import type { TarotCard, Language } from './tarot-types'
 
+function getSuitSymbol(card: TarotCard): string {
+  if (card.arcana === 'major') return '✦'
+  switch (card.suit) {
+    case 'wands': return '🜂'
+    case 'cups': return '🜄'
+    case 'swords': return '🜁'
+    case 'pentacles': return '🜃'
+    default: return '✦'
+  }
+}
+
 interface Props {
   card: TarotCard
   reversed: boolean
@@ -23,6 +34,7 @@ export function CardFlip({
   onClick,
 }: Props) {
   const [flipped, setFlipped] = useState(false)
+  const [imageError, setImageError] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -51,7 +63,7 @@ export function CardFlip({
       aria-label={ariaLabel}
       onClick={onClick}
       className="relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 rounded-lg"
-      style={{ width: 80, height: 120, perspective: 600 }}
+      style={{ width: 120, height: 180, perspective: 800 }}
     >
       {/* Glow effect for active state */}
       {active && (
@@ -85,9 +97,9 @@ export function CardFlip({
           {/* Decorative element */}
           <span
             className="flex items-center justify-center border border-purple-400/40 rounded"
-            style={{ width: 48, height: 72 }}
+            style={{ width: 72, height: 108 }}
           >
-            <span className="text-purple-300 text-lg select-none">✦</span>
+            <span className="text-purple-300 text-2xl select-none">✦</span>
           </span>
         </span>
 
@@ -107,19 +119,28 @@ export function CardFlip({
               transform: reversed ? 'rotate(180deg)' : 'none',
             }}
           >
-            <img
-              src={card.imageUrl}
-              alt={card.name[language]}
-              loading="lazy"
-              className="w-full h-full object-cover"
-              draggable={false}
-            />
+            {imageError ? (
+              <span className="flex items-center justify-center w-full h-full bg-gradient-to-br from-purple-100 via-pink-100 to-purple-200 dark:from-purple-900/40 dark:via-pink-900/40 dark:to-purple-800/40">
+                <span className="text-5xl text-purple-500/70 dark:text-purple-300/70 select-none">
+                  {getSuitSymbol(card)}
+                </span>
+              </span>
+            ) : (
+              <img
+                src={card.imageUrl}
+                alt={card.name[language]}
+                loading="lazy"
+                className="w-full h-full object-cover"
+                draggable={false}
+                onError={() => setImageError(true)}
+              />
+            )}
           </span>
 
           {/* Card name */}
           <span
-            className="absolute bottom-0 left-0 right-0 px-1 py-0.5 text-center text-white/90 bg-black/50 leading-tight select-none"
-            style={{ fontSize: 8 }}
+            className="absolute bottom-0 left-0 right-0 px-1.5 py-1 text-center text-white/95 bg-black/60 leading-tight select-none font-medium"
+            style={{ fontSize: 11 }}
           >
             {card.name[language]}
           </span>
@@ -127,8 +148,8 @@ export function CardFlip({
           {/* Reversed badge */}
           {reversed && (
             <span
-              className="absolute top-1 right-1 flex items-center justify-center rounded-full bg-red-600 text-white font-bold leading-none select-none"
-              style={{ width: 14, height: 14, fontSize: 8 }}
+              className="absolute top-1.5 right-1.5 flex items-center justify-center rounded-full bg-red-600 text-white font-bold leading-none select-none"
+              style={{ width: 20, height: 20, fontSize: 11 }}
               aria-hidden="true"
             >
               R
