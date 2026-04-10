@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { TarotProject, DEFAULT_PROJECT, WizardStep, Language } from '@/tools/tarot/tarot-types'
+import { TarotProject, DEFAULT_PROJECT, WizardStep } from '@/tools/tarot/tarot-types'
 import { QuestionStep } from '@/tools/tarot/question-step'
 import { SpreadStep } from '@/tools/tarot/spread-step'
 import { ReadingTheater } from '@/tools/tarot/reading-theater'
