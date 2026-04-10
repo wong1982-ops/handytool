@@ -7,6 +7,7 @@ import { zh } from '@/tools/tarot/i18n/zh'
 import { getSpread } from '@/tools/tarot/tarot-spreads'
 import { getCard } from '@/tools/tarot/tarot-cards'
 import { HistoryCard, type SavedReading } from '@/tools/tarot/history-card'
+import { TrendsPanel } from '@/tools/tarot/trends-panel'
 
 interface ReadingDetail extends SavedReading {
   interpretation?: {
@@ -179,6 +180,9 @@ export function HistoryTab({ language }: HistoryTabProps) {
 
   return (
     <>
+      {/* Trends panel */}
+      <TrendsPanel language={language} readingCount={readings.length} t={t} />
+
       {/* Readings list */}
       <div className="flex flex-col gap-3 p-1">
         {readings.map((r) => (
