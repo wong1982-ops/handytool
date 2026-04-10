@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import type { TarotProject, SpreadCategory } from '@/tools/tarot/tarot-types'
 import type { I18nStrings } from '@/tools/tarot/i18n/en'
 
@@ -19,6 +19,30 @@ const CATEGORIES: { key: SpreadCategory; emoji: string }[] = [
 ]
 
 export function QuestionStep({ project, setProject, t }: QuestionStepProps) {
+  const [recommending, setRecommending] = useState(false)
+
+  const handleRecommend = useCallback(async () => {
+    setRecommending(true)
+    try {
+      const res = await fetch('/api/v1/tarot/recommend-spread', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: project.question, language: project.language }),
+      })
+      if (res.ok) {
+        const json = await res.json()
+        const { spreadId } = json.data
+        setProject((p) => ({ ...p, recommendedSpreadId: spreadId, spreadId, step: 2, error: null }))
+      } else {
+        setProject((p) => ({ ...p, step: 2, error: null }))
+      }
+    } catch {
+      setProject((p) => ({ ...p, step: 2, error: null }))
+    } finally {
+      setRecommending(false)
+    }
+  }, [project.question, project.language, setProject])
+
   const handleQuestionChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setProject((p) => ({ ...p, question: e.target.value }))
@@ -87,6 +111,18 @@ export function QuestionStep({ project, setProject, t }: QuestionStepProps) {
           })}
         </div>
       </div>
+
+      {/* AI recommend button */}
+      {project.question.trim().length > 0 && (
+        <button
+          type="button"
+          onClick={handleRecommend}
+          disabled={recommending}
+          className="w-full px-4 py-3 rounded-xl text-sm font-medium transition-all min-h-[44px] cursor-pointer border-2 border-dashed border-purple-300 dark:border-purple-700 text-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 disabled:opacity-50"
+        >
+          {recommending ? '...' : `✨ ${t.questionStep.recommendSpread}`}
+        </button>
+      )}
 
       {/* Next button */}
       <div className="flex justify-end pt-2">
