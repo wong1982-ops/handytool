@@ -223,11 +223,15 @@ export function ReadingTheater({
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
-      {/* Left: card spread area */}
+      {/* Left: card spread area — responsive, viewport-bounded */}
       <div className="flex-1 min-w-0">
         <div
-          className="relative w-full"
-          style={{ paddingBottom: '95%', minHeight: 560 /* tall aspect for larger cards */ }}
+          className="relative w-full mx-auto"
+          style={{
+            height: 'clamp(360px, 65vh, 720px)',
+            maxWidth: '100%',
+            containerType: 'inline-size',
+          }}
         >
           {project.drawnCards.map((dc, idx) => {
             const pos = spread.positions[dc.positionIndex]
@@ -237,19 +241,19 @@ export function ReadingTheater({
                 ? idx < project.revealedCount
                 : false
 
+            const baseTransform = `translate(-50%, -50%)${pos.rotation ? ` rotate(${pos.rotation}deg)` : ''}`
+
             return (
               <div
                 key={`${dc.cardId}-${idx}`}
-                className="absolute transition-all duration-500 ease-out"
+                className="absolute transition-all duration-500 ease-out flex flex-col items-center"
                 style={{
-                  left: `calc(${pos.x}% - 80px)`,
-                  top: `calc(${pos.y}% - 120px)`,
+                  left: `${pos.x}%`,
+                  top: `${pos.y}%`,
                   opacity: isDealing ? 0 : 1,
                   transform: isDealing
-                    ? 'translateY(-40px)'
-                    : pos.rotation
-                      ? `rotate(${pos.rotation}deg)`
-                      : 'translateY(0)',
+                    ? `translate(-50%, calc(-50% - 40px))`
+                    : baseTransform,
                   transitionDelay: `${idx * 150}ms`,
                   zIndex: activeCardIndex === idx ? 20 : 10,
                 }}
@@ -264,8 +268,8 @@ export function ReadingTheater({
                 />
                 {/* Position label */}
                 <p
-                  className="text-center text-slate-600 dark:text-slate-300 mt-2 whitespace-nowrap overflow-hidden text-ellipsis font-semibold"
-                  style={{ fontSize: 12, maxWidth: 160 }}
+                  className="text-center text-slate-600 dark:text-slate-300 mt-1.5 whitespace-nowrap overflow-hidden text-ellipsis font-semibold"
+                  style={{ fontSize: 11, maxWidth: 140 }}
                 >
                   {pos.label[project.language]}
                 </p>
@@ -312,7 +316,7 @@ export function ReadingTheater({
 
       {/* Right: interpretation panel */}
       {(cardInterpretations.length > 0 || narrative) && (
-        <div className="lg:w-80 shrink-0">
+        <div className="lg:w-96 shrink-0">
           <InterpretationPanel
             cardInterpretations={cardInterpretations}
             narrative={narrative}

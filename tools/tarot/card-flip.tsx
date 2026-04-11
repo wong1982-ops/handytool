@@ -63,7 +63,11 @@ export function CardFlip({
       aria-label={ariaLabel}
       onClick={onClick}
       className="relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 rounded-lg"
-      style={{ width: 160, height: 240, perspective: 1000 }}
+      style={{
+        width: 'clamp(64px, 12cqi, 130px)',
+        height: 'clamp(96px, 18cqi, 195px)',
+        perspective: 1000,
+      }}
     >
       {/* Glow effect for active state */}
       {active && (
