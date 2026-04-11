@@ -120,7 +120,35 @@ export async function POST(request: Request) {
       temperature: 0.85,
       maxOutputTokens: 2048,
       responseMimeType: 'application/json',
+      responseSchema: {
+        type: 'OBJECT',
+        properties: {
+          cards: {
+            type: 'ARRAY',
+            items: {
+              type: 'OBJECT',
+              properties: {
+                position: { type: 'STRING' },
+                cardName: { type: 'STRING' },
+                interpretation: { type: 'STRING' },
+              },
+              required: ['position', 'cardName', 'interpretation'],
+            },
+          },
+          narrative: { type: 'STRING' },
+        },
+        required: ['cards', 'narrative'],
+      },
     },
+  }
+
+  function stripCodeFences(text: string): string {
+    let cleaned = text.trim()
+    // Remove ```json or ``` opening fence
+    cleaned = cleaned.replace(/^```(?:json)?\s*/i, '')
+    // Remove closing fence
+    cleaned = cleaned.replace(/\s*```\s*$/, '')
+    return cleaned.trim()
   }
 
   const stream = new ReadableStream({
@@ -155,10 +183,16 @@ export async function POST(request: Request) {
 
         let result: GeminiReadingResult
         try {
-          result = JSON.parse(rawText) as GeminiReadingResult
+          result = JSON.parse(stripCodeFences(rawText)) as GeminiReadingResult
         } catch {
-          console.error('tarot/reading: Failed to parse Gemini JSON —', rawText)
+          console.error('tarot/reading: Failed to parse Gemini JSON —', rawText.slice(0, 500))
           send({ type: 'error', message: 'Failed to parse reading. Please try again.' })
+          return
+        }
+
+        if (!result?.cards || !Array.isArray(result.cards)) {
+          console.error('tarot/reading: Gemini response missing cards array —', rawText.slice(0, 500))
+          send({ type: 'error', message: 'AI returned malformed response. Please try again.' })
           return
         }
 

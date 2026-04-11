@@ -449,7 +449,7 @@ async function executeScenes(supabase: any, job: StoryVideoJobRow) {
           characterBible: job.character_bible || { characters: [] },
           artStyle: job.art_style,
         })
-        const targetDuration = Math.min(job.screenplay.totalDuration, 60)
+        const targetDuration = Math.min(Math.max(job.screenplay.totalDuration, 4), 8)
         const opName = await geminiProvider.startVideoGeneration(prompt, targetDuration)
 
         await updateJob(supabase, job.id, {
@@ -499,7 +499,7 @@ async function executeScenes(supabase: any, job: StoryVideoJobRow) {
 
   try {
     const prompt = geminiProvider.buildScenePrompt(sceneData, job.art_style, job.character_bible)
-    const opName = await geminiProvider.startVideoGeneration(prompt, Math.min(sceneData.duration, 8))
+    const opName = await geminiProvider.startVideoGeneration(prompt, Math.min(Math.max(sceneData.duration, 4), 8))
 
     await updateJob(supabase, job.id, {
       artifacts: { ...artifacts, veoOperationName: opName, veoOperationType: 'scene' },
