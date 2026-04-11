@@ -164,7 +164,7 @@ export function convertClient(from: Format, to: Format, content: string): Format
         if (value === null || typeof value !== 'object' || Array.isArray(value)) {
           throw new Error('TOML requires a top-level object')
         }
-        output = TOML.stringify(value as Parameters<typeof TOML.stringify>[0])
+        output = TOML.stringify(value as unknown as Parameters<typeof TOML.stringify>[0])
         break
       default:
         throw new Error(`Cannot convert to ${to}`)
