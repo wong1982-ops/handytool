@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { ChatMessage } from './types'
+import { ActionGate } from '@/components/auth/action-gate'
 
 interface ChatBarProps {
   chatHistory: ChatMessage[]
@@ -202,33 +203,35 @@ export default function ChatBar({
         />
 
         {/* Send button */}
-        <button
-          type="button"
-          onClick={handleSend}
-          disabled={!input.trim() || refining}
-          aria-label="Send refinement instruction"
-          className={[
-            'w-10 h-10 shrink-0 rounded-xl flex items-center justify-center transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed border-none',
-            refining
-              ? 'bg-[#3D6AF2] animate-pulse'
-              : 'bg-[#3D6AF2] hover:bg-[#3D79F2]',
-          ].join(' ')}
-        >
-          <svg
-            className="w-4 h-4 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
+        <ActionGate cost={1}>{() => (
+          <button
+            type="button"
+            onClick={handleSend}
+            disabled={!input.trim() || refining}
+            aria-label="Send refinement instruction"
+            className={[
+              'w-10 h-10 shrink-0 rounded-xl flex items-center justify-center transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed border-none',
+              refining
+                ? 'bg-[#3D6AF2] animate-pulse'
+                : 'bg-[#3D6AF2] hover:bg-[#3D79F2]',
+            ].join(' ')}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-            />
-          </svg>
-        </button>
+            <svg
+              className="w-4 h-4 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+              />
+            </svg>
+          </button>
+        )}</ActionGate>
       </div>
     </div>
   )

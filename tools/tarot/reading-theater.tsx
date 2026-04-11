@@ -227,7 +227,7 @@ export function ReadingTheater({
       <div className="flex-1 min-w-0">
         <div
           className="relative w-full"
-          style={{ paddingBottom: '90%', minHeight: 400 /* taller aspect for card layouts */ }}
+          style={{ paddingBottom: '95%', minHeight: 560 /* tall aspect for larger cards */ }}
         >
           {project.drawnCards.map((dc, idx) => {
             const pos = spread.positions[dc.positionIndex]
@@ -242,8 +242,8 @@ export function ReadingTheater({
                 key={`${dc.cardId}-${idx}`}
                 className="absolute transition-all duration-500 ease-out"
                 style={{
-                  left: `calc(${pos.x}% - 60px)`,
-                  top: `calc(${pos.y}% - 90px)`,
+                  left: `calc(${pos.x}% - 80px)`,
+                  top: `calc(${pos.y}% - 120px)`,
                   opacity: isDealing ? 0 : 1,
                   transform: isDealing
                     ? 'translateY(-40px)'
@@ -264,8 +264,8 @@ export function ReadingTheater({
                 />
                 {/* Position label */}
                 <p
-                  className="text-center text-slate-500 dark:text-slate-400 mt-1.5 whitespace-nowrap overflow-hidden text-ellipsis font-medium"
-                  style={{ fontSize: 11, maxWidth: 120 }}
+                  className="text-center text-slate-600 dark:text-slate-300 mt-2 whitespace-nowrap overflow-hidden text-ellipsis font-semibold"
+                  style={{ fontSize: 12, maxWidth: 160 }}
                 >
                   {pos.label[project.language]}
                 </p>

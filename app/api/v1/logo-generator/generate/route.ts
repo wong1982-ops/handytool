@@ -1,4 +1,4 @@
-import { apiSuccess, apiError } from '@/lib/api/response'
+import { apiSuccess, apiError, getAuthUserId, API_ERRORS } from '@/lib/api/response'
 import { uploadToR2 } from '@/lib/storage/r2'
 import { buildPrompts } from '@/lib/logo-generator/prompts'
 import type { LogoStyle } from '@/tools/logo-generator/types'
@@ -45,6 +45,9 @@ async function callGeminiTextToImage(prompt: string): Promise<Buffer> {
 }
 
 export async function POST(request: Request) {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
   let body: {
     businessName: string
     tagline?: string

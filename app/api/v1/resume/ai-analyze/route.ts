@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { apiSuccess, apiError } from '@/lib/api/response'
+import { apiSuccess, apiError, getAuthUserId, API_ERRORS } from '@/lib/api/response'
 import { z } from 'zod'
 
 export const maxDuration = 60
@@ -25,6 +25,9 @@ const schema = z.object({
 })
 
 export async function POST(request: NextRequest) {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
   if (!GEMINI_API_KEY) {
     return apiError('AI service not configured', 'AI_NOT_CONFIGURED', 503)
   }

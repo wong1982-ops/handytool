@@ -1,9 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { apiSuccess, apiError, API_ERRORS } from '@/lib/api/response'
+import { apiSuccess, apiError, API_ERRORS, getAuthUserId } from '@/lib/api/response'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 export async function POST(request: Request) {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
   let body: { narrativeText: string; dialogue?: { speaker: string; line: string }[]; mood?: string; sceneDescription?: string }
   try {
     body = await request.json()

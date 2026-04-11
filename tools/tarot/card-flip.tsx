@@ -63,7 +63,7 @@ export function CardFlip({
       aria-label={ariaLabel}
       onClick={onClick}
       className="relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 rounded-lg"
-      style={{ width: 120, height: 180, perspective: 800 }}
+      style={{ width: 160, height: 240, perspective: 1000 }}
     >
       {/* Glow effect for active state */}
       {active && (
@@ -97,9 +97,9 @@ export function CardFlip({
           {/* Decorative element */}
           <span
             className="flex items-center justify-center border border-purple-400/40 rounded"
-            style={{ width: 72, height: 108 }}
+            style={{ width: 100, height: 150 }}
           >
-            <span className="text-purple-300 text-2xl select-none">✦</span>
+            <span className="text-purple-300 text-3xl select-none">✦</span>
           </span>
         </span>
 
@@ -139,8 +139,8 @@ export function CardFlip({
 
           {/* Card name */}
           <span
-            className="absolute bottom-0 left-0 right-0 px-1.5 py-1 text-center text-white/95 bg-black/60 leading-tight select-none font-medium"
-            style={{ fontSize: 11 }}
+            className="absolute bottom-0 left-0 right-0 px-2 py-1.5 text-center text-white bg-black/70 leading-tight select-none font-semibold"
+            style={{ fontSize: 13 }}
           >
             {card.name[language]}
           </span>
@@ -148,8 +148,8 @@ export function CardFlip({
           {/* Reversed badge */}
           {reversed && (
             <span
-              className="absolute top-1.5 right-1.5 flex items-center justify-center rounded-full bg-red-600 text-white font-bold leading-none select-none"
-              style={{ width: 20, height: 20, fontSize: 11 }}
+              className="absolute top-2 right-2 flex items-center justify-center rounded-full bg-red-600 text-white font-bold leading-none select-none"
+              style={{ width: 24, height: 24, fontSize: 13 }}
               aria-hidden="true"
             >
               R

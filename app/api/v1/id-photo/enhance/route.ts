@@ -1,9 +1,12 @@
-import { apiSuccess, apiError } from '@/lib/api/response'
+import { apiSuccess, apiError, getAuthUserId, API_ERRORS } from '@/lib/api/response'
 import { analyzePhoto, calculateAdjustments, calculateCropTransform } from '@/lib/id-photo/ai-enhance'
 
 export const maxDuration = 30
 
 export async function POST(request: Request) {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
   let body: { image: string }
   try {
     body = await request.json()

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import Link from 'next/link'
+import { useDraft } from '@/lib/hooks/use-draft'
 import type { ComponentSession, Framework, GeneratedCode, ComponentSettings } from './types'
 import { DEFAULT_SESSION } from './types'
 import LivePreview from './live-preview'
@@ -13,6 +14,7 @@ type MobileTab = 'preview' | 'code' | 'chat'
 
 export default function ComponentLab() {
   const [session, setSession] = useState<ComponentSession>({ ...DEFAULT_SESSION })
+  useDraft('component-lab:draft', session, setSession)
   const [generating, setGenerating] = useState(false)
   const [refining, setRefining] = useState(false)
   const [viewportWidth, setViewportWidth] = useState(1280)

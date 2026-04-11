@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/lib/hooks/use-auth'
+import { useDraftSnapshot } from '@/lib/hooks/use-draft'
+import { ActionGate } from '@/components/auth/action-gate'
 import { signInWithOAuth } from '@/lib/supabase/auth'
 import type { FaviconConfig } from './types'
 
@@ -26,6 +28,11 @@ export default function AiTab({ onConfigChange }: AiTabProps) {
   const [results, setResults] = useState<AiIcon[]>([])
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
+  useDraftSnapshot('favicon-generator-ai:draft', { prompt, selectedStyle }, (s) => {
+    if (s.prompt !== undefined) setPrompt(s.prompt)
+    if (s.selectedStyle !== undefined) setSelectedStyle(s.selectedStyle)
+  })
+
   async function handleGenerate() {
     if (!prompt.trim() || loading) return
     setLoading(true)
@@ -43,13 +50,7 @@ export default function AiTab({ onConfigChange }: AiTabProps) {
       const json = await res.json()
 
       if (!res.ok) {
-        if (json.code === 'INSUFFICIENT_CREDITS') {
-          setError('Not enough credits. Top up to use AI generation.')
-        } else if (json.code === 'UNAUTHORIZED') {
-          setError('Please sign in to use AI generation.')
-        } else {
-          setError(json.error || 'Failed to generate favicon.')
-        }
+        setError(json.error || 'Failed to generate favicon.')
         return
       }
 
@@ -133,6 +134,8 @@ export default function AiTab({ onConfigChange }: AiTabProps) {
       </div>
 
       {/* Generate button */}
+      <ActionGate cost={1}>
+        {() => (
       <button
         type="button"
         onClick={handleGenerate}
@@ -157,6 +160,8 @@ export default function AiTab({ onConfigChange }: AiTabProps) {
           </>
         )}
       </button>
+        )}
+      </ActionGate>
 
       {/* Error */}
       {error && (

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { Editor } from '@tiptap/core'
 import type { AIAction } from '../resume-types'
 import { useResume } from '../resume-provider'
+import { ActionGate } from '@/components/auth/action-gate'
 
 interface AIActionBarProps {
   editor: Editor | null
@@ -62,20 +63,24 @@ export function AIActionBar({ editor, module }: AIActionBarProps) {
   ]
 
   return (
-    <div className="flex items-center gap-2 px-2 py-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg">
-      {buttons.map(({ action, label, loadingLabel, icon }) => (
-        <button
-          key={action}
-          type="button"
-          onClick={() => handleAI(action)}
-          disabled={loading !== null}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label={label}
-        >
-          <span aria-hidden="true">{icon}</span>
-          {loading === action ? loadingLabel : label}
-        </button>
-      ))}
+    <div className="px-2 py-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg">
+      <ActionGate cost={1}>{() => (
+        <div className="flex items-center gap-2">
+          {buttons.map(({ action, label, loadingLabel, icon }) => (
+            <button
+              key={action}
+              type="button"
+              onClick={() => handleAI(action)}
+              disabled={loading !== null}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label={label}
+            >
+              <span aria-hidden="true">{icon}</span>
+              {loading === action ? loadingLabel : label}
+            </button>
+          ))}
+        </div>
+      )}</ActionGate>
     </div>
   )
 }

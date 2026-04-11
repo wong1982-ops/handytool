@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { FontStyle, FONT_STYLES, FONT_COLOR_PALETTES } from '@/tools/font-generator/types'
 import { getSavedPalettes } from '@/tools/color-palette/palette-storage'
+import { ActionGate } from '@/components/auth/action-gate'
 
 interface DescribeStepProps {
   stylePreset: FontStyle | null
@@ -362,14 +363,18 @@ export function DescribeStep({
 
       {/* Next button */}
       <div className="pt-1">
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={!isNextEnabled}
-          className="w-full bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white font-semibold rounded-xl min-h-[44px] cursor-pointer transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          Next
-        </button>
+        <ActionGate cost={1}>
+          {() => (
+            <button
+              type="button"
+              onClick={onNext}
+              disabled={!isNextEnabled}
+              className="w-full bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white font-semibold rounded-xl min-h-[44px] cursor-pointer transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          )}
+        </ActionGate>
       </div>
     </div>
   )

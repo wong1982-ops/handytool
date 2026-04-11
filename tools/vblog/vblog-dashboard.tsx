@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { tools } from '@/lib/tools'
+import { useDraftSnapshot } from '@/lib/hooks/use-draft'
+import { ActionGate } from '@/components/auth/action-gate'
 import { JobProgress } from './job-progress'
 import { TemplateUpload } from './template-upload'
 import type { VBlogJob, ScriptStyle, VoiceType } from './types'
@@ -21,6 +23,17 @@ export default function VBlogDashboard() {
   const [scriptStyle, setScriptStyle] = useState<ScriptStyle>('feature-walkthrough')
   const [voiceType, setVoiceType] = useState<VoiceType>('ai')
   const [duration, setDuration] = useState(DURATION_OPTIONS[1].value)
+
+  useDraftSnapshot(
+    'vblog:draft',
+    { selectedTool, scriptStyle, voiceType, duration },
+    (s) => {
+      if (s.selectedTool !== undefined) setSelectedTool(s.selectedTool)
+      if (s.scriptStyle !== undefined) setScriptStyle(s.scriptStyle)
+      if (s.voiceType !== undefined) setVoiceType(s.voiceType)
+      if (s.duration !== undefined) setDuration(s.duration)
+    },
+  )
 
   const fetchJobs = useCallback(async () => {
     try {
@@ -214,14 +227,16 @@ export default function VBlogDashboard() {
             )}
 
             {/* Generate button */}
-            <button
-              type="button"
-              onClick={handleGenerate}
-              disabled={generating || !selectedTool}
-              className="w-full bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white font-semibold rounded-xl min-h-[44px] px-6 py-3 text-sm cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
-            >
-              {generating ? 'Generating...' : `Generate ${selectedToolObj?.name ?? ''} Video`}
-            </button>
+            <ActionGate cost={1}>{() => (
+              <button
+                type="button"
+                onClick={handleGenerate}
+                disabled={generating || !selectedTool}
+                className="w-full bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] text-white font-semibold rounded-xl min-h-[44px] px-6 py-3 text-sm cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+              >
+                {generating ? 'Generating...' : `Generate ${selectedToolObj?.name ?? ''} Video`}
+              </button>
+            )}</ActionGate>
           </div>
 
           {/* Job list */}

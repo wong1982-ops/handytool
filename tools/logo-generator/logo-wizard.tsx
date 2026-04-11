@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { LogoProject, DEFAULT_PROJECT, WizardStep } from '@/tools/logo-generator/types'
+import { useDraft } from '@/lib/hooks/use-draft'
 import { BusinessInfoStep } from '@/tools/logo-generator/business-info-step'
 import { StyleStep } from '@/tools/logo-generator/style-step'
 import ConceptsGrid from '@/tools/logo-generator/concepts-grid'
@@ -25,6 +26,7 @@ const STEP_SUBTITLES: Record<WizardStep, string> = {
 export default function LogoWizard() {
   const [project, setProject] = useState<LogoProject>(DEFAULT_PROJECT)
   const [activeTab, setActiveTab] = useState<Tab>('create')
+  const draft = useDraft('logo-generator:draft', project, setProject, ['loading', 'error'])
 
   // --- Generation ---
   const handleGenerate = useCallback(async (proj: LogoProject) => {
@@ -100,9 +102,10 @@ export default function LogoWizard() {
   }, [handleGenerate, project])
 
   const handleStartOver = useCallback(() => {
+    draft.clear()
     setProject(DEFAULT_PROJECT)
     setActiveTab('create')
-  }, [])
+  }, [draft])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleLoadFromHistory = useCallback((entry: any) => {

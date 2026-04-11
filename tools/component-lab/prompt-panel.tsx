@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ComponentSettings } from './types'
 import { PROMPT_PLACEHOLDERS } from './types'
+import { ActionGate } from '@/components/auth/action-gate'
 
 interface PromptPanelProps {
   prompt: string
@@ -305,6 +306,7 @@ export default function PromptPanel({
       </section>
 
       {/* 4. Generate Button */}
+      <ActionGate cost={1}>{() => (
       <button
         type="button"
         onClick={onGenerate}
@@ -355,6 +357,7 @@ export default function PromptPanel({
           </>
         )}
       </button>
+      )}</ActionGate>
     </div>
   )
 }

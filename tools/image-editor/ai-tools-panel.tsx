@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useAuth } from '@/lib/hooks/use-auth'
+import { ActionGate } from '@/components/auth/action-gate'
 
 interface AiToolsPanelProps {
   isReady: boolean
@@ -38,7 +38,6 @@ export function AiToolsPanel({
   onGenerativeFillCancel,
   activeAiTool,
 }: AiToolsPanelProps) {
-  const { user, loading: authLoading } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
   const [brushSize, setBrushSize] = useState(30)
   const [inpaintPrompt, setInpaintPrompt] = useState('')
@@ -46,35 +45,6 @@ export function AiToolsPanel({
   const [enhanceMode, setEnhanceMode] = useState<EnhanceMode>('upscale')
 
   const disabled = !isReady || aiProcessing
-
-  // Auth gate
-  if (!authLoading && !user) {
-    return (
-      <div className="p-4 border-b border-slate-700">
-        <h3
-          className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2 cursor-pointer select-none"
-          onClick={() => setCollapsed(!collapsed)}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-          </svg>
-          AI Tools
-        </h3>
-        <div className="rounded-lg bg-slate-800/50 p-4 text-center">
-          <svg className="w-8 h-8 text-slate-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-          <p className="text-xs text-slate-400 mb-2">Sign in to use AI tools</p>
-          <a
-            href="/auth/login"
-            className="inline-block text-xs font-medium text-[var(--tk-color-primary-500)] hover:underline"
-          >
-            Sign in
-          </a>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="p-4 border-b border-slate-700">
@@ -97,6 +67,7 @@ export function AiToolsPanel({
       </button>
 
       {collapsed ? null : (
+        <ActionGate cost={1}>{() => (
         <div className="space-y-2">
           {/* Error banner */}
           {aiError && (
@@ -297,6 +268,7 @@ export function AiToolsPanel({
             </>
           )}
         </div>
+        )}</ActionGate>
       )}
     </div>
   )

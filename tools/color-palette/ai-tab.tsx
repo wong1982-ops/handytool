@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/lib/hooks/use-auth'
+import { useDraftSnapshot } from '@/lib/hooks/use-draft'
+import { ActionGate } from '@/components/auth/action-gate'
 import { signInWithOAuth } from '@/lib/supabase/auth'
 
 interface AITabProps {
@@ -35,6 +37,11 @@ export function AITab({ onApply }: AITabProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  useDraftSnapshot('color-palette-ai:draft', { prompt, selectedPreset }, (s) => {
+    if (s.prompt !== undefined) setPrompt(s.prompt)
+    if (s.selectedPreset !== undefined) setSelectedPreset(s.selectedPreset)
+  })
+
   function handlePresetClick(name: string) {
     setSelectedPreset(name)
     setGeneratedColors(PRESET_PALETTES[name])
@@ -60,13 +67,7 @@ export function AITab({ onApply }: AITabProps) {
       const json = await res.json()
 
       if (!res.ok) {
-        if (json.code === 'INSUFFICIENT_CREDITS') {
-          setError('Not enough credits. Top up to use AI generation.')
-        } else if (json.code === 'UNAUTHORIZED') {
-          setError('Please sign in to use AI generation.')
-        } else {
-          setError(json.error || 'Failed to generate palette.')
-        }
+        setError(json.error || 'Failed to generate palette.')
         return
       }
 
@@ -134,6 +135,7 @@ export function AITab({ onApply }: AITabProps) {
       </div>
 
       {/* Generate button */}
+      <ActionGate cost={1}>{() => (
       <button
         type="button"
         onClick={handleGenerate}
@@ -159,6 +161,7 @@ export function AITab({ onApply }: AITabProps) {
           </>
         )}
       </button>
+      )}</ActionGate>
 
       {/* Error */}
       {error && (

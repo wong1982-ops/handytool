@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { z } from 'zod'
+import { getAuthUserId } from '@/lib/api/response'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -9,6 +10,9 @@ const schema = z.object({
 })
 
 export async function POST(request: Request) {
+  const userId = await getAuthUserId()
+  if (!userId) return new Response('Unauthorized', { status: 401 })
+
   let body: unknown
   try { body = await request.json() } catch {
     return new Response('Invalid JSON', { status: 400 })

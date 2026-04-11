@@ -1,4 +1,4 @@
-import { API_ERRORS } from '@/lib/api/response'
+import { API_ERRORS, getAuthUserId } from '@/lib/api/response'
 import { refineRequestSchema } from '@/lib/story/types'
 import { refineConceptStream } from '@/lib/story/enrich'
 
@@ -7,6 +7,9 @@ function sseEvent(data: Record<string, unknown>): string {
 }
 
 export async function POST(request: Request) {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
   let body: unknown
   try {
     body = await request.json()

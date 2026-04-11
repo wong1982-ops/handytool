@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect, useRef, type DragEvent, type ChangeEvent } from 'react'
+import { useIdbDraftSnapshot } from '@/lib/hooks/use-idb-draft'
 import { EditorToolbar, type ToolType } from '@/tools/image-editor/editor-toolbar'
 import { PropertiesBar } from '@/tools/image-editor/properties-bar'
 import { type ShapeType, type ShapeStyle, DEFAULT_SHAPE_STYLE, SHAPE_TYPES } from '@/tools/image-editor/shape-tools'
@@ -50,7 +51,33 @@ export default function ImageEditorPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const layerFileInputRef = useRef<HTMLInputElement>(null)
 
+  // Source image dataUrl — persisted so the user's upload survives sign-in
+  const [sourceDataUrl, setSourceDataUrl] = useState<string | null>(null)
+  const restoredImageRef = useRef(false)
+
   const fabric = useFabricCanvas()
+
+  useIdbDraftSnapshot('image-editor:draft', { sourceDataUrl }, (s) => {
+    if (s.sourceDataUrl !== undefined) setSourceDataUrl(s.sourceDataUrl)
+  })
+
+  // When fabric becomes ready and we have a persisted dataUrl, restore it once
+  useEffect(() => {
+    if (restoredImageRef.current) return
+    if (!fabric.isReady || !sourceDataUrl) return
+    restoredImageRef.current = true
+    ;(async () => {
+      try {
+        const res = await fetch(sourceDataUrl)
+        const blob = await res.blob()
+        const file = new File([blob], 'restored-image.png', { type: blob.type || 'image/png' })
+        fabric.loadImage(file)
+      } catch {
+        // ignore restore failures
+      }
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fabric.isReady, sourceDataUrl])
 
   // Sync state to Fabric canvas
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -206,6 +233,16 @@ export default function ImageEditorPage() {
     setActiveFilter('natural')
     setFilterIntensity(100)
     setFilterThumbnails({})
+    // Capture dataUrl for persistence
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const url = e.target?.result
+      if (typeof url === 'string') {
+        restoredImageRef.current = true // user-initiated load — skip auto-restore
+        setSourceDataUrl(url)
+      }
+    }
+    reader.readAsDataURL(file)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fabric.loadImage])
 

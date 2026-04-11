@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useDraftSnapshot } from '@/lib/hooks/use-draft'
+import { ActionGate } from '@/components/auth/action-gate'
 import {
   ART_STYLES,
   estimateCredits,
@@ -24,6 +26,11 @@ interface SettingsFormProps {
 export default function SettingsForm({ selectedBook, onGenerate, generating }: SettingsFormProps) {
   const [artStyle, setArtStyle] = useState<ArtStyle>('cartoon')
   const [duration, setDuration] = useState<DurationPreset>('auto')
+
+  useDraftSnapshot('story-video:draft', { artStyle, duration }, (s) => {
+    if (s.artStyle !== undefined) setArtStyle(s.artStyle)
+    if (s.duration !== undefined) setDuration(s.duration)
+  })
 
   const credits = selectedBook ? estimateCredits(selectedBook.pageCount, duration) : 0
   const disabled = !selectedBook || generating
@@ -88,6 +95,7 @@ export default function SettingsForm({ selectedBook, onGenerate, generating }: S
 
       {/* Credit Estimate + Generate */}
       <div className="flex items-center gap-4">
+        <ActionGate cost={credits || 1}>{() => (
         <button
           type="button"
           disabled={disabled}
@@ -115,6 +123,7 @@ export default function SettingsForm({ selectedBook, onGenerate, generating }: S
             </>
           )}
         </button>
+        )}</ActionGate>
 
         {!selectedBook && (
           <p className="text-[#70767f] text-xs">Select a book to get started</p>

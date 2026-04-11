@@ -1,4 +1,4 @@
-import { apiSuccess, apiError } from '@/lib/api/response'
+import { apiSuccess, apiError, getAuthUserId, API_ERRORS } from '@/lib/api/response'
 import { uploadToR2 } from '@/lib/storage/r2'
 import { buildCharPrompt } from '@/lib/font-generator/prompts'
 import { callGeminiImage } from '@/lib/font-generator/gemini'
@@ -8,6 +8,9 @@ import type { FontStyle } from '@/tools/font-generator/types'
 export const maxDuration = 60
 
 export async function POST(request: Request) {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
   let body: {
     projectId: string
     stylePreset: string

@@ -1,6 +1,8 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useDraftSnapshot } from '@/lib/hooks/use-draft'
+import { ActionGate } from '@/components/auth/action-gate'
 
 interface ChatInputProps {
   onSend: (content: string) => void
@@ -11,6 +13,10 @@ interface ChatInputProps {
 export function ChatInput({ onSend, sending, disabled }: ChatInputProps) {
   const [input, setInput] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useDraftSnapshot('accountant-ai-chat:draft', { input }, (s) => {
+    if (s.input !== undefined) setInput(s.input)
+  })
 
   const canSend = input.trim().length > 0 && !sending && !disabled
 
@@ -54,6 +60,7 @@ export function ChatInput({ onSend, sending, disabled }: ChatInputProps) {
             style={{ height: '44px' }}
           />
 
+          <ActionGate cost={1}>{() => (
           <button
             onClick={handleSend}
             disabled={!canSend}
@@ -100,6 +107,7 @@ export function ChatInput({ onSend, sending, disabled }: ChatInputProps) {
               </svg>
             )}
           </button>
+          )}</ActionGate>
         </div>
 
         <div className="flex justify-end">

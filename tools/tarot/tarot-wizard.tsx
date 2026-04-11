@@ -46,7 +46,7 @@ export default function TarotWizard() {
   }, [])
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-6xl mx-auto">
       {/* Title + language toggle */}
       <div className="flex items-center justify-center gap-3 mb-2">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white text-center tracking-tight">

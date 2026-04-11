@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useDraftSnapshot } from '@/lib/hooks/use-draft'
 import {
   type StudioMode,
   type LyriaConfig,
@@ -28,6 +29,11 @@ export default function MusicStudio() {
   const [customPrompt, setCustomPrompt] = useState('')
   const [showControls, setShowControls] = useState(false)
   const [activeTab, setActiveTab] = useState<'studio' | 'history'>('studio')
+
+  useDraftSnapshot('music-studio:draft', { mode, customPrompt }, (s) => {
+    if (s.mode !== undefined) setMode(s.mode)
+    if (s.customPrompt !== undefined) setCustomPrompt(s.customPrompt)
+  })
 
   /* ─── Lyria Hook ─── */
   const {

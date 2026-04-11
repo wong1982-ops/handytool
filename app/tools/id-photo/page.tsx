@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import { useIdbDraftSnapshot } from '@/lib/hooks/use-idb-draft'
+import { ActionGate } from '@/components/auth/action-gate'
 import { InteractiveCanvas } from '@/tools/id-photo/interactive-canvas'
 import { FormatSelector } from '@/tools/id-photo/format-selector'
 import { AdjustmentsPanel } from '@/tools/id-photo/adjustments-panel'
@@ -50,6 +52,20 @@ export default function IdPhotoPage() {
   const [toast, setToast] = useState<string | null>(null)
   const [downloading, setDownloading] = useState(false)
 
+  // Persist photo + selections to IndexedDB so the user's work survives sign-in
+  useIdbDraftSnapshot(
+    'id-photo:draft',
+    { photoUrl, selectedFormatId, transform, adjustments, bgColor, compliance },
+    (s) => {
+      if (s.photoUrl !== undefined) setPhotoUrl(s.photoUrl)
+      if (s.selectedFormatId !== undefined) setSelectedFormatId(s.selectedFormatId)
+      if (s.transform !== undefined) setTransform(s.transform)
+      if (s.adjustments !== undefined) setAdjustments(s.adjustments)
+      if (s.bgColor !== undefined) setBgColor(s.bgColor)
+      if (s.compliance !== undefined) setCompliance(s.compliance)
+    },
+  )
+
   const selectedFormat = PHOTO_FORMATS.find((f) => f.id === selectedFormatId) || PHOTO_FORMATS[0]
 
   // --- Toast helper ---
@@ -77,10 +93,15 @@ export default function IdPhotoPage() {
       setTransform(DEFAULT_TRANSFORM)
       showToast('Analyzing face...')
       analyzeFace(file)
-      runEnhance(url)
+      // AI enhance is now opt-in via the "Enhance with AI" button (ActionGate'd)
     }
     reader.readAsDataURL(file)
-  }, [showToast])
+  }, [showToast, analyzeFace])
+
+  // Manual AI enhance trigger — gated by ActionGate
+  const handleEnhanceClick = useCallback(() => {
+    if (photoUrl) runEnhance(photoUrl)
+  }, [photoUrl, runEnhance])
 
   // --- Map server compliance to component state ---
   useEffect(() => {
@@ -344,6 +365,24 @@ export default function IdPhotoPage() {
             onTransformChange={setTransform}
             onFileSelect={handleFileSelect}
           />
+
+          {/* Manual AI enhance trigger — shown after upload, before enhance starts */}
+          {photoUrl && enhanceState === 'idle' && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30">
+              <ActionGate cost={1}>{() => (
+                <button
+                  type="button"
+                  onClick={handleEnhanceClick}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#3D6AF2] text-white px-5 py-3 text-sm font-semibold shadow-lg hover:bg-[#3D79F2] cursor-pointer min-h-[44px]"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                  Enhance with AI
+                </button>
+              )}</ActionGate>
+            </div>
+          )}
 
           {/* AI enhancing / bg removal overlay */}
           {(enhanceState === 'enhancing' || enhanceState === 'removing-bg') && (

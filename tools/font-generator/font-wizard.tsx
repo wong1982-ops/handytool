@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { FontProject, DEFAULT_FONT_PROJECT, WizardStep, FontCharacter } from '@/tools/font-generator/types'
+import { useDraft } from '@/lib/hooks/use-draft'
 import { DescribeStep } from './describe-step'
 import { PreviewStep } from './preview-step'
 import { AlphabetGrid } from './alphabet-grid'
@@ -13,6 +14,8 @@ type Tab = 'create' | 'history'
 
 const STEPS: WizardStep[] = [1, 2, 3, 4, 5]
 const STEP_LABELS = ['Describe', 'Preview', 'Generate', 'Refine', 'Download']
+
+const DRAFT_KEY = 'font-generator:draft'
 
 const STEP_SUBTITLES: Record<WizardStep, string> = {
   1: 'Choose your font style',
@@ -26,6 +29,8 @@ export default function FontWizard() {
   const [project, setProject] = useState<FontProject>(DEFAULT_FONT_PROJECT)
   const [activeTab, setActiveTab] = useState<Tab>('create')
   const [regeneratingChar, setRegeneratingChar] = useState<string | null>(null)
+
+  const draft = useDraft(DRAFT_KEY, project, setProject, ['loading', 'error'])
 
   // --- Preview (step 1 → 2) ---
   const handlePreview = useCallback(async (proj: FontProject) => {
@@ -79,6 +84,10 @@ export default function FontWizard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           projectId: project.projectId,
+          stylePreset: project.stylePreset,
+          customPrompt: project.customPrompt || undefined,
+          colors: project.colors,
+          referenceImageBase64: project.referenceImageBase64 || undefined,
           existingChars,
         }),
       })
@@ -134,6 +143,10 @@ export default function FontWizard() {
         body: JSON.stringify({
           projectId: project.projectId,
           char,
+          stylePreset: project.stylePreset,
+          customPrompt: project.customPrompt || undefined,
+          colors: project.colors,
+          referenceImageBase64: project.referenceImageBase64 || undefined,
         }),
       })
 
@@ -158,7 +171,7 @@ export default function FontWizard() {
     } finally {
       setRegeneratingChar(null)
     }
-  }, [project.projectId])
+  }, [project.projectId, project.stylePreset, project.customPrompt, project.colors, project.referenceImageBase64])
 
   // --- Navigation ---
   const handleBack = useCallback(() => {
@@ -169,9 +182,10 @@ export default function FontWizard() {
   }, [])
 
   const handleStartOver = useCallback(() => {
+    draft.clear()
     setProject(DEFAULT_FONT_PROJECT)
     setActiveTab('create')
-  }, [])
+  }, [draft])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleLoadFromHistory = useCallback((entry: any) => {

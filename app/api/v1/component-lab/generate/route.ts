@@ -1,5 +1,5 @@
 // app/api/v1/component-lab/generate/route.ts
-import { apiSuccess, apiError } from '@/lib/api/response'
+import { apiSuccess, apiError, getAuthUserId, API_ERRORS } from '@/lib/api/response'
 import { buildGeneratePrompt } from '@/tools/component-lab/prompts'
 import type { ComponentSettings, GeneratedCode } from '@/tools/component-lab/types'
 
@@ -8,6 +8,9 @@ export const maxDuration = 30
 const GEMINI_API_KEY = (process.env.GEMINI_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
 
 export async function POST(request: Request) {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
   let body: { prompt: string; settings: ComponentSettings; referenceImageBase64?: string }
   try {
     body = await request.json()

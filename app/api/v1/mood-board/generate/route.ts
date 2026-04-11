@@ -1,5 +1,5 @@
 // app/api/v1/mood-board/generate/route.ts
-import { apiSuccess, apiError } from '@/lib/api/response'
+import { apiSuccess, apiError, getAuthUserId, API_ERRORS } from '@/lib/api/response'
 import { uploadToR2 } from '@/lib/storage/r2'
 import { callGeminiImage, callGeminiText } from '@/lib/mood-board/gemini'
 import { buildMoodImagePrompt, buildPalettePrompt } from '@/lib/mood-board/prompts'
@@ -9,6 +9,9 @@ import type { BoardElement, MoodOption, ColorPreference } from '@/tools/mood-boa
 export const maxDuration = 60
 
 export async function POST(request: Request) {
+  const userId = await getAuthUserId()
+  if (!userId) return API_ERRORS.UNAUTHORIZED()
+
   let body: { theme: string; mood?: string; colorPreference?: string }
   try {
     body = await request.json()

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@/lib/hooks/use-auth'
+import { useDraft } from '@/lib/hooks/use-draft'
 import { signInWithOAuth } from '@/lib/supabase/auth'
 import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
 import { BusinessInfoForm } from '@/tools/ecard-studio/ai-card/business-info-form'
@@ -26,6 +27,7 @@ const STEP_LABELS = ['Info', 'Brand', 'Generate', 'Refine', 'Download'] as const
 export default function AIBusinessCardPage() {
   const { user, loading: authLoading } = useAuth()
   const [state, setState] = useState<WizardState>(DEFAULT_WIZARD_STATE)
+  useDraft('ecard-ai-card:draft', state, setState, ['loading', 'error'])
   const [designHistory, setDesignHistory] = useState<GeneratedDesign[]>([])
   const generateTriggered = useRef(false)
 

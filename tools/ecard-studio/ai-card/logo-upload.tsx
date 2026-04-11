@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback } from 'react'
 import type { BrandAnalysis } from '@/tools/ecard-studio/ai-card/types'
+import { ActionGate } from '@/components/auth/action-gate'
 
 interface LogoUploadProps {
   logoDataUrl: string | null
@@ -246,16 +247,18 @@ export function LogoUpload({
             >
               Remove
             </button>
-            <button
-              type="button"
-              onClick={onAnalyze}
-              disabled={loading}
-              className="min-h-[44px] rounded-lg bg-[var(--tk-color-primary-500)] px-4 py-2
-                text-sm font-medium text-white transition-colors
-                hover:bg-[var(--tk-color-primary-600)] disabled:opacity-50"
-            >
-              {loading ? 'Analyzing...' : 'Analyze Brand'}
-            </button>
+            <ActionGate cost={1}>{() => (
+              <button
+                type="button"
+                onClick={onAnalyze}
+                disabled={loading}
+                className="min-h-[44px] rounded-lg bg-[var(--tk-color-primary-500)] px-4 py-2
+                  text-sm font-medium text-white transition-colors
+                  hover:bg-[var(--tk-color-primary-600)] disabled:opacity-50"
+              >
+                {loading ? 'Analyzing...' : 'Analyze Brand'}
+              </button>
+            )}</ActionGate>
           </div>
         </div>
       )}

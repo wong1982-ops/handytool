@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import type { MoodOption, ColorPreference } from './types'
 import { MOOD_CARDS, TEMPLATES } from './wizard-moods'
+import { useDraftSnapshot } from '@/lib/hooks/use-draft'
+import { ActionGate } from '@/components/auth/action-gate'
 
 interface WizardProps {
   onGenerate: (params: { theme: string; mood: MoodOption; colorPreference: ColorPreference }) => void
@@ -24,6 +26,17 @@ export default function Wizard({ onGenerate, onViewBoards }: WizardProps) {
   const [mood, setMood] = useState<MoodOption | null>(null)
   const [colorPreference, setColorPreference] = useState<ColorPreference>('surprise')
   const [showTemplates, setShowTemplates] = useState(false)
+
+  useDraftSnapshot(
+    'mood-board:draft',
+    { step, theme, mood, colorPreference },
+    (s) => {
+      if (s.step !== undefined) setStep(s.step)
+      if (s.theme !== undefined) setTheme(s.theme)
+      if (s.mood !== undefined) setMood(s.mood)
+      if (s.colorPreference !== undefined) setColorPreference(s.colorPreference)
+    },
+  )
 
   const handleTemplateClick = (templateTheme: string) => {
     setTheme(templateTheme)
@@ -239,15 +252,19 @@ export default function Wizard({ onGenerate, onViewBoards }: WizardProps) {
             </div>
 
             <div className="w-full max-w-[380px] mx-auto flex flex-col gap-3">
-              <button
-                onClick={handleGenerate}
-                className="w-full bg-gradient-to-r from-[#3D6AF2] to-[#3D9DF2] text-white rounded-xl min-h-[44px] px-6 py-3 font-semibold text-[15px] hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-2"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
-                </svg>
-                Generate Board
-              </button>
+              <ActionGate cost={1}>
+                {() => (
+                  <button
+                    onClick={handleGenerate}
+                    className="w-full bg-gradient-to-r from-[#3D6AF2] to-[#3D9DF2] text-white rounded-xl min-h-[44px] px-6 py-3 font-semibold text-[15px] hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-2"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
+                    </svg>
+                    Generate Board
+                  </button>
+                )}
+              </ActionGate>
               <button
                 onClick={() => setStep(2)}
                 className="w-full bg-[#131a23] border border-[#1e2631] text-[#a6abb5] hover:bg-[#1e2631] hover:text-white rounded-xl min-h-[44px] px-6 py-3 text-sm font-medium transition-colors"

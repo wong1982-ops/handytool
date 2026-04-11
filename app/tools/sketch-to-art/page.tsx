@@ -12,6 +12,8 @@ import SaveShare from '@/tools/sketch-to-art/save-share'
 import MyCreations from '@/tools/sketch-to-art/my-creations'
 import { ShowcaseGallery } from '@/tools/sketch-to-art/showcase-gallery'
 import { useAuth } from '@/lib/hooks/use-auth'
+import { useDraft } from '@/lib/hooks/use-draft'
+import { ActionGate } from '@/components/auth/action-gate'
 import { signInWithOAuth } from '@/lib/supabase/auth'
 import type {
   SketchMode,
@@ -27,6 +29,7 @@ const STEPS: WizardStep[] = [1, 2, 3, 4, 5]
 
 export default function SketchToArtPage() {
   const [state, setState] = useState<WizardState>(DEFAULT_WIZARD_STATE)
+  useDraft('sketch-to-art:draft', state, setState, ['loading', 'error'])
   const [mode, setMode] = useState<SketchMode>('fun')
   const [activeTab, setActiveTab] = useState<'create' | 'creations'>('create')
   const { user, loading: authLoading } = useAuth()
@@ -56,9 +59,6 @@ export default function SketchToArtPage() {
   }, [])
 
   const handleGenerate = useCallback(async () => {
-    // Auth gate: require sign-in before generation
-    if (!user && !authLoading) return
-
     setState((s) => ({ ...s, step: 3, loading: true, error: null, variations: [] }))
 
     try {
@@ -432,14 +432,20 @@ export default function SketchToArtPage() {
                   </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={handleGenerate}
-                  disabled={!state.selectedStyle && !state.customStyle.trim()}
-                  className="mt-6 w-full min-h-[44px] rounded-xl bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold text-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  {isFun ? '\u2728 Make Magic!' : 'Generate'}
-                </button>
+                <div className="mt-6">
+                  <ActionGate cost={1}>
+                    {() => (
+                      <button
+                        type="button"
+                        onClick={handleGenerate}
+                        disabled={!state.selectedStyle && !state.customStyle.trim()}
+                        className="w-full min-h-[44px] rounded-xl bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold text-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        {isFun ? '\u2728 Make Magic!' : 'Generate'}
+                      </button>
+                    )}
+                  </ActionGate>
+                </div>
               )}
             </div>
           )}

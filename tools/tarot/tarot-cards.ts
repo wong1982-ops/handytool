@@ -269,7 +269,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'wands',
     number: 2,
-    imageUrl: '/tarot/wands/02.webp',
+    imageUrl: '/tarot/wands/two.webp',
     meanings: {
       upright: { en: 'Planning and foresight open doors to future possibilities.', zh: '规划和远见为未来的可能性打开了大门。' },
       reversed: { en: 'Fear of the unknown or poor planning hinders progress.', zh: '对未知的恐惧或糟糕的规划阻碍了进步。' },
@@ -282,7 +282,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'wands',
     number: 3,
-    imageUrl: '/tarot/wands/03.webp',
+    imageUrl: '/tarot/wands/three.webp',
     meanings: {
       upright: { en: 'Expansion and progress reward your forward-thinking efforts.', zh: '扩展和进步回报了你的前瞻性努力。' },
       reversed: { en: 'Obstacles to growth or frustration with slow returns.', zh: '成长的障碍或对缓慢回报的沮丧。' },
@@ -295,7 +295,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'wands',
     number: 4,
-    imageUrl: '/tarot/wands/04.webp',
+    imageUrl: '/tarot/wands/four.webp',
     meanings: {
       upright: { en: 'Celebration, harmony, and a joyful homecoming await you.', zh: '庆祝、和谐和欢乐的团聚等待着你。' },
       reversed: { en: 'Lack of harmony at home or a celebration that feels hollow.', zh: '家庭缺乏和谐或感觉空洞的庆祝。' },
@@ -308,7 +308,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'wands',
     number: 5,
-    imageUrl: '/tarot/wands/05.webp',
+    imageUrl: '/tarot/wands/five.webp',
     meanings: {
       upright: { en: 'Conflict and competition challenge you to prove your mettle.', zh: '冲突和竞争挑战你证明自己的勇气。' },
       reversed: { en: 'Avoidance of conflict or resolution of ongoing disputes.', zh: '逃避冲突或正在解决持续的争端。' },
@@ -321,7 +321,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'wands',
     number: 6,
-    imageUrl: '/tarot/wands/06.webp',
+    imageUrl: '/tarot/wands/six.webp',
     meanings: {
       upright: { en: 'Victory, public recognition, and well-earned praise uplift you.', zh: '胜利、公众认可和当之无愧的赞誉鼓舞了你。' },
       reversed: { en: 'Ego, arrogance, or fear of public failure undermine your confidence.', zh: '自负、傲慢或对公开失败的恐惧削弱了你的信心。' },
@@ -334,7 +334,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'wands',
     number: 7,
-    imageUrl: '/tarot/wands/07.webp',
+    imageUrl: '/tarot/wands/seven.webp',
     meanings: {
       upright: { en: 'Courage and perseverance help you defend your position against opposition.', zh: '勇气和毅力帮助你抵御反对，捍卫自己的立场。' },
       reversed: { en: 'Feeling overwhelmed or giving up ground under pressure.', zh: '感到不堪重负或在压力下节节败退。' },
@@ -347,7 +347,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'wands',
     number: 8,
-    imageUrl: '/tarot/wands/08.webp',
+    imageUrl: '/tarot/wands/eight.webp',
     meanings: {
       upright: { en: 'Rapid progress and swift action propel events forward with momentum.', zh: '快速进展和迅速行动推动事件向前发展。' },
       reversed: { en: 'Delays, frustration, or scattered energy slow things down.', zh: '延迟、沮丧或分散的精力使事情放慢。' },
@@ -360,7 +360,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'wands',
     number: 9,
-    imageUrl: '/tarot/wands/09.webp',
+    imageUrl: '/tarot/wands/nine.webp',
     meanings: {
       upright: { en: 'Resilience and determination keep you standing despite past wounds.', zh: '韧性和决心让你尽管有过去的创伤仍然坚持。' },
       reversed: { en: 'Exhaustion, paranoia, or refusal to compromise weaken your stance.', zh: '疲惫、偏执或拒绝妥协削弱了你的立场。' },
@@ -373,7 +373,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'wands',
     number: 10,
-    imageUrl: '/tarot/wands/10.webp',
+    imageUrl: '/tarot/wands/ten.webp',
     meanings: {
       upright: { en: 'Heavy burdens and responsibilities weigh on you as you near completion.', zh: '沉重的负担和责任在你接近完成时压着你。' },
       reversed: { en: 'Delegation or release of unnecessary burdens brings relief.', zh: '委派或释放不必要的负担带来了解脱。' },
@@ -455,7 +455,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'cups',
     number: 2,
-    imageUrl: '/tarot/cups/02.webp',
+    imageUrl: '/tarot/cups/two.webp',
     meanings: {
       upright: { en: 'A mutual attraction and unified partnership form a deep bond.', zh: '相互的吸引和统一的伙伴关系形成了深厚的纽带。' },
       reversed: { en: 'Imbalance in a relationship or a broken connection.', zh: '关系中的不平衡或断裂的联系。' },
@@ -468,7 +468,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'cups',
     number: 3,
-    imageUrl: '/tarot/cups/03.webp',
+    imageUrl: '/tarot/cups/three.webp',
     meanings: {
       upright: { en: 'Joyful celebration, friendship, and community lift your spirits.', zh: '欢乐的庆祝、友谊和社区提升了你的精神。' },
       reversed: { en: 'Overindulgence, gossip, or exclusion from a social group.', zh: '过度放纵、流言蜚语或被社交圈排斥。' },
@@ -481,7 +481,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'cups',
     number: 4,
-    imageUrl: '/tarot/cups/04.webp',
+    imageUrl: '/tarot/cups/four.webp',
     meanings: {
       upright: { en: 'Contemplation and apathy cause you to overlook an offered opportunity.', zh: '沉思和冷漠使你忽略了一个提供的机会。' },
       reversed: { en: 'Renewed motivation or acceptance of a previously ignored offer.', zh: '重新的动力或接受之前忽略的提议。' },
@@ -494,7 +494,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'cups',
     number: 5,
-    imageUrl: '/tarot/cups/05.webp',
+    imageUrl: '/tarot/cups/five.webp',
     meanings: {
       upright: { en: 'Grief and regret over loss overshadow what still remains.', zh: '对失去的悲伤和遗憾掩盖了仍然存在的东西。' },
       reversed: { en: 'Moving on from grief and finding acceptance after loss.', zh: '从悲伤中走出来，在失去后找到接受。' },
@@ -507,7 +507,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'cups',
     number: 6,
-    imageUrl: '/tarot/cups/06.webp',
+    imageUrl: '/tarot/cups/six.webp',
     meanings: {
       upright: { en: 'Nostalgia, childhood memories, and innocent joy warm your heart.', zh: '怀旧、童年回忆和纯真的快乐温暖了你的心。' },
       reversed: { en: 'Living in the past or unrealistic romanticization of memories.', zh: '活在过去或对回忆的不切实际的浪漫化。' },
@@ -520,7 +520,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'cups',
     number: 7,
-    imageUrl: '/tarot/cups/07.webp',
+    imageUrl: '/tarot/cups/seven.webp',
     meanings: {
       upright: { en: 'Fantasy, wishful thinking, and many choices cloud your judgment.', zh: '幻想、一厢情愿和众多选择模糊了你的判断。' },
       reversed: { en: 'Clarity of purpose emerges from overwhelming options.', zh: '目标的清晰从令人眼花缭乱的选择中浮现。' },
@@ -533,7 +533,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'cups',
     number: 8,
-    imageUrl: '/tarot/cups/08.webp',
+    imageUrl: '/tarot/cups/eight.webp',
     meanings: {
       upright: { en: 'Walking away from something unfulfilling to seek deeper meaning.', zh: '离开不令人满足的事物去寻求更深的意义。' },
       reversed: { en: 'Fear of abandoning the familiar or aimless drifting.', zh: '害怕放弃熟悉的事物或漫无目的地漂泊。' },
@@ -546,7 +546,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'cups',
     number: 9,
-    imageUrl: '/tarot/cups/09.webp',
+    imageUrl: '/tarot/cups/nine.webp',
     meanings: {
       upright: { en: 'Wishes fulfilled and deep contentment bring emotional satisfaction.', zh: '愿望实现和深深的满足带来情感上的满意。' },
       reversed: { en: 'Materialism or superficial happiness masks deeper dissatisfaction.', zh: '物质主义或表面的幸福掩盖了更深的不满。' },
@@ -559,7 +559,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'cups',
     number: 10,
-    imageUrl: '/tarot/cups/10.webp',
+    imageUrl: '/tarot/cups/ten.webp',
     meanings: {
       upright: { en: 'Emotional bliss, family harmony, and lasting happiness are yours.', zh: '情感的幸福、家庭的和谐和持久的快乐属于你。' },
       reversed: { en: 'Family discord or unrealistic expectations of domestic bliss.', zh: '家庭不和或对家庭幸福的不切实际的期望。' },
@@ -641,7 +641,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'swords',
     number: 2,
-    imageUrl: '/tarot/swords/02.webp',
+    imageUrl: '/tarot/swords/two.webp',
     meanings: {
       upright: { en: 'A difficult choice requires careful weighing of options in stalemate.', zh: '一个困难的选择需要在僵局中仔细权衡选项。' },
       reversed: { en: 'Information revealed or a decision finally made after indecision.', zh: '信息被揭示或在犹豫不决后终于做出了决定。' },
@@ -654,7 +654,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'swords',
     number: 3,
-    imageUrl: '/tarot/swords/03.webp',
+    imageUrl: '/tarot/swords/three.webp',
     meanings: {
       upright: { en: 'Heartbreak, sorrow, and emotional pain demand to be felt and released.', zh: '心碎、悲伤和情感的痛苦需要被感受和释放。' },
       reversed: { en: 'Recovery from heartbreak or learning to forgive and heal.', zh: '从心碎中恢复或学会原谅和疗愈。' },
@@ -667,7 +667,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'swords',
     number: 4,
-    imageUrl: '/tarot/swords/04.webp',
+    imageUrl: '/tarot/swords/four.webp',
     meanings: {
       upright: { en: 'Rest, recovery, and mental retreat restore your depleted energy.', zh: '休息、恢复和精神上的退隐恢复你耗尽的能量。' },
       reversed: { en: 'Restlessness, burnout, or returning to action too soon.', zh: '不安、倦怠或过早地回到行动中。' },
@@ -680,7 +680,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'swords',
     number: 5,
-    imageUrl: '/tarot/swords/05.webp',
+    imageUrl: '/tarot/swords/five.webp',
     meanings: {
       upright: { en: 'A hollow victory won through conflict leaves bitterness in its wake.', zh: '通过冲突赢得的空洞胜利留下了苦涩。' },
       reversed: { en: 'Reconciliation or walking away from a no-win situation.', zh: '和解或从无赢局面中抽身。' },
@@ -693,7 +693,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'swords',
     number: 6,
-    imageUrl: '/tarot/swords/06.webp',
+    imageUrl: '/tarot/swords/six.webp',
     meanings: {
       upright: { en: 'Transition to calmer waters as you leave difficulties behind.', zh: '当你把困难抛在身后时，过渡到更平静的水域。' },
       reversed: { en: 'Resistance to necessary change or unresolved emotional baggage.', zh: '对必要变化的抗拒或未解决的情感包袱。' },
@@ -706,7 +706,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'swords',
     number: 7,
-    imageUrl: '/tarot/swords/07.webp',
+    imageUrl: '/tarot/swords/seven.webp',
     meanings: {
       upright: { en: 'Strategy and cunning are needed, but beware of deception.', zh: '需要策略和机智，但要小心欺骗。' },
       reversed: { en: 'Deception exposed or a confession that clears the air.', zh: '欺骗被揭露或坦白使空气清新。' },
@@ -719,7 +719,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'swords',
     number: 8,
-    imageUrl: '/tarot/swords/08.webp',
+    imageUrl: '/tarot/swords/eight.webp',
     meanings: {
       upright: { en: 'Self-imposed restrictions and negative thinking trap you in limitation.', zh: '自我设限和消极思维将你困在局限中。' },
       reversed: { en: 'Breaking free from mental prison and reclaiming personal power.', zh: '从精神牢笼中挣脱并重新获得个人力量。' },
@@ -732,7 +732,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'swords',
     number: 9,
-    imageUrl: '/tarot/swords/09.webp',
+    imageUrl: '/tarot/swords/nine.webp',
     meanings: {
       upright: { en: 'Anxiety, nightmares, and overwhelming worry disturb your peace.', zh: '焦虑、噩梦和压倒性的担忧扰乱了你的平静。' },
       reversed: { en: 'Finding hope after despair or releasing irrational fears.', zh: '在绝望后找到希望或释放非理性的恐惧。' },
@@ -745,7 +745,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'swords',
     number: 10,
-    imageUrl: '/tarot/swords/10.webp',
+    imageUrl: '/tarot/swords/ten.webp',
     meanings: {
       upright: { en: 'A painful ending or betrayal marks rock bottom, but dawn approaches.', zh: '痛苦的结局或背叛标志着谷底，但黎明正在到来。' },
       reversed: { en: 'Recovery from rock bottom and the worst is finally over.', zh: '从谷底恢复，最糟糕的终于结束了。' },
@@ -827,7 +827,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'pentacles',
     number: 2,
-    imageUrl: '/tarot/pentacles/02.webp',
+    imageUrl: '/tarot/pentacles/two.webp',
     meanings: {
       upright: { en: 'Adaptability and balance help you juggle multiple priorities skillfully.', zh: '适应力和平衡帮助你巧妙地兼顾多个优先事项。' },
       reversed: { en: 'Overwhelm from taking on too much or financial disorganization.', zh: '承担太多导致的不堪重负或财务混乱。' },
@@ -840,7 +840,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'pentacles',
     number: 3,
-    imageUrl: '/tarot/pentacles/03.webp',
+    imageUrl: '/tarot/pentacles/three.webp',
     meanings: {
       upright: { en: 'Teamwork, skilled collaboration, and craftsmanship produce excellent results.', zh: '团队合作、熟练的协作和精湛的工艺产生了卓越的成果。' },
       reversed: { en: 'Poor teamwork, lack of skill recognition, or misaligned goals.', zh: '糟糕的团队合作、缺乏技能认可或目标不一致。' },
@@ -853,7 +853,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'pentacles',
     number: 4,
-    imageUrl: '/tarot/pentacles/04.webp',
+    imageUrl: '/tarot/pentacles/four.webp',
     meanings: {
       upright: { en: 'Financial security through conservation, but beware of hoarding.', zh: '通过保守实现财务安全，但要小心囤积。' },
       reversed: { en: 'Generosity after releasing attachment or reckless spending.', zh: '放下执着后的慷慨或鲁莽消费。' },
@@ -866,7 +866,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'pentacles',
     number: 5,
-    imageUrl: '/tarot/pentacles/05.webp',
+    imageUrl: '/tarot/pentacles/five.webp',
     meanings: {
       upright: { en: 'Financial hardship and feeling left out in the cold test your resilience.', zh: '经济困难和被冷落的感觉考验着你的韧性。' },
       reversed: { en: 'Recovery from financial loss or finding help in difficult times.', zh: '从经济损失中恢复或在困难时期找到帮助。' },
@@ -879,7 +879,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'pentacles',
     number: 6,
-    imageUrl: '/tarot/pentacles/06.webp',
+    imageUrl: '/tarot/pentacles/six.webp',
     meanings: {
       upright: { en: 'Generosity and fair sharing of wealth create balanced exchange.', zh: '慷慨和公平分享财富创造了平衡的交换。' },
       reversed: { en: 'Strings attached to gifts or inequality in giving and receiving.', zh: '礼物附带条件或给予和接受的不平等。' },
@@ -892,7 +892,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'pentacles',
     number: 7,
-    imageUrl: '/tarot/pentacles/07.webp',
+    imageUrl: '/tarot/pentacles/seven.webp',
     meanings: {
       upright: { en: 'Patience during a period of assessment reveals the fruits of your labor.', zh: '在评估期间的耐心揭示了你劳动的成果。' },
       reversed: { en: 'Impatience with slow progress or poor return on investment.', zh: '对缓慢进展的不耐烦或投资回报不佳。' },
@@ -905,7 +905,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'pentacles',
     number: 8,
-    imageUrl: '/tarot/pentacles/08.webp',
+    imageUrl: '/tarot/pentacles/eight.webp',
     meanings: {
       upright: { en: 'Diligent work and mastery of a craft reward your dedicated effort.', zh: '勤奋工作和精通技艺回报了你的专注努力。' },
       reversed: { en: 'Perfectionism, lack of motivation, or misdirected effort.', zh: '完美主义、缺乏动力或方向错误的努力。' },
@@ -918,7 +918,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'pentacles',
     number: 9,
-    imageUrl: '/tarot/pentacles/09.webp',
+    imageUrl: '/tarot/pentacles/nine.webp',
     meanings: {
       upright: { en: 'Self-sufficiency, luxury, and refinement reflect your hard-earned success.', zh: '自给自足、奢华和精致反映了你来之不易的成功。' },
       reversed: { en: 'Financial dependence on others or overindulgence in luxury.', zh: '在经济上依赖他人或过度沉溺于奢华。' },
@@ -931,7 +931,7 @@ export const TAROT_CARDS: TarotCard[] = [
     arcana: 'minor',
     suit: 'pentacles',
     number: 10,
-    imageUrl: '/tarot/pentacles/10.webp',
+    imageUrl: '/tarot/pentacles/ten.webp',
     meanings: {
       upright: { en: 'Lasting wealth, family legacy, and long-term financial security are established.', zh: '持久的财富、家族遗产和长期财务安全已经建立。' },
       reversed: { en: 'Family financial disputes or loss of a long-standing legacy.', zh: '家庭财务纠纷或失去长期的遗产。' },

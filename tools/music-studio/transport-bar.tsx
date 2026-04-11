@@ -1,5 +1,7 @@
 'use client'
 
+import { ActionGate } from '@/components/auth/action-gate'
+
 interface TransportBarProps {
   status: 'idle' | 'connecting' | 'playing' | 'paused' | 'error'
   isRecording: boolean
@@ -81,12 +83,14 @@ export function TransportBar({
   if (status === 'idle') {
     return (
       <div className="flex items-center justify-center py-4">
-        <button
-          onClick={onConnect}
-          className="min-h-[44px] cursor-pointer rounded-full bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-900/30 transition-opacity hover:opacity-90"
-        >
-          Start Session
-        </button>
+        <ActionGate cost={1}>{() => (
+          <button
+            onClick={onConnect}
+            className="min-h-[44px] cursor-pointer rounded-full bg-gradient-to-r from-[#3D6AF2] to-[#7C3AED] px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-900/30 transition-opacity hover:opacity-90"
+          >
+            Start Session
+          </button>
+        )}</ActionGate>
       </div>
     )
   }

@@ -7,7 +7,7 @@ export default function TarotPage() {
       className="flex-1 flex flex-col items-center py-10 px-4 bg-white dark:bg-[#090f16]"
       style={{ overscrollBehaviorX: 'none' } as React.CSSProperties}
     >
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-6xl">
         <div className="mb-6">
           <ToolBreadcrumb toolName="Tarot Card Reading" toolSlug="tarot" />
         </div>

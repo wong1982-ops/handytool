@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { useResume } from '../resume-provider'
+import { ActionGate } from '@/components/auth/action-gate'
 import { RESUME_SAMPLES, type ResumeSample } from '../resume-samples'
 import type { AIAnalysisResponse, ResumeState } from '../resume-types'
 
@@ -161,13 +162,15 @@ export function ToolboxPanel() {
             {t.toolbox.aiAnalysisDescription}
           </p>
 
-          <button
-            onClick={handleAnalyze}
-            disabled={analyzing}
-            className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {analyzing ? t.ai.analyzing : t.ai.analyze}
-          </button>
+          <ActionGate cost={1}>{() => (
+            <button
+              onClick={handleAnalyze}
+              disabled={analyzing}
+              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {analyzing ? t.ai.analyzing : t.ai.analyze}
+            </button>
+          )}</ActionGate>
 
           {analysis && (
             <div className="mt-4 space-y-4">

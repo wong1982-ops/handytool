@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { LogoStyle, LOGO_STYLES, COLOR_PALETTES } from './types'
 import { getSavedPalettes } from '@/tools/color-palette/palette-storage'
+import { ActionGate } from '@/components/auth/action-gate'
 
 interface StyleStepProps {
   style: LogoStyle | null
@@ -269,15 +270,21 @@ export function StyleStep({
           </svg>
           Back
         </button>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={!isNextEnabled}
-          className="flex-1 flex items-center justify-center gap-2 text-white font-semibold rounded-xl min-h-[44px] cursor-pointer transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{ background: 'linear-gradient(135deg, #3D6AF2, #7C3AED)', boxShadow: '0 4px 20px rgba(61,106,242,0.3)' }}
-        >
-          Generate Logos
-        </button>
+        <div className="flex-1">
+          <ActionGate cost={1}>
+            {() => (
+              <button
+                type="button"
+                onClick={onNext}
+                disabled={!isNextEnabled}
+                className="w-full flex items-center justify-center gap-2 text-white font-semibold rounded-xl min-h-[44px] cursor-pointer transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: 'linear-gradient(135deg, #3D6AF2, #7C3AED)', boxShadow: '0 4px 20px rgba(61,106,242,0.3)' }}
+              >
+                Generate Logos
+              </button>
+            )}
+          </ActionGate>
+        </div>
       </div>
     </div>
   )
