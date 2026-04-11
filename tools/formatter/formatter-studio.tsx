@@ -20,6 +20,10 @@ import {
 import { en } from '@/tools/formatter/i18n/en'
 import { zh } from '@/tools/formatter/i18n/zh'
 import type { I18nStrings } from '@/tools/formatter/i18n/en'
+import { FormatterToolbar } from '@/tools/formatter/formatter-toolbar'
+import { FormatterEditor } from '@/tools/formatter/formatter-editor'
+import { FormatterDiff } from '@/tools/formatter/formatter-diff'
+import { FormatterStatusBar } from '@/tools/formatter/formatter-status-bar'
 
 export default function FormatterStudio() {
   const [state, setState] = useState<FormatterState>(DEFAULT_STATE)
@@ -166,8 +170,9 @@ export default function FormatterStudio() {
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+      {/* Title + language toggle */}
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
           {t.pageTitle}
         </h1>
         <button
@@ -181,21 +186,47 @@ export default function FormatterStudio() {
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
         {t.pageSubtitle}
       </p>
-      {/* Sub-components added in subsequent tasks */}
-      <div className="text-slate-400 text-sm">
-        Studio scaffold ready. Toolbar / editor / diff / status bar coming in next tasks.
-      </div>
-      {/* Suppress unused warnings until subcomponents are wired */}
-      <span hidden>
-        {String(state.loading)}
-        {String(handleInputChange)}
-        {String(handleInputBChange)}
-        {String(handleFormatChange)}
-        {String(handleActionChange)}
-        {String(handleConvertTargetChange)}
-        {String(handleRun)}
-        {String(effectiveFormat)}
-      </span>
+
+      {/* Toolbar */}
+      <FormatterToolbar
+        format={state.format}
+        detectedFormat={state.detectedFormat}
+        effectiveFormat={effectiveFormat}
+        action={state.action}
+        convertTarget={state.convertTarget}
+        loading={state.loading}
+        onFormatChange={handleFormatChange}
+        onActionChange={handleActionChange}
+        onConvertTargetChange={handleConvertTargetChange}
+        onRun={handleRun}
+        t={t}
+      />
+
+      {/* Main editing area — diff mode shows DiffComponent, else editor */}
+      {state.action === 'diff' ? (
+        <FormatterDiff
+          inputA={state.input}
+          inputB={state.inputB}
+          onInputAChange={handleInputChange}
+          onInputBChange={handleInputBChange}
+          t={t}
+        />
+      ) : (
+        <FormatterEditor
+          input={state.input}
+          output={state.output}
+          onInputChange={handleInputChange}
+          t={t}
+        />
+      )}
+
+      {/* Status bar */}
+      <FormatterStatusBar
+        output={state.output}
+        validation={state.validation}
+        effectiveFormat={effectiveFormat}
+        t={t}
+      />
     </div>
   )
 }
