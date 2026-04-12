@@ -217,7 +217,7 @@ function HomeInner() {
   // -------------------------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-32">
+    <div className="fixed inset-0 z-40 overflow-y-auto bg-slate-50 dark:bg-slate-950 pb-32">
       {/* Sticky top bar */}
       <header className="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm">
         <div className="flex items-center justify-between px-4 py-3">
@@ -320,7 +320,7 @@ function HomeInner() {
       </main>
 
       {/* Fixed bottom input bar */}
-      <div className="fixed bottom-0 inset-x-0 z-30">
+      <div className="fixed bottom-0 inset-x-0 z-50">
         {/* Settings panel (slides up from bottom) */}
         <MobileSettingsPanel
           open={settingsOpen}
