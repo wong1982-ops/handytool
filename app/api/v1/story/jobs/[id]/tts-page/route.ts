@@ -9,6 +9,21 @@ import {
 } from '@/lib/story/tts'
 
 /**
+ * Build narration text for Chinese TTS — single voice, natural reading.
+ * Includes dialogue inline with speaker attribution in Chinese.
+ */
+function buildChineseNarration(
+  narrativeText: string,
+  dialogue?: { speaker: string; line: string }[],
+): string {
+  let text = narrativeText
+  if (dialogue?.length) {
+    text += '。' + dialogue.map(d => `${d.speaker}说："${d.line}"`).join('。')
+  }
+  return text
+}
+
+/**
  * Filter bilingual text to keep only the target language.
  * Chinese is detected by Unicode ranges for CJK characters and punctuation.
  */
@@ -116,15 +131,22 @@ export const POST = withJobStep('tts_page', async (ctx) => {
   let lockedProvider: TtsProvider | undefined = job.state.ttsProvider as TtsProvider | undefined
 
   try {
-    if (lockedProvider === 'openai') {
-      const narration = buildPageNarration(narrativeText, dialogue)
+    // Chinese narration: use single voice for consistency (multi-voice Gemini is unstable with Chinese)
+    const useSingleVoice = narrationLanguage === 'zh' || lockedProvider === 'openai'
+
+    if (useSingleVoice) {
+      const narration = narrationLanguage === 'zh'
+        ? buildChineseNarration(narrativeText, dialogue)
+        : buildPageNarration(narrativeText, dialogue)
       const result = await generatePageAudio({
         text: narration,
         bookId,
         pageNumber: pageNum,
-        forceProvider: 'openai',
+        voiceName: narrationLanguage === 'zh' ? 'Kore' : undefined,
+        forceProvider: lockedProvider || undefined,
       })
       audioUrl = result.audioUrl
+      lockedProvider = result.provider
     } else {
       const segments = segmentPageAudio(narrativeText, dialogue, voiceMap)
       const result = await generateMultiVoicePageAudio({
