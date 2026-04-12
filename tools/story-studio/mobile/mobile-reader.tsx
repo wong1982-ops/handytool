@@ -14,6 +14,7 @@ import type { StoryBook, Page } from '@/tools/story-studio/types'
 
 export interface MobileReaderProps {
   book: StoryBook
+  bookId?: string
   isOwner?: boolean
   onEditPage?: (sequence: number) => void
   totalPages?: number
@@ -38,8 +39,10 @@ export function MobileReader(props: MobileReaderProps) {
 
 function ReaderInner({
   book,
+  bookId,
   isOwner = false,
   onEditPage,
+  totalPages: totalPagesProp,
   onPageChange,
 }: MobileReaderProps) {
   const router = useRouter()
@@ -144,21 +147,35 @@ function ReaderInner({
   // Audio playback
   // ------------------------------------------------------------------
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const autoPlayRef = useRef(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [autoPlay, setAutoPlay] = useState(false)
+
+  // Keep ref in sync for use inside audio event handlers
+  useEffect(() => { autoPlayRef.current = autoPlay }, [autoPlay])
 
   const stopAudio = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current = null
     }
+    setIsPlaying(false)
   }, [])
 
   const playCurrentPage = useCallback(() => {
     stopAudio()
     const page = currentPage === 0 ? null : contentPages[currentPage - 1]
-    if (!page?.audioUrl) return
+    if (!page?.audioUrl) {
+      // No audio: if auto-playing, advance after 3s pause
+      if (autoPlayRef.current && currentPage < totalContentPages) {
+        setTimeout(() => {
+          if (autoPlayRef.current) goNext()
+        }, 3000)
+      }
+      return
+    }
 
+    setIsPlaying(true)
     const audio = new Audio(page.audioUrl)
     audioRef.current = audio
     audio.play().catch(() => {
@@ -166,24 +183,21 @@ function ReaderInner({
       setAutoPlay(false)
     })
     audio.addEventListener('ended', () => {
-      if (autoPlay) {
+      setIsPlaying(false)
+      if (autoPlayRef.current && currentPage < totalContentPages) {
         goNext()
-      } else {
-        setIsPlaying(false)
       }
     })
-  }, [currentPage, contentPages, autoPlay, stopAudio, goNext])
+  }, [currentPage, contentPages, totalContentPages, stopAudio, goNext])
 
   const togglePlay = useCallback(() => {
-    if (isPlaying) {
+    if (isPlaying || autoPlay) {
       // Pause
       stopAudio()
-      setIsPlaying(false)
       setAutoPlay(false)
     } else {
       // Start
       setAutoPlay(true)
-      setIsPlaying(true)
       // If on cover, advance to page 1 first
       if (currentPage === 0) {
         setCurrentPage(1)
@@ -192,7 +206,7 @@ function ReaderInner({
         playCurrentPage()
       }
     }
-  }, [isPlaying, currentPage, stopAudio, playCurrentPage, onPageChange])
+  }, [isPlaying, autoPlay, currentPage, stopAudio, playCurrentPage, onPageChange])
 
   // When autoPlay is on and page changes (> 0), play after 400ms
   useEffect(() => {
@@ -204,6 +218,16 @@ function ReaderInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoPlay, currentPage])
 
+  // Lock body scroll while reader is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
+    }
+  }, [])
+
   // Cleanup audio on unmount
   useEffect(() => {
     return () => {
@@ -211,11 +235,12 @@ function ReaderInner({
     }
   }, [stopAudio])
 
-  // Check if current page has audio
-  const hasAudio =
-    currentPage > 0
-      ? Boolean(contentPages[currentPage - 1]?.audioUrl)
-      : false
+  // Check if any page has audio (for enabling play button)
+  const hasAnyAudio = contentPages.some((p) => Boolean(p.audioUrl))
+  const hasAudio = hasAnyAudio
+  // Check if book has illustrations/narration (for ⋯ menu)
+  const hasIllustrations = contentPages.some((p) => Boolean(p.imageUrl))
+  const hasNarration = hasAnyAudio
 
   // ------------------------------------------------------------------
   // Lightbox
@@ -330,6 +355,43 @@ function ReaderInner({
                     {language === 'zh' ? '编辑此页' : 'Edit This Page'}
                   </button>
                 )}
+                {/* Bulk generate options for owners */}
+                {isOwner && bookId && !hasIllustrations && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setMenuOpen(false)
+                      await fetch(`/api/v1/story/books/${bookId}/bulk-illustrate`, { method: 'POST' })
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-left"
+                    style={{ minHeight: '44px' }}
+                  >
+                    <svg className="w-4 h-4 text-[#3D6AF2]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
+                    </svg>
+                    {language === 'zh' ? '添加插画' : 'Add Illustrations'}
+                  </button>
+                )}
+                {isOwner && bookId && !hasNarration && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setMenuOpen(false)
+                      await fetch(`/api/v1/story/books/${bookId}/bulk-narrate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ narrationLanguage: language }),
+                      })
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-left"
+                    style={{ minHeight: '44px' }}
+                  >
+                    <svg className="w-4 h-4 text-purple-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                    </svg>
+                    {language === 'zh' ? '添加配音' : 'Add Narration'}
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -367,6 +429,8 @@ function ReaderInner({
         hasAudio={hasAudio}
         isPlaying={isPlaying}
         onTogglePlay={togglePlay}
+        onPrev={goPrev}
+        onNext={goNext}
         onShare={() => {/* handled inside MobileReaderControls */}}
       />
 

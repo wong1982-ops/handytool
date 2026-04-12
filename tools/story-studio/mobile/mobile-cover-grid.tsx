@@ -42,7 +42,7 @@ export default function MobileCoverGrid({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3 p-3">
+      <div className="grid grid-cols-2 gap-3">
         {/* In-progress job cards — shown first */}
         {activeJobs.map(jp => (
           <JobCard key={jp.job.id} jobProgress={jp} />

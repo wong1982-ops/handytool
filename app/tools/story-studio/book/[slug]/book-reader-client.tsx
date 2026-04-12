@@ -140,6 +140,7 @@ export function BookReaderClient({ bookData, bookId, isOwner, initialPages, page
       <LanguageProvider>
         <MobileReader
           book={book}
+          bookId={bookId}
           isOwner={isOwner}
           onEditPage={isOwner && bookId ? (sequence) => setEditingPage(sequence) : undefined}
           onPageChange={handlePageChange}

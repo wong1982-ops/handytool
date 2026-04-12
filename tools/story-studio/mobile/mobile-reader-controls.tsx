@@ -9,6 +9,8 @@ export interface MobileReaderControlsProps {
   hasAudio: boolean
   isPlaying: boolean
   onTogglePlay: () => void
+  onPrev: () => void
+  onNext: () => void
   onShare: () => void
 }
 
@@ -20,6 +22,8 @@ export default function MobileReaderControls({
   hasAudio,
   isPlaying,
   onTogglePlay,
+  onPrev,
+  onNext,
   onShare,
 }: MobileReaderControlsProps) {
   const { t } = useLanguage()
@@ -46,10 +50,10 @@ export default function MobileReaderControls({
       role="toolbar"
       aria-label="Reader controls"
     >
-      <div className="flex items-center justify-between px-4 py-2 gap-3">
+      <div className="flex items-center justify-between px-3 py-2 gap-1">
 
         {/* Left — page indicator */}
-        <div className="flex items-center min-w-0">
+        <div className="flex items-center min-w-0 w-16">
           {useDotsIndicator ? (
             <DotIndicator
               currentPage={currentPage}
@@ -64,38 +68,53 @@ export default function MobileReaderControls({
           )}
         </div>
 
-        {/* Right — action buttons */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Play / Pause button */}
+        {/* Right — prev / play / next / share — unified button style */}
+        <div className="flex items-center gap-1.5">
+          {/* Prev */}
+          <button
+            type="button"
+            onClick={onPrev}
+            disabled={currentPage === 0}
+            aria-label="Previous page"
+            className="flex items-center justify-center w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-25 disabled:cursor-default"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+          </button>
+
+          {/* Play / Pause — accent color */}
           <button
             type="button"
             onClick={onTogglePlay}
             disabled={!hasAudio}
             aria-label={isPlaying ? 'Pause narration' : 'Play narration'}
             className={[
-              'inline-flex items-center gap-1.5 rounded-full px-4 h-11 min-w-[80px] justify-center',
-              'text-sm font-medium text-white bg-[#3D6AF2]',
-              'transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3D6AF2] focus-visible:ring-offset-2',
-              !hasAudio ? 'opacity-30 cursor-not-allowed' : 'active:opacity-80',
+              'flex items-center justify-center rounded-full w-10 h-10',
+              hasAudio
+                ? 'bg-[#3D6AF2] text-white active:opacity-80'
+                : 'border border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed',
+              'transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3D6AF2]',
             ].join(' ')}
           >
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
-            <span className="leading-none">
-              {isPlaying ? 'Pause' : 'Play'}
-            </span>
           </button>
 
-          {/* Share button */}
+          {/* Next */}
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={currentPage >= totalPages}
+            aria-label="Next page"
+            className="flex items-center justify-center w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-25 disabled:cursor-default"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+          </button>
+
+          {/* Share */}
           <button
             type="button"
             onClick={handleShare}
             aria-label={copied ? t.viewer.copied : t.viewer.share}
-            className={[
-              'flex items-center justify-center rounded-full w-11 h-11 shrink-0',
-              'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300',
-              'transition-colors active:bg-slate-200 dark:active:bg-slate-700',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3D6AF2] focus-visible:ring-offset-2',
-            ].join(' ')}
+            className="flex items-center justify-center w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
           >
             {copied ? <CheckIcon /> : <ShareIcon />}
           </button>
