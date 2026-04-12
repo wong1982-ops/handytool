@@ -42,7 +42,7 @@ export default function MobileReaderControls({
 
   return (
     <div
-      className="fixed bottom-0 inset-x-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-t border-slate-200/60 dark:border-slate-800/60 pb-[env(safe-area-inset-bottom)]"
+      className="fixed bottom-0 inset-x-0 z-[61] bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-t border-slate-200/60 dark:border-slate-800/60 pb-[env(safe-area-inset-bottom)]"
       role="toolbar"
       aria-label="Reader controls"
     >

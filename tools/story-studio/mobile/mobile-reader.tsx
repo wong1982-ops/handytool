@@ -242,7 +242,7 @@ function ReaderInner({
     book.title.length > 28 ? book.title.slice(0, 26) + '…' : book.title
 
   return (
-    <div className="fixed inset-0 bg-white dark:bg-slate-950 flex flex-col">
+    <div className="fixed inset-0 z-[60] bg-white dark:bg-slate-950 flex flex-col">
 
       {/* ----------------------------------------------------------------
           Top bar (auto-hiding)
