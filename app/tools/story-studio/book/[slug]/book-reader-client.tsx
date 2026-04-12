@@ -112,8 +112,8 @@ export function BookReaderClient({ bookData, bookId, isOwner, initialPages, page
 
   if (!pages.length && totalPages === 0) return null
 
-  // Show page editor overlay when editing
-  if (editingPage !== null && bookId && isOwner) {
+  // Show page editor overlay when editing (desktop only — mobile uses MobileEditDrawer)
+  if (!isMobile && editingPage !== null && bookId && isOwner) {
     const page = pages.find(p => p.sequence === editingPage)
     if (page) {
       return (

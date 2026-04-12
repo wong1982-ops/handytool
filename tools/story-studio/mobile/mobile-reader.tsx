@@ -6,6 +6,7 @@ import { LanguageProvider, useLanguage } from '@/tools/story-studio/use-language
 import { ImageLightbox } from '@/tools/story-studio/image-lightbox'
 import MobilePageCard from '@/tools/story-studio/mobile/mobile-page-card'
 import MobileReaderControls from '@/tools/story-studio/mobile/mobile-reader-controls'
+import MobileEditDrawer from '@/tools/story-studio/mobile/mobile-edit-drawer'
 import type { StoryBook, Page } from '@/tools/story-studio/types'
 
 // ---------------------------------------------------------------------------
@@ -246,6 +247,7 @@ function ReaderInner({
   // Lightbox
   // ------------------------------------------------------------------
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
+  const [editingSequence, setEditingSequence] = useState<number | null>(null)
 
   const openLightbox = useCallback(() => {
     if (activePage.imageUrl) setLightboxSrc(activePage.imageUrl)
@@ -342,10 +344,10 @@ function ReaderInner({
                   </svg>
                   {language === 'zh' ? '创建新故事' : 'Create Your Own Story'}
                 </a>
-                {isOwner && onEditPage && currentPage > 0 && (
+                {isOwner && bookId && currentPage > 0 && (
                   <button
                     type="button"
-                    onClick={() => { setMenuOpen(false); onEditPage!(activePage!.sequence) }}
+                    onClick={() => { setMenuOpen(false); setEditingSequence(activePage!.sequence) }}
                     className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-left"
                     style={{ minHeight: '44px' }}
                   >
@@ -444,6 +446,23 @@ function ReaderInner({
           onClose={closeLightbox}
         />
       )}
+
+      {/* Edit drawer */}
+      {editingSequence !== null && bookId && (() => {
+        const editPage = contentPages.find(p => p.sequence === editingSequence)
+        if (!editPage) return null
+        return (
+          <MobileEditDrawer
+            open={true}
+            onClose={() => setEditingSequence(null)}
+            page={editPage}
+            pageNumber={editingSequence}
+            totalPages={totalContentPages}
+            bookId={bookId}
+            onSave={() => setEditingSequence(null)}
+          />
+        )
+      })()}
     </div>
   )
 }
