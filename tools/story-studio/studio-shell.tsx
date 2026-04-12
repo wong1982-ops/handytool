@@ -5,6 +5,7 @@ import { TabNavigation } from '@/tools/story-studio/tab-navigation'
 import { BookSelector } from '@/tools/story-studio/book-selector'
 import { BookProvider } from '@/tools/story-studio/use-book-context'
 import { LanguageProvider, useLanguage } from '@/tools/story-studio/use-language-context'
+import { useMobileShell } from '@/lib/hooks/use-mobile-shell'
 import Link from 'next/link'
 
 function ShellInner({ children }: { children: React.ReactNode }) {
@@ -117,6 +118,18 @@ function ShellInner({ children }: { children: React.ReactNode }) {
 }
 
 export function StudioShell({ children }: { children: React.ReactNode }) {
+  const isMobile = useMobileShell()
+
+  // Mobile: skip shell UI, just provide context providers
+  // Children handle their own mobile layout (MobileHome, etc.)
+  if (isMobile) {
+    return (
+      <LanguageProvider>
+        {children}
+      </LanguageProvider>
+    )
+  }
+
   return (
     <LanguageProvider>
       <BookProvider>

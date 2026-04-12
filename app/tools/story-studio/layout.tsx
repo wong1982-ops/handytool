@@ -16,5 +16,6 @@ export default function StoryStudioLayout({ children }: { children: React.ReactN
     return <>{children}</>
   }
 
+  // StudioShell handles mobile detection internally — renders children-only on mobile
   return <StudioShell>{children}</StudioShell>
 }

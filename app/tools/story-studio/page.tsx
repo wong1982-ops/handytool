@@ -28,10 +28,6 @@ function StoriesContent() {
 
   const isMobile = useMobileShell()
 
-  if (isMobile) {
-    return <MobileHome />
-  }
-
   // When a job completes, open the result
   useEffect(() => {
     if (!completedJobId) return
@@ -61,6 +57,11 @@ function StoriesContent() {
   const handleEdit = useCallback((id: string) => {
     router.push(`/tools/story-studio/edit/${id}`)
   }, [router])
+
+  // Mobile: render MobileHome (must be after all hooks)
+  if (isMobile) {
+    return <MobileHome />
+  }
 
   // Auth gate
   if (!authLoading && !user) {
