@@ -3,6 +3,7 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import { BookViewer } from '@/tools/story-studio/book-viewer'
 import { BulkGenerateActions } from '@/tools/story-studio/bulk-generate-actions'
+import { LanguageProvider } from '@/tools/story-studio/use-language-context'
 import type { StoryBook, Page } from '@/tools/story-studio/types'
 import { PageEditor } from './page-editor'
 
@@ -131,7 +132,7 @@ export function BookReaderClient({ bookData, bookId, isOwner, initialPages, page
   const showBulkActions = isOwner && bookId && bookMode === 'speed'
 
   return (
-    <>
+    <LanguageProvider>
       {showBulkActions && (
         <BulkGenerateActions
           bookId={bookId}
@@ -151,6 +152,6 @@ export function BookReaderClient({ bookData, bookId, isOwner, initialPages, page
         totalPages={totalPages}
         pagesLoaded={loadedCount}
       />
-    </>
+    </LanguageProvider>
   )
 }

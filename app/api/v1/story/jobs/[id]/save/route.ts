@@ -20,6 +20,7 @@ export const POST = withJobStep('save', async (ctx) => {
   const storyData = job.state.storyData as Record<string, unknown>
   const slug = job.state.slug as string
   const authorName = job.state.authorName as string || 'Anonymous'
+  const existingBookId = (job.input as { bookId?: string }).bookId
   const coverUrl = job.state.coverUrl as string | undefined
   const illustratedPages = (job.state.pages as { seq: number; imageUrl: string }[] | undefined) ?? []
   const audioPages = (job.state.audio as { seq: number; audioUrl: string }[] | undefined) ?? []
@@ -37,18 +38,20 @@ export const POST = withJobStep('save', async (ctx) => {
     return {
       ...page,
       sequence: seq,
-      imageUrl: illustration?.imageUrl || '',
-      imageStatus: illustration?.imageUrl ? 'done' : 'error',
-      audioUrl: audio?.audioUrl || undefined,
+      // For illustrations: use new if available, otherwise keep existing page data
+      imageUrl: illustration?.imageUrl || (page.imageUrl as string) || '',
+      imageStatus: illustration?.imageUrl ? 'done' : (page.imageStatus as string) || 'error',
+      // For audio: use new if available, otherwise keep existing page data
+      audioUrl: audio?.audioUrl || (page.audioUrl as string) || undefined,
     }
   })
 
   const finalBook = {
-    id: bookId,
+    id: existingBookId || bookId,
     slug,
     title: (storyData?.title as string) || concept.title,
     authors: ['AI', authorName],
-    coverImageUrl: coverUrl,
+    coverImageUrl: coverUrl || (storyData?.coverImageUrl as string) || undefined,
     concept,
     theme: (storyData?.theme as string) || '',
     setting: (storyData?.setting as string) || '',
@@ -60,38 +63,53 @@ export const POST = withJobStep('save', async (ctx) => {
     updatedAt: now,
   }
 
-  // Save to books table (direct insert to bypass PostgREST schema cache issues)
+  // Save to books table via SECURITY DEFINER RPC (step routes have no user session)
   const bookMode = (job.input as { mode?: string }).mode || 'speed'
-  const bookConcept = finalBook.concept as Record<string, unknown> | undefined
-  const tags = bookConcept?.tags as Record<string, unknown> | undefined
 
-  const { data: insertedBook, error: insertError } = await supabase
-    .from('books')
-    .insert({
-      user_id: job.user_id,
-      slug,
-      data: finalBook,
-      is_public: false,
-      series_id: seriesId ?? null,
-      mode: bookMode,
-      title: finalBook.title || 'Untitled',
-      cover_url: finalBook.coverImageUrl?.startsWith('http') ? finalBook.coverImageUrl : null,
-      page_count: finalBook.pages?.length ?? 0,
-      audience: (tags?.audience as string) || '',
-      style: (tags?.style as string) || '',
+  // Check if this is a bulk job updating an existing book
+  const isBulkMode = existingBookId && (bookMode === 'bulk-illustrate' || bookMode === 'bulk-narrate')
+
+  let savedBookId: string
+
+  if (isBulkMode) {
+    // Update existing book's data with new illustrations/audio
+    const { error: updateError } = await supabase.rpc('update_book_data', {
+      p_user_id: job.user_id,
+      p_book_id: existingBookId,
+      p_data: finalBook,
     })
-    .select('id')
-    .single()
 
-  if (insertError) {
-    console.error('[save] Failed to save book:', insertError)
-    throw new Error(`Failed to save book: ${insertError.message}`)
-  }
+    if (updateError) {
+      console.error('[save] Failed to update book:', updateError)
+      throw new Error(`Failed to update book: ${updateError.message}`)
+    }
 
-  const savedBookId = insertedBook?.id
+    savedBookId = existingBookId
 
-  // Complete the job
-  if (savedBookId) {
+    // Complete the job
+    await supabase.rpc('complete_job', {
+      p_job_id: job.id,
+      p_book_id: savedBookId,
+    })
+  } else {
+    // Original flow: insert new book via RPC
+    const { data: insertedBookId, error: insertError } = await supabase.rpc('insert_book', {
+      p_user_id: job.user_id,
+      p_slug: slug,
+      p_data: finalBook,
+      p_is_public: false,
+      p_series_id: seriesId ?? null,
+      p_mode: bookMode,
+    })
+
+    if (insertError || !insertedBookId) {
+      console.error('[save] Failed to save book:', insertError)
+      throw new Error(`Failed to save book: ${insertError?.message || 'No book ID returned'}`)
+    }
+
+    savedBookId = insertedBookId
+
+    // Complete the job
     await supabase.rpc('complete_job', {
       p_job_id: job.id,
       p_book_id: savedBookId,

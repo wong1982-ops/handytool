@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { CharacterItem } from '@/tools/story-studio/use-characters'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 interface CharacterListProps {
   characters: CharacterItem[]
@@ -12,6 +13,7 @@ interface CharacterListProps {
 }
 
 export function CharacterList({ characters, loading, onSelect, onDelete, onCreate }: CharacterListProps) {
+  const { t } = useLanguage()
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
   if (loading) {
@@ -27,7 +29,7 @@ export function CharacterList({ characters, loading, onSelect, onDelete, onCreat
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">My Characters</h2>
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t.characters.title}</h2>
         <button
           onClick={onCreate}
           className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white
@@ -37,13 +39,13 @@ export function CharacterList({ characters, loading, onSelect, onDelete, onCreat
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          New Character
+          {t.characters.newCharacter}
         </button>
       </div>
 
       {characters.length === 0 ? (
         <div className="text-center py-12 text-slate-400 dark:text-slate-500">
-          <p className="text-sm">No characters yet. Create your first character to get started.</p>
+          <p className="text-sm">{t.characters.noCharacters}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -78,7 +80,7 @@ export function CharacterList({ characters, loading, onSelect, onDelete, onCreat
                       ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                       : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
                   }`}>
-                    {char.status === 'approved' ? 'Approved' : 'Draft'}
+                    {char.status === 'approved' ? t.characters.approved : t.characters.draft}
                   </span>
                 </div>
                 {char.role && (
@@ -106,9 +108,9 @@ export function CharacterList({ characters, loading, onSelect, onDelete, onCreat
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-sm mx-4 shadow-xl">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Delete Character?</h3>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{t.characters.deleteTitle}</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-              This will permanently delete the character and remove it from all series. This cannot be undone.
+              {t.characters.deleteMessage}
             </p>
             <div className="flex justify-end gap-2">
               <button
@@ -117,14 +119,14 @@ export function CharacterList({ characters, loading, onSelect, onDelete, onCreat
                   hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
                 style={{ minHeight: '44px' }}
               >
-                Cancel
+                {t.characters.cancel}
               </button>
               <button
                 onClick={() => { onDelete(deleteConfirm); setDeleteConfirm(null) }}
                 className="px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg cursor-pointer"
                 style={{ minHeight: '44px' }}
               >
-                Delete
+                {t.characters.delete}
               </button>
             </div>
           </div>

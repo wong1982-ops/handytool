@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import type { StoryBook } from './types'
 import { CREDIT_COSTS } from './types'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 interface ExportPanelProps {
   book: StoryBook
 }
 
 export function ExportPanel({ book }: ExportPanelProps) {
+  const { t } = useLanguage()
   const [pdfLoading, setPdfLoading] = useState(false)
   const [imagesLoading, setImagesLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -47,7 +49,7 @@ export function ExportPanel({ book }: ExportPanelProps) {
       a.click()
       URL.revokeObjectURL(url)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'PDF export failed')
+      setError(err instanceof Error ? err.message : t.exportPanel.pdfFailed)
     } finally {
       setPdfLoading(false)
     }
@@ -59,7 +61,7 @@ export function ExportPanel({ book }: ExportPanelProps) {
     try {
       const pagesWithImages = book.pages.filter((p) => p.imageUrl)
       if (pagesWithImages.length === 0) {
-        setError('No images to download')
+        setError(t.exportPanel.noImages)
         return
       }
 
@@ -69,7 +71,7 @@ export function ExportPanel({ book }: ExportPanelProps) {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Image download failed')
+      setError(err instanceof Error ? err.message : t.exportPanel.imageFailed)
     } finally {
       setImagesLoading(false)
     }
@@ -80,7 +82,7 @@ export function ExportPanel({ book }: ExportPanelProps) {
   return (
     <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 space-y-4">
       <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-        Export
+        {t.exportPanel.title}
       </h3>
 
       {/* PDF download */}
@@ -113,7 +115,7 @@ export function ExportPanel({ book }: ExportPanelProps) {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
               />
             </svg>
-            Generating PDF...
+            {t.exportPanel.generatingPdf}
           </>
         ) : (
           <>
@@ -124,7 +126,7 @@ export function ExportPanel({ book }: ExportPanelProps) {
                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            Download PDF
+            {t.exportPanel.downloadPdf}
             <span className="ml-1 text-xs opacity-75">
               ({CREDIT_COSTS.exportPdf} credits)
             </span>
@@ -164,7 +166,7 @@ export function ExportPanel({ book }: ExportPanelProps) {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
               />
             </svg>
-            Downloading...
+            {t.exportPanel.downloading}
           </>
         ) : (
           <>
@@ -175,7 +177,7 @@ export function ExportPanel({ book }: ExportPanelProps) {
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            Download Images ({pagesWithImages})
+            {`${t.exportPanel.downloadImages} (${pagesWithImages})`}
           </>
         )}
       </button>
@@ -188,7 +190,7 @@ export function ExportPanel({ book }: ExportPanelProps) {
       {/* Info */}
       {pagesWithImages === 0 && (
         <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
-          Generate illustrations first to enable exports.
+          {t.exportPanel.generateFirst}
         </p>
       )}
     </div>

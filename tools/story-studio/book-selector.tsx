@@ -2,8 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useBookContext } from '@/tools/story-studio/use-book-context'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 export function BookSelector() {
+  const { t } = useLanguage()
   const { activeBook, setActiveBookId, books, loading } = useBookContext()
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -34,7 +36,7 @@ export function BookSelector() {
     return (
       <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#131a23] text-[#a6abb5] text-sm">
         <div className="w-4 h-4 border-2 border-[#3D6AF2]/30 border-t-[#3D6AF2] rounded-full animate-spin" />
-        Loading...
+        {t.bookSelector.loading}
       </div>
     )
   }
@@ -42,7 +44,7 @@ export function BookSelector() {
   if (books.length === 0) {
     return (
       <span className="text-[#70767f] text-sm italic">
-        No books yet
+        {t.bookSelector.noBooks}
       </span>
     )
   }
@@ -62,7 +64,7 @@ export function BookSelector() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
         </svg>
         <span className="truncate">
-          {activeBook ? activeBook.title : 'Select a book...'}
+          {activeBook ? activeBook.title : t.bookSelector.selectBook}
         </span>
         <svg className={`w-4 h-4 text-[#a6abb5] shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -83,7 +85,7 @@ export function BookSelector() {
                 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer
                 border-b border-slate-100 dark:border-slate-700"
             >
-              Clear selection
+              {t.bookSelector.clearSelection}
             </button>
           )}
 
@@ -120,7 +122,7 @@ export function BookSelector() {
                 <div className="min-w-0 flex-1">
                   <div className="font-medium truncate">{book.title}</div>
                   <div className="text-xs text-slate-400 dark:text-slate-500">
-                    {book.pageCount} pages
+                    {`${book.pageCount} ${t.bookSelector.pages}`}
                   </div>
                 </div>
 

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { StoryCard } from '@/tools/story-studio/stories/story-card'
 import type { StoryItem, SortOption } from '@/tools/story-studio/use-stories-list'
 import { useSeriesList } from '@/tools/story-studio/use-series'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 interface StoryListProps {
   stories: StoryItem[]
@@ -27,13 +28,14 @@ export function StoryList({
   onEdit, onDelete, onToggleShare, onMarkComplete,
 }: StoryListProps) {
   const { series } = useSeriesList()
+  const { t } = useLanguage()
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
   return (
     <div>
       {/* Header row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">My Stories</h2>
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t.storyList.title}</h2>
         <button
           onClick={onCreateNew}
           className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white
@@ -43,7 +45,7 @@ export function StoryList({
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          New Story
+          {t.storyList.newStory}
         </button>
       </div>
 
@@ -58,7 +60,7 @@ export function StoryList({
             type="text"
             value={search}
             onChange={e => onSearchChange(e.target.value)}
-            placeholder="Search stories..."
+            placeholder={t.storyList.searchPlaceholder}
             className="w-full pl-9 pr-3 py-2 min-h-[44px] rounded-lg border border-slate-300 dark:border-slate-600
               bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white
               focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
@@ -73,10 +75,10 @@ export function StoryList({
             bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white
             focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
         >
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
-          <option value="updated">Recently updated</option>
-          <option value="alphabetical">A → Z</option>
+          <option value="newest">{t.storyList.newest}</option>
+          <option value="oldest">{t.storyList.oldest}</option>
+          <option value="updated">{t.storyList.updated}</option>
+          <option value="alphabetical">{t.storyList.alphabetical}</option>
         </select>
 
         {/* Series filter */}
@@ -88,7 +90,7 @@ export function StoryList({
               bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white
               focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
           >
-            <option value="">All series</option>
+            <option value="">{t.storyList.allSeries}</option>
             {series.map(s => (
               <option key={s.id} value={s.id}>{s.title}</option>
             ))}
@@ -109,7 +111,7 @@ export function StoryList({
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
           </svg>
           <p className="text-slate-500 dark:text-slate-400">
-            {search ? 'No stories match your search.' : 'No stories yet. Create your first story!'}
+            {search ? t.storyList.noStoriesSearch : t.storyList.noStoriesEmpty}
           </p>
         </div>
       ) : (
@@ -131,9 +133,9 @@ export function StoryList({
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-sm mx-4 shadow-xl">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Delete Story?</h3>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{t.deleteStory.title}</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-              This will permanently delete the story and all its pages, illustrations, and narration. This cannot be undone.
+              {t.deleteStory.message}
             </p>
             <div className="flex justify-end gap-2">
               <button
@@ -141,14 +143,14 @@ export function StoryList({
                 className="px-4 py-2 text-sm text-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
                 style={{ minHeight: '44px' }}
               >
-                Cancel
+                {t.deleteStory.cancel}
               </button>
               <button
                 onClick={() => { onDelete(deleteConfirm); setDeleteConfirm(null) }}
                 className="px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg cursor-pointer"
                 style={{ minHeight: '44px' }}
               >
-                Delete
+                {t.deleteStory.confirm}
               </button>
             </div>
           </div>

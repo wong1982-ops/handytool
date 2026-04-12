@@ -3,27 +3,20 @@
 import { useState } from 'react'
 import type { StoryConcept, ChatMessage } from './types'
 import { CREDIT_COSTS } from './types'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 const MAX_ROUNDS = 1
 
-const QUICK_REFINEMENTS = [
-  { label: 'More giggles & sunshine', value: 'Make it funnier and more lighthearted', icon: '✨' },
-  { label: 'Epic quests & daring feats', value: 'Add more action and adventure', icon: '⚔️' },
-  { label: 'Whispers in the dark', value: 'Make it more mysterious and suspenseful', icon: '🌙' },
-  { label: 'A twist nobody sees coming', value: 'Add a surprise twist ending', icon: '🎭' },
-  { label: 'Characters you\'ll remember', value: 'Make the characters more relatable', icon: '💫' },
-  { label: 'A lesson from the heart', value: 'Add a moral lesson for kids', icon: '🌟' },
-  { label: 'A world that breathes', value: 'Make the world more detailed and immersive', icon: '🏰' },
-  { label: 'A magical companion', value: 'Add a magical companion or sidekick', icon: '🦊' },
-]
+const QUICK_REFINEMENT_ICONS = ['✨', '⚔️', '🌙', '🎭', '💫', '🌟', '🏰', '🦊'] as const
+const QUICK_REFINEMENT_KEYS = ['giggles', 'epic', 'whispers', 'twist', 'characters', 'lesson', 'world', 'companion'] as const
 
-const SECTION_LABELS: { key: keyof StoryConcept['sections']; label: string; icon: string }[] = [
-  { key: 'premise', label: 'The Story', icon: '📖' },
-  { key: 'authorIntent', label: 'What It Provokes', icon: '💭' },
-  { key: 'messageToAudience', label: 'The Takeaway', icon: '🎁' },
-  { key: 'narrativeArc', label: 'How It Unfolds', icon: '🗺️' },
-  { key: 'tone', label: 'The Voice', icon: '🎵' },
-  { key: 'visualStyle', label: 'The Look', icon: '🎨' },
+const SECTION_KEYS: { key: keyof StoryConcept['sections']; tKey: 'theStory' | 'whatItProvokes' | 'theTakeaway' | 'howItUnfolds' | 'theVoice' | 'theLook'; icon: string }[] = [
+  { key: 'premise', tKey: 'theStory', icon: '📖' },
+  { key: 'authorIntent', tKey: 'whatItProvokes', icon: '💭' },
+  { key: 'messageToAudience', tKey: 'theTakeaway', icon: '🎁' },
+  { key: 'narrativeArc', tKey: 'howItUnfolds', icon: '🗺️' },
+  { key: 'tone', tKey: 'theVoice', icon: '🎵' },
+  { key: 'visualStyle', tKey: 'theLook', icon: '🎨' },
 ]
 
 interface RefinementChatProps {
@@ -36,6 +29,7 @@ interface RefinementChatProps {
 }
 
 export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, loading, mode = 'professional' }: RefinementChatProps) {
+  const { t } = useLanguage()
   const [history, setHistory] = useState<ChatMessage[]>([])
   const [refining, setRefining] = useState(false)
   const [streamingReply, setStreamingReply] = useState('')
@@ -45,6 +39,18 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
 
   const roundsUsed = history.filter(m => m.role === 'user').length
   const roundsLeft = MAX_ROUNDS - roundsUsed
+
+  const quickRefinements = QUICK_REFINEMENT_KEYS.map((key, i) => ({
+    label: t.refinement.quickRefinements[key].label,
+    value: t.refinement.quickRefinements[key].value,
+    icon: QUICK_REFINEMENT_ICONS[i],
+  }))
+
+  const sectionLabels = SECTION_KEYS.map(({ key, tKey, icon }) => ({
+    key,
+    label: t.concept[tKey],
+    icon,
+  }))
 
   const handleRefine = async (option: string) => {
     setRefining(true)
@@ -115,11 +121,11 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
           </svg>
-          Back to concepts
+          {t.refinement.backToConcepts}
         </button>
         {roundsLeft <= 0 && (
           <span className="text-xs text-purple-400 dark:text-purple-500 italic">
-            Spell has been cast
+            {t.refinement.spellCast}
           </span>
         )}
       </div>
@@ -148,7 +154,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                   {concept.tags.audience}
                 </span>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-[#a6abb5] border border-purple-200/50 dark:border-purple-800/40">
-                  {concept.tags.pageCount} pages
+                  {concept.tags.pageCount} {t.common.pages}
                 </span>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border border-amber-200/50 dark:border-amber-800/40">
                   {concept.tags.tone}
@@ -159,7 +165,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
 
           {/* Section content — storybook style */}
           <div className="space-y-4 mt-5">
-            {SECTION_LABELS.map(({ key, label, icon }) => (
+            {sectionLabels.map(({ key, label, icon }) => (
               <div key={key} className="group">
                 <h4 className="flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
                   <span className="text-sm">{icon}</span>
@@ -191,7 +197,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                   ? 'text-[#93aaff] dark:text-[#3D6AF2]'
                   : 'text-amber-500 dark:text-amber-400'
               }`}>
-                {msg.role === 'user' ? 'Your Wish' : 'Story Fairy'}
+                {msg.role === 'user' ? t.refinement.yourWish : t.refinement.storyFairy}
               </span>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
                 {msg.content}
@@ -221,10 +227,10 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
               </svg>
             </div>
             <h3 className="text-lg font-bold text-amber-300 mb-1" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
-              Casting a spell on your story...
+              {t.refinement.castingSpell}
             </h3>
             <p className="text-sm text-[#a6abb5]/80 italic">
-              {streamingReply ? 'The Story Fairy is rewriting your tale...' : 'The Story Fairy is weaving new magic into your tale'}
+              {streamingReply ? t.refinement.storyFairyRewriting : t.refinement.storyFairyWeaving}
             </p>
           </div>
         </div>
@@ -242,12 +248,12 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                 </svg>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Cast a Spell</h3>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500">Choose an enchantment to transform your story</p>
+                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">{t.refinement.castASpell}</h3>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500">{t.refinement.chooseEnchantment}</p>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {QUICK_REFINEMENTS.map((option) => (
+              {quickRefinements.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => handleRefine(option.value)}
@@ -285,14 +291,14 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                   <path d="M11.983 1.907a.75.75 0 00-1.292-.657l-8.5 9.836A.75.75 0 002.75 12h6.572l-1.305 10.093a.75.75 0 001.292.657l8.5-9.836A.75.75 0 0017.25 12h-6.572l1.305-10.093z" />
                 </svg>
               </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Quick Story</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">{t.refinement.quickStory}</span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
-              Cast a spell and your story appears! You can add pictures and sound later.
+              {t.refinement.quickStoryDesc}
             </p>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] text-slate-400 dark:text-slate-500">Credits are refunded if generation fails</span>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">10 credits</span>
+              <span className="text-[11px] text-slate-400 dark:text-slate-500">{t.refinement.creditsRefunded}</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">{t.refinement.tenCredits}</span>
             </div>
             <button
               onClick={() => onGenerate(concept, { skipIllustration: true, skipAudio: true, skipValidation: true })}
@@ -306,14 +312,14 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.824 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Casting spell...
+                  {t.refinement.castingSpellBtn}
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2">
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
                   </svg>
-                  Cast a Spell!
+                  {t.refinement.castASpellBtn}
                 </span>
               )}
             </button>
@@ -342,7 +348,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                   </svg>
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#3D6AF2] dark:text-[#93aaff]">Generation</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#3D6AF2] dark:text-[#93aaff]">{t.refinement.generation}</span>
                 <div className="flex gap-1.5 ml-auto">
                   <button
                     type="button"
@@ -354,7 +360,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     }`}
                     style={{ minHeight: '44px' }}
                   >
-                    All On
+                    {t.refinement.allOn}
                   </button>
                   <button
                     type="button"
@@ -366,7 +372,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     }`}
                     style={{ minHeight: '44px' }}
                   >
-                    Text Only
+                    {t.refinement.textOnly}
                   </button>
                 </div>
               </div>
@@ -376,21 +382,21 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                 <table className="w-full text-[11px]">
                   <thead>
                     <tr className="bg-slate-50 dark:bg-slate-800/50">
-                      <th className="text-left px-3 py-2 font-semibold text-slate-500 dark:text-slate-400">Step</th>
-                      <th className="text-center px-2 py-2 font-semibold text-slate-500 dark:text-slate-400 w-16">Time</th>
-                      <th className="text-center px-2 py-2 font-semibold text-slate-500 dark:text-slate-400 w-12">On</th>
+                      <th className="text-left px-3 py-2 font-semibold text-slate-500 dark:text-slate-400">{t.refinement.step}</th>
+                      <th className="text-center px-2 py-2 font-semibold text-slate-500 dark:text-slate-400 w-16">{t.refinement.time}</th>
+                      <th className="text-center px-2 py-2 font-semibold text-slate-500 dark:text-slate-400 w-12">{t.refinement.on}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {/* Fixed steps — always on */}
                     {[
-                      { step: 'Story Bible', desc: 'Characters, setting, rules', time: '~10s' },
-                      { step: 'Story Draft', desc: 'Write all pages', time: '~15s' },
+                      { step: t.refinement.storyBible, desc: t.refinement.storyBibleDesc, time: '~10s' },
+                      { step: t.refinement.storyDraft, desc: t.refinement.storyDraftDesc, time: '~15s' },
                     ].map((row) => (
                       <tr key={row.step}>
                         <td className="px-3 py-1.5">
                           <span className="font-medium text-slate-700 dark:text-slate-300">{row.step}</span>
-                          <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— {row.desc}</span>
+                          <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">&mdash; {row.desc}</span>
                         </td>
                         <td className="text-center px-2 py-1.5 text-slate-400 dark:text-slate-500 font-mono">{row.time}</td>
                         <td className="text-center px-2 py-1.5">
@@ -404,8 +410,8 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                       onClick={() => setSkipValidation(v => !v)}
                     >
                       <td className="px-3 py-1.5">
-                        <span className={`font-medium ${skipValidation ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>Consistency Check</span>
-                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— Verify &amp; fix against rules</span>
+                        <span className={`font-medium ${skipValidation ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>{t.refinement.consistencyCheck}</span>
+                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">&mdash; {t.refinement.consistencyCheckDesc}</span>
                       </td>
                       <td className={`text-center px-2 py-1.5 font-mono ${skipValidation ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400 dark:text-slate-500'}`}>~10s</td>
                       <td className="text-center px-2 py-1.5">
@@ -414,18 +420,18 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     </tr>
                     {/* Character Ref & Cover Art — skipped when skipIllustration */}
                     {[
-                      { step: 'Character Ref', desc: 'Visual reference sheet', time: '~60s' },
-                      { step: 'Cover Art', desc: 'Book cover illustration', time: '~60s' },
+                      { step: t.refinement.characterRef, desc: t.refinement.characterRefDesc, time: '~60s' },
+                      { step: t.refinement.coverArt, desc: t.refinement.coverArtDesc, time: '~60s' },
                     ].map((row) => (
                       <tr key={row.step} className={skipIllustration ? 'bg-slate-50/50 dark:bg-slate-800/20' : ''}>
                         <td className="px-3 py-1.5">
                           <span className={`font-medium ${skipIllustration ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>{row.step}</span>
-                          <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— {row.desc}</span>
+                          <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">&mdash; {row.desc}</span>
                         </td>
                         <td className={`text-center px-2 py-1.5 font-mono ${skipIllustration ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400 dark:text-slate-500'}`}>{row.time}</td>
                         <td className="text-center px-2 py-1.5">
                           {skipIllustration ? (
-                            <span className="text-[10px] text-slate-400 dark:text-slate-500">skip</span>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500">{t.refinement.skip}</span>
                           ) : (
                             <svg className="w-3.5 h-3.5 text-emerald-500 inline" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                           )}
@@ -438,8 +444,8 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                       onClick={() => setSkipIllustration(v => !v)}
                     >
                       <td className="px-3 py-1.5">
-                        <span className={`font-medium ${skipIllustration ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>{`Illustrations (x${pages})`}</span>
-                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— Per-page artwork</span>
+                        <span className={`font-medium ${skipIllustration ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>{t.refinement.illustrationsX.replace('{count}', String(pages))}</span>
+                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">&mdash; {t.refinement.illustrationsDesc}</span>
                       </td>
                       <td className={`text-center px-2 py-1.5 font-mono ${skipIllustration ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400 dark:text-slate-500'}`}>{`~${pages} min`}</td>
                       <td className="text-center px-2 py-1.5">
@@ -452,8 +458,8 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                       onClick={() => setSkipAudio(v => !v)}
                     >
                       <td className="px-3 py-1.5">
-                        <span className={`font-medium ${skipAudio ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>{`Narration (x${pages})`}</span>
-                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— Voice-over per page</span>
+                        <span className={`font-medium ${skipAudio ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'}`}>{t.refinement.narrationX.replace('{count}', String(pages))}</span>
+                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">&mdash; {t.refinement.narrationDesc}</span>
                       </td>
                       <td className={`text-center px-2 py-1.5 font-mono ${skipAudio ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400 dark:text-slate-500'}`}>{`~${Math.ceil(pages * 0.25)} min`}</td>
                       <td className="text-center px-2 py-1.5">
@@ -463,8 +469,8 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     {/* Save — always on */}
                     <tr>
                       <td className="px-3 py-1.5">
-                        <span className="font-medium text-slate-700 dark:text-slate-300">Save</span>
-                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">— Finalize book</span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300">{t.refinement.save}</span>
+                        <span className="text-slate-400 dark:text-slate-500 ml-1 hidden sm:inline">&mdash; {t.refinement.saveDesc}</span>
                       </td>
                       <td className="text-center px-2 py-1.5 text-slate-400 dark:text-slate-500 font-mono">~1s</td>
                       <td className="text-center px-2 py-1.5">
@@ -473,7 +479,7 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                     </tr>
                     {/* Total row */}
                     <tr className="bg-slate-50/80 dark:bg-slate-800/30 font-semibold">
-                      <td className="px-3 py-2 text-slate-700 dark:text-slate-300">Estimated total</td>
+                      <td className="px-3 py-2 text-slate-700 dark:text-slate-300">{t.refinement.estimatedTotal}</td>
                       <td className="text-center px-2 py-2 text-[#3D6AF2] dark:text-[#93aaff] font-mono">{estLabel}</td>
                       <td className="text-center px-2 py-2" />
                     </tr>
@@ -484,18 +490,18 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
               {/* Context hint for skipped validation */}
               {!skipValidation && (
                 <div className="rounded-xl bg-[#3D6AF2]/10/80 dark:bg-indigo-900/15 border border-[#1e2631]/40 dark:border-[#1e2631]/30 px-3 py-2.5 mb-4">
-                  <p className="text-[11px] font-semibold text-[#3D6AF2] dark:text-[#93aaff] mb-1">Consistency check verifies:</p>
+                  <p className="text-[11px] font-semibold text-[#3D6AF2] dark:text-[#93aaff] mb-1">{t.refinement.consistencyVerifies}</p>
                   <ul className="text-[10px] text-[#3D6AF2]/80 dark:text-[#93aaff]/70 space-y-0.5 pl-3">
-                    <li>Character descriptions match Story Bible on every page</li>
-                    <li>Timeline &amp; causality — no plot holes or contradictions</li>
-                    <li>Auto-fixes any issues found before illustration</li>
+                    <li>{t.refinement.verifyCharacters}</li>
+                    <li>{t.refinement.verifyTimeline}</li>
+                    <li>{t.refinement.verifyAutoFix}</li>
                   </ul>
                 </div>
               )}
 
               <div className="flex items-center justify-between mb-3">
-                <span className="text-[11px] text-slate-400 dark:text-slate-500">Credits are refunded if generation fails</span>
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">{CREDIT_COSTS.generate} credits</span>
+                <span className="text-[11px] text-slate-400 dark:text-slate-500">{t.refinement.creditsRefunded}</span>
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-700/40">{CREDIT_COSTS.generate} {t.refinement.credits}</span>
               </div>
 
               <button
@@ -514,14 +520,14 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.824 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    The magic is unfolding...
+                    {t.refinement.magicUnfolding}
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-2">
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                     </svg>
-                    Bring This Story to Life
+                    {t.refinement.bringToLife}
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-white/20 border border-white/30">{estLabel}</span>
                   </span>
                 )}
@@ -533,4 +539,3 @@ export function RefinementChat({ concept, onConceptUpdate, onGenerate, onBack, l
     </div>
   )
 }
-

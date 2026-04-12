@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { ProgressEvent } from './types'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 interface GenerationProgressProps {
   events: ProgressEvent[]
@@ -12,40 +13,17 @@ interface GenerationProgressProps {
   mode?: 'speed' | 'professional'
 }
 
-const FUN_TIPS = [
-  'Mixing metaphors and magic dust...',
-  'Teaching dragons to pose for portraits...',
-  'Convincing the moon to hold still...',
-  'Brewing a potion of perfect plot twists...',
-  'Whispering secrets to enchanted quills...',
-  'Asking the stars for character inspiration...',
-  'Painting dreams onto invisible canvases...',
-  'Negotiating with mischievous fairies...',
-  'Polishing a crystal ball for foresight...',
-  'Untangling a ball of narrative yarn...',
-]
-
-const SPELL_MESSAGES = [
-  'Waving the magic wand...',
-  'Sprinkling story dust...',
-  'Stirring the cauldron of tales...',
-  'Whispering to enchanted quills...',
-  'Mixing imagination potion...',
-  'Summoning characters...',
-  'Painting with starlight...',
-  'Weaving words together...',
-]
-
 function SpellAnimation({ jobId: _jobId }: { jobId: string }) {
+  const { t } = useLanguage()
   const [msgIndex, setMsgIndex] = useState(0)
 
   // Rotate fun messages
   useEffect(() => {
     const timer = setInterval(() => {
-      setMsgIndex(prev => (prev + 1) % SPELL_MESSAGES.length)
+      setMsgIndex(prev => (prev + 1) % t.progress.spellMessages.length)
     }, 3000)
     return () => clearInterval(timer)
-  }, [])
+  }, [t.progress.spellMessages.length])
 
   return (
     <div className="max-w-sm mx-auto text-center py-10 md:py-14">
@@ -68,13 +46,13 @@ function SpellAnimation({ jobId: _jobId }: { jobId: string }) {
       </div>
 
       <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-        Casting a Spell...
+        {t.progress.castingASpell}
       </h2>
       <p className="text-sm text-amber-600 dark:text-amber-400 mb-2 h-5 transition-opacity">
-        {SPELL_MESSAGES[msgIndex]}
+        {t.progress.spellMessages[msgIndex]}
       </p>
       <p className="text-xs text-slate-400 dark:text-slate-500 mb-6">
-        Your story will be ready in a moment!
+        {t.progress.storyReadyInMoment}
       </p>
 
       {/* Pulsing progress dots */}
@@ -92,7 +70,7 @@ function SpellAnimation({ jobId: _jobId }: { jobId: string }) {
         href="/tools/story-studio/bookshelf"
         className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
       >
-        or go to bookshelf
+        {t.progress.orGoToBookshelf}
       </a>
 
       <style jsx>{`
@@ -118,6 +96,8 @@ function SpellAnimation({ jobId: _jobId }: { jobId: string }) {
 }
 
 function BackgroundJobProgress({ jobId: _jobId }: { jobId: string }) {
+  const { t } = useLanguage()
+
   return (
     <div className="max-w-lg mx-auto text-center py-10 md:py-14">
       <div className="relative w-28 h-28 mx-auto mb-8">
@@ -134,13 +114,13 @@ function BackgroundJobProgress({ jobId: _jobId }: { jobId: string }) {
       </div>
 
       <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
-        Your Book is Being Created
+        {t.progress.bookBeingCreated}
       </h2>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
-        Your story is being generated in the background. You can safely leave this page.
+        {t.progress.storyGeneratedBackground}
       </p>
       <p className="text-xs text-slate-400 dark:text-slate-500 mb-6">
-        Track progress and find your completed book on the bookshelf.
+        {t.progress.trackProgress}
       </p>
 
       <a
@@ -151,7 +131,7 @@ function BackgroundJobProgress({ jobId: _jobId }: { jobId: string }) {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
         </svg>
-        Go to Bookshelf
+        {t.progress.goToBookshelf}
       </a>
 
       <style jsx>{`
@@ -169,6 +149,8 @@ function BackgroundJobProgress({ jobId: _jobId }: { jobId: string }) {
 }
 
 export function GenerationProgress({ events, totalPages, activeJobId, mode }: GenerationProgressProps) {
+  const { t } = useLanguage()
+
   // Background job mode
   if (activeJobId) {
     // Speed mode: show spell animation inline
@@ -202,8 +184,8 @@ export function GenerationProgress({ events, totalPages, activeJobId, mode }: Ge
     : 4
 
   const statusMessage = hasError
-    ? 'Something went wrong...'
-    : latestMessage || 'Starting...'
+    ? t.progress.somethingWentWrong
+    : latestMessage || t.progress.starting
 
   // Progress: 0-15% writing, 15-25% reviewing, 25-35% char ref, 35-75% illustrations, 75-100% audio
   let progress = 0
@@ -227,22 +209,30 @@ export function GenerationProgress({ events, totalPages, activeJobId, mode }: Ge
   }
 
   // Pick a fun tip based on progress to rotate through them
-  const tipIndex = Math.floor(progress / 10) % FUN_TIPS.length
-  const funTip = FUN_TIPS[tipIndex]
+  const tipIndex = Math.floor(progress / 10) % t.progress.funTips.length
+  const funTip = t.progress.funTips[tipIndex]
 
   const stageLabel = hasError
-    ? 'Generation failed'
+    ? t.progress.generationFailed
     : isWriting
-      ? 'Writing story...'
+      ? t.progress.writingStory
       : stage <= 1
-        ? 'Reviewing for consistency...'
+        ? t.progress.reviewingConsistency
         : isCharRef
-          ? 'Creating character references...'
+          ? t.progress.creatingCharacterRefs
           : isIllustrating
-            ? `Illustrating... ${imagesDone} / ${totalPages} pages`
+            ? t.progress.illustrating.replace('{done}', String(imagesDone)).replace('{total}', String(totalPages))
             : isNarrating
-              ? `Recording narration... ${audiosDone} / ${totalPages} pages`
-              : 'Finishing up...'
+              ? t.progress.recordingNarration.replace('{done}', String(audiosDone)).replace('{total}', String(totalPages))
+              : t.progress.finishingUp
+
+  const stageIndicators = [
+    { label: t.progress.stageWriting, idx: 0 },
+    { label: t.progress.stageReviewing, idx: 1 },
+    { label: t.progress.stageCharacters, idx: 2 },
+    { label: t.progress.stageIllustrating, idx: 3 },
+    { label: t.progress.stageNarrating, idx: 4 },
+  ]
 
   return (
     <div className="max-w-lg mx-auto text-center py-10 md:py-14">
@@ -253,7 +243,7 @@ export function GenerationProgress({ events, totalPages, activeJobId, mode }: Ge
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
             </svg>
           </div>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Generation Failed</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">{t.progress.generationFailed}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">{statusMessage}</p>
         </div>
       ) : (
@@ -322,13 +312,13 @@ export function GenerationProgress({ events, totalPages, activeJobId, mode }: Ge
 
           {/* Status text */}
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
-            Crafting Your Tale
+            {t.progress.craftingYourTale}
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
             {statusMessage}
           </p>
           <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">
-            To generate quality storybook illustrations and narration, this may take 2–3 minutes.
+            {t.progress.qualityNote}
           </p>
           <p className="text-xs text-purple-400 dark:text-purple-500 italic mb-6 h-4">
             {funTip}
@@ -336,13 +326,7 @@ export function GenerationProgress({ events, totalPages, activeJobId, mode }: Ge
 
           {/* Stage indicators */}
           <div className="flex items-center justify-center gap-1.5 md:gap-2 mb-6 flex-wrap">
-            {[
-              { label: 'Writing', idx: 0 },
-              { label: 'Reviewing', idx: 1 },
-              { label: 'Characters', idx: 2 },
-              { label: 'Illustrating', idx: 3 },
-              { label: 'Narrating', idx: 4 },
-            ].map((s, i) => (
+            {stageIndicators.map((s, i) => (
               <div key={s.label} className="flex items-center gap-1.5">
                 {i > 0 && (
                   <div className={`w-4 md:w-6 h-0.5 rounded-full transition-colors duration-500 ${

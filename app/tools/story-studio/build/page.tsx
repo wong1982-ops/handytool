@@ -1,9 +1,10 @@
 'use client'
 
-import { Suspense, useState, useEffect } from 'react'
+import { Suspense, useState, useEffect, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useStoryBook } from '@/tools/story-studio/use-story-book'
+import { useJobProgress } from '@/tools/story-studio/use-job-progress'
 import { PlotInput } from '@/tools/story-studio/plot-input'
 import { RefinementChat } from '@/tools/story-studio/refinement-chat'
 import { GenerationProgress } from '@/tools/story-studio/generation-progress'
@@ -189,6 +190,8 @@ function BuildContent() {
   const urlSeriesId = searchParams.get('seriesId')
 
   const storyBook = useStoryBook()
+  const { completedJobId, clearCompletion } = useJobProgress(user?.id)
+  const speedJobIdRef = useRef<string | null>(null)
 
   // Auto-set mode from URL
   useEffect(() => {
@@ -198,6 +201,74 @@ function BuildContent() {
       if (urlSeriesId) storyBook.setSeriesId(urlSeriesId)
     }
   }, [urlMode]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Speed mode: capture jobId when it becomes available
+  useEffect(() => {
+    if (storyBook.mode === 'speed' && storyBook.activeJobId && storyBook.phase === 'generating') {
+      speedJobIdRef.current = storyBook.activeJobId
+    }
+  }, [storyBook.activeJobId, storyBook.mode, storyBook.phase])
+
+  // Speed mode: poll every 3s for job completion (fast feedback)
+  useEffect(() => {
+    const jobId = speedJobIdRef.current
+    if (!jobId || storyBook.phase !== 'generating' || storyBook.mode !== 'speed') return
+
+    let cancelled = false
+    const interval = setInterval(async () => {
+      if (cancelled) return
+      try {
+        const res = await fetch(`/api/v1/story/jobs/${jobId}`, {
+          signal: AbortSignal.timeout(5000),
+        })
+        if (!res.ok || cancelled) return
+        const { job } = await res.json()
+        if (cancelled) return
+
+        if (job?.status === 'completed' || job?.book_id) {
+          clearInterval(interval)
+          const slug = job?.state?.slug
+          speedJobIdRef.current = null
+          clearCompletion()
+          router.push(slug ? `/tools/story-studio/book/${slug}` : '/tools/story-studio/bookshelf')
+        } else if (job?.status === 'failed') {
+          clearInterval(interval)
+          speedJobIdRef.current = null
+          storyBook.setError(job?.error_message || 'Generation failed')
+          storyBook.setPhase('input')
+        }
+      } catch { /* ignore poll errors */ }
+    }, 3000)
+
+    return () => { cancelled = true; clearInterval(interval) }
+  }, [storyBook.phase, storyBook.mode, storyBook.activeJobId, clearCompletion, router]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Realtime fallback: when job completes via Supabase Realtime, redirect
+  useEffect(() => {
+    if (!completedJobId || !speedJobIdRef.current) return
+    if (completedJobId !== speedJobIdRef.current) return
+
+    let cancelled = false
+    async function redirectToBook() {
+      try {
+        const res = await fetch(`/api/v1/story/jobs/${completedJobId}`)
+        if (!res.ok || cancelled) return
+        const { job } = await res.json()
+        if (cancelled) return
+        const slug = job?.state?.slug
+        speedJobIdRef.current = null
+        clearCompletion()
+        router.push(slug ? `/tools/story-studio/book/${slug}` : '/tools/story-studio/bookshelf')
+      } catch {
+        if (!cancelled) {
+          clearCompletion()
+          router.push('/tools/story-studio/bookshelf')
+        }
+      }
+    }
+    redirectToBook()
+    return () => { cancelled = true }
+  }, [completedJobId, clearCompletion, router])
 
   const handleBack = () => {
     storyBook.reset()
@@ -267,8 +338,8 @@ function BuildContent() {
           loading={loading}
           error={error}
           onGenerate={async (refinementInstruction) => {
+            // Stay on page — useEffect captures jobId when it becomes available
             await startGeneration(plot || '', selectedConcept, { skipIllustration: true, skipAudio: true, skipValidation: true, refinementInstruction })
-            router.push('/tools/story-studio')
           }}
           onBack={() => setPhase('input')}
         />

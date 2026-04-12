@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 interface StudioMobileHeaderProps {
   title: string
@@ -8,6 +9,7 @@ interface StudioMobileHeaderProps {
 }
 
 export function StudioMobileHeader({ title, onMenuToggle }: StudioMobileHeaderProps) {
+  const { t } = useLanguage()
   const router = useRouter()
 
   return (
@@ -16,7 +18,7 @@ export function StudioMobileHeader({ title, onMenuToggle }: StudioMobileHeaderPr
       <button
         onClick={() => router.back()}
         className="flex items-center justify-center w-11 h-11 rounded-full text-[#a6abb5] hover:text-white transition-colors cursor-pointer"
-        aria-label="Go back"
+        aria-label={t.mobile.goBack}
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -35,7 +37,7 @@ export function StudioMobileHeader({ title, onMenuToggle }: StudioMobileHeaderPr
       <button
         onClick={onMenuToggle}
         className="flex items-center justify-center w-11 h-11 rounded-full text-[#a6abb5] hover:text-white transition-colors cursor-pointer"
-        aria-label="Open menu"
+        aria-label={t.mobile.openMenu}
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />

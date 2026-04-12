@@ -1,6 +1,7 @@
 'use client'
 
 import type { StoryConcept } from './types'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 interface ConceptCardsProps {
   concept: StoryConcept
@@ -8,16 +9,17 @@ interface ConceptCardsProps {
   loading: boolean
 }
 
-const SECTION_LABELS: { key: keyof StoryConcept['sections']; label: string; icon: string }[] = [
-  { key: 'premise', label: 'The Story', icon: '📖' },
-  { key: 'authorIntent', label: 'What It Provokes', icon: '💭' },
-  { key: 'messageToAudience', label: 'The Takeaway', icon: '🎁' },
-  { key: 'narrativeArc', label: 'How It Unfolds', icon: '🗺️' },
-  { key: 'tone', label: 'The Voice', icon: '🎵' },
-  { key: 'visualStyle', label: 'The Look', icon: '🎨' },
-]
-
 export function ConceptCards({ concept, onPick, loading }: ConceptCardsProps) {
+  const { t } = useLanguage()
+
+  const SECTION_LABELS: { key: keyof StoryConcept['sections']; label: string; icon: string }[] = [
+    { key: 'premise', label: t.concept.theStory, icon: '📖' },
+    { key: 'authorIntent', label: t.concept.whatItProvokes, icon: '💭' },
+    { key: 'messageToAudience', label: t.concept.theTakeaway, icon: '🎁' },
+    { key: 'narrativeArc', label: t.concept.howItUnfolds, icon: '🗺️' },
+    { key: 'tone', label: t.concept.theVoice, icon: '🎵' },
+    { key: 'visualStyle', label: t.concept.theLook, icon: '🎨' },
+  ]
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -29,10 +31,10 @@ export function ConceptCards({ concept, onPick, loading }: ConceptCardsProps) {
           </div>
           <div>
             <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white" style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}>
-              Your Story Path
+              {t.concept.yourStoryPath}
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              The Story Fairy has crafted a concept from your idea
+              {t.concept.storyFairyCrafted}
             </p>
           </div>
         </div>
@@ -69,7 +71,7 @@ export function ConceptCards({ concept, onPick, loading }: ConceptCardsProps) {
                 {concept.tags.audience}
               </span>
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-[#a6abb5] border border-purple-200/50 dark:border-purple-800/40">
-                {concept.tags.pageCount} pages
+                {concept.tags.pageCount} {t.concept.pages}
               </span>
             </div>
           </div>
@@ -100,10 +102,10 @@ export function ConceptCards({ concept, onPick, loading }: ConceptCardsProps) {
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
               </svg>
-              Refine & Generate
+              {t.concept.refineAndGenerate}
             </button>
             <span className="text-xs text-slate-400 dark:text-slate-500 italic">
-              Click to customize or go straight to generation
+              {t.concept.clickToCustomize}
             </span>
           </div>
         </div>

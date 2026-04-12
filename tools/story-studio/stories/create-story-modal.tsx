@@ -1,5 +1,7 @@
 'use client'
 
+import { useLanguage } from '@/tools/story-studio/use-language-context'
+
 interface CreateStoryModalProps {
   open: boolean
   onClose: () => void
@@ -8,18 +10,19 @@ interface CreateStoryModalProps {
 }
 
 export function CreateStoryModal({ open, onClose, onSelectMode, onWriteFromScratch }: CreateStoryModalProps) {
+  const { t } = useLanguage()
   if (!open) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md mx-4 shadow-xl w-full">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Create a New Story</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t.createStory.title}</h2>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full
               text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors cursor-pointer"
-            aria-label="Close"
+            aria-label={t.createStory.close}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -43,11 +46,11 @@ export function CreateStoryModal({ open, onClose, onSelectMode, onWriteFromScrat
                 </svg>
               </div>
               <div>
-                <h3 className="font-medium text-sm text-slate-900 dark:text-white">Speed Mode</h3>
+                <h3 className="font-medium text-sm text-slate-900 dark:text-white">{t.createStory.speedMode}</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Quick story with cover. Add illustrations &amp; narration later.
+                  {t.createStory.speedDesc}
                 </p>
-                <p className="text-xs text-amber-500 mt-1.5">20 credits</p>
+                <p className="text-xs text-amber-500 mt-1.5">{t.createStory.speedCredits}</p>
               </div>
             </div>
           </button>
@@ -67,11 +70,11 @@ export function CreateStoryModal({ open, onClose, onSelectMode, onWriteFromScrat
                 </svg>
               </div>
               <div>
-                <h3 className="font-medium text-sm text-slate-900 dark:text-white">Professional Mode</h3>
+                <h3 className="font-medium text-sm text-slate-900 dark:text-white">{t.createStory.professionalMode}</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Full creative control. Edit each page, fine-tune illustrations &amp; narration.
+                  {t.createStory.professionalDesc}
                 </p>
-                <p className="text-xs text-[#3D6AF2] mt-1.5">50 credits</p>
+                <p className="text-xs text-[#3D6AF2] mt-1.5">{t.createStory.professionalCredits}</p>
               </div>
             </div>
           </button>
@@ -91,11 +94,11 @@ export function CreateStoryModal({ open, onClose, onSelectMode, onWriteFromScrat
                 </svg>
               </div>
               <div>
-                <h3 className="font-medium text-sm text-slate-900 dark:text-white">Write from scratch</h3>
+                <h3 className="font-medium text-sm text-slate-900 dark:text-white">{t.createStory.writeFromScratch}</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Start with a blank story. Add pages and write your own scenes, dialogue, and prompts.
+                  {t.createStory.writeFromScratchDesc}
                 </p>
-                <p className="text-xs text-green-500 mt-1.5">Free</p>
+                <p className="text-xs text-green-500 mt-1.5">{t.createStory.free}</p>
               </div>
             </div>
           </button>

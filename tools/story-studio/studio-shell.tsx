@@ -3,14 +3,15 @@
 import { ToolBreadcrumb } from '@/components/ui/tool-breadcrumb'
 import { TabNavigation } from '@/tools/story-studio/tab-navigation'
 import { BookSelector } from '@/tools/story-studio/book-selector'
-import { BookProvider, useBookContext } from '@/tools/story-studio/use-book-context'
+import { BookProvider } from '@/tools/story-studio/use-book-context'
+import { LanguageProvider, useLanguage } from '@/tools/story-studio/use-language-context'
 import Link from 'next/link'
 
 function ShellInner({ children }: { children: React.ReactNode }) {
-  const { activeBook } = useBookContext()
+  const { language, toggleLanguage, t } = useLanguage()
 
   return (
-    <div className="min-h-screen h-screen overflow-y-auto bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Fantasy header */}
       <div className="relative" style={{ background: '#090f16' }}>
         {/* Starfield background */}
@@ -44,9 +45,17 @@ function ShellInner({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 md:px-6 pt-4 pb-4 md:pt-5 md:pb-5">
-          {/* Top row: breadcrumb */}
-          <div className="hidden md:block">
-            <ToolBreadcrumb toolName="Story Studio" toolSlug="story-studio" />
+          {/* Top row: breadcrumb + language toggle */}
+          <div className="hidden md:flex items-center justify-between">
+            <ToolBreadcrumb toolName={t.studioTitle} toolSlug="story-studio" />
+            <button
+              onClick={toggleLanguage}
+              className="px-2.5 py-1 rounded-lg text-xs font-semibold text-[#a6abb5] hover:text-white bg-[#131a23] hover:bg-[#1e2631] border border-[#1e2631] transition-colors cursor-pointer"
+              style={{ minHeight: '32px' }}
+              aria-label={language === 'en' ? 'Switch to Chinese' : 'Switch to English'}
+            >
+              {language === 'en' ? t.langToggle.zh : t.langToggle.en}
+            </button>
           </div>
 
           {/* Header row: title + book selector */}
@@ -56,7 +65,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
               <Link
                 href="/"
                 className="md:hidden flex items-center justify-center w-9 h-9 rounded-full text-[#a6abb5] hover:text-white transition-colors"
-                aria-label="Home"
+                aria-label={t.home}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
@@ -73,12 +82,23 @@ function ShellInner({ children }: { children: React.ReactNode }) {
                 className="text-xl md:text-2xl font-bold text-white tracking-tight"
                 style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", serif' }}
               >
-                Story Studio
+                {t.studioTitle}
               </h1>
             </div>
 
-            {/* Book selector */}
-            <BookSelector />
+            <div className="flex items-center gap-2">
+              {/* Mobile language toggle */}
+              <button
+                onClick={toggleLanguage}
+                className="md:hidden px-2.5 py-1 rounded-lg text-xs font-semibold text-[#a6abb5] hover:text-white bg-[#131a23] hover:bg-[#1e2631] border border-[#1e2631] transition-colors cursor-pointer"
+                style={{ minHeight: '32px' }}
+                aria-label={language === 'en' ? 'Switch to Chinese' : 'Switch to English'}
+              >
+                {language === 'en' ? t.langToggle.zh : t.langToggle.en}
+              </button>
+              {/* Book selector */}
+              <BookSelector />
+            </div>
           </div>
         </div>
       </div>
@@ -98,8 +118,10 @@ function ShellInner({ children }: { children: React.ReactNode }) {
 
 export function StudioShell({ children }: { children: React.ReactNode }) {
   return (
-    <BookProvider>
-      <ShellInner>{children}</ShellInner>
-    </BookProvider>
+    <LanguageProvider>
+      <BookProvider>
+        <ShellInner>{children}</ShellInner>
+      </BookProvider>
+    </LanguageProvider>
   )
 }

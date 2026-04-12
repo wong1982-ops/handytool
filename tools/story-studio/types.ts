@@ -1,5 +1,7 @@
 // tools/story-studio/types.ts
 
+export type Language = 'en' | 'zh'
+
 export type CharacterRole = 'protagonist' | 'antagonist' | 'supporting'
 export type BookStatus = 'generating' | 'complete'
 export type ImageStatus = 'pending' | 'generating' | 'done' | 'error'

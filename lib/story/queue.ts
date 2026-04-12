@@ -9,9 +9,10 @@
  */
 
 const CRON_SECRET = process.env.CRON_SECRET || ''
-const APP_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : 'http://localhost:3000'
+const APP_URL = process.env.NODE_ENV === 'development'
+  ? 'http://localhost:3000'
+  : process.env.NEXT_PUBLIC_SITE_URL
+    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
 
 /** All steps in the generation pipeline, in order. */
 export const PIPELINE_STEPS = [

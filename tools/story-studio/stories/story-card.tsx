@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { StoryItem } from '@/tools/story-studio/use-stories-list'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 interface StoryCardProps {
   story: StoryItem
@@ -13,6 +14,7 @@ interface StoryCardProps {
 }
 
 export function StoryCard({ story, onEdit, onDelete, onToggleShare, onMarkComplete }: StoryCardProps) {
+  const { t } = useLanguage()
   const dateStr = new Date(story.createdAt).toLocaleDateString(undefined, {
     month: 'short', day: 'numeric', year: 'numeric',
   })
@@ -47,7 +49,7 @@ export function StoryCard({ story, onEdit, onDelete, onToggleShare, onMarkComple
           <div className="min-w-0">
             <h3 className="font-medium text-sm text-slate-900 dark:text-white truncate">{story.title}</h3>
             <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-              {story.pageCount} pages &middot; {dateStr}
+              {story.pageCount} {t.storyCard.pages} &middot; {dateStr}
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -56,7 +58,7 @@ export function StoryCard({ story, onEdit, onDelete, onToggleShare, onMarkComple
                 ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                 : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
             }`}>
-              {story.status === 'complete' ? 'Complete' : 'Draft'}
+              {story.status === 'complete' ? t.storyCard.complete : t.storyCard.draft}
             </span>
             {story.status !== 'complete' && onMarkComplete && (
               <button
@@ -64,9 +66,9 @@ export function StoryCard({ story, onEdit, onDelete, onToggleShare, onMarkComple
                 className="text-[10px] font-medium px-1.5 py-0.5 rounded-full cursor-pointer
                   bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400
                   hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors"
-                title="Mark this story as complete"
+                title={t.storyCard.markCompleteTitle}
               >
-                ✓ Complete
+                {t.storyCard.markComplete}
               </button>
             )}
           </div>
@@ -88,14 +90,14 @@ export function StoryCard({ story, onEdit, onDelete, onToggleShare, onMarkComple
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
             </svg>
-            Edit
+            {t.storyCard.edit}
           </button>
           <button
             onClick={() => onToggleShare(story.id, !story.isPublic)}
             className="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-[#3D6AF2]
               rounded-lg transition-colors cursor-pointer"
-            aria-label={story.isPublic ? 'Make private' : 'Make public'}
-            title={story.isPublic ? 'Public — click to make private' : 'Private — click to share'}
+            aria-label={story.isPublic ? t.storyCard.makePrivate : t.storyCard.makePublic}
+            title={story.isPublic ? t.storyCard.publicTip : t.storyCard.privateTip}
           >
             {story.isPublic ? (
               <svg className="w-3.5 h-3.5 text-[#3D6AF2]" fill="currentColor" viewBox="0 0 24 24">
@@ -112,7 +114,7 @@ export function StoryCard({ story, onEdit, onDelete, onToggleShare, onMarkComple
             onClick={() => onDelete(story.id)}
             className="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-red-500
               rounded-lg transition-colors cursor-pointer"
-            aria-label="Delete"
+            aria-label={t.storyCard.delete}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />

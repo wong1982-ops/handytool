@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 interface BulkGenerateActionsProps {
   bookId: string
@@ -17,6 +18,7 @@ export function BulkGenerateActions({
   hasIllustrations,
   hasNarration,
 }: BulkGenerateActionsProps) {
+  const { language } = useLanguage()
   const [illustrateStatus, setIllustrateStatus] = useState<ActionStatus>('idle')
   const [narrateStatus, setNarrateStatus] = useState<ActionStatus>('idle')
   const [illustrateMessage, setIllustrateMessage] = useState('')
@@ -49,6 +51,8 @@ export function BulkGenerateActions({
     try {
       const res = await fetch(`/api/v1/story/books/${bookId}/bulk-narrate`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ narrationLanguage: language }),
       })
       const json = await res.json()
       if (!res.ok) {

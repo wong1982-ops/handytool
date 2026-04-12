@@ -54,15 +54,16 @@ export function MobileShell({ children }: MobileShellProps) {
   }, [])
 
   // Lock html+body scroll when MobileShell is active to prevent scrollbar bleed-through
+  // Skip for full-screen routes — they manage their own scrolling
   useEffect(() => {
-    if (!isMobile) return
+    if (!isMobile || isFullScreen) return
     document.documentElement.style.overflow = 'hidden'
     document.body.style.overflow = 'hidden'
     return () => {
       document.documentElement.style.overflow = ''
       document.body.style.overflow = ''
     }
-  }, [isMobile])
+  }, [isMobile, isFullScreen])
 
   if (!isMobile) return null
 
@@ -70,7 +71,7 @@ export function MobileShell({ children }: MobileShellProps) {
   // pointer-events-none on wrapper so the page's own fixed layout receives clicks
   if (isFullScreen) {
     return (
-      <div className="fixed inset-0 z-[60] pointer-events-none [&>*]:pointer-events-auto">
+      <div className="fixed inset-0 z-[60] overflow-y-auto pointer-events-none [&>*]:pointer-events-auto">
         {children}
       </div>
     )

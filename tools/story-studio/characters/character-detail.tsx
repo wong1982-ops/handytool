@@ -6,6 +6,7 @@ import { useSeriesList } from '@/tools/story-studio/use-series'
 import { CharacterForm } from '@/tools/story-studio/characters/character-form'
 import { PortraitLightbox } from '@/tools/story-studio/characters/portrait-lightbox'
 import { VoiceRecorder } from '@/tools/story-studio/characters/voice-recorder'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 interface CharacterDetailProps {
   characterId: string
@@ -13,6 +14,7 @@ interface CharacterDetailProps {
 }
 
 export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
+  const { t } = useLanguage()
   const {
     character, portraits, loading, refining,
     updateCharacter, generatePortrait, setPrimaryPortrait, approveCharacter,
@@ -54,7 +56,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
   const handleStyleClick = (styleValue: string, styleLabel: string) => {
     if (refining) return
     if (!character.physicalDescription) {
-      setError('Add a physical description before generating a portrait')
+      setError(t.characterDetail.addPhysicalDesc)
       return
     }
 
@@ -77,7 +79,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
     try {
       await generatePortrait(styleValue)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Generation failed')
+      setError(e instanceof Error ? e.message : t.characterDetail.generationFailed)
     }
   }
 
@@ -88,7 +90,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
       await generatePortrait(selectedPortrait.artStyle, feedback || undefined, selectedPortrait.id)
       setFeedback('')
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Refinement failed')
+      setError(e instanceof Error ? e.message : t.characterDetail.refinementFailed)
     }
   }
 
@@ -126,16 +128,16 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Generate Portrait</h3>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t.characterDetail.generatePortrait}</h3>
             </div>
             <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
-              Generate a <strong className="text-slate-800 dark:text-slate-200">{confirmStyle.label}</strong> portrait for {character.name}?
+              {t.characterDetail.generatePortraitConfirm.replace('{style}', confirmStyle.label).replace('{name}', character.name)}
             </p>
             <p className="text-sm font-medium text-amber-600 dark:text-amber-400 mb-6 flex items-center gap-1.5">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
-              This will use 1 credit
+              {t.characterDetail.useOneCredit}
             </p>
             <div className="flex gap-3">
               <button
@@ -145,7 +147,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                   rounded-lg transition-colors cursor-pointer"
                 style={{ minHeight: '44px' }}
               >
-                Cancel
+                {t.characterDetail.cancel}
               </button>
               <button
                 onClick={handleConfirmGenerate}
@@ -153,7 +155,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                   bg-[#3D6AF2] hover:bg-[#3560d8] rounded-lg transition-colors cursor-pointer"
                 style={{ minHeight: '44px' }}
               >
-                Generate
+                {t.characterDetail.generate}
               </button>
             </div>
           </div>
@@ -166,7 +168,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
           onClick={onBack}
           className="flex items-center justify-center w-9 h-9 rounded-full
             hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-          aria-label="Back to characters"
+          aria-label={t.characterDetail.backToCharacters}
         >
           <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -178,7 +180,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
             ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
             : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
         }`}>
-          {character.status === 'approved' ? 'Approved' : 'Draft'}
+          {character.status === 'approved' ? t.characters.approved : t.characters.draft}
         </span>
       </div>
 
@@ -204,7 +206,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                     </span>
                     {selectedPortrait.isPrimary && (
                       <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-500/80 text-white backdrop-blur-sm">
-                        Primary
+                        {t.characterDetail.primary}
                       </span>
                     )}
                   </div>
@@ -213,7 +215,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-2">
                       <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span className="text-sm text-white font-medium">Generating...</span>
+                      <span className="text-sm text-white font-medium">{t.characterDetail.generating}</span>
                     </div>
                   </div>
                 )}
@@ -223,14 +225,14 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                 {refining ? (
                   <>
                     <div className="w-12 h-12 border-2 border-[#3D6AF2] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm mt-3 text-[#3D6AF2] font-medium">Generating portrait...</p>
+                    <p className="text-sm mt-3 text-[#3D6AF2] font-medium">{t.characterDetail.generatingPortrait}</p>
                   </>
                 ) : (
                   <>
                     <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0" />
                     </svg>
-                    <p className="text-sm mt-2">Pick a style below to generate</p>
+                    <p className="text-sm mt-2">{t.characterDetail.pickStyleToGenerate}</p>
                   </>
                 )}
               </div>
@@ -282,7 +284,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                 rounded-lg transition-colors cursor-pointer"
               style={{ minHeight: '44px' }}
             >
-              Set as Primary Portrait
+              {t.characterDetail.setPrimaryPortrait}
             </button>
           )}
 
@@ -290,14 +292,14 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
           {selectedPortrait && (
             <div className="space-y-2">
               <div className="text-xs text-slate-500">
-                Refinements: {selectedPortrait.refinementCount}/3
+                {t.characterDetail.refinements.replace('{count}', String(selectedPortrait.refinementCount))}
               </div>
               {selectedPortrait.refinementCount < 3 && (
                 <>
                   <textarea
                     value={feedback}
                     onChange={e => setFeedback(e.target.value)}
-                    placeholder="Feedback for refinement (e.g., 'make the hair curlier')"
+                    placeholder={t.characterDetail.feedbackPlaceholder}
                     rows={2}
                     className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600
                       bg-white dark:bg-slate-800 text-sm resize-none
@@ -310,7 +312,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                       disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors cursor-pointer"
                     style={{ minHeight: '44px' }}
                   >
-                    {refining ? 'Refining...' : 'Refine Portrait (free)'}
+                    {refining ? t.characterDetail.refining : t.characterDetail.refinePortrait}
                   </button>
                 </>
               )}
@@ -320,13 +322,13 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
           {canApprove && (
             <button
               onClick={async () => {
-                try { await approveCharacter() } catch { setError('Failed to approve') }
+                try { await approveCharacter() } catch { setError(t.characterDetail.failedApprove) }
               }}
               className="w-full px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700
                 rounded-lg transition-colors cursor-pointer"
               style={{ minHeight: '44px' }}
             >
-              Approve Character
+              {t.characterDetail.approveCharacter}
             </button>
           )}
         </div>
@@ -335,7 +337,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
         <div className="space-y-4">
           {/* Art style picker */}
           <div>
-            <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Art Styles</h3>
+            <h3 className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">{t.characterDetail.artStyles}</h3>
             <div className="flex flex-wrap gap-1.5">
               {ART_STYLES.map(style => {
                 const existing = stylePortraitMap.get(style.value)
@@ -376,13 +378,13 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                 <svg className="w-2.5 h-2.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                Generated
+                {t.characterDetail.generated}
               </span>
               <span className="inline-flex items-center gap-0.5">
                 <svg className="w-2.5 h-2.5 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
-                1 credit
+                {t.characterDetail.oneCredit}
               </span>
             </p>
           </div>
@@ -391,31 +393,31 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
           <div className="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-800">
             {character.role && (
               <div>
-                <span className="text-xs font-medium text-slate-400 uppercase">Role</span>
+                <span className="text-xs font-medium text-slate-400 uppercase">{t.characterDetail.role}</span>
                 <p className="text-sm text-slate-700 dark:text-slate-300 capitalize">{character.role}</p>
               </div>
             )}
             {character.age && (
               <div>
-                <span className="text-xs font-medium text-slate-400 uppercase">Age</span>
+                <span className="text-xs font-medium text-slate-400 uppercase">{t.characterDetail.age}</span>
                 <p className="text-sm text-slate-700 dark:text-slate-300">{character.age}</p>
               </div>
             )}
             {character.personality && (
               <div>
-                <span className="text-xs font-medium text-slate-400 uppercase">Personality</span>
+                <span className="text-xs font-medium text-slate-400 uppercase">{t.characterDetail.personality}</span>
                 <p className="text-sm text-slate-700 dark:text-slate-300">{character.personality}</p>
               </div>
             )}
             {character.physicalDescription && (
               <div>
-                <span className="text-xs font-medium text-slate-400 uppercase">Physical Description</span>
+                <span className="text-xs font-medium text-slate-400 uppercase">{t.characterDetail.physicalDescription}</span>
                 <p className="text-sm text-slate-700 dark:text-slate-300">{character.physicalDescription}</p>
               </div>
             )}
             {character.voice && (
               <div>
-                <span className="text-xs font-medium text-slate-400 uppercase">Voice</span>
+                <span className="text-xs font-medium text-slate-400 uppercase">{t.characterDetail.voice}</span>
                 <p className="text-sm text-slate-700 dark:text-slate-300">{character.voice}</p>
               </div>
             )}
@@ -423,11 +425,11 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
 
           {/* Custom Voice Recording */}
           <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
-            <h3 className="text-xs font-medium text-slate-400 uppercase mb-2">Your Voice</h3>
+            <h3 className="text-xs font-medium text-slate-400 uppercase mb-2">{t.characterDetail.yourVoice}</h3>
             <VoiceRecorder characterId={character.id} characterName={character.name} />
             {character.voice && (
               <p className="text-[11px] text-slate-400 mt-2 italic">
-                This voice will be used for the character. Delete it to pick a different one.
+                {t.characterDetail.voiceUsedHint}
               </p>
             )}
           </div>
@@ -438,12 +440,12 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
               hover:bg-[#3D6AF2]/10 dark:hover:bg-[#3D6AF2]/15 rounded-lg transition-colors cursor-pointer"
             style={{ minHeight: '44px' }}
           >
-            Edit Details
+            {t.characterDetail.editDetails}
           </button>
 
           {/* Series linking */}
           <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
-            <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Series</h3>
+            <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{t.characterDetail.series}</h3>
 
             {linkedSeriesIds.length > 0 ? (
               <div className="space-y-1 mb-3">
@@ -454,13 +456,13 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                       onClick={() => unlinkFromSeries(s.id)}
                       className="text-xs text-red-500 hover:text-red-700 cursor-pointer"
                     >
-                      Remove
+                      {t.characterDetail.remove}
                     </button>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-400 italic mb-3">Not in any series</p>
+              <p className="text-xs text-slate-400 italic mb-3">{t.characterDetail.notInAnySeries}</p>
             )}
 
             {availableSeries.length > 0 && (
@@ -472,7 +474,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                     bg-white dark:bg-slate-800 text-sm
                     focus:outline-none focus:ring-2 focus:ring-[#3D6AF2]"
                 >
-                  <option value="">Add to series...</option>
+                  <option value="">{t.characterDetail.addToSeries}</option>
                   {availableSeries.map(s => (
                     <option key={s.id} value={s.id}>{s.title}</option>
                   ))}
@@ -488,7 +490,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                     disabled:opacity-50 disabled:cursor-not-allowed rounded-lg cursor-pointer"
                   style={{ minHeight: '44px' }}
                 >
-                  Add
+                  {t.characterDetail.add}
                 </button>
               </div>
             )}

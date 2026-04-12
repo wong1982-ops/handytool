@@ -8,10 +8,30 @@ import {
   type TtsProvider,
 } from '@/lib/story/tts'
 
+/**
+ * Filter bilingual text to keep only the target language.
+ * Chinese is detected by Unicode ranges for CJK characters and punctuation.
+ */
+function filterTextByLanguage(text: string, language: 'en' | 'zh'): string {
+  // Split by sentences (period, exclamation, question mark, Chinese period/exclamation)
+  const sentences = text.split(/(?<=[.!?。！？])\s*/)
+  const filtered = sentences.filter(s => {
+    const trimmed = s.trim()
+    if (!trimmed) return false
+    // Count Chinese characters
+    const chineseChars = (trimmed.match(/[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]/g) || []).length
+    const totalChars = trimmed.replace(/\s/g, '').length
+    const chineseRatio = totalChars > 0 ? chineseChars / totalChars : 0
+    // If >30% Chinese characters, it's a Chinese sentence
+    return language === 'zh' ? chineseRatio > 0.3 : chineseRatio <= 0.3
+  })
+  return filtered.join(' ').trim() || text // fallback to original if filter removes everything
+}
+
 export const POST = withJobStep('tts_page', async (ctx) => {
   const { job, supabase } = ctx
   const pageNum = parseInt(ctx.params.page, 10)
-  const { seriesId } = job.input as { seriesId?: string }
+  const { seriesId, narrationLanguage } = job.input as { seriesId?: string; narrationLanguage?: 'en' | 'zh' }
 
   // Idempotent: check if this page's audio is already done
   const existingAudio = (job.state.audio as { seq: number; audioUrl: string }[] | undefined) ?? []
@@ -35,6 +55,17 @@ export const POST = withJobStep('tts_page', async (ctx) => {
   if (!page) {
     throw new Error(`Page ${pageNum} not found in story data`)
   }
+
+  // Filter text by language for bilingual books
+  const narrativeText = narrationLanguage
+    ? filterTextByLanguage(page.narrativeText, narrationLanguage)
+    : page.narrativeText
+  const dialogue = narrationLanguage && page.dialogue
+    ? page.dialogue.map(d => ({
+        ...d,
+        line: filterTextByLanguage(d.line, narrationLanguage),
+      })).filter(d => d.line.trim())
+    : page.dialogue
 
   // Get or build voice map
   let voiceMap = job.state.voiceMap as Record<string, string> | undefined
@@ -86,7 +117,7 @@ export const POST = withJobStep('tts_page', async (ctx) => {
 
   try {
     if (lockedProvider === 'openai') {
-      const narration = buildPageNarration(page.narrativeText, page.dialogue)
+      const narration = buildPageNarration(narrativeText, dialogue)
       const result = await generatePageAudio({
         text: narration,
         bookId,
@@ -95,7 +126,7 @@ export const POST = withJobStep('tts_page', async (ctx) => {
       })
       audioUrl = result.audioUrl
     } else {
-      const segments = segmentPageAudio(page.narrativeText, page.dialogue, voiceMap)
+      const segments = segmentPageAudio(narrativeText, dialogue, voiceMap)
       const result = await generateMultiVoicePageAudio({
         segments,
         bookId,
