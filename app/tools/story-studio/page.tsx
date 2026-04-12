@@ -8,6 +8,8 @@ import { useJobProgress } from '@/tools/story-studio/use-job-progress'
 import { StoryList } from '@/tools/story-studio/stories/story-list'
 import { InProgressSection } from '@/tools/story-studio/job-card'
 import { signInWithOAuth } from '@/lib/supabase/auth'
+import { useMobileShell } from '@/lib/hooks/use-mobile-shell'
+import { MobileHome } from '@/tools/story-studio/mobile/mobile-home'
 
 export default function StoriesPage() {
   return (
@@ -23,6 +25,12 @@ function StoriesContent() {
 
   const storiesList = useStoriesList()
   const { jobs: activeJobs, retryJob, deleteJob, completedJobId, clearCompletion } = useJobProgress(user?.id)
+
+  const isMobile = useMobileShell()
+
+  if (isMobile) {
+    return <MobileHome />
+  }
 
   // When a job completes, open the result
   useEffect(() => {
