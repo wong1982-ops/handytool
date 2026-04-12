@@ -153,14 +153,14 @@ function ContentPage({
   const hasImage = Boolean(page.imageUrl)
 
   return (
-    <div className="flex h-full flex-col bg-white dark:bg-slate-900">
-      {/* Image area */}
+    <div className="relative h-full bg-slate-900">
+      {/* Full-bleed image background */}
       {hasImage ? (
         <button
           type="button"
           aria-label="View image"
           onClick={onImageTap}
-          className="relative h-[60%] w-full shrink-0 cursor-pointer overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3D6AF2]"
+          className="absolute inset-0 cursor-pointer focus-visible:outline-none"
         >
           <Image
             src={page.imageUrl!}
@@ -170,13 +170,15 @@ function ContentPage({
           />
         </button>
       ) : (
-        /* Smaller spacer when no image */
-        <div className="h-[20%] shrink-0 bg-slate-100 dark:bg-slate-800" />
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-100 via-purple-50 to-amber-50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-700" />
       )}
 
-      {/* Text area — scrollable */}
+      {/* Gradient overlay — bottom half */}
+      <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/80 via-black/50 to-transparent pointer-events-none" />
+
+      {/* Text overlay at bottom */}
       <div
-        className="flex-1 overflow-y-auto px-5 py-4"
+        className="absolute inset-x-0 bottom-0 px-5 pb-5 max-h-[55%] overflow-y-auto"
         onTouchStart={onTouchStart}
         onTouchEnd={onCancelLongPress}
         onTouchCancel={onCancelLongPress}
@@ -184,7 +186,7 @@ function ContentPage({
         {/* Narrative text */}
         {page.narrativeText && (
           <p
-            className="text-base leading-relaxed text-slate-900 dark:text-slate-100"
+            className="text-base leading-relaxed text-white/95 drop-shadow-md"
             style={{ fontFamily: SERIF_FONT }}
           >
             {page.narrativeText}
@@ -193,9 +195,21 @@ function ContentPage({
 
         {/* Dialogue */}
         {page.dialogue && page.dialogue.length > 0 && (
-          <div className="mt-4 space-y-3">
+          <div className="mt-3 space-y-2">
             {page.dialogue.map((d, i) => (
-              <DialogueLine key={i} speaker={d.speaker} line={d.line} />
+              <div key={i} className="border-l-2 border-amber-400/60 pl-3">
+                {d.speaker && (
+                  <span className="block text-[10px] font-semibold uppercase tracking-wider text-amber-300/80">
+                    {d.speaker}
+                  </span>
+                )}
+                <p
+                  className="text-sm italic text-white/90"
+                  style={{ fontFamily: SERIF_FONT }}
+                >
+                  &ldquo;{d.line}&rdquo;
+                </p>
+              </div>
             ))}
           </div>
         )}
@@ -204,32 +218,3 @@ function ContentPage({
   )
 }
 
-// ---------------------------------------------------------------------------
-// Dialogue Line
-// ---------------------------------------------------------------------------
-
-interface DialogueLineProps {
-  speaker: string
-  line: string
-}
-
-function DialogueLine({ speaker, line }: DialogueLineProps) {
-  return (
-    <div className="border-l-4 border-amber-400 pl-4 dark:border-amber-500">
-      {speaker && (
-        <span
-          className="block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300"
-          style={{ fontFamily: SERIF_FONT, fontVariant: 'small-caps' }}
-        >
-          {speaker}
-        </span>
-      )}
-      <p
-        className="mt-0.5 italic text-slate-900 dark:text-slate-100"
-        style={{ fontFamily: SERIF_FONT }}
-      >
-        {line}
-      </p>
-    </div>
-  )
-}
