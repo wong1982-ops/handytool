@@ -68,13 +68,9 @@ export function MobileShell({ children }: MobileShellProps) {
   if (!isMobile) return null
 
   // Full-screen routes (e.g. Story Studio, ID Photo) render children directly — no tabs, no bottom bar
-  // pointer-events-none on wrapper so the page's own fixed layout receives clicks
+  // No wrapper needed — these routes manage their own layout and scrolling
   if (isFullScreen) {
-    return (
-      <div className="fixed inset-0 z-[60] overflow-y-auto overflow-x-hidden pointer-events-none [&>*]:pointer-events-auto">
-        {children}
-      </div>
-    )
+    return <>{children}</>
   }
 
   return (
