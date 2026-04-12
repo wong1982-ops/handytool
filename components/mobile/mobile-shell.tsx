@@ -71,7 +71,7 @@ export function MobileShell({ children }: MobileShellProps) {
   // pointer-events-none on wrapper so the page's own fixed layout receives clicks
   if (isFullScreen) {
     return (
-      <div className="fixed inset-0 z-[60] overflow-y-auto pointer-events-none [&>*]:pointer-events-auto">
+      <div className="fixed inset-0 z-[60] overflow-y-auto overflow-x-hidden pointer-events-none [&>*]:pointer-events-auto">
         {children}
       </div>
     )

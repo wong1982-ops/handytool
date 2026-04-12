@@ -259,7 +259,7 @@ export default async function BookPage({ params }: BookPageProps) {
   return (
     <BookPageShell>
       {/* SEO-only static preview (hidden visually, visible to crawlers) */}
-      <div className="sr-only">
+      <div className="sr-only overflow-hidden">
         <h1>{title}</h1>
         {authors.length > 0 && <p>Written by {authors.join(' & ')}</p>}
         {premise && <p>{premise}</p>}
