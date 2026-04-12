@@ -56,6 +56,7 @@ function HomeInner() {
   const storiesList = useStoriesList()
   const jobProgressHook = useJobProgress(user?.id)
   const storyBook = useStoryBook()
+  const { sortBy, setSortBy, search, setSearch } = storiesList
 
   const [input, setInput] = useState('')
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -301,29 +302,72 @@ function HomeInner() {
         {/* Bookshelf */}
         {(storiesList.loading || storiesList.allStories.length > 0) && (
           <section aria-label="My stories">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                {language === 'zh' ? '我的绘本' : 'My Stories'}
-                {!storiesList.loading && (
-                  <span className="ml-1.5 text-xs text-slate-400 dark:text-slate-500 font-normal">
-                    ({storiesList.allStories.length})
-                  </span>
-                )}
-              </h2>
+            {/* Sticky filter bar — sticks below the top header when scrolled */}
+            <div className="sticky top-[52px] z-10 -mx-4 px-4 py-2 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm">
+              <div className="flex items-center gap-2">
+                {/* Section title */}
+                <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 shrink-0">
+                  {language === 'zh' ? '我的绘本' : 'My Stories'}
+                  {!storiesList.loading && (
+                    <span className="ml-1.5 text-xs text-slate-400 dark:text-slate-500 font-normal">
+                      ({storiesList.allStories.length})
+                    </span>
+                  )}
+                </h2>
+
+                <div className="flex-1" />
+
+                {/* Search input (compact) */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder={language === 'zh' ? '搜索...' : 'Search...'}
+                    className="w-28 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 pl-7 pr-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#3D6AF2] placeholder:text-slate-400"
+                    style={{ minHeight: '32px' }}
+                  />
+                  <svg className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                  </svg>
+                </div>
+
+                {/* Sort selector */}
+                <select
+                  value={sortBy}
+                  onChange={e => setSortBy(e.target.value as typeof sortBy)}
+                  className="rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#3D6AF2] appearance-none"
+                  style={{ minHeight: '32px' }}
+                  aria-label={language === 'zh' ? '排序方式' : 'Sort by'}
+                >
+                  <option value="newest">{language === 'zh' ? '最新' : 'Newest'}</option>
+                  <option value="oldest">{language === 'zh' ? '最早' : 'Oldest'}</option>
+                  <option value="updated">{language === 'zh' ? '最近更新' : 'Updated'}</option>
+                  <option value="alphabetical">{language === 'zh' ? 'A→Z' : 'A→Z'}</option>
+                </select>
+              </div>
             </div>
+
+            {/* Grid */}
             {storiesList.loading ? (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 mt-2">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="aspect-[3/4] rounded-xl bg-slate-200 dark:bg-slate-800 animate-pulse" />
                 ))}
               </div>
+            ) : storiesList.stories.length === 0 ? (
+              <p className="text-center text-sm text-slate-400 dark:text-slate-500 py-8">
+                {language === 'zh' ? '没有匹配的故事' : 'No matching stories'}
+              </p>
             ) : (
-              <MobileCoverGrid
-                stories={storiesList.allStories}
-                activeJobs={activeJobs}
-                onDelete={storiesList.deleteStory}
-                onToggleShare={storiesList.toggleShare}
-              />
+              <div className="mt-2">
+                <MobileCoverGrid
+                  stories={storiesList.stories}
+                  activeJobs={activeJobs}
+                  onDelete={storiesList.deleteStory}
+                  onToggleShare={storiesList.toggleShare}
+                />
+              </div>
             )}
           </section>
         )}
