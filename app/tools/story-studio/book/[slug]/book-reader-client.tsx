@@ -4,6 +4,8 @@ import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import { BookViewer } from '@/tools/story-studio/book-viewer'
 import { BulkGenerateActions } from '@/tools/story-studio/bulk-generate-actions'
 import { LanguageProvider } from '@/tools/story-studio/use-language-context'
+import { MobileReader } from '@/tools/story-studio/mobile/mobile-reader'
+import { useMobileShell } from '@/lib/hooks/use-mobile-shell'
 import type { StoryBook, Page } from '@/tools/story-studio/types'
 import { PageEditor } from './page-editor'
 
@@ -130,6 +132,22 @@ export function BookReaderClient({ bookData, bookId, isOwner, initialPages, page
   const hasIllustrations = pages.length > 0 && pages.some(p => !!p.imageUrl)
   const hasNarration = pages.length > 0 && pages.some(p => !!p.audioUrl)
   const showBulkActions = isOwner && bookId && bookMode === 'speed'
+
+  const isMobile = useMobileShell()
+
+  if (isMobile) {
+    return (
+      <LanguageProvider>
+        <MobileReader
+          book={book}
+          isOwner={isOwner}
+          onEditPage={isOwner && bookId ? (sequence) => setEditingPage(sequence) : undefined}
+          onPageChange={handlePageChange}
+          totalPages={totalPages}
+        />
+      </LanguageProvider>
+    )
+  }
 
   return (
     <LanguageProvider>
