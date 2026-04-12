@@ -299,22 +299,32 @@ function HomeInner() {
         )}
 
         {/* Bookshelf */}
-        {storiesList.allStories.length > 0 && (
+        {(storiesList.loading || storiesList.allStories.length > 0) && (
           <section aria-label="My stories">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                 {language === 'zh' ? '我的绘本' : 'My Stories'}
-                <span className="ml-1.5 text-xs text-slate-400 dark:text-slate-500 font-normal">
-                  ({storiesList.allStories.length})
-                </span>
+                {!storiesList.loading && (
+                  <span className="ml-1.5 text-xs text-slate-400 dark:text-slate-500 font-normal">
+                    ({storiesList.allStories.length})
+                  </span>
+                )}
               </h2>
             </div>
-            <MobileCoverGrid
-              stories={storiesList.allStories}
-              activeJobs={activeJobs}
-              onDelete={storiesList.deleteStory}
-              onToggleShare={storiesList.toggleShare}
-            />
+            {storiesList.loading ? (
+              <div className="grid grid-cols-2 gap-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="aspect-[3/4] rounded-xl bg-slate-200 dark:bg-slate-800 animate-pulse" />
+                ))}
+              </div>
+            ) : (
+              <MobileCoverGrid
+                stories={storiesList.allStories}
+                activeJobs={activeJobs}
+                onDelete={storiesList.deleteStory}
+                onToggleShare={storiesList.toggleShare}
+              />
+            )}
           </section>
         )}
       </main>
