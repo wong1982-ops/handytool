@@ -107,6 +107,9 @@ export function BookReaderClient({ bookData, bookId, isOwner, initialPages, page
     setPages(prev => prev.map(p => p.sequence === sequence ? { ...p, ...updates } : p))
   }, [])
 
+  // Must call all hooks before any early returns
+  const isMobile = useMobileShell()
+
   if (!pages.length && totalPages === 0) return null
 
   // Show page editor overlay when editing
@@ -132,8 +135,6 @@ export function BookReaderClient({ bookData, bookId, isOwner, initialPages, page
   const hasIllustrations = pages.length > 0 && pages.some(p => !!p.imageUrl)
   const hasNarration = pages.length > 0 && pages.some(p => !!p.audioUrl)
   const showBulkActions = isOwner && bookId && bookMode === 'speed'
-
-  const isMobile = useMobileShell()
 
   if (isMobile) {
     return (
