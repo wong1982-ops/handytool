@@ -51,7 +51,7 @@ export function MobileHome() {
 function HomeInner() {
   const router = useRouter()
   const { user } = useAuth()
-  const { t, language, toggleLanguage } = useLanguage()
+  const { language, toggleLanguage } = useLanguage()
 
   const storiesList = useStoriesList()
   const jobProgressHook = useJobProgress(user?.id)
