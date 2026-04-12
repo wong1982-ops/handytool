@@ -199,8 +199,8 @@ function BookPageShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10">
-        {/* Sticky CTA header */}
-        <div className="sticky top-0 z-30 -mx-4 md:-mx-6 px-4 md:px-6 py-2.5 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between gap-3 mb-4">
+        {/* Sticky CTA header — hidden on mobile (MobileReader has its own) */}
+        <div className="sticky top-0 z-30 -mx-4 md:-mx-6 px-4 md:px-6 py-2.5 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-200/60 dark:border-slate-800/60 hidden md:flex items-center justify-between gap-3 mb-4">
           <BackButton />
           <Link
             href="/tools/story-studio"

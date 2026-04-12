@@ -43,7 +43,7 @@ function ReaderInner({
   onPageChange,
 }: MobileReaderProps) {
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
 
   // ------------------------------------------------------------------
   // Page state (0 = cover, 1..N = content pages)
@@ -91,10 +91,12 @@ function ReaderInner({
   // Top-bar auto-hide
   // ------------------------------------------------------------------
   const [topBarVisible, setTopBarVisible] = useState(true)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const handleCenterTap = useCallback(() => {
+    if (menuOpen) { setMenuOpen(false); return }
     setTopBarVisible((v) => !v)
-  }, [])
+  }, [menuOpen])
 
   // ------------------------------------------------------------------
   // Swipe handling
@@ -283,21 +285,54 @@ function ReaderInner({
           </h1>
 
           {/* More (⋯) menu button */}
-          <button
-            type="button"
-            aria-label="More options"
-            className="flex items-center justify-center w-11 h-11 -mr-2 rounded-full text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3D6AF2]"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-5 h-5"
-              aria-hidden="true"
+          <div className="relative">
+            <button
+              type="button"
+              aria-label="More options"
+              aria-expanded={menuOpen}
+              onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v) }}
+              className="flex items-center justify-center w-11 h-11 -mr-2 rounded-full text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3D6AF2]"
             >
-              <path d="M3 10a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM8.5 10a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM15.5 8.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-5 h-5"
+                aria-hidden="true"
+              >
+                <path d="M3 10a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM8.5 10a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0ZM15.5 8.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />
+              </svg>
+            </button>
+
+            {/* Dropdown menu */}
+            {menuOpen && (
+              <div className="absolute right-0 top-full mt-1 w-56 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl py-1 z-10">
+                <a
+                  href="/tools/story-studio"
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                  style={{ minHeight: '44px' }}
+                >
+                  <svg className="w-4 h-4 text-[#3D6AF2]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                  {language === 'zh' ? '创建新故事' : 'Create Your Own Story'}
+                </a>
+                {isOwner && onEditPage && currentPage > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => { setMenuOpen(false); onEditPage!(activePage!.sequence) }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-left"
+                    style={{ minHeight: '44px' }}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                    </svg>
+                    {language === 'zh' ? '编辑此页' : 'Edit This Page'}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
