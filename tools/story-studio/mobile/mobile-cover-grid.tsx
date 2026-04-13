@@ -212,6 +212,26 @@ function StoryCoverCard({ story, bulkProgress, onLongPress }: StoryCoverCardProp
         </div>
       )}
 
+      {/* Status badges — top-right corner */}
+      {(story.hasAudio || story.hasIllustrations) && !isBulk && (
+        <div className="absolute top-1.5 right-1.5 flex items-center gap-1">
+          {story.hasIllustrations && (
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-black/40 backdrop-blur-sm" title={language === 'zh' ? '有插画' : 'Has illustrations'}>
+              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
+              </svg>
+            </span>
+          )}
+          {story.hasAudio && (
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-black/40 backdrop-blur-sm" title={language === 'zh' ? '有配音' : 'Has narration'}>
+              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+              </svg>
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Title overlay */}
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-2 pb-2 pt-6">
         <p className="truncate text-xs font-semibold leading-tight text-white drop-shadow-sm">

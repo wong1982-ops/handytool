@@ -66,6 +66,8 @@ export async function GET() {
       style: b.style || '',
       pageCount: b.page_count || 0,
       isPublic: b.is_public,
+      hasAudio: Boolean(b.has_audio),
+      hasIllustrations: Boolean(b.has_illustrations ?? b.cover_image_url),
       createdAt: b.created_at,
       seriesId: (b.series_id as string) || null,
       seriesTitle: (b.series_title as string) || null,
@@ -91,6 +93,7 @@ export async function GET() {
     const bd = b.data as Record<string, unknown> | undefined
     const concept = bd?.concept as Record<string, unknown> | undefined
     const tags = concept?.tags as Record<string, unknown> | undefined
+    const pages = Array.isArray(bd?.pages) ? (bd.pages as Record<string, unknown>[]) : []
     return {
       id: b.id,
       slug: b.slug,
@@ -99,8 +102,10 @@ export async function GET() {
       coverImageUrl: (bd?.coverImageUrl as string) || null,
       audience: (tags?.audience as string) || '',
       style: (tags?.style as string) || '',
-      pageCount: Array.isArray(bd?.pages) ? (bd.pages as unknown[]).length : 0,
+      pageCount: pages.length,
       isPublic: b.is_public,
+      hasAudio: pages.some(p => Boolean(p.audioUrl)),
+      hasIllustrations: pages.some(p => Boolean(p.imageUrl)),
       createdAt: b.created_at,
       seriesId: (b.series_id as string) || null,
       seriesTitle: null,

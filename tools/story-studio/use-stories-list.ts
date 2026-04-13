@@ -14,6 +14,8 @@ export interface StoryItem {
   seriesTitle: string | null
   audience: string | null
   style: string | null
+  hasAudio: boolean
+  hasIllustrations: boolean
   createdAt: string
   updatedAt: string
 }
