@@ -18,7 +18,7 @@ export interface ActiveJob {
   error_message: string | null
   created_at: string
   updated_at: string
-  mode: 'speed' | 'professional'
+  mode: 'speed' | 'professional' | 'bulk-illustrate' | 'bulk-narrate'
 }
 
 /** Computed progress info for display. */
@@ -40,7 +40,57 @@ function computeProgress(job: ActiveJob): { percent: number; label: string } {
   let percent = 0
   let label = getStepLabel(job.current_step, undefined, total)
 
-  if (job.mode === 'speed') {
+  if (job.mode === 'bulk-illustrate') {
+    // Bulk illustrate: character_ref(5%) → cover(10%) → illustrate_page(10-90%) → save(95%) → done(100%)
+    switch (job.current_step) {
+      case 'character_ref':
+        percent = 5
+        label = 'Preparing characters…'
+        break
+      case 'cover':
+        percent = 10
+        label = 'Generating cover…'
+        break
+      case 'illustrate_page': {
+        const pageDone = job.pages_completed
+        const pagePercent = total > 0 ? (pageDone / total) * 80 : 0
+        percent = 10 + pagePercent
+        label = `Illustrating page ${pageDone + 1} of ${total}…`
+        break
+      }
+      case 'save':
+        percent = 95
+        label = 'Saving…'
+        break
+      case 'done':
+        percent = 100
+        label = 'Illustrations complete!'
+        break
+      default:
+        percent = 2
+    }
+  } else if (job.mode === 'bulk-narrate') {
+    // Bulk narrate: tts_page(5-90%) → save(95%) → done(100%)
+    switch (job.current_step) {
+      case 'tts_page': {
+        const audioDone = job.audio_completed
+        const audioPercent = total > 0 ? (audioDone / total) * 85 : 0
+        percent = 5 + audioPercent
+        label = `Narrating page ${audioDone + 1} of ${total}…`
+        break
+      }
+      case 'save':
+        percent = 95
+        label = 'Saving…'
+        break
+      case 'done':
+        percent = 100
+        label = 'Narration complete!'
+        break
+      default:
+        percent = 2
+    }
+  } else if (job.mode === 'speed') {
     // Speed: story_bible(15%) → story_draft(50%) → save(90%) → done(100%)
     switch (job.current_step) {
       case 'story_bible':

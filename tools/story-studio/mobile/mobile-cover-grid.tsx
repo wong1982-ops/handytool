@@ -40,22 +40,39 @@ export default function MobileCoverGrid({
 
   const closeMenu = () => setMenuId(null)
 
+  // Separate bulk jobs (match to existing story cards) from new-story jobs (standalone cards)
+  const bulkModes = new Set(['bulk-illustrate', 'bulk-narrate'])
+  const bulkJobsByTitle = new Map<string, JobProgress>()
+  const standaloneJobs: JobProgress[] = []
+
+  for (const jp of activeJobs) {
+    if (bulkModes.has(jp.job.mode)) {
+      bulkJobsByTitle.set(jp.job.title, jp)
+    } else {
+      standaloneJobs.push(jp)
+    }
+  }
+
   return (
     <>
       <div className="grid grid-cols-2 gap-3">
-        {/* In-progress job cards — shown first */}
-        {activeJobs.map(jp => (
+        {/* Standalone job cards (new story creation) — shown first */}
+        {standaloneJobs.map(jp => (
           <JobCard key={jp.job.id} jobProgress={jp} />
         ))}
 
-        {/* Completed story covers */}
-        {stories.map(story => (
-          <StoryCoverCard
-            key={story.id}
-            story={story}
-            onLongPress={() => setMenuId(story.id)}
-          />
-        ))}
+        {/* Story covers — with optional bulk progress overlay */}
+        {stories.map(story => {
+          const bulkProgress = bulkJobsByTitle.get(story.title) ?? null
+          return (
+            <StoryCoverCard
+              key={story.id}
+              story={story}
+              bulkProgress={bulkProgress}
+              onLongPress={() => setMenuId(story.id)}
+            />
+          )
+        })}
       </div>
 
       {/* Long-press action menu */}
@@ -139,10 +156,15 @@ function JobCard({ jobProgress }: JobCardProps) {
 
 interface StoryCoverCardProps {
   story: StoryItem
+  bulkProgress?: JobProgress | null
   onLongPress: () => void
 }
 
-function StoryCoverCard({ story, onLongPress }: StoryCoverCardProps) {
+const OVERLAY_RING_R = 22
+const OVERLAY_RING_C = 2 * Math.PI * OVERLAY_RING_R
+
+function StoryCoverCard({ story, bulkProgress, onLongPress }: StoryCoverCardProps) {
+  const { language } = useLanguage()
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleTouchStart = () => {
@@ -157,6 +179,13 @@ function StoryCoverCard({ story, onLongPress }: StoryCoverCardProps) {
       timerRef.current = null
     }
   }
+
+  const isBulk = bulkProgress !== null && bulkProgress !== undefined
+  const bulkLabel = isBulk
+    ? bulkProgress.job.mode === 'bulk-illustrate'
+      ? (language === 'zh' ? '插画生成中' : 'Illustrating')
+      : (language === 'zh' ? '配音生成中' : 'Narrating')
+    : ''
 
   return (
     <Link
@@ -189,6 +218,30 @@ function StoryCoverCard({ story, onLongPress }: StoryCoverCardProps) {
           {story.title}
         </p>
       </div>
+
+      {/* Bulk progress overlay */}
+      {isBulk && (
+        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-1.5">
+          {/* Mini progress ring */}
+          <svg width="52" height="52" viewBox="0 0 52 52" aria-hidden="true">
+            <circle cx="26" cy="26" r={OVERLAY_RING_R} fill="none" stroke="currentColor" strokeWidth="3" className="text-white/20" />
+            <circle
+              cx="26" cy="26" r={OVERLAY_RING_R} fill="none" stroke="currentColor" strokeWidth="3"
+              strokeLinecap="round"
+              strokeDasharray={OVERLAY_RING_C}
+              strokeDashoffset={OVERLAY_RING_C * (1 - bulkProgress.percent / 100)}
+              transform="rotate(-90 26 26)"
+              className="text-[#3D6AF2] transition-all duration-500"
+            />
+            <text x="26" y="26" textAnchor="middle" dominantBaseline="central" fill="white" fontSize="12" fontWeight="600">
+              {bulkProgress.percent}%
+            </text>
+          </svg>
+          <span className="text-[10px] font-medium text-white/90 drop-shadow-sm">
+            {bulkLabel}
+          </span>
+        </div>
+      )}
     </Link>
   )
 }
