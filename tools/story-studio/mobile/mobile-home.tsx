@@ -244,7 +244,10 @@ function HomeInner() {
       <main className="px-4 pt-2 pb-4 space-y-6">
         {/* Hero */}
         <section className="flex flex-col items-center text-center pt-4 pb-2" aria-label="Hero">
-          <div className="w-14 h-14 rounded-full flex items-center justify-center mb-3 shrink-0"
+          <div className={[
+              'w-14 h-14 rounded-full flex items-center justify-center mb-3 shrink-0',
+              storyBook.loading ? 'animate-pulse' : '',
+            ].join(' ')}
             style={{
               background: 'linear-gradient(135deg, #fbbf24 0%, #a78bfa 50%, #3D6AF2 100%)',
             }}
@@ -262,32 +265,38 @@ function HomeInner() {
             </svg>
           </div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
-            {language === 'zh' ? '✨ 想要什么故事？' : '✨ What story do you want?'}
+            {storyBook.loading
+              ? (language === 'zh' ? '🪄 正在创作...' : '🪄 Creating your story...')
+              : (language === 'zh' ? '✨ 想要什么故事？' : '✨ What story do you want?')}
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            {language === 'zh' ? '描述一下，AI帮你画' : 'Describe it, AI will illustrate it'}
+            {storyBook.loading
+              ? (language === 'zh' ? '请稍等，AI正在构思你的故事' : 'Please wait while AI crafts your story')
+              : (language === 'zh' ? '描述一下，AI帮你画' : 'Describe it, AI will illustrate it')}
           </p>
         </section>
 
-        {/* Example prompt cards */}
-        <section aria-label="Example prompts">
-          <div className="grid grid-cols-2 gap-2">
-            {prompts.map((prompt, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => {
-                  setInput(prompt)
-                  setTimeout(resizeTextarea, 0)
-                }}
-                className="text-left p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 hover:border-[#3D6AF2] hover:text-[#3D6AF2] dark:hover:border-indigo-400 dark:hover:text-indigo-400 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3D6AF2]"
-                style={{ minHeight: '44px' }}
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
-        </section>
+        {/* Example prompt cards — hidden while loading */}
+        {!storyBook.loading && (
+          <section aria-label="Example prompts">
+            <div className="grid grid-cols-2 gap-2">
+              {prompts.map((prompt, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => {
+                    setInput(prompt)
+                    setTimeout(resizeTextarea, 0)
+                  }}
+                  className="text-left p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 hover:border-[#3D6AF2] hover:text-[#3D6AF2] dark:hover:border-indigo-400 dark:hover:text-indigo-400 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3D6AF2]"
+                  style={{ minHeight: '44px' }}
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Error banner */}
         {storyBook.error && (
@@ -395,13 +404,16 @@ function HomeInner() {
           <button
             type="button"
             onClick={() => setSettingsOpen(prev => !prev)}
+            disabled={storyBook.loading}
             aria-label="Toggle settings"
             aria-expanded={settingsOpen}
             className={[
               'shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-              settingsOpen
-                ? 'bg-[#3D6AF2] text-white focus-visible:ring-[#3D6AF2]'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus-visible:ring-slate-400',
+              storyBook.loading
+                ? 'bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                : settingsOpen
+                  ? 'bg-[#3D6AF2] text-white focus-visible:ring-[#3D6AF2]'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus-visible:ring-slate-400',
             ].join(' ')}
           >
             <GearIcon />
@@ -411,6 +423,7 @@ function HomeInner() {
           <textarea
             ref={textareaRef}
             value={input}
+            disabled={storyBook.loading}
             onChange={e => {
               setInput(e.target.value)
               resizeTextarea()
@@ -418,7 +431,12 @@ function HomeInner() {
             onInput={resizeTextarea}
             placeholder={language === 'zh' ? '描述你的故事...' : 'Describe your story...'}
             rows={1}
-            className="flex-1 resize-none rounded-2xl bg-slate-100 dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] leading-relaxed"
+            className={[
+              'flex-1 resize-none rounded-2xl text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#3D6AF2] leading-relaxed',
+              storyBook.loading
+                ? 'bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500',
+            ].join(' ')}
             style={{ minHeight: '44px', maxHeight: '96px', overflowY: 'auto' }}
             onKeyDown={e => {
               if (e.key === 'Enter' && !e.shiftKey) {
