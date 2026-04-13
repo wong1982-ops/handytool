@@ -12,8 +12,8 @@ export const POST = withJobStep('save', async (ctx) => {
     seriesId?: string
   }
 
-  // Idempotent
-  if (job.book_id) {
+  // Idempotent — if already fully saved (not just early draft)
+  if (job.book_id && job.state.savedAt) {
     return { statePatch: {} }
   }
 
@@ -68,6 +68,8 @@ export const POST = withJobStep('save', async (ctx) => {
 
   // Check if this is a bulk job updating an existing book
   const isBulkMode = existingBookId && (bookMode === 'bulk-illustrate' || bookMode === 'bulk-narrate')
+  // Check if book was already created by validate step (early save)
+  const earlySavedBookId = (job.state.bookId as string) || job.book_id || null
 
   let savedBookId: string
 
@@ -86,13 +88,31 @@ export const POST = withJobStep('save', async (ctx) => {
 
     savedBookId = existingBookId
 
-    // Complete the job
+    await supabase.rpc('complete_job', {
+      p_job_id: job.id,
+      p_book_id: savedBookId,
+    })
+  } else if (earlySavedBookId) {
+    // Book was already created by validate step — update it with final assets
+    const { error: updateError } = await supabase.rpc('update_book_data', {
+      p_user_id: job.user_id,
+      p_book_id: earlySavedBookId,
+      p_data: finalBook,
+    })
+
+    if (updateError) {
+      console.error('[save] Failed to update early-saved book:', updateError)
+      throw new Error(`Failed to update book: ${updateError.message}`)
+    }
+
+    savedBookId = earlySavedBookId
+
     await supabase.rpc('complete_job', {
       p_job_id: job.id,
       p_book_id: savedBookId,
     })
   } else {
-    // Original flow: insert new book via RPC
+    // Fallback: insert new book via RPC (if early save failed)
     const { data: insertedBookId, error: insertError } = await supabase.rpc('insert_book', {
       p_user_id: job.user_id,
       p_slug: slug,
@@ -109,7 +129,6 @@ export const POST = withJobStep('save', async (ctx) => {
 
     savedBookId = insertedBookId
 
-    // Complete the job
     await supabase.rpc('complete_job', {
       p_job_id: job.id,
       p_book_id: savedBookId,
