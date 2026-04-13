@@ -31,7 +31,7 @@ export default function MobileEditDrawer({
   page,
   pageNumber,
   totalPages,
-  bookId: _bookId,
+  bookId,
   onSave,
 }: MobileEditDrawerProps) {
   const { language } = useLanguage()
@@ -53,6 +53,12 @@ export default function MobileEditDrawer({
   }
   void handleOpen // consumed by effect-less pattern — reset happens on mount via prop
 
+  const [imageUrl, setImageUrl] = useState(page.imageUrl)
+  const [audioUrl, setAudioUrl] = useState(page.audioUrl)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [textChanged, setTextChanged] = useState(false)
+
   // ------------------------------------------------------------------
   // AI refine
   // ------------------------------------------------------------------
@@ -69,6 +75,7 @@ export default function MobileEditDrawer({
         const data = await res.json() as { rephrasedPlot?: string }
         if (data.rephrasedPlot) {
           setNarrativeText(data.rephrasedPlot)
+          setTextChanged(true)
         }
       }
     } catch {
@@ -79,11 +86,102 @@ export default function MobileEditDrawer({
   }
 
   // ------------------------------------------------------------------
-  // Save
+  // Save text to API + local state
   // ------------------------------------------------------------------
-  const handleSave = () => {
-    onSave({ narrativeText })
-    onClose()
+  const handleSave = async () => {
+    if (isSaving) return
+    setIsSaving(true)
+    setSaveError(null)
+    try {
+      const res = await fetch(`/api/v1/story/books/${bookId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pageSequence: page.sequence,
+          narrativeText,
+          imageUrl,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => null)
+        throw new Error(err?.error || 'Save failed')
+      }
+      onSave({ narrativeText, imageUrl, audioUrl })
+      onClose()
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Save failed')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Regenerate illustration via API
+  // ------------------------------------------------------------------
+  const handleRegenerateImage = async () => {
+    if (isRegeneratingImage) return
+    setIsRegeneratingImage(true)
+    setSaveError(null)
+    try {
+      const res = await fetch('/api/v1/story/regenerate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imagePrompt: page.imagePrompt || page.sceneDescription,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => null)
+        throw new Error(err?.error || 'Image regeneration failed')
+      }
+      const { data } = await res.json()
+      if (data?.imageUrl) {
+        setImageUrl(data.imageUrl)
+        // Save the new image to the book immediately
+        await fetch(`/api/v1/story/books/${bookId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pageSequence: page.sequence, imageUrl: data.imageUrl }),
+        })
+        onSave({ imageUrl: data.imageUrl })
+      }
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Image regeneration failed')
+    } finally {
+      setIsRegeneratingImage(false)
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Regenerate narration via API
+  // ------------------------------------------------------------------
+  const handleRegenerateAudio = async () => {
+    if (isRegeneratingAudio) return
+    setIsRegeneratingAudio(true)
+    setSaveError(null)
+    try {
+      const res = await fetch(`/api/v1/story/books/${bookId}/narrate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pageId: page.sequence,
+          narrationLanguage: language,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => null)
+        throw new Error(err?.error || 'Narration failed')
+      }
+      const { data } = await res.json()
+      if (data?.audioUrl) {
+        setAudioUrl(data.audioUrl)
+        onSave({ audioUrl: data.audioUrl })
+      }
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Narration failed')
+    } finally {
+      setIsRegeneratingAudio(false)
+    }
   }
 
   // ------------------------------------------------------------------
@@ -212,19 +310,33 @@ export default function MobileEditDrawer({
               </div>
             )}
 
+            {/* Error */}
+            {saveError && activeTab === 'text' && (
+              <p className="text-xs text-red-500">{saveError}</p>
+            )}
+
             {/* Save button */}
             <button
               type="button"
               onClick={handleSave}
+              disabled={isSaving}
               className={[
                 'w-full rounded-xl text-sm font-semibold transition-colors',
                 'min-h-[44px]',
                 'bg-[#3D6AF2] text-white',
                 'hover:bg-[#3D58D4] active:bg-[#3448B6]',
+                'disabled:opacity-60 disabled:cursor-not-allowed',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3D6AF2] focus-visible:ring-offset-2',
               ].join(' ')}
             >
-              {zh ? '保存修改' : 'Save Changes'}
+              {isSaving ? (
+                <span className="flex items-center justify-center gap-2">
+                  <SpinnerIcon className="w-4 h-4 animate-spin" />
+                  {zh ? '保存中…' : 'Saving…'}
+                </span>
+              ) : (
+                zh ? '保存修改' : 'Save Changes'
+              )}
             </button>
           </div>
         )}
@@ -235,12 +347,12 @@ export default function MobileEditDrawer({
         {activeTab === 'illustration' && (
           <div className="space-y-4">
             {/* Image preview or placeholder */}
-            <div className="aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
-              {page.imageUrl ? (
+            <div className="aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
+              {imageUrl ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={page.imageUrl}
+                    src={imageUrl}
                     alt={page.sceneDescription}
                     className="w-full h-full object-cover"
                   />
@@ -253,20 +365,32 @@ export default function MobileEditDrawer({
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full gap-2 text-slate-400 dark:text-slate-500">
-                  <ImagePlaceholderIcon className="w-10 h-10" />
-                  <p className="text-sm">{zh ? '暂无插画' : 'No illustration'}</p>
+                  {isRegeneratingImage ? (
+                    <SpinnerIcon className="w-10 h-10 animate-spin" />
+                  ) : (
+                    <ImagePlaceholderIcon className="w-10 h-10" />
+                  )}
+                  <p className="text-sm">{isRegeneratingImage ? (zh ? '生成中…' : 'Generating…') : (zh ? '暂无插画' : 'No illustration')}</p>
                 </div>
               )}
             </div>
 
+            {/* Hint when text was edited */}
+            {textChanged && imageUrl && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {zh ? '文字已修改，建议重新生成插画以匹配新内容' : 'Text was changed — consider regenerating the illustration to match'}
+              </p>
+            )}
+
+            {/* Error */}
+            {saveError && activeTab === 'illustration' && (
+              <p className="text-xs text-red-500">{saveError}</p>
+            )}
+
             {/* Regenerate button */}
             <button
               type="button"
-              onClick={() => {
-                setIsRegeneratingImage(true)
-                // Visual-only: reset after 2s for demo
-                setTimeout(() => setIsRegeneratingImage(false), 2000)
-              }}
+              onClick={handleRegenerateImage}
               disabled={isRegeneratingImage}
               className={[
                 'w-full rounded-xl text-sm font-semibold transition-colors',
@@ -283,7 +407,7 @@ export default function MobileEditDrawer({
                   {zh ? '生成中…' : 'Generating…'}
                 </span>
               ) : (
-                zh ? '重新生成' : 'Regenerate'
+                zh ? '重新生成插画' : 'Regenerate Illustration'
               )}
             </button>
           </div>
@@ -295,31 +419,41 @@ export default function MobileEditDrawer({
         {activeTab === 'narration' && (
           <div className="space-y-4">
             {/* Audio player or placeholder */}
-            {page.audioUrl ? (
-              <div className="rounded-xl bg-slate-50 dark:bg-slate-800 p-3">
+            {audioUrl ? (
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800 p-3 relative">
                 {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
                 <audio
                   controls
-                  src={page.audioUrl}
+                  src={audioUrl}
                   className="w-full"
                   aria-label={zh ? '配音播放器' : 'Narration player'}
                 />
+                {isRegeneratingAudio && (
+                  <div className="absolute inset-0 bg-white/60 dark:bg-slate-800/60 flex items-center justify-center rounded-xl">
+                    <SpinnerIcon className="w-8 h-8 text-[#3D6AF2] animate-spin" />
+                  </div>
+                )}
               </div>
             ) : (
               <div className="aspect-[3/1] rounded-xl bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-400 dark:text-slate-500">
-                <AudioPlaceholderIcon className="w-8 h-8" />
-                <p className="text-sm">{zh ? '暂无配音' : 'No narration'}</p>
+                {isRegeneratingAudio ? (
+                  <SpinnerIcon className="w-8 h-8 animate-spin" />
+                ) : (
+                  <AudioPlaceholderIcon className="w-8 h-8" />
+                )}
+                <p className="text-sm">{isRegeneratingAudio ? (zh ? '生成中…' : 'Generating…') : (zh ? '暂无配音' : 'No narration')}</p>
               </div>
+            )}
+
+            {/* Error */}
+            {saveError && activeTab === 'narration' && (
+              <p className="text-xs text-red-500">{saveError}</p>
             )}
 
             {/* Regenerate narration button */}
             <button
               type="button"
-              onClick={() => {
-                setIsRegeneratingAudio(true)
-                // Visual-only: reset after 2s for demo
-                setTimeout(() => setIsRegeneratingAudio(false), 2000)
-              }}
+              onClick={handleRegenerateAudio}
               disabled={isRegeneratingAudio}
               className={[
                 'w-full rounded-xl text-sm font-semibold transition-colors',
