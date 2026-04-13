@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/lib/hooks/use-auth'
 import { LanguageProvider, useLanguage } from '@/tools/story-studio/use-language-context'
+import { useJobProgress } from '@/tools/story-studio/use-job-progress'
 import { ImageLightbox } from '@/tools/story-studio/image-lightbox'
 import MobilePageCard from '@/tools/story-studio/mobile/mobile-page-card'
 import MobileReaderControls from '@/tools/story-studio/mobile/mobile-reader-controls'
@@ -47,7 +49,33 @@ function ReaderInner({
   onPageChange,
 }: MobileReaderProps) {
   const router = useRouter()
+  const { user } = useAuth()
   const { t, language } = useLanguage()
+  const jobProgressHook = useJobProgress(user?.id)
+
+  // ------------------------------------------------------------------
+  // Bulk job tracking (illustrations / narration)
+  // ------------------------------------------------------------------
+  const [bulkIllustrationJobId, setBulkIllustrationJobId] = useState<string | null>(null)
+  const [bulkNarrationJobId, setBulkNarrationJobId] = useState<string | null>(null)
+  const [bulkTriggering, setBulkTriggering] = useState<'illustrate' | 'narrate' | null>(null)
+
+  // Find progress for active bulk jobs
+  const illustrationProgress = bulkIllustrationJobId
+    ? jobProgressHook.jobs.find(jp => jp.job.id === bulkIllustrationJobId) ?? null
+    : null
+  const narrationProgress = bulkNarrationJobId
+    ? jobProgressHook.jobs.find(jp => jp.job.id === bulkNarrationJobId) ?? null
+    : null
+
+  // Also detect if there's already a running job for this book from a prior session
+  // (jobs whose title matches the current book)
+  const existingBulkJob = jobProgressHook.jobs.find(jp =>
+    jp.job.title === book.title || jp.job.id === bulkIllustrationJobId || jp.job.id === bulkNarrationJobId
+  )
+
+  const activeBulkProgress = illustrationProgress ?? narrationProgress ?? existingBulkJob ?? null
+  const isBulkRunning = activeBulkProgress !== null
 
   // ------------------------------------------------------------------
   // Page state (0 = cover, 1..N = content pages)
@@ -283,7 +311,7 @@ function ReaderInner({
           topBarVisible ? 'translate-y-0' : '-translate-y-full',
         ].join(' ')}
       >
-        <div className="flex items-center justify-between px-4 pt-[env(safe-area-inset-top)] pb-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200/60 dark:border-slate-800/60">
+        <div className="flex items-center justify-between px-4 py-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200/60 dark:border-slate-800/60">
           {/* Back button — matches bottom control bar circle style */}
           <button
             type="button"
@@ -345,36 +373,66 @@ function ReaderInner({
                 {isOwner && bookId && !hasIllustrations && (
                   <button
                     type="button"
+                    disabled={isBulkRunning || bulkTriggering === 'illustrate'}
                     onClick={async () => {
                       setMenuOpen(false)
-                      await fetch(`/api/v1/story/books/${bookId}/bulk-illustrate`, { method: 'POST' })
+                      setBulkTriggering('illustrate')
+                      try {
+                        const res = await fetch(`/api/v1/story/books/${bookId}/bulk-illustrate`, { method: 'POST' })
+                        if (res.ok) {
+                          const data = await res.json()
+                          if (data.data?.jobId) setBulkIllustrationJobId(data.data.jobId)
+                          jobProgressHook.refetch()
+                        }
+                      } finally {
+                        setBulkTriggering(null)
+                      }
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{ minHeight: '44px' }}
                   >
-                    <svg className="w-4 h-4 text-[#3D6AF2]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
-                    </svg>
+                    {bulkTriggering === 'illustrate' ? (
+                      <span className="w-4 h-4 border-2 border-[#3D6AF2] border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <svg className="w-4 h-4 text-[#3D6AF2]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
+                      </svg>
+                    )}
                     {language === 'zh' ? '添加插画' : 'Add Illustrations'}
                   </button>
                 )}
                 {isOwner && bookId && !hasNarration && (
                   <button
                     type="button"
+                    disabled={isBulkRunning || bulkTriggering === 'narrate'}
                     onClick={async () => {
                       setMenuOpen(false)
-                      await fetch(`/api/v1/story/books/${bookId}/bulk-narrate`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ narrationLanguage: language }),
-                      })
+                      setBulkTriggering('narrate')
+                      try {
+                        const res = await fetch(`/api/v1/story/books/${bookId}/bulk-narrate`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ narrationLanguage: language }),
+                        })
+                        if (res.ok) {
+                          const data = await res.json()
+                          if (data.data?.jobId) setBulkNarrationJobId(data.data.jobId)
+                          jobProgressHook.refetch()
+                        }
+                      } finally {
+                        setBulkTriggering(null)
+                      }
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{ minHeight: '44px' }}
                   >
-                    <svg className="w-4 h-4 text-purple-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-                    </svg>
+                    {bulkTriggering === 'narrate' ? (
+                      <span className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <svg className="w-4 h-4 text-purple-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                      </svg>
+                    )}
                     {language === 'zh' ? '添加配音' : 'Add Narration'}
                   </button>
                 )}
@@ -383,6 +441,36 @@ function ReaderInner({
           </div>
         </div>
       </div>
+
+      {/* ----------------------------------------------------------------
+          Bulk job progress banner
+      ---------------------------------------------------------------- */}
+      {activeBulkProgress && (
+        <div className="absolute inset-x-0 top-[52px] z-10 px-4 py-2">
+          <div className="flex items-center gap-3 rounded-xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-200/60 dark:border-slate-700/60 px-3 py-2.5 shadow-lg">
+            {/* Progress ring */}
+            <svg width="36" height="36" viewBox="0 0 36 36" className="shrink-0" aria-hidden="true">
+              <circle cx="18" cy="18" r="14" fill="none" stroke="currentColor" strokeWidth="3" className="text-slate-200 dark:text-slate-600" />
+              <circle
+                cx="18" cy="18" r="14" fill="none" stroke="currentColor" strokeWidth="3"
+                strokeLinecap="round"
+                strokeDasharray={2 * Math.PI * 14}
+                strokeDashoffset={2 * Math.PI * 14 * (1 - activeBulkProgress.percent / 100)}
+                transform="rotate(-90 18 18)"
+                className="text-[#3D6AF2] transition-all duration-500"
+              />
+            </svg>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate">
+                {activeBulkProgress.label}
+              </p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                {activeBulkProgress.percent}%
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ----------------------------------------------------------------
           Page content area (swipeable)
