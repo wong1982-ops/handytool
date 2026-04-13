@@ -7,7 +7,8 @@ import { ImagePromptViewer } from '@/tools/story-studio/stories/image-prompt-vie
 import { IllustrationReviewFlow } from '@/tools/story-studio/add-ons/illustration-review-flow'
 import { NarrationFlow } from '@/tools/story-studio/add-ons/narration-flow'
 import { ImageLightbox } from '@/tools/story-studio/image-lightbox'
-import { ART_STYLES } from '@/tools/story-studio/use-characters'
+import { ART_STYLES, getArtStyleLabel } from '@/tools/story-studio/use-characters'
+import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 interface PageData {
   sequence: number
@@ -261,6 +262,7 @@ function CoverEditor({ title, coverUrl, generating, error, artStyle: initialStyl
   const [characters, setCharacters] = useState<{ id: string; name: string }[]>([])
   const [selectedCharIds, setSelectedCharIds] = useState<string[]>([])
   const [selectedStyle, setSelectedStyle] = useState(initialStyle || "children's book illustration")
+  const { language } = useLanguage()
 
   // Fetch approved characters
   useEffect(() => {
@@ -382,7 +384,7 @@ function CoverEditor({ title, coverUrl, generating, error, artStyle: initialStyl
           style={{ minHeight: '44px' }}
         >
           {ART_STYLES.map(s => (
-            <option key={s.value} value={s.value}>{s.label}</option>
+            <option key={s.value} value={s.value}>{getArtStyleLabel(s, language)}</option>
           ))}
         </select>
       </div>

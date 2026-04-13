@@ -159,6 +159,9 @@ export async function POST(
       })
     }
 
+    // Mark book as having illustrations
+    await supabase.from('books').update({ has_illustrations: true }).eq('id', bookId)
+
     await supabase.rpc('confirm_reserved_credits', {
       p_reservation_id: reservation.reservation_id,
       p_description: `Story Studio — ${pageId ? 'page illustration' : 'cover'} (${qualityMode})`,

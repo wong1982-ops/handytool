@@ -127,7 +127,8 @@ export function useBookshelf() {
 
       if (res.ok) {
         const { data } = await res.json()
-        const apiBooks: BookshelfItem[] = (data || []).map((b: Record<string, unknown>) => ({
+        const rawList = Array.isArray(data) ? data : (data?.items ?? [])
+        const apiBooks: BookshelfItem[] = (rawList || []).map((b: Record<string, unknown>) => ({
           id: b.id,
           slug: b.slug,
           title: b.title || 'Untitled',

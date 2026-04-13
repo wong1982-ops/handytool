@@ -36,6 +36,8 @@ export const zh: I18nStrings = {
     allSeries: '全部系列',
     noStoriesSearch: '没有找到匹配的故事。',
     noStoriesEmpty: '还没有故事，快来创建你的第一个故事吧！',
+    loadMore: '加载更多',
+    loading: '加载中...',
   },
 
   // Story card

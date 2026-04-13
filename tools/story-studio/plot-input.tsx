@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { useCharacterList, ART_STYLES } from '@/tools/story-studio/use-characters'
+import { useCharacterList, ART_STYLES, getArtStyleLabel } from '@/tools/story-studio/use-characters'
 import { useLanguage } from '@/tools/story-studio/use-language-context'
 
 export const PLOT_DRAFT_KEY = 'toolk1t-story-plot-draft'
@@ -35,7 +35,7 @@ export function PlotInput({
   })
 
   const { characters } = useCharacterList()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
 
   const updatePlot = useCallback((value: string) => {
     setPlot(value)
@@ -264,7 +264,7 @@ export function PlotInput({
                   }`}
                 style={{ minHeight: '32px' }}
               >
-                {style.label}
+                {getArtStyleLabel(style, language)}
               </button>
             )
           })}

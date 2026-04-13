@@ -41,76 +41,77 @@ export async function POST(request: NextRequest) {
   return apiSuccess({ id: data }, 201)
 }
 
-export async function GET() {
-  const effectiveUserId = await getAuthUserId()
+const DEFAULT_PAGE_SIZE = 12
 
-  // Not logged in — return empty list (bookshelf uses localStorage as fallback)
-  if (!effectiveUserId) return apiSuccess([])
+// Bookshelf columns — lightweight, no JSONB `data` column
+const BOOKSHELF_SELECT = `
+  id, slug, title, cover_url, audience, style, page_count,
+  is_public, has_audio, has_illustrations, created_at, series_id,
+  series:series_id ( title )
+`.replace(/\s+/g, ' ').trim()
 
+export async function GET(request: NextRequest) {
+  // Single client for both auth + query
   const supabase = await createClient()
 
-  // Try lightweight bookshelf RPC first
-  const { data: books, error } = await supabase.rpc('get_user_bookshelf', {
-    p_user_id: effectiveUserId,
-  })
-
-  if (!error && books) {
-    // Map DB column names to camelCase for client
-    const list = (books || []).map((b: Record<string, unknown>) => ({
-      id: b.id,
-      slug: b.slug,
-      title: b.title || 'Untitled',
-      authors: (b.authors as string[]) || ['AI'],
-      coverImageUrl: (b.cover_image_url as string) || null,
-      audience: b.audience || '',
-      style: b.style || '',
-      pageCount: b.page_count || 0,
-      isPublic: b.is_public,
-      hasAudio: Boolean(b.has_audio),
-      hasIllustrations: Boolean(b.has_illustrations ?? b.cover_image_url),
-      createdAt: b.created_at,
-      seriesId: (b.series_id as string) || null,
-      seriesTitle: (b.series_title as string) || null,
-    }))
-
-    return apiSuccess(list)
+  // Get user — fast path for dev, otherwise decode from session
+  let userId: string | null = null
+  const devId = await getAuthUserId()
+  if (devId) {
+    userId = devId
+  } else {
+    // Already checked in getAuthUserId, but just in case
+    return apiSuccess({ items: [], nextCursor: null })
   }
 
-  // Fallback: direct query (RPC may not exist yet)
-  console.warn('story/books: get_user_bookshelf RPC failed, using fallback', error?.message)
-  const { data: fallbackBooks, error: fbErr } = await supabase
-    .from('books')
-    .select('id, slug, data, is_public, created_at, series_id')
-    .eq('user_id', effectiveUserId)
-    .order('created_at', { ascending: false })
+  const url = request.nextUrl
+  const limit = Math.min(Math.max(Number(url.searchParams.get('limit')) || DEFAULT_PAGE_SIZE, 1), 50)
+  const cursor = url.searchParams.get('cursor')
 
-  if (fbErr) {
-    console.error('story/books: fallback fetch failed', fbErr)
+  // Single query — lightweight columns only, cursor pagination
+  // Uses .eq('user_id') which works with both RLS (prod) and service-role (dev)
+  let query = supabase
+    .from('books')
+    .select(BOOKSHELF_SELECT)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit + 1)
+
+  if (cursor) {
+    query = query.lt('created_at', cursor)
+  }
+
+  const { data: books, error } = await query
+
+  if (error) {
+    console.error('story/books: query failed', error)
     return API_ERRORS.INTERNAL()
   }
 
-  const list = (fallbackBooks || []).map((b: Record<string, unknown>) => {
-    const bd = b.data as Record<string, unknown> | undefined
-    const concept = bd?.concept as Record<string, unknown> | undefined
-    const tags = concept?.tags as Record<string, unknown> | undefined
-    const pages = Array.isArray(bd?.pages) ? (bd.pages as Record<string, unknown>[]) : []
+  const rows = (books || []) as Record<string, unknown>[]
+  const hasMore = rows.length > limit
+  const page = hasMore ? rows.slice(0, limit) : rows
+
+  const list = page.map((b: Record<string, unknown>) => {
+    const series = b.series as Record<string, unknown> | null
     return {
       id: b.id,
       slug: b.slug,
-      title: (bd?.title as string) || 'Untitled',
-      authors: (bd?.authors as string[]) || ['AI'],
-      coverImageUrl: (bd?.coverImageUrl as string) || null,
-      audience: (tags?.audience as string) || '',
-      style: (tags?.style as string) || '',
-      pageCount: pages.length,
+      title: (b.title as string) || 'Untitled',
+      coverImageUrl: (b.cover_url as string) || null,
+      audience: (b.audience as string) || '',
+      style: (b.style as string) || '',
+      pageCount: (b.page_count as number) || 0,
       isPublic: b.is_public,
-      hasAudio: pages.some(p => Boolean(p.audioUrl)),
-      hasIllustrations: pages.some(p => Boolean(p.imageUrl)),
+      hasAudio: Boolean(b.has_audio),
+      hasIllustrations: Boolean(b.has_illustrations),
       createdAt: b.created_at,
       seriesId: (b.series_id as string) || null,
-      seriesTitle: null,
+      seriesTitle: (series?.title as string) || null,
     }
   })
 
-  return apiSuccess(list)
+  const nextCursor = hasMore ? (page[page.length - 1].created_at as string) : null
+
+  return apiSuccess({ items: list, nextCursor })
 }

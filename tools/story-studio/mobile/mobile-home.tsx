@@ -61,6 +61,9 @@ function HomeInner() {
   const [input, setInput] = useState('')
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [pageCount, setPageCount] = useState(6)
+  const [narratorVoice, setNarratorVoice] = useState('Aoede')
+  const [generateIllustrations, setGenerateIllustrations] = useState(false)
+  const [generateAudio, setGenerateAudio] = useState(false)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -102,9 +105,12 @@ function HomeInner() {
         if (!res.ok) return
         const data = await res.json()
         const job = data.job ?? data
-        if (job?.status === 'complete' && job?.slug) {
+        const slug = job?.state?.slug || job?.slug
+        if (job?.status === 'complete' && slug) {
           stopPolling()
-          router.push(`/tools/story-studio/book/${job.slug}`)
+          storyBook.setPhase('input')
+          storiesList.refresh()
+          router.push(`/tools/story-studio/book/${slug}`)
         }
       } catch {
         // silently ignore transient fetch errors
@@ -123,18 +129,25 @@ function HomeInner() {
     const { completedJobId, clearCompletion } = jobProgressHook
     if (!completedJobId) return
 
-    const matchingJob = jobProgressHook.jobs.find(j => j.job.id === completedJobId)
     clearCompletion()
 
-    if (matchingJob) {
-      // Navigate if we have a slug (look in job data), else fall through to polling
-      const job = matchingJob.job as typeof matchingJob.job & { slug?: string }
-      if (job.slug) {
-        stopPolling()
-        router.push(`/tools/story-studio/book/${job.slug}`)
-      }
-    }
-  }, [jobProgressHook, router, stopPolling])
+    // Fetch the completed job to get the slug
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/v1/story/jobs/${completedJobId}`)
+        if (!res.ok) return
+        const data = await res.json()
+        const job = data.job ?? data
+        const slug = job?.state?.slug || job?.slug
+        if (slug) {
+          stopPolling()
+          storyBook.setPhase('input')
+          storiesList.refresh()
+          router.push(`/tools/story-studio/book/${slug}`)
+        }
+      } catch { /* ignore */ }
+    })()
+  }, [jobProgressHook.completedJobId])
 
   // -------------------------------------------------------------------------
   // Auto-trigger generation after fetchConcepts sets phase to 'refine'
@@ -151,8 +164,8 @@ function HomeInner() {
       const plotText = pendingInputRef.current
       pendingInputRef.current = null
       storyBook.startGeneration(plotText, storyBook.selectedConcept, {
-        skipIllustration: true,
-        skipAudio: true,
+        skipIllustration: !generateIllustrations,
+        skipAudio: !generateAudio,
         skipValidation: true,
       })
     }
@@ -218,20 +231,30 @@ function HomeInner() {
   // -------------------------------------------------------------------------
 
   return (
-    <div className="fixed inset-0 z-40 overflow-y-auto bg-slate-50 dark:bg-slate-950 pb-32">
-      {/* Sticky top bar */}
-      <header className="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-2">
+    <div className="fixed inset-0 z-[60] overflow-y-auto bg-slate-50 dark:bg-slate-950 pb-32">
+      {/* Sticky top bar with back button */}
+      <header className="sticky top-0 z-20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-200/50 dark:border-slate-800/50">
+        <div className="flex items-center px-2 py-2 gap-1">
+          <button
+            type="button"
+            onClick={() => router.push('/tools')}
+            className="flex items-center justify-center w-10 h-10 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+            aria-label={language === 'zh' ? '返回' : 'Back'}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+          <div className="flex items-center gap-1.5 flex-1 min-w-0">
             <span className="text-lg" aria-hidden="true">🔖</span>
-            <h1 className="text-base font-bold text-slate-900 dark:text-white">
+            <h1 className="text-base font-bold text-slate-900 dark:text-white truncate">
               {language === 'zh' ? '故事工坊' : 'Story Studio'}
             </h1>
           </div>
           <button
             type="button"
             onClick={toggleLanguage}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3D6AF2]"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shrink-0"
             style={{ minHeight: '44px' }}
             aria-label="Toggle language"
           >
@@ -312,7 +335,7 @@ function HomeInner() {
         {(storiesList.loading || storiesList.allStories.length > 0) && (
           <section aria-label="My stories">
             {/* Sticky filter bar — sticks below the top header when scrolled */}
-            <div className="sticky top-[52px] z-10 -mx-4 px-4 py-2 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm">
+            <div className="sticky top-[57px] z-10 -mx-4 px-4 py-2 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm">
               <div className="flex items-center gap-2">
                 {/* Section title */}
                 <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 shrink-0">
@@ -381,6 +404,20 @@ function HomeInner() {
                   onDelete={storiesList.deleteStory}
                   onToggleShare={storiesList.toggleShare}
                 />
+                {storiesList.hasMore && (
+                  <div className="flex justify-center py-4">
+                    <button
+                      onClick={storiesList.loadMore}
+                      disabled={storiesList.loadingMore}
+                      className="px-6 py-2.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+                      style={{ minHeight: '44px' }}
+                    >
+                      {storiesList.loadingMore
+                        ? (language === 'zh' ? '加载中...' : 'Loading...')
+                        : (language === 'zh' ? '加载更多' : 'Load more')}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </section>
@@ -396,6 +433,12 @@ function HomeInner() {
           onArtStyleChange={storyBook.setSelectedArtStyle}
           pageCount={pageCount}
           onPageCountChange={setPageCount}
+          narratorVoice={narratorVoice}
+          onNarratorVoiceChange={setNarratorVoice}
+          generateIllustrations={generateIllustrations}
+          onGenerateIllustrationsChange={setGenerateIllustrations}
+          generateAudio={generateAudio}
+          onGenerateAudioChange={setGenerateAudio}
         />
 
         {/* Input row */}

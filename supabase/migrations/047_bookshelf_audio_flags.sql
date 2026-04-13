@@ -1,3 +1,8 @@
+-- DEPRECATED: Superseded by 049_bookshelf_bool_columns.sql
+-- This migration added expensive jsonb_array_elements scanning to the bookshelf RPC.
+-- The new migration uses physical boolean columns instead.
+--
+-- Original description:
 -- Migration: Add has_audio and has_illustrations flags to bookshelf RPC
 -- These are derived from the pages array in the data JSONB column
 

@@ -20,12 +20,16 @@ interface StoryListProps {
   onDelete: (id: string) => void
   onToggleShare: (id: string, isPublic: boolean) => void
   onMarkComplete?: (id: string) => void
+  hasMore?: boolean
+  loadingMore?: boolean
+  onLoadMore?: () => void
 }
 
 export function StoryList({
   stories, loading, search, onSearchChange, sortBy, onSortChange,
   filterSeries, onFilterSeriesChange, onCreateNew,
   onEdit, onDelete, onToggleShare, onMarkComplete,
+  hasMore, loadingMore, onLoadMore,
 }: StoryListProps) {
   const { series } = useSeriesList()
   const { t } = useLanguage()
@@ -126,6 +130,20 @@ export function StoryList({
               onMarkComplete={onMarkComplete}
             />
           ))}
+        </div>
+      )}
+
+      {/* Load more */}
+      {hasMore && (
+        <div className="flex justify-center py-6">
+          <button
+            onClick={onLoadMore}
+            disabled={loadingMore}
+            className="px-6 py-2.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 cursor-pointer"
+            style={{ minHeight: '44px' }}
+          >
+            {loadingMore ? t.storyList.loading || 'Loading...' : t.storyList.loadMore || 'Load more'}
+          </button>
         </div>
       )}
 

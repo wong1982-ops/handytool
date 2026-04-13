@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useCharacterDetail, type UpdateCharacterInput, type CharacterPortrait, ART_STYLES } from '@/tools/story-studio/use-characters'
+import { useCharacterDetail, type UpdateCharacterInput, type CharacterPortrait, ART_STYLES, getArtStyleLabel } from '@/tools/story-studio/use-characters'
 import { useSeriesList } from '@/tools/story-studio/use-series'
 import { CharacterForm } from '@/tools/story-studio/characters/character-form'
 import { PortraitLightbox } from '@/tools/story-studio/characters/portrait-lightbox'
@@ -14,7 +14,7 @@ interface CharacterDetailProps {
 }
 
 export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const {
     character, portraits, loading, refining,
     updateCharacter, generatePortrait, setPrimaryPortrait, approveCharacter,
@@ -202,7 +202,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                 {selectedPortrait && (
                   <div className="absolute top-2 left-2 flex items-center gap-1.5">
                     <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-black/50 text-white backdrop-blur-sm">
-                      {ART_STYLES.find(s => s.value === selectedPortrait.artStyle)?.label ?? selectedPortrait.artStyle}
+                      {(() => { const s = ART_STYLES.find(s => s.value === selectedPortrait.artStyle); return s ? getArtStyleLabel(s, language) : selectedPortrait.artStyle })()}
                     </span>
                     {selectedPortrait.isPrimary && (
                       <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-500/80 text-white backdrop-blur-sm">
@@ -244,7 +244,8 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
             <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
               {portraits.map(p => {
                 const isSelected = selectedPortrait?.id === p.id
-                const styleLabel = ART_STYLES.find(s => s.value === p.artStyle)?.label ?? p.artStyle
+                const found = ART_STYLES.find(s => s.value === p.artStyle)
+                const styleLabel = found ? getArtStyleLabel(found, language) : p.artStyle
                 return (
                   <button
                     key={p.id}
@@ -363,7 +364,7 @@ export function CharacterDetail({ characterId, onBack }: CharacterDetailProps) {
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
-                    {style.label}
+                    {getArtStyleLabel(style, language)}
                     {!existing && (
                       <svg className="w-3 h-3 opacity-40" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />

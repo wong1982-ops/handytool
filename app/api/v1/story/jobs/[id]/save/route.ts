@@ -116,6 +116,22 @@ export const POST = withJobStep('save', async (ctx) => {
     })
   }
 
+  // Set has_audio / has_illustrations flags based on job mode
+  const flagUpdate: Record<string, boolean> = {}
+  if (bookMode === 'bulk-illustrate') {
+    flagUpdate.has_illustrations = true
+  } else if (bookMode === 'bulk-narrate') {
+    flagUpdate.has_audio = true
+  } else {
+    // speed/professional mode — check the generated pages
+    const pages = Array.isArray(finalBook.pages) ? finalBook.pages : []
+    if (pages.some((p: Record<string, unknown>) => p.imageUrl)) flagUpdate.has_illustrations = true
+    if (pages.some((p: Record<string, unknown>) => p.audioUrl)) flagUpdate.has_audio = true
+  }
+  if (Object.keys(flagUpdate).length > 0) {
+    await supabase.from('books').update(flagUpdate).eq('id', savedBookId)
+  }
+
   // Confirm credit reservation
   if (job.credits_reservation_id) {
     try {

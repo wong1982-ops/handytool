@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import type { Language } from './types'
 import type { I18nStrings } from './i18n/en'
 import { en } from './i18n/en'
@@ -17,16 +17,16 @@ interface LanguageContextValue {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null)
 
-function getInitialLanguage(): Language {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === 'en' || stored === 'zh') return stored
-  } catch { /* ignore */ }
-  return 'en'
-}
-
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLang] = useState<Language>(getInitialLanguage)
+  // Always start with 'en' to match SSR, then sync from localStorage after hydration
+  const [language, setLang] = useState<Language>('en')
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY)
+      if (stored === 'zh') setLang('zh')
+    } catch { /* ignore */ }
+  }, [])
 
   const setLanguage = useCallback((lang: Language) => {
     setLang(lang)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 export interface StoryItem {
   id: string
@@ -22,32 +22,81 @@ export interface StoryItem {
 
 export type SortOption = 'newest' | 'oldest' | 'alphabetical' | 'updated'
 
+const PAGE_SIZE = 12
+
 export function useStoriesList() {
   const [stories, setStories] = useState<StoryItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('newest')
   const [filterSeries, setFilterSeries] = useState<string | null>(null)
+  const [hasMore, setHasMore] = useState(false)
+  const cursorRef = useRef<string | null>(null)
 
-  const fetchStories = useCallback(async () => {
+  const fetchStories = useCallback(async (cursor?: string | null) => {
+    const isFirstPage = !cursor
     try {
-      setLoading(true)
-      const res = await fetch('/api/v1/story/books')
+      if (isFirstPage) setLoading(true)
+      else setLoadingMore(true)
+
+      const params = new URLSearchParams({ limit: String(PAGE_SIZE) })
+      if (cursor) params.set('cursor', cursor)
+
+      const res = await fetch(`/api/v1/story/books?${params}`)
       if (!res.ok) {
-        if (res.status === 401) { setLoading(false); return }
+        if (res.status === 401) { setLoading(false); setLoadingMore(false); return }
         throw new Error('Failed to load stories')
       }
-      const { data } = await res.json()
-      setStories(data ?? [])
+      const json = await res.json()
+
+      // Support both paginated { items, nextCursor } and legacy array response
+      let items: StoryItem[]
+      let nextCursor: string | null = null
+
+      if (json.data && Array.isArray(json.data.items)) {
+        items = json.data.items
+        nextCursor = json.data.nextCursor ?? null
+      } else if (Array.isArray(json.data)) {
+        items = json.data
+        nextCursor = null
+      } else {
+        items = []
+      }
+
+      cursorRef.current = nextCursor
+      setHasMore(nextCursor !== null)
+
+      if (isFirstPage) {
+        setStories(items)
+      } else {
+        setStories(prev => {
+          const existingIds = new Set(prev.map(s => s.id))
+          const newItems = items.filter(s => !existingIds.has(s.id))
+          return [...prev, ...newItems]
+        })
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error')
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
   }, [])
 
   useEffect(() => { fetchStories() }, [fetchStories])
+
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore || !cursorRef.current) return
+    fetchStories(cursorRef.current)
+  }, [fetchStories, loadingMore, hasMore])
+
+  const refresh = useCallback(() => {
+    cursorRef.current = null
+    setHasMore(false)
+    fetchStories()
+  }, [fetchStories])
 
   const deleteStory = useCallback(async (id: string) => {
     const res = await fetch(`/api/v1/story/books/${id}`, { method: 'DELETE' })
@@ -95,11 +144,12 @@ export function useStoriesList() {
   return {
     stories: filtered,
     allStories: stories,
-    loading, error,
+    loading, loadingMore, error,
+    hasMore, loadMore,
     search, setSearch,
     sortBy, setSortBy,
     filterSeries, setFilterSeries,
     deleteStory, toggleShare, markComplete,
-    refresh: fetchStories,
+    refresh,
   }
 }

@@ -236,6 +236,9 @@ export async function POST(
       p_duration_seconds: null,
     })
 
+    // Mark book as having audio
+    await supabase.from('books').update({ has_audio: true }).eq('id', bookId)
+
     // Confirm credits
     await supabase.rpc('confirm_reserved_credits', {
       p_reservation_id: reservation.reservation_id,

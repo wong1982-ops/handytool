@@ -14,9 +14,11 @@ let _devClient: any = null
 
 function getDevClient() {
   if (_devClient) return _devClient
+  // Use service role key to bypass RLS (dev mode only — RPCs and direct queries both work)
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   _devClient = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    key,
   )
   return _devClient
 }

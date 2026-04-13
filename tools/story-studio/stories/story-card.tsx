@@ -14,7 +14,7 @@ interface StoryCardProps {
 }
 
 export function StoryCard({ story, onEdit, onDelete, onToggleShare, onMarkComplete }: StoryCardProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const dateStr = new Date(story.createdAt).toLocaleDateString(undefined, {
     month: 'short', day: 'numeric', year: 'numeric',
   })
@@ -38,6 +38,32 @@ export function StoryCard({ story, onEdit, onDelete, onToggleShare, onMarkComple
               <svg className="w-12 h-12 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
               </svg>
+            </div>
+          )}
+
+          {/* Audio / Illustration badges */}
+          {(story.hasAudio || story.hasIllustrations) && (
+            <div className="absolute top-2 right-2 flex items-center gap-1">
+              {story.hasIllustrations && (
+                <span
+                  className="flex items-center justify-center w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm"
+                  title={language === 'zh' ? '有插画' : 'Has illustrations'}
+                >
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
+                  </svg>
+                </span>
+              )}
+              {story.hasAudio && (
+                <span
+                  className="flex items-center justify-center w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm"
+                  title={language === 'zh' ? '有配音' : 'Has narration'}
+                >
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+                  </svg>
+                </span>
+              )}
             </div>
           )}
         </div>

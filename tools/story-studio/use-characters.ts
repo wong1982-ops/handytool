@@ -4,21 +4,25 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/lib/hooks/use-auth'
 
 export const ART_STYLES = [
-  { value: "children's book illustration", label: "Children's Book" },
-  { value: 'watercolor painting', label: 'Watercolor' },
-  { value: 'cartoon', label: 'Cartoon' },
-  { value: 'anime', label: 'Anime' },
-  { value: 'pixel art', label: 'Pixel Art' },
-  { value: 'oil painting', label: 'Oil Painting' },
-  { value: 'pencil sketch', label: 'Pencil Sketch' },
-  { value: 'comic book', label: 'Comic Book' },
-  { value: 'flat vector illustration', label: 'Flat Vector' },
-  { value: '3D render', label: '3D Render' },
-  { value: 'realistic digital art', label: 'Realistic' },
-  { value: 'pastel drawing', label: 'Pastel' },
-  { value: 'ink wash painting', label: 'Ink Wash' },
-  { value: 'storybook gouache', label: 'Gouache' },
+  { value: "children's book illustration", label: "Children's Book", labelZh: '绘本风' },
+  { value: 'watercolor painting', label: 'Watercolor', labelZh: '水彩' },
+  { value: 'cartoon', label: 'Cartoon', labelZh: '卡通' },
+  { value: 'anime', label: 'Anime', labelZh: '动漫' },
+  { value: 'pixel art', label: 'Pixel Art', labelZh: '像素' },
+  { value: 'oil painting', label: 'Oil Painting', labelZh: '油画' },
+  { value: 'pencil sketch', label: 'Pencil Sketch', labelZh: '铅笔素描' },
+  { value: 'comic book', label: 'Comic Book', labelZh: '漫画' },
+  { value: 'flat vector illustration', label: 'Flat Vector', labelZh: '扁平矢量' },
+  { value: '3D render', label: '3D Render', labelZh: '3D 渲染' },
+  { value: 'realistic digital art', label: 'Realistic', labelZh: '写实' },
+  { value: 'pastel drawing', label: 'Pastel', labelZh: '粉彩' },
+  { value: 'ink wash painting', label: 'Ink Wash', labelZh: '水墨' },
+  { value: 'storybook gouache', label: 'Gouache', labelZh: '水粉' },
 ] as const
+
+export function getArtStyleLabel(style: typeof ART_STYLES[number], lang: string) {
+  return lang === 'zh' ? style.labelZh : style.label
+}
 
 export interface CharacterPortrait {
   id: string

@@ -103,6 +103,9 @@ function StoriesContent() {
         onDelete={storiesList.deleteStory}
         onToggleShare={storiesList.toggleShare}
         onMarkComplete={storiesList.markComplete}
+        hasMore={storiesList.hasMore}
+        loadingMore={storiesList.loadingMore}
+        onLoadMore={storiesList.loadMore}
       />
     </div>
   )

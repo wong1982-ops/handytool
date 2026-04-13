@@ -34,6 +34,8 @@ export const en = {
     allSeries: 'All series',
     noStoriesSearch: 'No stories match your search.',
     noStoriesEmpty: 'No stories yet. Create your first story!',
+    loadMore: 'Load more',
+    loading: 'Loading...',
   },
 
   // Story card

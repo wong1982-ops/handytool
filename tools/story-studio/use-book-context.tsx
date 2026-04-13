@@ -39,7 +39,9 @@ export function BookProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch('/api/v1/story/books')
       if (!res.ok) return
       const { data } = await res.json()
-      setBooks(data ?? [])
+      // Support both paginated { items, nextCursor } and legacy array response
+      const list = Array.isArray(data) ? data : (data?.items ?? [])
+      setBooks(list)
     } catch {
       // silent
     } finally {
