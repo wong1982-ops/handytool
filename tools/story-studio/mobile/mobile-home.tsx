@@ -352,7 +352,12 @@ function HomeInner() {
             {storiesList.loading ? (
               <div className="grid grid-cols-2 gap-3 mt-2">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="aspect-[3/4] rounded-xl bg-slate-200 dark:bg-slate-800 animate-pulse" />
+                  <div key={i} className="aspect-[3/4] rounded-xl overflow-hidden relative bg-slate-100 dark:bg-slate-800 animate-pulse">
+                    {/* Title placeholder at bottom — matches cover card gradient overlay */}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-300/60 dark:from-slate-700/60 to-transparent px-2 pb-2 pt-6">
+                      <div className="h-3 w-3/4 rounded bg-slate-300 dark:bg-slate-600" />
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : storiesList.stories.length === 0 ? (
