@@ -14,10 +14,6 @@
       "schedule": "0 4 * * *"
     },
     {
-      "path": "/api/cron/process-jobs",
-      "schedule": "* * * * *"
-    },
-    {
       "path": "/api/cron/scrape-jobs/seek",
       "schedule": "0 19 * * *"
     },
@@ -48,10 +44,6 @@
     {
       "path": "/api/cron/archive-ai-news",
       "schedule": "0 20 * * 0"
-    },
-    {
-      "path": "/api/cron/vblog-worker",
-      "schedule": "* * * * *"
     },
     {
       "path": "/api/cron/scrape-flights",
