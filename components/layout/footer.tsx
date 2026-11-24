@@ -85,6 +85,29 @@ export function Footer({
         </div>
       </div>
 
+      <nav
+        aria-label="Friend links"
+        className="max-w-5xl mx-auto mt-3 flex flex-wrap justify-center md:justify-end items-center gap-x-4 gap-y-1 text-xs text-slate-500"
+      >
+        <span>Friends:</span>
+        <a
+          href="https://liangjiemei.com"
+          target="_blank"
+          rel="noopener"
+          className="hover:text-[var(--tk-color-primary-500)] transition-colors"
+        >
+          两姐妹绘本
+        </a>
+        <a
+          href="https://aitanyan.com"
+          target="_blank"
+          rel="noopener"
+          className="hover:text-[var(--tk-color-primary-500)] transition-colors"
+        >
+          AI调研员
+        </a>
+      </nav>
+
       <Script
         src="https://staticcdn.co.nz/embed/embed.js"
         strategy="lazyOnload"
